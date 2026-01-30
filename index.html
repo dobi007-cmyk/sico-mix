@@ -82,15 +82,13 @@
   <br><br>
 
   <input type="file" id="importFile" accept=".txt" onchange="handleImport(this)" hidden>
-  <button onclick="importRecipes()">Import TXT</button>
+  <button onclick="importRecipes()" data-i18n="importTxt">Import TXT</button>
 
   <p data-i18n="pasteText"></p>
   <textarea id="importText" rows="8" style="width:100%"></textarea>
   <br>
   <button onclick="importFromText()" data-i18n="importTextBtn"></button>
 </section>
-
-</main>
 
 <script src="js/data-colors.js"></script>
 <script src="js/i18n.js"></script>
