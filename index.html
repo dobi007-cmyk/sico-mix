@@ -1,60 +1,61 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SICO MIX</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SICO MIX</title>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
 
-<style>
-body{
-  margin:0;
-  font-family: Arial, sans-serif;
-  background:#f4f4f4;
-  color:#111;
-}
-header{
-  background:#ffffff;
-  padding:16px;
-  text-align:center;
-  font-size:22px;
-  font-weight:bold;
-}
-.card{
-  background:#ffffff;
-  margin:12px;
-  padding:16px;
-  border-radius:14px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
-button{
-  width:100%;
-  padding:12px;
-  font-size:16px;
-  background:#d81f26;
-  color:white;
-  border:none;
-  border-radius:10px;
-}
-</style>
+  <meta name="theme-color" content="#ffffff">
 </head>
-
 <body>
 
-<header>SICO MIX ÷</header>
+<header>
+  <h1>SICO MIX</h1>
+  <p>Manual Ink Mixing</p>
+</header>
 
-<div class="card">
-  <h3>Рецепти</h3>
-  <p>Ручне додавання, імпорт та експорт рецептів</p>
-  <button>Додати рецепт</button>
-</div>
+<nav>
+  <button onclick="showTab('colors')">Фарби</button>
+  <button onclick="showTab('recipes')">Рецепти</button>
+  <button onclick="showTab('new')">Новий</button>
+  <button onclick="showTab('import')">Імпорт</button>
+</nav>
 
-<div class="card">
-  <h3>База фарб</h3>
-  <p>EC / CF / PLUV / SX / SPTN / SN / AS / OTF</p>
-</div>
+<main>
+
+<section id="colors" class="tab active">
+  <h2>Каталог фарб</h2>
+  <div id="colorList"></div>
+</section>
+
+<section id="recipes" class="tab">
+  <h2>Змішані рецепти</h2>
+  <div id="recipeList"></div>
+</section>
+
+<section id="new" class="tab">
+  <h2>Новий рецепт</h2>
+
+  <input id="recipeName" placeholder="Назва рецепта">
+  <textarea id="recipeNote" placeholder="Примітка"></textarea>
+
+  <button onclick="saveRecipe()">Зберегти рецепт</button>
+</section>
+
+<section id="import" class="tab">
+  <h2>Імпорт рецепта</h2>
+  <textarea id="importText" placeholder="Встав текст рецепта тут"></textarea>
+  <button onclick="importRecipe()">Імпортувати</button>
+</section>
+
+</main>
+
+<script src="js/data-colors.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/app.js"></script>
 
 </body>
 </html>
