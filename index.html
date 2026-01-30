@@ -41,6 +41,19 @@
   <div id="recipeItems"></div>
 
   <button onclick="saveRecipe()">💾 Зберегти рецепт</button>
+  <hr>
+
+<h3>Калькулятор ваги</h3>
+
+<select id="totalWeight" onchange="calculateWeight()">
+  <option value="100">100 г</option>
+  <option value="500">500 г</option>
+  <option value="1000" selected>1 кг</option>
+  <option value="5000">5 кг</option>
+</select>
+
+<div id="weightResult"></div>
+
 </section>
 
 <!-- RECIPES -->
