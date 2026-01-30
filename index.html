@@ -53,7 +53,7 @@
 
   <hr>
 
-  <h3>Калькулятор ваги</h3>
+  <h3 data-i18n="weightCalc"></h3>
 
   <select id="totalWeight" onchange="calculateWeight()">
     <option value="100">100 г</option>
@@ -75,16 +75,16 @@
 <section id="import" class="tab">
   <h2 data-i18n="import"></h2>
 
-  <button onclick="exportRecipes()">Export TXT</button>
+  <button onclick="exportRecipes()" data-i18n="exportTxt"></button>
   <br><br>
 
   <input type="file" id="importFile" accept=".txt" onchange="handleImport(this)" hidden>
   <button onclick="importRecipes()">Import TXT</button>
 
-  <p>Або встав текст рецепта:</p>
+  <p data-i18n="pasteText"></p>
   <textarea id="importText" rows="8" style="width:100%"></textarea>
   <br>
-  <button onclick="importFromText()">Import Text</button>
+  <button onclick="importFromText()" data-i18n="importTextBtn"></button>
 </section>
 
 </main>
