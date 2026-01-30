@@ -6,24 +6,24 @@
 let currentRecipe = {
   name: "",
   note: "",
-  items: [] // {code, name, percent}
+  items: []
 };
 
 let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
 
-// ---- UI HELPERS ----
-function showTab(id) {
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-
-  if (id === "recipes") renderRecipes();
-}
-
+// ---- HELPERS ----
 function qs(id) {
   return document.getElementById(id);
 }
 
-// ---- COLORS LIST ----
+function showTab(id) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  qs(id).classList.add("active");
+
+  if (id === "recipes") renderRecipes();
+}
+
+// ---- COLORS ----
 function renderColors() {
   const list = qs("colorList");
   list.innerHTML = "";
@@ -43,7 +43,7 @@ function renderColors() {
   });
 }
 
-// ---- ADD COLOR TO RECIPE ----
+// ---- ADD COLOR ----
 function addColorToRecipe(code) {
   const color = COLORS.find(c => c.code === code);
   if (!color) return;
@@ -77,23 +77,25 @@ function renderCurrentRecipe() {
     `;
   });
 
-  html += <p><strong>Сума:</strong> ${total}%</p>;
+  html += `<p><strong>Сума:</strong> ${total}%</p>`;
 
   qs("recipeItems").innerHTML = html;
 }
 
-// ---- UPDATE / REMOVE ----
+// ---- UPDATE ----
 function updatePercent(index, value) {
   currentRecipe.items[index].percent = Number(value);
   renderCurrentRecipe();
+  calculateWeight();
 }
 
 function removeItem(index) {
   currentRecipe.items.splice(index, 1);
   renderCurrentRecipe();
+  calculateWeight();
 }
 
-// ---- SAVE RECIPE ----
+// ---- SAVE ----
 function saveRecipe() {
   const name = qs("recipeName").value.trim();
   const note = qs("recipeNote").value.trim();
@@ -109,19 +111,15 @@ function saveRecipe() {
     return;
   }
 
-  recipes.push({
-    name,
-    note,
-    items: currentRecipe.items
-  });
+  recipes.push({ name, note, items: currentRecipe.items });
 
   localStorage.setItem("sico_recipes", JSON.stringify(recipes));
 
-  // reset
   currentRecipe = { name: "", note: "", items: [] };
   qs("recipeName").value = "";
   qs("recipeNote").value = "";
   qs("recipeItems").innerHTML = "";
+  qs("weightResult").innerHTML = "";
 
   alert("Рецепт збережено");
   showTab("recipes");
@@ -149,38 +147,32 @@ function renderRecipes() {
   });
 }
 
-// ---- VIEW RECIPE ----
+// ---- VIEW ----
 function showRecipe(index) {
   const r = recipes[index];
-  let text = ${r.name}\n\n;
+  let text = `${r.name}\n\n`;
 
   r.items.forEach(i => {
-    text += ${i.code} – ${i.percent}%\n;
+    text += `${i.code} – ${i.percent}%\n`;
   });
 
   alert(text);
 }
 
-// ---- INIT ----
-renderColors();
-// ---- WEIGHT CALCULATOR ----
+// ---- WEIGHT ----
 function calculateWeight() {
-  const total = Number(document.getElementById("totalWeight").value);
+  const total = Number(qs("totalWeight").value);
   let html = "";
   let sum = 0;
 
   currentRecipe.items.forEach(i => sum += Number(i.percent));
 
   if (sum !== 100) {
-    document.getElementById("weightResult").innerHTML =
+    qs("weightResult").innerHTML =
       "<p style='color:red'>Сума повинна бути 100%</p>";
     return;
   }
 
   currentRecipe.items.forEach(i => {
     const grams = (total * i.percent / 100).toFixed(1);
-    html += `<div>${i.code}: <strong>${grams} г</strong></div>`;
-  });
-
-  document.getElementById("weightResult").innerHTML = html;
-}
+    html += `<div>${i.code}: <strong>${grams}
