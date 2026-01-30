@@ -1,71 +1,103 @@
-/* =========================
-   SICO MIX – Languages
-   ========================= */
-
-let LANG = localStorage.getItem("sico_lang") || "ua";
-
-const I18N = {
+const i18n = {
   ua: {
     paints: "Фарби",
     recipes: "Рецепти",
-    newRecipe: "Новий",
-    import: "Імпорт",
+    newRecipe: "Новий рецепт",
+    import: "Імпорт / Експорт",
+
     catalog: "Каталог фарб",
     mixed: "Змішані рецепти",
+
+    recipeName: "Назва рецепту",
+    recipeNote: "Нотатка",
+
     addRecipe: "Зберегти рецепт",
-    recipeName: "Назва рецепта",
-    recipeNote: "Примітка",
+
     noRecipes: "Немає рецептів",
-    importText: "Встав текст рецепта тут"
+
+    weightCalc: "Калькулятор ваги",
+
+    exportTxt: "Експорт TXT",
+    importTxt: "Імпорт TXT",
+    pasteText: "Або встав текст рецепта:",
+    importTextBtn: "Імпортувати текст"
   },
+
   pl: {
     paints: "Farby",
     recipes: "Receptury",
     newRecipe: "Nowy",
-    import: "Import",
+    import: "Import / Export",
+
     catalog: "Katalog farb",
     mixed: "Receptury mieszane",
-    addRecipe: "Zapisz recepturę",
+
     recipeName: "Nazwa receptury",
     recipeNote: "Notatka",
+
+    addRecipe: "Zapisz recepturę",
+
     noRecipes: "Brak receptur",
-    importText: "Wklej tekst receptury tutaj"
+
+    weightCalc: "Kalkulator wagi",
+
+    exportTxt: "Eksport TXT",
+    importTxt: "Import TXT",
+    pasteText: "Lub wklej tekst receptury:",
+    importTextBtn: "Importuj tekst"
   },
+
   en: {
     paints: "Paints",
     recipes: "Recipes",
-    newRecipe: "New",
-    import: "Import",
+    newRecipe: "New recipe",
+    import: "Import / Export",
+
     catalog: "Paint catalog",
     mixed: "Mixed recipes",
-    addRecipe: "Save recipe",
+
     recipeName: "Recipe name",
     recipeNote: "Note",
+
+    addRecipe: "Save recipe",
+
     noRecipes: "No recipes",
-    importText: "Paste recipe text here"
+
+    weightCalc: "Weight calculator",
+
+    exportTxt: "Export TXT",
+    importTxt: "Import TXT",
+    pasteText: "Or paste recipe text:",
+    importTextBtn: "Import text"
   }
 };
 
-function t(key) {
-  return I18N[LANG][key] || key;
-}
+let currentLang = "ua";
 
-function setLang(l) {
-  LANG = l;
-  localStorage.setItem("sico_lang", l);
-  applyLang();
-}
+function setLang(lang) {
+  currentLang = lang;
 
-function applyLang() {
+  // text
   document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    el.innerText = t(key);
+    const key = el.dataset.i18n;
+    if (i18n[lang][key]) {
+      el.textContent = i18n[lang][key];
+    }
   });
 
+  // placeholders
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-    const key = el.getAttribute("data-i18n-placeholder");
-    el.placeholder = t(key);
+    const key = el.dataset.i18nPlaceholder;
+    if (i18n[lang][key]) {
+      el.placeholder = i18n[lang][key];
+    }
   });
+
+  localStorage.setItem("sico_lang", lang);
 }
 
-document.addEventListener("DOMContentLoaded", applyLang);
+document.addEventListener("DOMContentLoaded", () => {
+  const savedLang = localStorage.getItem("sico_lang");
+  if (savedLang) currentLang = savedLang;
+  setLang(currentLang);
+});
