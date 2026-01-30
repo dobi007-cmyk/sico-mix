@@ -1,10 +1,11 @@
 {
   "name": "SICO MIX",
   "short_name": "SICO MIX",
-  "start_url": ".",
+  "description": "Manual mixing app for SICO screen printing inks",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "theme_color": "#111111",
   "icons": [
     {
       "src": "icons/icon-192.png",
