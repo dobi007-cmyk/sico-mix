@@ -20,7 +20,13 @@
   <button onclick="showTab('colors')">Фарби</button>
   <button onclick="showTab('new')">Новий рецепт</button>
   <button onclick="showTab('recipes')">Змішані</button>
+  <button onclick="exportRecipes()">Експорт</button>
+  <button onclick="importRecipes()">Імпорт</button>
+  <input type="file" id="importFile" accept=".txt"
+         style="display:none"
+         onchange="handleImport(this)">
 </nav>
+
 
 <main>
 
