@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <title>SICO MIX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="SICO MIX">
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="SICO MIX">
 
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/style.css">
@@ -16,64 +17,64 @@
 
 <header>
   <h1>SICO MIX</h1>
-  <p>Manual Ink Mixing</p>
+  <div>
+    <button onclick="setLang('ua')">UA</button>
+    <button onclick="setLang('pl')">PL</button>
+    <button onclick="setLang('en')">EN</button>
+  </div>
 </header>
 
 <nav>
-  <button onclick="showTab('colors')">Фарби</button>
-  <button onclick="showTab('new')">Новий рецепт</button>
-  <button onclick="showTab('recipes')">Змішані</button>
-  <button onclick="exportRecipes()">Експорт</button>
-  <button onclick="importRecipes()">Імпорт</button>
-  <input type="file" id="importFile" accept=".txt"
-         style="display:none"
-         onchange="handleImport(this)">
+  <button onclick="showTab('colors')" data-i18n="paints"></button>
+  <button onclick="showTab('recipes')" data-i18n="recipes"></button>
+  <button onclick="showTab('new')" data-i18n="newRecipe"></button>
+  <button onclick="showTab('import')" data-i18n="import"></button>
 </nav>
-
 
 <main>
 
 <!-- COLORS -->
 <section id="colors" class="tab active">
-  <h2>Каталог фарб</h2>
+  <h2 data-i18n="catalog"></h2>
   <div id="colorList"></div>
 </section>
 
 <!-- NEW RECIPE -->
 <section id="new" class="tab">
-  <h2>Новий рецепт</h2>
+  <h2 data-i18n="newRecipe"></h2>
 
-  <input id="recipeName" placeholder="Назва рецепта">
-  <textarea id="recipeNote" placeholder="Примітка"></textarea>
+  <input id="recipeName" data-i18n-placeholder="recipeName">
+  <input id="recipeNote" data-i18n-placeholder="recipeNote">
 
-  <h3>Фарби в рецепті</h3>
+  <h3 data-i18n="catalog"></h3>
   <div id="recipeItems"></div>
 
-  <button onclick="saveRecipe()">💾 Зберегти рецепт</button>
+  <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
+
   <hr>
 
-<h3>Калькулятор ваги</h3>
+  <h3>Калькулятор ваги</h3>
 
-<select id="totalWeight" onchange="calculateWeight()">
-  <option value="100">100 г</option>
-  <option value="500">500 г</option>
-  <option value="1000" selected>1 кг</option>
-  <option value="5000">5 кг</option>
-</select>
+  <select id="totalWeight" onchange="calculateWeight()">
+    <option value="100">100 г</option>
+    <option value="500">500 г</option>
+    <option value="1000" selected>1 кг</option>
+    <option value="5000">5 кг</option>
+  </select>
 
-<div id="weightResult"></div>
-
+  <div id="weightResult"></div>
 </section>
 
 <!-- RECIPES -->
 <section id="recipes" class="tab">
-  <h2>Змішані рецепти</h2>
+  <h2 data-i18n="mixed"></h2>
   <div id="recipeList"></div>
 </section>
 
 </main>
 
 <script src="js/data-colors.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/app.js"></script>
 
 </body>
