@@ -163,3 +163,24 @@ function showRecipe(index) {
 
 // ---- INIT ----
 renderColors();
+// ---- WEIGHT CALCULATOR ----
+function calculateWeight() {
+  const total = Number(document.getElementById("totalWeight").value);
+  let html = "";
+  let sum = 0;
+
+  currentRecipe.items.forEach(i => sum += Number(i.percent));
+
+  if (sum !== 100) {
+    document.getElementById("weightResult").innerHTML =
+      "<p style='color:red'>Сума повинна бути 100%</p>";
+    return;
+  }
+
+  currentRecipe.items.forEach(i => {
+    const grams = (total * i.percent / 100).toFixed(1);
+    html += `<div>${i.code}: <strong>${grams} г</strong></div>`;
+  });
+
+  document.getElementById("weightResult").innerHTML = html;
+}
