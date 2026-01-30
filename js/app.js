@@ -112,7 +112,11 @@ function renderRecipes() {
   list.innerHTML = "";
 
   if (!recipes.length) {
-    list.innerHTML = "<p>Немає рецептів</p>";
+    list.innerHTML = '<p data-i18n="noRecipes"></p>';
+    // Оновити текст з поточною мовою
+    if (typeof setLang === 'function') {
+      setLang(currentLang);
+    }
     return;
   }
 
@@ -173,6 +177,10 @@ function importFromText() {
   alert("Імпорт буде доданий на наступному кроці");
 }
 
+// ---- INIT ----
+document.addEventListener("DOMContentLoaded", () => {
+  renderColors();
+});
 // ---- INIT ----
 // ---- INIT ----
 document.addEventListener("DOMContentLoaded", () => {
