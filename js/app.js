@@ -71,7 +71,7 @@ function renderCurrentRecipe() {
     `;
   });
 
-  html += <p><strong>Сума:</strong> ${total}%</p>;
+  html += `<p><strong>Сума:</strong> ${total}%</p>`;
   qs("recipeItems").innerHTML = html;
 }
 
@@ -117,9 +117,9 @@ function renderRecipes() {
   }
 
   recipes.forEach(r => {
-    let html = <div class="card"><strong>${r.name}</strong><br>;
+    let html = `<div class="card"><strong>${r.name}</strong><br>`;
     r.items.forEach(i => {
-      html += ${i.code}: ${i.percent}%<br>;
+      html += `${i.code}: ${i.percent}%<br>`;
     });
     html += "</div>";
     list.innerHTML += html;
@@ -136,10 +136,10 @@ function calculateWeight() {
     return;
   }
 
-  let html = <h4>${total} г</h4>;
+  let html = `<h4>${total} г</h4>`;
   currentRecipe.items.forEach(i => {
     const g = (total * i.percent / 100).toFixed(1);
-    html += <div>${i.code}: <strong>${g} г</strong></div>;
+    html += `<div>${i.code}: <strong>${g} г</strong></div>`;
   });
 
   out.innerHTML = html;
@@ -151,9 +151,12 @@ function exportRecipes() {
 
   let text = "";
   recipes.forEach(r => {
-    text += RECIPE\nNAME:${r.name}\nNOTE:${r.note}\n;
+    text += `RECIPE
+NAME:${r.name}
+NOTE:${r.note}
+`;
     r.items.forEach(i => {
-      text += ${i.code}=${i.percent}\n;
+      text += `${i.code}=${i.percent}\n`;
     });
     text += "END\n\n";
   });
@@ -165,13 +168,10 @@ function exportRecipes() {
   a.click();
 }
 
+// ---- IMPORT (поки без парсингу) ----
+function importFromText() {
+  alert("Імпорт буде доданий на наступному кроці");
+}
+
 // ---- INIT ----
 renderColors();
-// ---- IMPORT FROM TEXT ----
-function importFromText() {
-  const text = document.getElementById("importText").value.trim();
-  if (!text) return;
-
-  parseImportedText(text);
-  document.getElementById("importText").value = "";
-}
