@@ -94,6 +94,11 @@ function setLang(lang) {
   });
 
   localStorage.setItem("sico_lang", lang);
+  
+  // ДОДАНО: перемалювати список рецептів, якщо функція існує
+  if (typeof renderRecipes === 'function') {
+    renderRecipes();
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
