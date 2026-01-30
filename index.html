@@ -29,7 +29,6 @@
   <button onclick="showTab('recipes')" data-i18n="recipes"></button>
   <button onclick="showTab('new')" data-i18n="newRecipe"></button>
   <button onclick="showTab('import')" data-i18n="import"></button>
-  <button onclick="exportRecipes('export')">Export</button>
 </nav>
 
 <main>
@@ -71,14 +70,15 @@
   <h2 data-i18n="mixed"></h2>
   <div id="recipeList"></div>
 </section>
+
+<!-- IMPORT / EXPORT -->
 <section id="import" class="tab">
-  <h2>Import / Export</h2>
+  <h2 data-i18n="import"></h2>
 
   <button onclick="exportRecipes()">Export TXT</button>
   <br><br>
 
   <input type="file" id="importFile" accept=".txt" onchange="handleImport(this)" hidden>
-
   <button onclick="importRecipes()">Import TXT</button>
 
   <p>Або встав текст рецепта:</p>
@@ -86,7 +86,7 @@
   <br>
   <button onclick="importFromText()">Import Text</button>
 </section>
-  
+
 </main>
 
 <script src="js/data-colors.js"></script>
