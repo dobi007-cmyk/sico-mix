@@ -66,7 +66,10 @@ main {
 }
 
 /* ---- Colors list ---- */
-.color {
+..color > div {
+  line-height: 1.2;
+}
+ {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
