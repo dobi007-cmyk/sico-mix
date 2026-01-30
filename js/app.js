@@ -19,7 +19,6 @@ function qs(id) {
 function showTab(id) {
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   qs(id).classList.add("active");
-
   if (id === "recipes") renderRecipes();
 }
 
@@ -33,7 +32,7 @@ function renderColors() {
     div.className = "color";
     div.innerHTML = `
       <div class="swatch" style="background:${c.hex}"></div>
-      <div style="flex:1">
+      <div>
         <strong>${c.code}</strong><br>
         <small>${c.name}</small>
       </div>
@@ -43,14 +42,12 @@ function renderColors() {
   });
 }
 
-// ---- ADD COLOR ----
 function addColorToRecipe(code) {
   const color = COLORS.find(c => c.code === code);
   if (!color) return;
 
   currentRecipe.items.push({
     code: color.code,
-    name: color.name,
     percent: 0
   });
 
@@ -62,37 +59,30 @@ function renderCurrentRecipe() {
   let html = "";
   let total = 0;
 
-  currentRecipe.items.forEach((item, i) => {
-    total += Number(item.percent);
-
+  currentRecipe.items.forEach((i, idx) => {
+    total += Number(i.percent);
     html += `
-      <div style="margin-bottom:8px">
-        <strong>${item.code}</strong>
-        <input type="number" min="0" max="100"
-          value="${item.percent}"
-          style="width:70px;margin-left:10px"
-          onchange="updatePercent(${i}, this.value)"> %
-        <button onclick="removeItem(${i})">✕</button>
+      <div>
+        <strong>${i.code}</strong>
+        <input type="number" value="${i.percent}" min="0" max="100"
+          onchange="updatePercent(${idx}, this.value)"> %
+        <button onclick="removeItem(${idx})">✕</button>
       </div>
     `;
   });
 
-  html += `<p><strong>Сума:</strong> ${total}%</p>`;
-
+  html += <p><strong>Сума:</strong> ${total}%</p>;
   qs("recipeItems").innerHTML = html;
 }
 
-// ---- UPDATE ----
-function updatePercent(index, value) {
-  currentRecipe.items[index].percent = Number(value);
+function updatePercent(i, val) {
+  currentRecipe.items[i].percent = Number(val);
   renderCurrentRecipe();
-  calculateWeight();
 }
 
-function removeItem(index) {
-  currentRecipe.items.splice(index, 1);
+function removeItem(i) {
+  currentRecipe.items.splice(i, 1);
   renderCurrentRecipe();
-  calculateWeight();
 }
 
 // ---- SAVE ----
@@ -100,28 +90,19 @@ function saveRecipe() {
   const name = qs("recipeName").value.trim();
   const note = qs("recipeNote").value.trim();
 
-  if (!name) {
-    alert("Введи назву рецепта");
-    return;
-  }
+  if (!name) return alert("Введи назву рецепта");
 
   const total = currentRecipe.items.reduce((s, i) => s + Number(i.percent), 0);
-  if (total !== 100) {
-    alert("Сума має бути 100%");
-    return;
-  }
+  if (total !== 100) return alert("Сума має бути 100%");
 
   recipes.push({ name, note, items: currentRecipe.items });
-
   localStorage.setItem("sico_recipes", JSON.stringify(recipes));
 
   currentRecipe = { name: "", note: "", items: [] };
   qs("recipeName").value = "";
   qs("recipeNote").value = "";
   qs("recipeItems").innerHTML = "";
-  qs("weightResult").innerHTML = "";
 
-  alert("Рецепт збережено");
   showTab("recipes");
 }
 
@@ -130,120 +111,59 @@ function renderRecipes() {
   const list = qs("recipeList");
   list.innerHTML = "";
 
-  if (recipes.length === 0) {
+  if (!recipes.length) {
     list.innerHTML = "<p>Немає рецептів</p>";
     return;
   }
 
-  recipes.forEach((r, i) => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <strong>${r.name}</strong><br>
-      <small>${r.note || ""}</small><br>
-      <button onclick="showRecipe(${i})">Відкрити</button>
-    `;
-    list.appendChild(div);
+  recipes.forEach(r => {
+    let html = <div class="card"><strong>${r.name}</strong><br>;
+    r.items.forEach(i => {
+      html += ${i.code}: ${i.percent}%<br>;
+    });
+    html += "</div>";
+    list.innerHTML += html;
   });
 }
 
-// ---- VIEW ----
-function showRecipe(index) {
-  const r = recipes[index];
-  let text = `${r.name}\n\n`;
-
-  r.items.forEach(i => {
-    text += `${i.code} – ${i.percent}%\n`;
-  });
-
-  alert(text);
-}
-
-// ---- WEIGHT ----
+// ---- WEIGHT CALCULATOR ----
 function calculateWeight() {
   const total = Number(qs("totalWeight").value);
-  let html = "";
-  let sum = 0;
+  const out = qs("weightResult");
 
-  currentRecipe.items.forEach(i => sum += Number(i.percent));
-
-  if (sum !== 100) {
-    qs("weightResult").innerHTML =
-      "<p style='color:red'>Сума повинна бути 100%</p>";
+  if (!currentRecipe.items.length) {
+    out.innerHTML = "<p>Немає фарб у рецепті</p>";
     return;
   }
 
+  let html = <h4>${total} г</h4>;
   currentRecipe.items.forEach(i => {
-    const grams = (total * i.percent / 100).toFixed(1);
-    html += `<div>${i.code}: <strong>${grams}
+    const g = (total * i.percent / 100).toFixed(1);
+    html += <div>${i.code}: <strong>${g} г</strong></div>;
+  });
+
+  out.innerHTML = html;
+}
+
 // ---- EXPORT ----
 function exportRecipes() {
-  if (recipes.length === 0) {
-    alert("Немає рецептів для експорту");
-    return;
-  }
+  if (!recipes.length) return alert("Немає рецептів");
 
   let text = "";
-
   recipes.forEach(r => {
-    text += "RECIPE\n";
-    text += `NAME: ${r.name}\n`;
-    text += `NOTE: ${r.note || ""}\n`;
+    text += RECIPE\nNAME:${r.name}\nNOTE:${r.note}\n;
     r.items.forEach(i => {
-      text += `${i.code}=${i.percent}\n`;
+      text += ${i.code}=${i.percent}\n;
     });
     text += "END\n\n";
   });
 
   const blob = new Blob([text], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-
   const a = document.createElement("a");
-  a.href = url;
+  a.href = URL.createObjectURL(blob);
   a.download = "sico_recipes.txt";
   a.click();
-
-  URL.revokeObjectURL(url);
 }
 
-// ---- IMPORT ----
-function importRecipes() {
-  document.getElementById("importFile").click();
-}
-
-function handleImport(input) {
-  const file = input.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = e => parseImportedText(e.target.result);
-  reader.readAsText(file);
-}
-
-function parseImportedText(text) {
-  const blocks = text.split("RECIPE").map(b => b.trim()).filter(Boolean);
-
-  blocks.forEach(block => {
-    const lines = block.split("\n");
-    let name = "";
-    let note = "";
-    let items = [];
-
-    lines.forEach(l => {
-      if (l.startsWith("NAME:")) name = l.replace("NAME:", "").trim();
-      else if (l.startsWith("NOTE:")) note = l.replace("NOTE:", "").trim();
-      else if (l.includes("=")) {
-        const [code, percent] = l.split("=");
-        items.push({ code: code.trim(), percent: Number(percent) });
-      }
-    });
-
-    if (name && items.length) {
-      recipes.push({ name, note, items });
-    }
-  });
-
-  localStorage.setItem("sico_recipes", JSON.stringify(recipes));
-  alert("Імпорт завершено");
-  showTab("recipes");
-}
+// ---- INIT ----
+renderColors();
