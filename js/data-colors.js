@@ -71,4 +71,5 @@ const COLORS = [
   { code: "EC140", name: "Fluorescent Yellow", hex: "#f7ff00" },
   { code: "EC141", name: "Fluorescent Orange", hex: "#ff9f00" },
   { code: "EC142", name: "Fluorescent Red", hex: "#ff0033" },
-  { code: "EC143", name: "Fluorescent Pink", hex: "#ff2fa8" 
+  { code: "EC143", name: "Fluorescent Pink", hex: "#ff2fa8" }
+];
