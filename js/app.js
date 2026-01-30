@@ -167,3 +167,11 @@ function exportRecipes() {
 
 // ---- INIT ----
 renderColors();
+// ---- IMPORT FROM TEXT ----
+function importFromText() {
+  const text = document.getElementById("importText").value.trim();
+  if (!text) return;
+
+  parseImportedText(text);
+  document.getElementById("importText").value = "";
+}
