@@ -174,4 +174,8 @@ function importFromText() {
 }
 
 // ---- INIT ----
-renderColors();
+// ---- INIT ----
+document.addEventListener("DOMContentLoaded", () => {
+  renderColors();
+});
+
