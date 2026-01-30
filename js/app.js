@@ -176,3 +176,74 @@ function calculateWeight() {
   currentRecipe.items.forEach(i => {
     const grams = (total * i.percent / 100).toFixed(1);
     html += `<div>${i.code}: <strong>${grams}
+// ---- EXPORT ----
+function exportRecipes() {
+  if (recipes.length === 0) {
+    alert("Немає рецептів для експорту");
+    return;
+  }
+
+  let text = "";
+
+  recipes.forEach(r => {
+    text += "RECIPE\n";
+    text += `NAME: ${r.name}\n`;
+    text += `NOTE: ${r.note || ""}\n`;
+    r.items.forEach(i => {
+      text += `${i.code}=${i.percent}\n`;
+    });
+    text += "END\n\n";
+  });
+
+  const blob = new Blob([text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "sico_recipes.txt";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+// ---- IMPORT ----
+function importRecipes() {
+  document.getElementById("importFile").click();
+}
+
+function handleImport(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => parseImportedText(e.target.result);
+  reader.readAsText(file);
+}
+
+function parseImportedText(text) {
+  const blocks = text.split("RECIPE").map(b => b.trim()).filter(Boolean);
+
+  blocks.forEach(block => {
+    const lines = block.split("\n");
+    let name = "";
+    let note = "";
+    let items = [];
+
+    lines.forEach(l => {
+      if (l.startsWith("NAME:")) name = l.replace("NAME:", "").trim();
+      else if (l.startsWith("NOTE:")) note = l.replace("NOTE:", "").trim();
+      else if (l.includes("=")) {
+        const [code, percent] = l.split("=");
+        items.push({ code: code.trim(), percent: Number(percent) });
+      }
+    });
+
+    if (name && items.length) {
+      recipes.push({ name, note, items });
+    }
+  });
+
+  localStorage.setItem("sico_recipes", JSON.stringify(recipes));
+  alert("Імпорт завершено");
+  showTab("recipes");
+}
