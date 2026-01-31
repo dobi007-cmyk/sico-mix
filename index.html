@@ -47,9 +47,16 @@
   <input id="recipeNote" data-i18n-placeholder="recipeNote">
 
   <h3 data-i18n="catalog"></h3>
-  <div id="recipeItems"></div>
 
-  <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
+  <div id="recipeItems">
+  <!-- тут будуть компоненти рецепта -->
+  </div>
+
+  <button type="button" onclick="addRecipeItem()">➕ Додати фарбу</button>
+
+  <br><br>
+
+  <button type="button" onclick="saveRecipe()" data-i18n="addRecipe"></button>
 
   <hr>
 
