@@ -16,13 +16,15 @@ function qs(id) {
   return document.getElementById(id);
 }
 
+// ---- TABS ----
 function showTab(id) {
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   qs(id).classList.add("active");
+
   if (id === "recipes") renderRecipes();
 }
 
-// ---- COLORS ----
+// ---- COLORS CATALOG ----
 function renderColors() {
   const list = qs("colorList");
   list.innerHTML = "";
@@ -36,18 +38,17 @@ function renderColors() {
         <strong>${c.code}</strong><br>
         <small>${c.name}</small>
       </div>
-      <button onclick="addColorToRecipe('${c.code}')">+</button>
+      <button onclick="addColorToRecipe('${c.code}')">➕</button>
     `;
     list.appendChild(div);
   });
 }
 
 function addColorToRecipe(code) {
-  const color = COLORS.find(c => c.code === code);
-  if (!color) return;
+  if (currentRecipe.items.find(i => i.code === code)) return;
 
   currentRecipe.items.push({
-    code: color.code,
+    code,
     percent: 0
   });
 
@@ -56,46 +57,66 @@ function addColorToRecipe(code) {
 
 // ---- CURRENT RECIPE ----
 function renderCurrentRecipe() {
-  let html = "";
+  const box = qs("recipeItems");
   let total = 0;
 
-  currentRecipe.items.forEach((i, idx) => {
-    total += Number(i.percent);
-    html += `
-      <div>
-        <strong>${i.code}</strong>
-        <input type="number" value="${i.percent}" min="0" max="100"
-          onchange="updatePercent(${idx}, this.value)"> %
-        <button onclick="removeItem(${idx})">✕</button>
-      </div>
+  if (!currentRecipe.items.length) {
+    box.innerHTML = `<p>${t("noColors")}</p>`;
+    return;
+  }
+
+  box.innerHTML = "";
+
+  currentRecipe.items.forEach((item, idx) => {
+    total += Number(item.percent);
+
+    const row = document.createElement("div");
+    row.innerHTML = `
+      <strong>${item.code}</strong>
+      <input type="number" min="0" max="100" value="${item.percent}"
+        onchange="updatePercent(${idx}, this.value)"> %
+      <button onclick="removeItem(${idx})">❌</button>
     `;
+    box.appendChild(row);
   });
 
-  html += `<p><strong>Сума:</strong> ${total}%</p>`;
-  qs("recipeItems").innerHTML = html;
+  const sum = document.createElement("p");
+  sum.innerHTML = `<strong>${t("sum")}:</strong> ${total}%`;
+  box.appendChild(sum);
 }
 
-function updatePercent(i, val) {
-  currentRecipe.items[i].percent = Number(val);
+function updatePercent(index, value) {
+  currentRecipe.items[index].percent = Number(value);
   renderCurrentRecipe();
 }
 
-function removeItem(i) {
-  currentRecipe.items.splice(i, 1);
+function removeItem(index) {
+  currentRecipe.items.splice(index, 1);
   renderCurrentRecipe();
 }
 
-// ---- SAVE ----
+// ---- SAVE RECIPE ----
 function saveRecipe() {
   const name = qs("recipeName").value.trim();
   const note = qs("recipeNote").value.trim();
 
-  if (!name) return alert("Введи назву рецепта");
+  if (!name) {
+    alert(t("errorName"));
+    return;
+  }
 
   const total = currentRecipe.items.reduce((s, i) => s + Number(i.percent), 0);
-  if (total !== 100) return alert("Сума має бути 100%");
+  if (total !== 100) {
+    alert(t("errorPercent"));
+    return;
+  }
 
-  recipes.push({ name, note, items: currentRecipe.items });
+  recipes.push({
+    name,
+    note,
+    items: currentRecipe.items
+  });
+
   localStorage.setItem("sico_recipes", JSON.stringify(recipes));
 
   currentRecipe = { name: "", note: "", items: [] };
@@ -112,21 +133,23 @@ function renderRecipes() {
   list.innerHTML = "";
 
   if (!recipes.length) {
-    list.innerHTML = '<p data-i18n="noRecipes"></p>';
-    // Оновити текст з поточною мовою
-    if (typeof setLang === 'function') {
-      setLang(currentLang);
-    }
+    list.innerHTML = `<p>${t("noRecipes")}</p>`;
     return;
   }
 
   recipes.forEach(r => {
-    let html = `<div class="card"><strong>${r.name}</strong><br>`;
+    const card = document.createElement("div");
+    card.className = "card";
+
+    let html = `<strong>${r.name}</strong><br>`;
+    if (r.note) html += `<em>${r.note}</em><br><br>`;
+
     r.items.forEach(i => {
       html += `${i.code}: ${i.percent}%<br>`;
     });
-    html += "</div>";
-    list.innerHTML += html;
+
+    card.innerHTML = html;
+    list.appendChild(card);
   });
 }
 
@@ -136,14 +159,14 @@ function calculateWeight() {
   const out = qs("weightResult");
 
   if (!currentRecipe.items.length) {
-    out.innerHTML = "<p>Немає фарб у рецепті</p>";
+    out.innerHTML = `<p>${t("noColors")}</p>`;
     return;
   }
 
-  let html = `<h4>${total} г</h4>`;
+  let html = `<h4>${total} ${t("grams")}</h4>`;
   currentRecipe.items.forEach(i => {
     const g = (total * i.percent / 100).toFixed(1);
-    html += `<div>${i.code}: <strong>${g} г</strong></div>`;
+    html += `<div>${i.code}: <strong>${g} ${t("grams")}</strong></div>`;
   });
 
   out.innerHTML = html;
@@ -151,14 +174,14 @@ function calculateWeight() {
 
 // ---- EXPORT ----
 function exportRecipes() {
-  if (!recipes.length) return alert("Немає рецептів");
+  if (!recipes.length) {
+    alert(t("noData"));
+    return;
+  }
 
   let text = "";
   recipes.forEach(r => {
-    text += `RECIPE
-NAME:${r.name}
-NOTE:${r.note}
-`;
+    text += `RECIPE\nNAME:${r.name}\nNOTE:${r.note || ""}\n`;
     r.items.forEach(i => {
       text += `${i.code}=${i.percent}\n`;
     });
@@ -172,17 +195,39 @@ NOTE:${r.note}
   a.click();
 }
 
-// ---- IMPORT (поки без парсингу) ----
+// ---- IMPORT (TEXTAREA) ----
 function importFromText() {
-  alert("Імпорт буде доданий на наступному кроці");
+  const text = qs("importText").value.trim();
+  if (!text) return;
+
+  const blocks = text.split("RECIPE").map(b => b.trim()).filter(Boolean);
+
+  blocks.forEach(block => {
+    const lines = block.split("\n");
+    let name = "";
+    let note = "";
+    let items = [];
+
+    lines.forEach(l => {
+      if (l.startsWith("NAME:")) name = l.replace("NAME:", "").trim();
+      else if (l.startsWith("NOTE:")) note = l.replace("NOTE:", "").trim();
+      else if (l.includes("=")) {
+        const [code, percent] = l.split("=");
+        items.push({ code: code.trim(), percent: Number(percent) });
+      }
+    });
+
+    if (name && items.length) {
+      recipes.push({ name, note, items });
+    }
+  });
+
+  localStorage.setItem("sico_recipes", JSON.stringify(recipes));
+  qs("importText").value = "";
+  showTab("recipes");
 }
 
 // ---- INIT ----
 document.addEventListener("DOMContentLoaded", () => {
   renderColors();
-});
-// ---- INIT ----
-// ---- INIT ----
-document.addEventListener("DOMContentLoaded", () => {
-  renderColors();
-});
+});});
