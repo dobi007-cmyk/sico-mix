@@ -1,7 +1,18 @@
-let currentRecipe = { items: [] };
-let currentRecipeSeries = null;
+/* =========================
+   SICO MIX – App Logic
+   ========================= */
+
+// ---- STATE ----
+let currentRecipe = {
+  name: "",
+  note: "",
+  items: []
+};
+
+let currentSeries = null; // ⬅️ ДОДАНО
 let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
 
+// ---- HELPERS ----
 function qs(id) {
   return document.getElementById(id);
 }
@@ -12,91 +23,179 @@ function showTab(id) {
   if (id === "recipes") renderRecipes();
 }
 
-function renderSeriesFilter() {
-  const s = qs("seriesFilter");
-  s.innerHTML = `<option value="">Всі серії</option>`;
-  SERIES.forEach(x => {
-    s.innerHTML += `<option value="${x}">${x}</option>`;
-  });
+// ---- SERIES FILTER ----
+function applySeriesFilter() {
+  renderColors();
 }
 
+// ---- COLORS ----
 function renderColors() {
   const list = qs("colorList");
   list.innerHTML = "";
 
-  const filter = qs("seriesFilter").value;
+  const selected = qs("seriesFilter")?.value || "ALL";
 
-  COLORS.filter(c => !filter || c.series === filter)
+  COLORS
+    .filter(c => selected === "ALL" || c.series === selected)
     .forEach(c => {
       const div = document.createElement("div");
       div.className = "color";
       div.innerHTML = `
         <div class="swatch" style="background:${c.hex}"></div>
-        <strong>${c.code}</strong>
-        <button onclick="addColor('${c.code}')">+</button>
+        <div>
+          <strong>${c.code}</strong><br>
+          <small>${c.name[currentLang]}</small>
+        </div>
+        <button type="button" onclick="addColorToRecipe('${c.code}')">+</button>
       `;
       list.appendChild(div);
     });
 }
 
-function addColor(code) {
-  const c = COLORS.find(x => x.code === code);
+function addColorToRecipe(code) {
+  const color = COLORS.find(c => c.code === code);
+  if (!color) return;
 
-  if (!currentRecipeSeries) {
-    currentRecipeSeries = c.series;
-  }
-
-  if (c.series !== currentRecipeSeries) {
-    alert("❌ Мішати можна тільки в межах однієї серії!");
+  // ❗ ПЕРЕВІРКА СЕРІЇ
+  if (!currentSeries) {
+    currentSeries = color.series;
+  } else if (currentSeries !== color.series) {
+    alert("❌ Можна змішувати лише фарби однієї серії");
     return;
   }
 
-  currentRecipe.items.push({ code, percent: 0 });
-  renderRecipe();
+  currentRecipe.items.push({
+    code: color.code,
+    percent: 0
+  });
+
+  renderCurrentRecipe();
 }
 
-function renderRecipe() {
-  let html = `<p><b>Серія:</b> ${currentRecipeSeries}</p>`;
+// ---- CURRENT RECIPE ----
+function renderCurrentRecipe() {
+  let html = "";
+  let total = 0;
+
   currentRecipe.items.forEach((i, idx) => {
+    total += Number(i.percent);
     html += `
-      <div>
-        ${i.code}
-        <input type="number" value="${i.percent}" onchange="update(${idx},this.value)"> %
-        <button onclick="removeItem(${idx})">✕</button>
+      <div class="recipe-item">
+        <strong>${i.code}</strong>
+        <input type="number"
+               min="0"
+               max="100"
+               value="${i.percent}"
+               onchange="updatePercent(${idx}, this.value)"> %
+        <button type="button" onclick="removeItem(${idx})">✕</button>
       </div>
     `;
   });
+
+  html += `<p><strong>${t("sum")}:</strong> ${total}%</p>`;
   qs("recipeItems").innerHTML = html;
 }
 
-function update(i, v) {
-  currentRecipe.items[i].percent = Number(v);
+function updatePercent(i, val) {
+  currentRecipe.items[i].percent = Number(val);
+  renderCurrentRecipe();
 }
 
 function removeItem(i) {
   currentRecipe.items.splice(i, 1);
-  if (!currentRecipe.items.length) currentRecipeSeries = null;
-  renderRecipe();
+  if (currentRecipe.items.length === 0) {
+    currentSeries = null; // ⬅️ СКИДАЄМО СЕРІЮ
+  }
+  renderCurrentRecipe();
 }
 
+// ---- SAVE ----
 function saveRecipe() {
+  const name = qs("recipeName").value.trim();
+  const note = qs("recipeNote").value.trim();
+
+  if (!name) {
+    alert(t("errorName"));
+    return;
+  }
+
+  const total = currentRecipe.items.reduce((s, i) => s + Number(i.percent), 0);
+  if (total !== 100) {
+    alert(t("errorPercent"));
+    return;
+  }
+
   recipes.push({
-    series: currentRecipeSeries,
+    name,
+    note,
+    series: currentSeries,
     items: currentRecipe.items
   });
+
   localStorage.setItem("sico_recipes", JSON.stringify(recipes));
-  currentRecipe = { items: [] };
-  currentRecipeSeries = null;
-  renderRecipe();
+
+  currentRecipe = { name: "", note: "", items: [] };
+  currentSeries = null;
+
+  qs("recipeName").value = "";
+  qs("recipeNote").value = "";
+  qs("recipeItems").innerHTML = "";
+
+  showTab("recipes");
 }
 
+// ---- RECIPES LIST ----
 function renderRecipes() {
-  qs("recipeList").innerHTML = recipes.map(r =>
-    `<div><b>${r.series}</b><br>${r.items.map(i => i.code).join(", ")}</div>`
-  ).join("");
+  const list = qs("recipeList");
+  list.innerHTML = "";
+
+  if (!recipes.length) {
+    list.innerHTML = `<p data-i18n="noRecipes"></p>`;
+    setLang(currentLang);
+    return;
+  }
+
+  recipes.forEach(r => {
+    let html = `<div class="card">
+      <strong>${r.name}</strong><br>
+      <small>Серія: ${r.series}</small><br>`;
+    r.items.forEach(i => {
+      html += `${i.code}: ${i.percent}%<br>`;
+    });
+    html += "</div>";
+    list.innerHTML += html;
+  });
 }
 
+// ---- WEIGHT CALCULATOR ----
+function calculateWeight() {
+  const total = Number(qs("totalWeight").value);
+  const out = qs("weightResult");
+
+  if (!currentRecipe.items.length) {
+    out.innerHTML = `<p>${t("noColors")}</p>`;
+    return;
+  }
+
+  let html = `<h4>${total} ${t("grams")}</h4>`;
+  currentRecipe.items.forEach(i => {
+    const g = (total * i.percent / 100).toFixed(1);
+    html += `<div>${i.code}: <strong>${g} ${t("grams")}</strong></div>`;
+  });
+
+  out.innerHTML = html;
+}
+
+// ---- INIT ----
 document.addEventListener("DOMContentLoaded", () => {
-  renderSeriesFilter();
+  // заповнити фільтр серій
+  const select = qs("seriesFilter");
+  SERIES.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.id;
+    opt.textContent = s.name;
+    select.appendChild(opt);
+  });
+
   renderColors();
-});document.addEventListener("DOMContentLoaded",renderColors);
+});});document.addEventListener("DOMContentLoaded",renderColors);
