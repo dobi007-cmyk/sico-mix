@@ -43,4 +43,4 @@ SERIES.forEach(series => {
       hex: color.hex
     });
   });
-});
+});});
