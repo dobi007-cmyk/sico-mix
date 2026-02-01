@@ -52,6 +52,12 @@
 <!-- COLORS -->
 <section id="colors" class="tab active">
   <h2 data-i18n="catalog"></h2>
+  <div style="margin-bottom:10px;">
+  <label data-i18n="filterSeries"></label>
+  <select id="seriesFilter" onchange="applySeriesFilter()">
+    <option value="ALL" data-i18n="allSeries"></option>
+  </select>
+  </div>
   <div id="colorList"></div>
 </section>
 
