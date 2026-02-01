@@ -36,7 +36,7 @@ function renderColors() {
         <strong>${c.code}</strong><br>
         <small>${c.name}</small>
       </div>
-      <button onclick="addColorToRecipe('${c.code}')">+</button>
+      <button type="button" onclick="addColorToRecipe('${c.code}')">+</button>
     `;
     list.appendChild(div);
   });
@@ -62,11 +62,14 @@ function renderCurrentRecipe() {
   currentRecipe.items.forEach((i, idx) => {
     total += Number(i.percent);
     html += `
-      <div>
+      <div class="recipe-item">
         <strong>${i.code}</strong>
-        <input type="number" value="${i.percent}" min="0" max="100"
-          onchange="updatePercent(${idx}, this.value)"> %
-        <button onclick="removeItem(${idx})">✕</button>
+        <input type="number"
+               min="0"
+               max="100"
+               value="${i.percent}"
+               onchange="updatePercent(${idx}, this.value)"> %
+        <button type="button" onclick="removeItem(${idx})">✕</button>
       </div>
     `;
   });
@@ -90,12 +93,23 @@ function saveRecipe() {
   const name = qs("recipeName").value.trim();
   const note = qs("recipeNote").value.trim();
 
-  if (!name) return alert("Введи назву рецепта");
+  if (!name) {
+    alert("Введи назву рецепта");
+    return;
+  }
 
   const total = currentRecipe.items.reduce((s, i) => s + Number(i.percent), 0);
-  if (total !== 100) return alert("Сума має бути 100%");
+  if (total !== 100) {
+    alert("Сума має бути 100%");
+    return;
+  }
 
-  recipes.push({ name, note, items: currentRecipe.items });
+  recipes.push({
+    name,
+    note,
+    items: currentRecipe.items
+  });
+
   localStorage.setItem("sico_recipes", JSON.stringify(recipes));
 
   currentRecipe = { name: "", note: "", items: [] };
@@ -112,9 +126,8 @@ function renderRecipes() {
   list.innerHTML = "";
 
   if (!recipes.length) {
-    list.innerHTML = '<p data-i18n="noRecipes"></p>';
-    // Оновити текст з поточною мовою
-    if (typeof setLang === 'function') {
+    list.innerHTML = `<p data-i18n="noRecipes"></p>`;
+    if (typeof setLang === "function") {
       setLang(currentLang);
     }
     return;
@@ -151,7 +164,10 @@ function calculateWeight() {
 
 // ---- EXPORT ----
 function exportRecipes() {
-  if (!recipes.length) return alert("Немає рецептів");
+  if (!recipes.length) {
+    alert("Немає рецептів");
+    return;
+  }
 
   let text = "";
   recipes.forEach(r => {
@@ -177,11 +193,6 @@ function importFromText() {
   alert("Імпорт буде доданий на наступному кроці");
 }
 
-// ---- INIT ----
-document.addEventListener("DOMContentLoaded", () => {
-  renderColors();
-});
-// ---- INIT ----
 // ---- INIT ----
 document.addEventListener("DOMContentLoaded", () => {
   renderColors();
