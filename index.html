@@ -3,20 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <title>SICO MIX</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- MOBILE / PWA -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="SICO MIX">
 
+  <!-- ICONS -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!-- MANIFEST -->
   <link rel="manifest" href="manifest.json">
+
+  <!-- STYLES -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-<header>
-  <h1>SICO MIX</h1>
+<header style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+  <div style="display:flex; align-items:center; gap:10px;">
+    <img
+      src="icons/icon-192.png"
+      alt="SICO MIX"
+      style="height:48px;"
+    >
+    <h1 style="margin:0;">SICO MIX</h1>
+  </div>
+
   <div>
     <button onclick="setLang('ua')">UA</button>
     <button onclick="setLang('pl')">PL</button>
@@ -49,14 +65,14 @@
   <h3 data-i18n="catalog"></h3>
 
   <div id="recipeItems">
-  <!-- тут будуть компоненти рецепта -->
+    <!-- компоненти рецепта -->
   </div>
 
   <button
-  type="button"
-  onclick="addRecipeItem()"
-  data-i18n="addColor">
-</button>
+    type="button"
+    onclick="addRecipeItem()"
+    data-i18n="addColor">
+  </button>
 
   <br><br>
 
@@ -79,9 +95,7 @@
 <!-- RECIPES -->
 <section id="recipes" class="tab">
   <h2 data-i18n="mixed"></h2>
-  <div id="recipeList">
-    <!-- ЗАЛИШИ ПУСТО - текст додасться через JavaScript -->
-  </div>
+  <div id="recipeList"></div>
 </section>
 
 <!-- IMPORT / EXPORT -->
@@ -92,7 +106,7 @@
   <br><br>
 
   <input type="file" id="importFile" accept=".txt" onchange="handleImport(this)" hidden>
-  <button onclick="importRecipes()" data-i18n="importTxt">Import TXT</button>
+  <button onclick="importRecipes()" data-i18n="importTxt"></button>
 
   <p data-i18n="pasteText"></p>
   <textarea id="importText" rows="8" style="width:100%"></textarea>
@@ -100,6 +114,9 @@
   <button onclick="importFromText()" data-i18n="importTextBtn"></button>
 </section>
 
+</main>
+
+<!-- SCRIPTS -->
 <script src="js/data-colors.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/app.js"></script>
