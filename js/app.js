@@ -1,199 +1,88 @@
-/* =========================
-   SICO MIX – App Logic
-   ========================= */
+let currentRecipe={items:[]};
+let recipes=JSON.parse(localStorage.getItem("sico_recipes")||"[]");
 
-// ---- STATE ----
-let currentRecipe = {
-  name: "",
-  note: "",
-  items: []
-};
+const qs=id=>document.getElementById(id);
 
-let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
-
-// ---- HELPERS ----
-function qs(id) {
-  return document.getElementById(id);
-}
-
-function showTab(id) {
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+function showTab(id){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   qs(id).classList.add("active");
-  if (id === "recipes") renderRecipes();
+  if(id==="recipes") renderRecipes();
 }
 
-// ---- COLORS ----
-function renderColors() {
-  const list = qs("colorList");
-  list.innerHTML = "";
+function getFilteredColors(){
+  const s=qs("seriesFilter").value;
+  const q=(qs("colorSearch").value||"").toLowerCase();
+  return COLORS.filter(c=>
+    (s==="ALL"||c.series===s) &&
+    (c.code.toLowerCase().includes(q)||c.name[currentLang].toLowerCase().includes(q))
+  );
+}
 
-  COLORS.forEach(c => {
-    const div = document.createElement("div");
-    div.className = "color";
-    div.innerHTML = `
+function renderColors(){
+  const list=qs("colorList");
+  list.innerHTML="";
+  getFilteredColors().forEach(c=>{
+    const d=document.createElement("div");
+    d.className="color-card";
+    d.innerHTML=`
       <div class="swatch" style="background:${c.hex}"></div>
-      <div>
-        <strong>${c.code}</strong><br>
-        <small>${c.name}</small>
-      </div>
-      <button type="button" onclick="addColorToRecipe('${c.code}')">+</button>
-    `;
-    list.appendChild(div);
+      <div><strong>${c.code}</strong><small>${c.name[currentLang]}</small></div>
+      <button onclick="addColor('${c.code}')">+</button>`;
+    list.appendChild(d);
   });
 }
 
-function addColorToRecipe(code) {
-  const color = COLORS.find(c => c.code === code);
-  if (!color) return;
-
-  currentRecipe.items.push({
-    code: color.code,
-    percent: 0
-  });
-
+function addColor(code){
+  currentRecipe.items.push({code,percent:0});
   renderCurrentRecipe();
 }
 
-// ---- CURRENT RECIPE ----
-function renderCurrentRecipe() {
-  let html = "";
-  let total = 0;
-
-  currentRecipe.items.forEach((i, idx) => {
-    total += Number(i.percent);
-    html += `
-      <div class="recipe-item">
-        <strong>${i.code}</strong>
-        <input type="number"
-               min="0"
-               max="100"
-               value="${i.percent}"
-               onchange="updatePercent(${idx}, this.value)"> %
-        <button type="button" onclick="removeItem(${idx})">✕</button>
-      </div>
-    `;
-  });
-
-  html += `<p><strong>Сума:</strong> ${total}%</p>`;
-  qs("recipeItems").innerHTML = html;
+function renderCurrentRecipe(){
+  qs("recipeItems").innerHTML=currentRecipe.items.map((i,idx)=>`
+    <div>${i.code}
+      <input type="number" value="${i.percent}" onchange="update(${idx},this.value)">%
+      <button onclick="removeItem(${idx})">✕</button>
+    </div>`).join("");
 }
 
-function updatePercent(i, val) {
-  currentRecipe.items[i].percent = Number(val);
-  renderCurrentRecipe();
-}
+function update(i,v){currentRecipe.items[i].percent=Number(v);}
+function removeItem(i){currentRecipe.items.splice(i,1);renderCurrentRecipe();}
 
-function removeItem(i) {
-  currentRecipe.items.splice(i, 1);
-  renderCurrentRecipe();
-}
-
-// ---- SAVE ----
-function saveRecipe() {
-  const name = qs("recipeName").value.trim();
-  const note = qs("recipeNote").value.trim();
-
-  if (!name) {
-    alert("Введи назву рецепта");
-    return;
-  }
-
-  const total = currentRecipe.items.reduce((s, i) => s + Number(i.percent), 0);
-  if (total !== 100) {
-    alert("Сума має бути 100%");
-    return;
-  }
-
+function saveRecipe(){
   recipes.push({
-    name,
-    note,
-    items: currentRecipe.items
+    name:qs("recipeName").value,
+    note:qs("recipeNote").value,
+    items:currentRecipe.items
   });
-
-  localStorage.setItem("sico_recipes", JSON.stringify(recipes));
-
-  currentRecipe = { name: "", note: "", items: [] };
-  qs("recipeName").value = "";
-  qs("recipeNote").value = "";
-  qs("recipeItems").innerHTML = "";
-
+  localStorage.setItem("sico_recipes",JSON.stringify(recipes));
+  currentRecipe={items:[]};
   showTab("recipes");
 }
 
-// ---- RECIPES LIST ----
-function renderRecipes() {
-  const list = qs("recipeList");
-  list.innerHTML = "";
-
-  if (!recipes.length) {
-    list.innerHTML = `<p data-i18n="noRecipes"></p>`;
-    if (typeof setLang === "function") {
-      setLang(currentLang);
-    }
-    return;
-  }
-
-  recipes.forEach(r => {
-    let html = `<div class="card"><strong>${r.name}</strong><br>`;
-    r.items.forEach(i => {
-      html += `${i.code}: ${i.percent}%<br>`;
-    });
-    html += "</div>";
-    list.innerHTML += html;
-  });
+function renderRecipes(){
+  qs("recipeList").innerHTML=recipes.map(r=>`
+    <div><strong>${r.name}</strong><br>
+    ${r.items.map(i=>`${i.code}: ${i.percent}%`).join("<br>")}</div>`).join("");
 }
 
-// ---- WEIGHT CALCULATOR ----
-function calculateWeight() {
-  const total = Number(qs("totalWeight").value);
-  const out = qs("weightResult");
-
-  if (!currentRecipe.items.length) {
-    out.innerHTML = "<p>Немає фарб у рецепті</p>";
-    return;
-  }
-
-  let html = `<h4>${total} г</h4>`;
-  currentRecipe.items.forEach(i => {
-    const g = (total * i.percent / 100).toFixed(1);
-    html += `<div>${i.code}: <strong>${g} г</strong></div>`;
-  });
-
-  out.innerHTML = html;
+function calculateWeight(){
+  const t=Number(qs("totalWeight").value);
+  qs("weightResult").innerHTML=currentRecipe.items.map(i=>{
+    return `${i.code}: ${(t*i.percent/100).toFixed(1)} g`;
+  }).join("<br>");
 }
 
-// ---- EXPORT ----
-function exportRecipes() {
-  if (!recipes.length) {
-    alert("Немає рецептів");
-    return;
-  }
-
-  let text = "";
-  recipes.forEach(r => {
-    text += `RECIPE
-NAME:${r.name}
-NOTE:${r.note}
-`;
-    r.items.forEach(i => {
-      text += `${i.code}=${i.percent}\n`;
-    });
-    text += "END\n\n";
+function exportRecipes(){
+  let txt="";
+  recipes.forEach(r=>{
+    txt+=`RECIPE\nNAME:${r.name}\n`;
+    r.items.forEach(i=>txt+=`${i.code}=${i.percent}\n`);
+    txt+="END\n\n";
   });
-
-  const blob = new Blob([text], { type: "text/plain" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "sico_recipes.txt";
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([txt]));
+  a.download="sico_recipes.txt";
   a.click();
 }
 
-// ---- IMPORT (поки без парсингу) ----
-function importFromText() {
-  alert("Імпорт буде доданий на наступному кроці");
-}
-
-// ---- INIT ----
-document.addEventListener("DOMContentLoaded", () => {
-  renderColors();
-});
+document.addEventListener("DOMContentLoaded",renderColors);
