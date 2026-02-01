@@ -129,4 +129,4 @@ document.addEventListener("DOMContentLoaded", () => {
   const saved = localStorage.getItem("sico_lang");
   if (saved) currentLang = saved;
   setLang(currentLang);
-});document.addEventListener("DOMContentLoaded",()=>setLang("ua"));
+});});document.addEventListener("DOMContentLoaded",()=>setLang("ua"));
