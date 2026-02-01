@@ -5,16 +5,25 @@
   <title>SICO MIX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="SICO MIX">
 
-  <link rel="manifest" href="manifest.json">
+  <!-- ICONS -->
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
 <header>
+  <img src="icons/icon-192.png" class="logo">
   <h1>SICO MIX</h1>
+
   <div class="langs">
     <button onclick="setLang('ua')">UA</button>
     <button onclick="setLang('pl')">PL</button>
@@ -24,71 +33,32 @@
 
 <nav>
   <button onclick="showTab('colors')" data-i18n="paints"></button>
-  <button onclick="showTab('new')" data-i18n="newRecipe"></button>
   <button onclick="showTab('recipes')" data-i18n="recipes"></button>
-  <button onclick="showTab('import')" data-i18n="import"></button>
+  <button onclick="showTab('new')" data-i18n="newRecipe"></button>
 </nav>
 
 <main>
 
 <section id="colors" class="tab active">
-  <h2 data-i18n="catalog"></h2>
-
-  <select id="seriesFilter" onchange="renderColors()">
-    <option value="ALL" data-i18n="allSeries"></option>
-    <option value="EC">EC</option>
-    <option value="CF">CF</option>
-    <option value="PLUV">PLUV</option>
-    <option value="SX">SX</option>
-    <option value="SPTN">SPTN</option>
-    <option value="SN">SN</option>
-    <option value="AS">AS</option>
-    <option value="OTF">OTF</option>
-  </select>
-
-  <input id="colorSearch" type="search" placeholder="EC24 / red" oninput="renderColors()">
-
+  <select id="seriesFilter" onchange="renderColors()"></select>
   <div id="colorList"></div>
 </section>
 
 <section id="new" class="tab">
-  <h2 data-i18n="newRecipe"></h2>
-
-  <input id="recipeName" data-i18n-placeholder="recipeName">
-  <input id="recipeNote" data-i18n-placeholder="recipeNote">
+  <input id="recipeName" placeholder="Назва">
+  <input id="recipeNote" placeholder="Нотатка">
 
   <div id="recipeItems"></div>
-
-  <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
-
-  <h3 data-i18n="weightCalc"></h3>
-  <select id="totalWeight" onchange="calculateWeight()">
-    <option value="100">100 g</option>
-    <option value="500">500 g</option>
-    <option value="1000" selected>1 kg</option>
-    <option value="5000">5 kg</option>
-  </select>
-
-  <div id="weightResult"></div>
+  <button onclick="saveRecipe()">Зберегти рецепт</button>
 </section>
 
 <section id="recipes" class="tab">
-  <h2 data-i18n="mixed"></h2>
   <div id="recipeList"></div>
-</section>
-
-<section id="import" class="tab">
-  <h2 data-i18n="import"></h2>
-  <button onclick="exportRecipes()" data-i18n="exportTxt"></button><br><br>
-
-  <input type="file" id="importFile" accept=".txt" hidden onchange="handleImport(this)">
-  <button onclick="document.getElementById('importFile').click()" data-i18n="importTxt"></button>
 </section>
 
 </main>
 
 <script src="js/data-colors.js"></script>
-<script src="js/i18n.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
