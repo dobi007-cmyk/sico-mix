@@ -89,10 +89,21 @@ function saveRecipe(){
   const sum = currentRecipe.items.reduce((s,i)=>s+i.percent,0);
   if(sum!==100) return alert(t("errorPercent"));
 
-  recipes.push({name,items:currentRecipe.items});
-  localStorage.setItem("sico_recipes",JSON.stringify(recipes));
-  currentRecipe={items:[]};
-  qs("recipeItems").innerHTML="";
+  recipes.push({
+    name,
+    items: currentRecipe.items
+  });
+
+  localStorage.setItem("sico_recipes", JSON.stringify(recipes));
+
+  // 🔹 повний скидання рецепта
+  currentRecipe = { items: [] };
+
+  // 🔹 КРИТИЧНО: скидання серії
+  currentRecipeSeries = null;
+
+  qs("recipeItems").innerHTML = "";
+
   showTab("recipes");
 }
 
