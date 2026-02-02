@@ -101,3 +101,4 @@ function setLang(lang){
 }
 
 document.addEventListener("DOMContentLoaded",()=>setLang(currentLang));
+document.addEventListener("DOMContentLoaded",()=>setLang(currentLang));
