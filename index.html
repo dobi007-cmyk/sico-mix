@@ -25,26 +25,22 @@
 
 <header style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
   <div style="display:flex; align-items:center; gap:10px;">
-    <img
-      src="icons/icon-192.png"
-      alt="SICO MIX"
-      style="height:48px;"
-    >
+    <img src="icons/icon-192.png" alt="SICO MIX" style="height:48px;">
     <h1 style="margin:0;">SICO MIX</h1>
   </div>
 
   <div>
-    <button onclick="setLang('ua')">UA</button>
-    <button onclick="setLang('pl')">PL</button>
-    <button onclick="setLang('en')">EN</button>
+    <button type="button" onclick="setLang('ua')">UA</button>
+    <button type="button" onclick="setLang('pl')">PL</button>
+    <button type="button" onclick="setLang('en')">EN</button>
   </div>
 </header>
 
 <nav>
-  <button onclick="showTab('colors')" data-i18n="paints"></button>
-  <button onclick="showTab('recipes')" data-i18n="recipes"></button>
-  <button onclick="showTab('new')" data-i18n="newRecipe"></button>
-  <button onclick="showTab('import')" data-i18n="import"></button>
+  <button type="button" onclick="showTab('colors')" data-i18n="paints"></button>
+  <button type="button" onclick="showTab('recipes')" data-i18n="recipes"></button>
+  <button type="button" onclick="showTab('new')" data-i18n="newRecipe"></button>
+  <button type="button" onclick="showTab('import')" data-i18n="import"></button>
 </nav>
 
 <main>
@@ -52,12 +48,14 @@
 <!-- COLORS -->
 <section id="colors" class="tab active">
   <h2 data-i18n="catalog"></h2>
+
   <div style="margin-bottom:10px;">
-  <label data-i18n="filterSeries"></label>
-  <select id="seriesFilter" onchange="applySeriesFilter()">
-    <option value="ALL" data-i18n="allSeries"></option>
-  </select>
+    <label data-i18n="filterSeries"></label>
+    <select id="seriesFilter" onchange="applySeriesFilter()">
+      <option value="ALL" data-i18n="allSeries"></option>
+    </select>
   </div>
+
   <div id="colorList"></div>
 </section>
 
@@ -70,15 +68,9 @@
 
   <h3 data-i18n="catalog"></h3>
 
-  <div id="recipeItems">
-    <!-- компоненти рецепта -->
-  </div>
+  <div id="recipeItems"></div>
 
-  <button
-    type="button"
-    onclick="addRecipeItem()"
-    data-i18n="addColor">
-  </button>
+  <button type="button" onclick="addRecipeItem()" data-i18n="addColor"></button>
 
   <br><br>
 
@@ -108,16 +100,16 @@
 <section id="import" class="tab">
   <h2 data-i18n="import"></h2>
 
-  <button onclick="exportRecipes()" data-i18n="exportTxt"></button>
+  <button type="button" onclick="exportRecipes()" data-i18n="exportTxt"></button>
   <br><br>
 
   <input type="file" id="importFile" accept=".txt" onchange="handleImport(this)" hidden>
-  <button onclick="importRecipes()" data-i18n="importTxt"></button>
+  <button type="button" onclick="importRecipes()" data-i18n="importTxt"></button>
 
   <p data-i18n="pasteText"></p>
   <textarea id="importText" rows="8" style="width:100%"></textarea>
   <br>
-  <button onclick="importFromText()" data-i18n="importTextBtn"></button>
+  <button type="button" onclick="importFromText()" data-i18n="importTextBtn"></button>
 </section>
 
 </main>
@@ -128,4 +120,4 @@
 <script src="js/app.js"></script>
 
 </body>
-</html></html>
+</html>
