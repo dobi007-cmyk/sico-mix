@@ -27,8 +27,29 @@ function renderColors(){
   });
 }
 
-function addColor(code){
-  currentRecipe.items.push({code,percent:0});
+function addColorToRecipe(code) {
+  const color = COLORS.find(c => c.code === code);
+  if (!color) return;
+
+  // якщо серія ще не вибрана — фіксуємо
+  if (!currentRecipeSeries) {
+    currentRecipeSeries = color.series;
+  }
+
+  // якщо серія не співпадає — блокуємо
+  if (color.series !== currentRecipeSeries) {
+    alert(
+      `❌ Можна змішувати тільки в межах однієї серії.\n` +
+      `Поточна серія: ${currentRecipeSeries}`
+    );
+    return;
+  }
+
+  currentRecipe.items.push({
+    code: color.code,
+    percent: 0
+  });
+
   renderCurrentRecipe();
 }
 
