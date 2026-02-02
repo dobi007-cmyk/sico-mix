@@ -77,9 +77,10 @@ function addColorToRecipe(code){
   // заборона змішування серій
   if(color.series !== currentRecipeSeries){
     alert(
-      `❌ Можна змішувати тільки в межах однієї серії.\n` +
-      `Поточна серія: ${currentRecipeSeries}`
-    );
+      alert(
+  `❌ ${t("errorSeries")}\n` +
+  `${t("currentSeries")}: ${currentRecipeSeries}`
+);
     return;
   }
 
