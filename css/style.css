@@ -66,7 +66,10 @@ main {
 }
 
 /* ---- Colors list ---- */
-..color > div {
+.color > div {
+  line-height: 1.2;
+}
+
   line-height: 1.2;
 }
  {
