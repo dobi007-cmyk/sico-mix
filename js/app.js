@@ -62,11 +62,9 @@ function addColorToRecipe(code){
   const color = COLORS.find(c => c.code === code);
   if(!color) return;
 
-  // якщо серія ще не зафіксована — фіксуємо
   if(!currentRecipeSeries){
     currentRecipeSeries = color.series;
 
-    // 🔹 автоматично фільтруємо каталог по серії рецепта
     const select = qs("seriesFilter");
     if(select){
       select.value = color.series;
@@ -74,13 +72,11 @@ function addColorToRecipe(code){
     }
   }
 
-  // заборона змішування серій
   if(color.series !== currentRecipeSeries){
     alert(
-      alert(
-  `❌ ${t("errorSeries")}\n` +
-  `${t("currentSeries")}: ${currentRecipeSeries}`
-);
+      `❌ ${t("errorSeries")}\n` +
+      `${t("currentSeries")}: ${currentRecipeSeries}`
+    );
     return;
   }
 
@@ -128,7 +124,6 @@ function removeItem(i){
   currentRecipe.items.splice(i, 1);
   renderCurrentRecipe();
 
-  // якщо рецепт порожній — скидаємо серію і фільтр
   if(currentRecipe.items.length === 0){
     currentRecipeSeries = null;
     const select = qs("seriesFilter");
@@ -219,10 +214,4 @@ function calculateWeight(){
 document.addEventListener("DOMContentLoaded", ()=>{
   initSeriesFilter();
   renderColors();
-});  out.innerHTML = `<h4>${w} ${t("grams")}</h4>` +
-    currentRecipe.items.map(i=>
-      `${i.code}: ${(w*i.percent/100).toFixed(1)} ${t("grams")}`
-    ).join("<br>");
-}
-
-document.addEventListener("DOMContentLoaded",renderColors);
+});
