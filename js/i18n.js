@@ -20,6 +20,10 @@ const i18n = {
     grams:"г",
     errorName:"Введи назву рецепта",
     errorPercent:"Сума має бути 100%"
+    filterSeries: "Серія фарб",
+    allSeries: "Всі серії",
+    errorSeries: "Можна змішувати тільки в межах однієї серії",
+    currentSeries: "Поточна серія"
   },
   pl:{
     paints:"Farby",
@@ -42,6 +46,10 @@ const i18n = {
     grams:"g",
     errorName:"Podaj nazwę receptury",
     errorPercent:"Suma musi wynosić 100%"
+    filterSeries: "Seria farb",
+    allSeries: "Wszystkie serie",
+    errorSeries: "Można mieszać tylko w obrębie jednej serii",
+    currentSeries: "Aktualna seria"
   },
   en:{
     paints:"Paints",
@@ -64,6 +72,10 @@ const i18n = {
     grams:"g",
     errorName:"Enter recipe name",
     errorPercent:"Total must be 100%"
+    filterSeries: "Paint series",
+    allSeries: "All series",
+    errorSeries: "You can mix paints only within one series",
+    currentSeries: "Current series"
   }
 };
 
