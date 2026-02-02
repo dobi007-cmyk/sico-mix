@@ -23,7 +23,8 @@ const i18n = {
     filterSeries: "Серія фарб",
     allSeries: "Всі серії",
     errorSeries: "Можна змішувати тільки в межах однієї серії",
-    currentSeries: "Поточна серія"
+    currentSeries: "Поточна серія,
+    addColor: "Додати фарбу"
   },
   pl:{
     paints:"Farby",
@@ -49,7 +50,8 @@ const i18n = {
     filterSeries: "Seria farb",
     allSeries: "Wszystkie serie",
     errorSeries: "Można mieszać tylko w obrębie jednej serii",
-    currentSeries: "Aktualna seria"
+    currentSeries: "Aktualna seria",
+    addColor: "Dodaj farbę"
   },
   en:{
     paints:"Paints",
@@ -75,7 +77,8 @@ const i18n = {
     filterSeries: "Paint series",
     allSeries: "All series",
     errorSeries: "You can mix paints only within one series",
-    currentSeries: "Current series"
+    currentSeries: "Current series",
+    addColor: "Add color"
   }
 };
 
