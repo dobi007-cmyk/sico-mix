@@ -1,3 +1,4 @@
+let currentRecipeSeries = null;
 let currentRecipe = { items: [] };
 let recipes = JSON.parse(localStorage.getItem("sico_recipes")||"[]");
 
