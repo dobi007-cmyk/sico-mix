@@ -1,3 +1,20 @@
+data-colors.js
+
+/* =========================
+   SICO MIX – Paint Catalog
+   ========================= */
+
+const SERIES = [
+  { id: "EC", name: "EC" },
+  { id: "CF", name: "CF" },
+  { id: "PLUV", name: "PLUV" },
+  { id: "SX", name: "SX" },
+  { id: "SPTN", name: "SPTN" },
+  { id: "SN", name: "SN" },
+  { id: "AS", name: "AS" },
+  { id: "OTF", name: "OTF" }
+];
+
 const BASE_COLORS = [
   { code: "10", name: { ua: "Фіолетовий", pl: "Fioletowy", en: "Violet" }, hex: "#4b3b8f" },
   { code: "20", name: { ua: "Синій", pl: "Niebieski", en: "Blue" }, hex: "#0033a0" },
@@ -54,3 +71,17 @@ const BASE_COLORS = [
   { code: "142", name: { ua: "CMYK Magenta", pl: "CMYK Magenta", en: "CMYK Magenta" }, hex: "#e91e63" },
   { code: "143", name: { ua: "CMYK Black", pl: "CMYK Black", en: "CMYK Black" }, hex: "#212121" }
 ];
+
+const COLORS = [];
+
+SERIES.forEach(series => {
+  BASE_COLORS.forEach(color => {
+    COLORS.push({
+      series: series.id,
+      code: `${series.id}${color.code}`,
+      baseCode: color.code,
+      name: color.name,
+      hex: color.hex
+    });
+  });
+});];
