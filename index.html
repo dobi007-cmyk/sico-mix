@@ -32,6 +32,12 @@
 
 <section id="new" class="tab">
   <input id="recipeName" data-i18n-placeholder="recipeName">
+
+<textarea id="recipeNote" data-i18n-placeholder="recipeNote"></textarea>
+
+<label>📷 Фото фарби / відбитка</label>
+<input type="file" accept="image/*" onchange="loadRecipePhoto(this)">
+<img id="recipePhoto" style="max-width:100%; margin-bottom:10px; display:none;">
   <div id="recipeItems"></div>
   <select id="totalWeight" onchange="calculateWeight()"></select>
   <div id="weightResult"></div>
