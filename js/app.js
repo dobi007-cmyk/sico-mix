@@ -1,5 +1,6 @@
 const qs = id => document.getElementById(id);
 
+let inputMode = "percent"; // percent | gram
 let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
 let currentRecipe = null;
 let currentRecipeSeries = null;
