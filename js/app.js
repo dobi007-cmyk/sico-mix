@@ -148,3 +148,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
   initSeriesFilter();
   renderColors();
 });
+/* =========================
+   FIX: missing function
+   ========================= */
+
+function addRecipeItem() {
+  alert(t("noColors"));
+}
