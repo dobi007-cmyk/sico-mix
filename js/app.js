@@ -31,18 +31,25 @@ function renderColors(list = COLORS){
   qs("colorList").innerHTML = list.map(c=>`
     <div class="color">
       <div class="swatch" style="background:${c.hex}"></div>
-      <div><strong>${c.code}</strong><br><small>${c.name[currentLang]}</small></div>
+      <div>
+        <strong>${c.code}</strong><br>
+        <small>${c.name[currentLang]}</small>
+      </div>
       <button onclick="addColor('${c.code}')">+</button>
     </div>`).join("");
 }
 
 function addColor(code){
   const c = COLORS.find(x=>x.code===code);
+  if(!c) return;
+
   if(!currentRecipeSeries) currentRecipeSeries = c.series;
+
   if(c.series !== currentRecipeSeries){
     alert(`${t("errorSeries")}\n${t("currentSeries")}: ${currentRecipeSeries}`);
     return;
   }
+
   currentRecipe.items.push({ code, percent: 0 });
   renderCurrentRecipe();
 }
@@ -50,16 +57,18 @@ function addColor(code){
 /* RECIPE */
 function renderCurrentRecipe(){
   let sum = 0;
-  qs("recipeItems").innerHTML = currentRecipe.items.map((i,idx)=>{
-    sum += i.percent;
-    return `
-      <div class="recipe-item">
-        ${i.code}
-        <input type="number" value="${i.percent}" min="0" max="100"
-        onchange="updatePercent(${idx},this.value)"> %
-        <button onclick="removeItem(${idx})">✕</button>
-      </div>`;
-  }).join("") + `<p><strong>${t("sum")}:</strong> ${sum}%</p>`;
+  qs("recipeItems").innerHTML =
+    currentRecipe.items.map((i,idx)=>{
+      sum += i.percent;
+      return `
+        <div class="recipe-item">
+          ${i.code}
+          <input type="number" value="${i.percent}" min="0" max="100"
+            onchange="updatePercent(${idx},this.value)"> %
+          <button onclick="removeItem(${idx})">✕</button>
+        </div>`;
+    }).join("") +
+    `<p><strong>${t("sum")}:</strong> ${sum}%</p>`;
 }
 
 function updatePercent(i,v){
@@ -69,7 +78,7 @@ function updatePercent(i,v){
 
 function removeItem(i){
   currentRecipe.items.splice(i,1);
-  if(!currentRecipe.items.length) currentRecipeSeries=null;
+  if(!currentRecipe.items.length) currentRecipeSeries = null;
   renderCurrentRecipe();
 }
 
@@ -77,11 +86,19 @@ function removeItem(i){
 function saveRecipe(){
   const name = qs("recipeName").value.trim();
   if(!name) return alert(t("errorName"));
+
   if(currentRecipe.items.reduce((s,i)=>s+i.percent,0)!==100)
     return alert(t("errorPercent"));
-  recipes.push({ name, series: currentRecipeSeries, items: currentRecipe.items });
+
+  recipes.push({
+    name,
+    series: currentRecipeSeries,
+    items: currentRecipe.items
+  });
+
   localStorage.setItem("sico_recipes", JSON.stringify(recipes));
-  currentRecipe={items:[]}; currentRecipeSeries=null;
+  currentRecipe = { items: [] };
+  currentRecipeSeries = null;
   qs("recipeItems").innerHTML="";
   showTab("recipes");
 }
@@ -91,8 +108,9 @@ function renderRecipes(){
   qs("recipeList").innerHTML = recipes.length
     ? recipes.map(r=>`
       <div class="color">
-        <div><strong>${r.name}</strong> (${r.series})<br>
-        ${r.items.map(i=>`${i.code}: ${i.percent}%`).join("<br>")}
+        <div>
+          <strong>${r.name}</strong> (${r.series})<br>
+          ${r.items.map(i=>`${i.code}: ${i.percent}%`).join("<br>")}
         </div>
       </div>`).join("")
     : `<p>${t("noRecipes")}</p>`;
@@ -102,11 +120,30 @@ function renderRecipes(){
 function calculateWeight(){
   const w = Number(qs("totalWeight").value);
   qs("weightResult").innerHTML = currentRecipe.items.length
-    ? `<h4>${w} ${t("grams")}</h4>`+
-      currentRecipe.items.map(i=>`${i.code}: ${(w*i.percent/100).toFixed(1)} ${t("grams")}`).join("<br>")
+    ? `<h4>${w} ${t("grams")}</h4>` +
+      currentRecipe.items
+        .map(i=>`${i.code}: ${(w*i.percent/100).toFixed(1)} ${t("grams")}`)
+        .join("<br>")
     : `<p>${t("noColors")}</p>`;
 }
 
+/* ===== MISSING FUNCTIONS (FIX) ===== */
+
+function addRecipeItem(){}
+
+function exportRecipes(){
+  alert("Export буде додано пізніше");
+}
+
+function importRecipes(){
+  alert("Import буде додано пізніше");
+}
+
+function importFromText(){
+  alert("Import з тексту буде додано пізніше");
+}
+
+/* INIT */
 document.addEventListener("DOMContentLoaded", ()=>{
   initSeriesFilter();
   renderColors();
