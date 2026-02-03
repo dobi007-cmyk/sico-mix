@@ -59,6 +59,12 @@ let currentLang = localStorage.getItem("sico_lang") || "ua";
 
 function t(k){ return i18n[currentLang][k] || k; }
 
+function showTab(id){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  qs(id).classList.add("active");
+  setLang(currentLang);
+}
+
 function setLang(lang){
   currentLang = lang;
   localStorage.setItem("sico_lang", lang);
