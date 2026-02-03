@@ -1,204 +1,67 @@
-const qs = id => document.getElementById(id);
-
-let inputMode = "percent"; // percent | gram
-let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
-let currentRecipe = null;
-let currentRecipeSeries = null;
-
-function showTab(id){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  qs(id).classList.add("active");
-}
-
-function initSeriesFilter(){
-  const s = qs("seriesFilter");
-  s.innerHTML = `<option value="ALL">${t("allSeries")}</option>`;
-  SERIES.forEach(x=>{
-    const o = document.createElement("option");
-    o.value = x.id;
-    o.textContent = x.id;
-    s.appendChild(o);
-  });
-  s.onchange = applySeriesFilter;
-}
-
-function applySeriesFilter(){
-  const v = qs("seriesFilter").value;
-  renderColors(v==="ALL" ? COLORS : COLORS.filter(c=>c.series===v));
-}
-
-function renderColors(list=COLORS){
-  const box = qs("colorList");
-  box.innerHTML = "";
-  list.forEach(c=>{
-    box.innerHTML += `
-      <div class="color">
-        <div class="swatch" style="background:${c.hex}"></div>
-        <div>
-          <strong>${c.code}</strong><br>
-          ${c.name[currentLang]}
-        </div>
-        <button onclick="addColor('${c.code}')">+</button>
-      </div>`;
-  });
-}
-
-function newRecipe(){
-  currentRecipe = { id:Date.now(), name:"", note:"", items:[] };
-  currentRecipeSeries = null;
-  renderCurrentRecipe();
-}
-
-function addColor(code){
-  const c = COLORS.find(x=>x.code===code);
-  if(!currentRecipe) newRecipe();
-
-  if(!currentRecipeSeries) currentRecipeSeries = c.series;
-  if(c.series !== currentRecipeSeries){
-    alert(t("errorSeries")+" ("+currentRecipeSeries+")");
-    return;
+const i18n = {
+  ua:{
+    paints:"Фарби",
+    recipes:"Рецепти",
+    newRecipe:"Новий рецепт",
+    import:"Імпорт / Експорт",
+    catalog:"Каталог фарб",
+    recipeName:"Назва рецепта",
+    recipeNote:"Нотатка",
+    addRecipe:"Зберегти рецепт",
+    noRecipes:"Немає рецептів",
+    weightCalc:"Калькулятор ваги",
+    sum:"Сума",
+    filterSeries:"Серія фарб",
+    allSeries:"Всі серії",
+    errorSeries:"Можна змішувати тільки в межах однієї серії",
+    exportTxt:"Експорт TXT",
+    exportPdf:"Експорт PDF"
+  },
+  pl:{
+    paints:"Farby",
+    recipes:"Receptury",
+    newRecipe:"Nowa receptura",
+    import:"Import / Export",
+    catalog:"Katalog farb",
+    recipeName:"Nazwa receptury",
+    recipeNote:"Notatka",
+    addRecipe:"Zapisz recepturę",
+    noRecipes:"Brak receptur",
+    weightCalc:"Kalkulator wagi",
+    sum:"Suma",
+    filterSeries:"Seria farb",
+    allSeries:"Wszystkie serie",
+    errorSeries:"Można mieszać tylko w jednej serii",
+    exportTxt:"Eksport TXT",
+    exportPdf:"Eksport PDF"
+  },
+  en:{
+    paints:"Paints",
+    recipes:"Recipes",
+    newRecipe:"New recipe",
+    import:"Import / Export",
+    catalog:"Paint catalog",
+    recipeName:"Recipe name",
+    recipeNote:"Note",
+    addRecipe:"Save recipe",
+    noRecipes:"No recipes",
+    weightCalc:"Weight calculator",
+    sum:"Total",
+    filterSeries:"Paint series",
+    allSeries:"All series",
+    errorSeries:"You can mix only within one series",
+    exportTxt:"Export TXT",
+    exportPdf:"Export PDF"
   }
+};
 
-  currentRecipe.items.push({ code:c.code, percent:0 });
-  renderCurrentRecipe();
+let currentLang = localStorage.getItem("sico_lang") || "ua";
+
+function t(k){ return i18n[currentLang][k] || k; }
+
+function setLang(lang){
+  currentLang = lang;
+  localStorage.setItem("sico_lang", lang);
+  document.querySelectorAll("[data-i18n]").forEach(e=>e.textContent=t(e.dataset.i18n));
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(e=>e.placeholder=t(e.dataset.i18nPlaceholder));
 }
-
-function removeItem(i){
-  currentRecipe.items.splice(i,1);
-  if(currentRecipe.items.length===0) currentRecipeSeries=null;
-  renderCurrentRecipe();
-}
-
-function renderCurrentRecipe(){
-  const box = qs("recipeItems");
-  const totalWeight = Number(qs("totalWeight").value || 1000);
-  let sum = 0;
-  box.innerHTML = "";
-
-  currentRecipe.items.forEach((i,idx)=>{
-    let value =
-      inputMode === "percent"
-        ? i.percent
-        : (i.percent * totalWeight / 100).toFixed(1);
-
-    sum += i.percent;
-
-    box.innerHTML += `
-      <div class="recipe-item">
-        ${i.code}
-        <input type="number"
-          value="${value}"
-          onchange="updateItem(${idx}, this.value)">
-        ${inputMode === "percent" ? "%" : "g"}
-        <button onclick="removeItem(${idx})">✕</button>
-      </div>
-    `;
-  });
-
-  box.innerHTML += `<p><strong>${t("sum")}:</strong> ${sum}%</p>`;
-}
-
-  box.innerHTML += `<strong>${t("sum")}: ${sum}%</strong>`;
-}
-
-function saveRecipe(){
-  currentRecipe.name = qs("recipeName").value;
-  currentRecipe.note = qs("recipeNote").value;
-
-  const i = recipes.findIndex(r=>r.id===currentRecipe.id);
-  if(i>=0) recipes[i]=currentRecipe;
-  else recipes.push(currentRecipe);
-
-  localStorage.setItem("sico_recipes", JSON.stringify(recipes));
-  renderRecipes();
-  alert("OK");
-}
-
-function renderRecipes(){
-  const box = qs("recipeList");
-  if(!recipes.length){
-    box.innerHTML = `<p>${t("noRecipes")}</p>`;
-    return;
-  }
-
-  box.innerHTML = recipes.map(r=>`
-    <div class="color">
-      <strong>${r.name}</strong>
-      <button onclick="editRecipe(${r.id})">✏️</button>
-    </div>`).join("");
-}
-
-function editRecipe(id){
-  currentRecipe = recipes.find(r=>r.id===id);
-  currentRecipeSeries = currentRecipe.items.length
-    ? COLORS.find(c=>c.code===currentRecipe.items[0].code).series
-    : null;
-  showTab("new");
-  renderCurrentRecipe();
-}
-
-/* ===== EXPORT / IMPORT ===== */
-
-function exportTxt(){
-  let ttxt = recipes.map(r=>{
-    return `# ${r.name}\n${r.note}\n` +
-      r.items.map(i=>`${i.code} ${i.percent}%`).join("\n");
-  }).join("\n\n");
-
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([ttxt]));
-  a.download = "sico_recipes.txt";
-  a.click();
-}
-
-function importTxt(input){
-  const r = new FileReader();
-  r.onload = ()=>{
-    alert("Імпорт через TXT — додай парсер за потреби");
-  };
-  r.readAsText(input.files[0]);
-}
-
-function exportPdf(){
-  window.print();
-}
-
-function loadRecipePhoto(input){
-  const file = input.files[0];
-  if(!file) return;
-
-  const reader = new FileReader();
-  reader.onload = e=>{
-    const img = document.getElementById("recipePhoto");
-    img.src = e.target.result;
-    img.style.display = "block";
-    currentRecipe.photo = e.target.result; // зберігаємо в рецепт
-  };
-  reader.readAsDataURL(file);
-}
-
-function toggleMode(){
-  inputMode = document.getElementById("modeToggle").checked
-    ? "gram"
-    : "percent";
-  renderCurrentRecipe();
-}
-
-function updateItem(idx, value){
-  const totalWeight = Number(qs("totalWeight").value || 1000);
-
-  if(inputMode === "percent"){
-    currentRecipe.items[idx].percent = Number(value);
-  } else {
-    currentRecipe.items[idx].percent =
-      (Number(value) / totalWeight) * 100;
-  }
-
-  renderCurrentRecipe();
-}
-
-document.addEventListener("DOMContentLoaded", ()=>{
-  initSeriesFilter();
-  renderColors();
-  renderRecipes();
-});
