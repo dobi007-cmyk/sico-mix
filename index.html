@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
 <header>
@@ -25,45 +26,71 @@
 </nav>
 
 <main>
+
+<!-- ================= COLORS ================= -->
 <section id="colors" class="tab active">
-  <select id="seriesFilter" onchange="renderColors()"></select>
+  <h2 data-i18n="catalog"></h2>
+
+  <label data-i18n="filterSeries"></label>
+  <select id="seriesFilter" onchange="applySeriesFilter()">
+    <option value="ALL" data-i18n="allSeries"></option>
+  </select>
+
   <div id="colorList"></div>
 </section>
 
+<!-- ================= NEW RECIPE ================= -->
 <section id="new" class="tab">
+  <h2 data-i18n="newRecipe"></h2>
+
   <input id="recipeName" data-i18n-placeholder="recipeName">
 
-<textarea id="recipeNote" data-i18n-placeholder="recipeNote"></textarea>
+  <textarea id="recipeNote" data-i18n-placeholder="recipeNote"></textarea>
 
-<label>📷 Фото фарби / відбитка</label>
-<input type="file" accept="image/*" onchange="loadRecipePhoto(this)">
-<img id="recipePhoto" style="max-width:100%; margin-bottom:10px; display:none;">
+  <!-- PHOTO -->
+  <label>📷 Фото фарби / відбитка</label>
+  <input type="file" accept="image/*" onchange="loadRecipePhoto(this)">
+  <img id="recipePhoto" style="max-width:100%; display:none; margin-bottom:10px;">
+
+  <!-- MODE TOGGLE -->
+  <label style="display:block; margin:10px 0;">
+    <input type="checkbox" id="modeToggle" onchange="toggleMode()">
+    % ↔ g
+  </label>
+
+  <!-- RECIPE ITEMS -->
   <div id="recipeItems"></div>
+
+  <!-- WEIGHT -->
+  <h3 data-i18n="weightCalc"></h3>
   <select id="totalWeight" onchange="calculateWeight()"></select>
   <div id="weightResult"></div>
+
   <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
 </section>
 
+<!-- ================= RECIPES ================= -->
 <section id="recipes" class="tab">
-  <button onclick="exportTXT()" data-i18n="exportTxt"></button>
-  <button onclick="exportPDF()" data-i18n="exportPdf"></button>
+  <h2 data-i18n="recipes"></h2>
+
+  <button onclick="exportTxt()" data-i18n="exportTxt"></button>
+  <button onclick="exportPdf()" data-i18n="exportPdf"></button>
+
   <div id="recipeList"></div>
 </section>
+
+<!-- ================= IMPORT ================= -->
 <section id="import" class="tab">
   <h2 data-i18n="import"></h2>
 
-  <button onclick="exportTxt()" data-i18n="exportTxt"></button>
-  <br><br>
-
-  <button onclick="exportPdf()" data-i18n="exportPdf"></button>
-  <br><br>
-
   <input type="file" accept=".txt" onchange="importTxt(this)">
 </section>
+
 </main>
 
 <script src="js/data-colors.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/app.js"></script>
+
 </body>
 </html>
