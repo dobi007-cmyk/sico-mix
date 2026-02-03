@@ -21,6 +21,7 @@
   <button onclick="showTab('colors')" data-i18n="paints"></button>
   <button onclick="showTab('new')" data-i18n="newRecipe"></button>
   <button onclick="showTab('recipes')" data-i18n="recipes"></button>
+  <button onclick="showTab('import')" data-i18n="import"></button>
 </nav>
 
 <main>
@@ -41,6 +42,17 @@
   <button onclick="exportTXT()" data-i18n="exportTxt"></button>
   <button onclick="exportPDF()" data-i18n="exportPdf"></button>
   <div id="recipeList"></div>
+</section>
+<section id="import" class="tab">
+  <h2 data-i18n="import"></h2>
+
+  <button onclick="exportTxt()" data-i18n="exportTxt"></button>
+  <br><br>
+
+  <button onclick="exportPdf()" data-i18n="exportPdf"></button>
+  <br><br>
+
+  <input type="file" accept=".txt" onchange="importTxt(this)">
 </section>
 </main>
 
