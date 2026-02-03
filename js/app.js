@@ -154,6 +154,20 @@ function exportPdf(){
   window.print();
 }
 
+function loadRecipePhoto(input){
+  const file = input.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const img = document.getElementById("recipePhoto");
+    img.src = e.target.result;
+    img.style.display = "block";
+    currentRecipe.photo = e.target.result; // зберігаємо в рецепт
+  };
+  reader.readAsDataURL(file);
+}
+
 document.addEventListener("DOMContentLoaded", ()=>{
   initSeriesFilter();
   renderColors();
