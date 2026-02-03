@@ -169,6 +169,13 @@ function loadRecipePhoto(input){
   reader.readAsDataURL(file);
 }
 
+function toggleMode(){
+  inputMode = document.getElementById("modeToggle").checked
+    ? "gram"
+    : "percent";
+  renderCurrentRecipe();
+}
+
 document.addEventListener("DOMContentLoaded", ()=>{
   initSeriesFilter();
   renderColors();
