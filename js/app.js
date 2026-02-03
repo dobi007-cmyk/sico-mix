@@ -70,25 +70,33 @@ function removeItem(i){
 }
 
 function renderCurrentRecipe(){
-  if(!currentRecipe) return;
-
-  qs("recipeName").value = currentRecipe.name || "";
-  qs("recipeNote").value = currentRecipe.note || "";
-
   const box = qs("recipeItems");
+  const totalWeight = Number(qs("totalWeight").value || 1000);
+  let sum = 0;
   box.innerHTML = "";
 
-  let sum = 0;
-  currentRecipe.items.forEach((it,i)=>{
-    sum += it.percent;
+  currentRecipe.items.forEach((i,idx)=>{
+    let value =
+      inputMode === "percent"
+        ? i.percent
+        : (i.percent * totalWeight / 100).toFixed(1);
+
+    sum += i.percent;
+
     box.innerHTML += `
       <div class="recipe-item">
-        ${it.code}
-        <input type="number" value="${it.percent}"
-          onchange="currentRecipe.items[${i}].percent=Number(this.value);renderCurrentRecipe()"> %
-        <button onclick="removeItem(${i})">${t("delete")}</button>
-      </div>`;
+        ${i.code}
+        <input type="number"
+          value="${value}"
+          onchange="updateItem(${idx}, this.value)">
+        ${inputMode === "percent" ? "%" : "g"}
+        <button onclick="removeItem(${idx})">✕</button>
+      </div>
+    `;
   });
+
+  box.innerHTML += `<p><strong>${t("sum")}:</strong> ${sum}%</p>`;
+}
 
   box.innerHTML += `<strong>${t("sum")}: ${sum}%</strong>`;
 }
@@ -173,6 +181,19 @@ function toggleMode(){
   inputMode = document.getElementById("modeToggle").checked
     ? "gram"
     : "percent";
+  renderCurrentRecipe();
+}
+
+function updateItem(idx, value){
+  const totalWeight = Number(qs("totalWeight").value || 1000);
+
+  if(inputMode === "percent"){
+    currentRecipe.items[idx].percent = Number(value);
+  } else {
+    currentRecipe.items[idx].percent =
+      (Number(value) / totalWeight) * 100;
+  }
+
   renderCurrentRecipe();
 }
 
