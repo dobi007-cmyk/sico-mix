@@ -101,14 +101,34 @@ SERIES.forEach(series => {
   });
 });
 
-// Додатково: сортування за кодом (опціонально, але зручно)
-COLORS.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }));
+// Сортування за кодом (числове сортування)
+COLORS.sort((a, b) => {
+  // Витягуємо числову частину коду (після префікса серії)
+  const numA = parseInt(a.baseCode.match(/\d+/)?.[0] || "0", 10);
+  const numB = parseInt(b.baseCode.match(/\d+/)?.[0] || "0", 10);
+  return numA - numB;
+});
 
 // ────────────────────────────────────────────────
-// Експорт для зручності використання в інших файлах
+// Допоміжні функції для роботи з кольорами
 // ────────────────────────────────────────────────
+export function getColorByCode(code) {
+  return COLORS.find(c => c.code === code);
+}
+
+export function getColorsBySeries(series) {
+  return COLORS.filter(c => c.series === series);
+}
+
+export function getBaseColors() {
+  return BASE_COLORS;
+}
+
 export default {
   SERIES,
   BASE_COLORS,
-  COLORS
+  COLORS,
+  getColorByCode,
+  getColorsBySeries,
+  getBaseColors
 };
