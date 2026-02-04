@@ -1,241 +1,264 @@
-const qs = id=>document.getElementById(id);
+/* =========================
+   SICO MIX – App Logic
+   ========================= */
 
-let currentRecipe = { items:[] };
+const qs = id => document.getElementById(id);
+
+/* ---------- STATE ---------- */
+let currentRecipe = {
+  name: "",
+  items: [] // { code, percent }
+};
+
 let currentSeries = null;
-let recipes = JSON.parse(localStorage.getItem("sico_recipes")||"[]");
+let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
+let mode = "percent"; // percent | grams
 
 /* ---------- UI ---------- */
-function showTab(id){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+function showTab(id) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   qs(id).classList.add("active");
 }
 
 /* ---------- SERIES ---------- */
-function initSeries(){
+function initSeries() {
   const s = qs("seriesFilter");
-  SERIES.forEach(x=>{
-    const o=document.createElement("option");
-    o.value=x.id;
-    o.textContent=x.name;
+  s.innerHTML = "";
+
+  SERIES.forEach(x => {
+    const o = document.createElement("option");
+    o.value = x.id;
+    o.textContent = x.id === "ALL" ? t("allSeries") : x.name;
     s.appendChild(o);
   });
 }
 
-function renderColors(){
-  const v=qs("seriesFilter").value;
-  const list = v==="ALL"?COLORS:COLORS.filter(c=>c.series===v);
-  const box=qs("colorList");
-  box.innerHTML="";
-  list.forEach(c=>{
-    box.innerHTML+=`
+/* ---------- COLORS ---------- */
+function renderColors() {
+  const v = qs("seriesFilter").value;
+  const list = v === "ALL" ? COLORS : COLORS.filter(c => c.series === v);
+  const box = qs("colorList");
+
+  box.innerHTML = "";
+  list.forEach(c => {
+    box.innerHTML += `
       <div class="color">
         <div class="swatch" style="background:${c.hex}"></div>
-        <div><strong>${c.code}</strong><br>${c.name[currentLang]}</div>
+        <div>
+          <strong>${c.code}</strong><br>
+          ${c.name[currentLang]}
+        </div>
         <button onclick="addColor('${c.code}')">+</button>
-      </div>`;
+      </div>
+    `;
   });
 }
 
 /* ---------- RECIPE ---------- */
-function addColor(code){
-  const c=COLORS.find(x=>x.code===code);
-  if(!currentSeries) currentSeries=c.series;
-  if(c.series!==currentSeries){
-    alert(t("errorSeries")+"\n"+t("currentSeries")+": "+currentSeries);
+function addColor(code) {
+  const c = COLORS.find(x => x.code === code);
+  if (!c) return;
+
+  if (!currentSeries) currentSeries = c.series;
+  if (c.series !== currentSeries) {
+    alert(`${t("errorSeries")}\n${t("currentSeries")}: ${currentSeries}`);
     return;
   }
-  currentRecipe.items.push({code:c.code,percent:0});
+
+  currentRecipe.items.push({ code: c.code, percent: 0 });
   renderRecipe();
 }
 
-function renderRecipe(){
-  const box=qs("recipeItems");
-  let sum=0;
-  box.innerHTML="";
-  currentRecipe.items.forEach((i,idx)=>{
-    sum+=i.percent;
-    box.innerHTML+=`
+function renderRecipe() {
+  const box = qs("recipeItems");
+  box.innerHTML = "";
+
+  if (!currentRecipe.items.length) {
+    box.innerHTML = `<p>${t("noColors")}</p>`;
+    return;
+  }
+
+  let sum = 0;
+  currentRecipe.items.forEach((i, idx) => {
+    sum += i.percent;
+
+    const value =
+      mode === "percent"
+        ? i.percent
+        : ((i.percent / 100) * Number(qs("totalWeight").value)).toFixed(1);
+
+    const unit = mode === "percent" ? "%" : t("grams");
+
+    box.innerHTML += `
       <div class="recipe-item">
         ${i.code}
-        <input type="number" value="${i.percent}" onchange="updatePercent(${idx},this.value)">%
+        <input type="number"
+               value="${value}"
+               onchange="updateValue(${idx}, this.value)">
+        ${unit}
         <button onclick="removeColor(${idx})">✕</button>
-      </div>`;
+      </div>
+    `;
   });
-  box.innerHTML+=`<strong>${t("sum")}: ${sum}%</strong>`;
+
+  box.innerHTML += `<strong>${t("sum")}: ${sum}%</strong>`;
+
+  calculateWeight();
 }
 
-function updatePercent(i,v){
-  currentRecipe.items[i].percent=Number(v);
+function updateValue(index, value) {
+  value = Number(value);
+  if (mode === "percent") {
+    currentRecipe.items[index].percent = value;
+  } else {
+    const total = Number(qs("totalWeight").value);
+    currentRecipe.items[index].percent = (value / total) * 100;
+  }
   renderRecipe();
 }
-function removeColor(i){
-  currentRecipe.items.splice(i,1);
-  if(!currentRecipe.items.length) currentSeries=null;
+
+function removeColor(index) {
+  currentRecipe.items.splice(index, 1);
+  if (!currentRecipe.items.length) currentSeries = null;
+  renderRecipe();
+}
+
+/* ---------- MODE ---------- */
+function toggleMode() {
+  mode = mode === "percent" ? "grams" : "percent";
   renderRecipe();
 }
 
 /* ---------- WEIGHT ---------- */
-function renderWeight(){
-  qs("totalWeight").innerHTML=`
+function renderWeightOptions() {
+  qs("totalWeight").innerHTML = `
     <option value="100">100 ${t("grams")}</option>
     <option value="500">500 ${t("grams")}</option>
     <option value="1000">1 ${t("kilograms")}</option>
-    <option value="5000">5 ${t("kilograms")}</option>`;
+    <option value="5000">5 ${t("kilograms")}</option>
+  `;
 }
 
-function calculateWeight(){
-  const w=Number(qs("totalWeight").value);
-  qs("weightResult").innerHTML=currentRecipe.items.map(i=>
-    `${i.code}: ${(w*i.percent/100).toFixed(1)} ${t("grams")}`
-  ).join("<br>");
+function calculateWeight() {
+  const w = Number(qs("totalWeight").value);
+  const out = qs("weightResult");
+
+  if (!currentRecipe.items.length) {
+    out.innerHTML = "";
+    return;
+  }
+
+  out.innerHTML = currentRecipe.items
+    .map(i => {
+      const g = ((w * i.percent) / 100).toFixed(1);
+      return `${i.code}: <strong>${g} ${t("grams")}</strong>`;
+    })
+    .join("<br>");
 }
 
-/* ---------- SAVE / EXPORT ---------- */
-function saveRecipe(){
-  const name=qs("recipeName").value.trim();
-  if(!name) return;
-  recipes.push({name,items:currentRecipe.items});
-  localStorage.setItem("sico_recipes",JSON.stringify(recipes));
-  currentRecipe={items:[]};
+/* ---------- SAVE ---------- */
+function saveRecipe() {
+  const name = qs("recipeName").value.trim();
+  if (!name) return alert(t("recipeName"));
+
+  const sum = currentRecipe.items.reduce((s, i) => s + i.percent, 0);
+  if (Math.round(sum) !== 100) return alert(`${t("sum")} ≠ 100%`);
+
+  recipes.push({
+    name,
+    series: currentSeries,
+    items: currentRecipe.items
+  });
+
+  localStorage.setItem("sico_recipes", JSON.stringify(recipes));
+
+  currentRecipe = { name: "", items: [] };
+  currentSeries = null;
+  qs("recipeName").value = "";
+
+  renderRecipe();
   renderRecipes();
+  showTab("recipes");
 }
 
-function exportTXT(){
-  const txt=JSON.stringify(recipes,null,2);
-  download(txt,"recipes.txt","text/plain");
+/* ---------- RECIPES ---------- */
+function renderRecipes() {
+  const box = qs("recipeList");
+  box.innerHTML = "";
+
+  if (!recipes.length) {
+    box.innerHTML = `<p>${t("noRecipes")}</p>`;
+    return;
+  }
+
+  recipes.forEach(r => {
+    box.innerHTML += `
+      <div class="color">
+        <strong>${r.name}</strong><br>
+        <small>${r.series}</small>
+      </div>
+    `;
+  });
 }
 
-function exportPDF(){
-  const txt=recipes.map(r=>r.name).join("\n");
-  download(txt,"recipes.pdf","application/pdf");
-}
-
-function download(content,name,type){
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([content],{type}));
-  a.download=name;
-  a.click();
-}
-
-/* ---------- INIT ---------- */
-function renderRecipes(){
-  const box=qs("recipeList");
-  box.innerHTML=recipes.length
-    ? recipes.map(r=>`<div class="color"><strong>${r.name}</strong></div>`).join("")
-    : `<p>${t("noRecipes")}</p>`;
-}
-
-document.addEventListener("DOMContentLoaded",()=>{
-  initSeries();
-  renderColors();
-  renderWeight();
-  setLang(currentLang);
-  /* =========================
-   EXPORT / IMPORT TXT
-   ========================= */
-
-function exportTXT(){
-  let txt = recipes.map(r=>{
-    return `# ${r.name}
+/* ---------- EXPORT / IMPORT ---------- */
+function exportTXT() {
+  let txt = recipes
+    .map(
+      r =>
+        `# ${r.name}
 Series: ${r.series}
-${r.items.map(i=>`${i.code} ${i.percent}%`).join("\n")}
-`;
-  }).join("\n----------------\n");
+${r.items.map(i => `${i.code} ${i.percent}%`).join("\n")}`
+    )
+    .join("\n----------------\n");
 
-  const blob = new Blob([txt], {type:"text/plain"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "sico-recipes.txt";
-  a.click();
+  download(txt, "sico-recipes.txt", "text/plain");
 }
 
-function importTXT(input){
+function importTXT(input) {
   const file = input.files[0];
-  if(!file) return;
+  if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = e=>{
+  reader.onload = e => {
     const blocks = e.target.result.split("----------------");
-    blocks.forEach(b=>{
+    blocks.forEach(b => {
       const lines = b.trim().split("\n");
-      if(!lines.length) return;
+      if (!lines.length) return;
 
-      const name = lines[0].replace("#","").trim();
-      const seriesLine = lines.find(l=>l.startsWith("Series"));
-      const series = seriesLine ? seriesLine.split(":")[1].trim() : null;
+      const name = lines[0].replace("#", "").trim();
+      const seriesLine = lines.find(l => l.startsWith("Series"));
+      const series = seriesLine?.split(":")[1].trim();
 
-      const items = lines.filter(l=>l.includes("%")).map(l=>{
-        const [code,p] = l.split(" ");
-        return {code, percent:Number(p.replace("%",""))};
-      });
+      const items = lines
+        .filter(l => l.includes("%"))
+        .map(l => {
+          const [code, p] = l.split(" ");
+          return { code, percent: Number(p.replace("%", "")) };
+        });
 
-      recipes.push({name, series, items});
+      recipes.push({ name, series, items });
     });
 
     localStorage.setItem("sico_recipes", JSON.stringify(recipes));
-    alert("Imported");
     renderRecipes();
+    alert("Imported");
   };
   reader.readAsText(file);
 }
 
-/* =========================
-   PRINT / PDF
-   ========================= */
-
-function printRecipes(){
-  let html = `<h1>SICO MIX</h1>`;
-  recipes.forEach(r=>{
-    html += `<h2>${r.name}</h2>`;
-    html += `<p>Series: ${r.series}</p>`;
-    r.items.forEach(i=>{
-      html += `${i.code}: ${i.percent}%<br>`;
-    });
-    html += "<hr>";
-  });
-
-  const w = window.open("");
-  w.document.write(html);
-  w.print();
+function download(content, name, type) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = name;
+  a.click();
 }
 
-/* =========================
-   NOTES
-   ========================= */
-
-function saveGlobalNote(){
-  const note = qs("globalNote").value;
-  localStorage.setItem("sico_note", note);
-  alert("Saved");
-}
-
-document.addEventListener("DOMContentLoaded", ()=>{
-  const n = localStorage.getItem("sico_note");
-  if(n) qs("globalNote").value = n;
-});
-
-/* =========================
-   PHOTO
-   ========================= */
-
-function savePhoto(input){
-  const file = input.files[0];
-  if(!file) return;
-
-  const reader = new FileReader();
-  reader.onload = e=>{
-    localStorage.setItem("sico_photo", e.target.result);
-    showPhoto();
-  };
-  reader.readAsDataURL(file);
-}
-
-function showPhoto(){
-  const img = localStorage.getItem("sico_photo");
-  if(img){
-    qs("photoPreview").innerHTML = `<img src="${img}" style="max-width:100%">`;
-  }
-}
-
-document.addEventListener("DOMContentLoaded", showPhoto);
+/* ---------- INIT ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+  initSeries();
+  renderColors();
+  renderWeightOptions();
+  renderRecipe();
+  renderRecipes();
 });
