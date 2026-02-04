@@ -21,6 +21,7 @@
   <button onclick="showTab('colors')" data-i18n="paints"></button>
   <button onclick="showTab('new')" data-i18n="newRecipe"></button>
   <button onclick="showTab('recipes')" data-i18n="recipes"></button>
+  <button onclick="showTab('import')" data-i18n="import"></button>
 </nav>
 
 <main>
@@ -41,6 +42,33 @@
   <button onclick="exportTXT()" data-i18n="exportTxt"></button>
   <button onclick="exportPDF()" data-i18n="exportPdf"></button>
   <div id="recipeList"></div>
+</section>
+<section id="import" class="tab">
+  <h2 data-i18n="import"></h2>
+
+  <h3>TXT</h3>
+  <button onclick="exportTXT()">Export TXT</button>
+
+  <br><br>
+
+  <input type="file" id="importFile" accept=".txt" onchange="importTXT(this)">
+
+  <hr>
+
+  <h3>PDF / Print</h3>
+  <button onclick="printRecipes()">Print / PDF</button>
+
+  <hr>
+
+  <h3>Notes</h3>
+  <textarea id="globalNote" rows="4" placeholder="Notes..."></textarea>
+  <button onclick="saveGlobalNote()">Save note</button>
+
+  <hr>
+
+  <h3>Photo</h3>
+  <input type="file" accept="image/*" capture="environment" onchange="savePhoto(this)">
+  <div id="photoPreview"></div>
 </section>
 </main>
 
