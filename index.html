@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#f5f5f5">
+  <meta name="description" content="SICO MIX - додаток для ручного змішування фарб SICO для трафаретного друку">
+  <meta name="keywords" content="фарба, рецепти, кольори, SICO, трафаретний друк">
   <title>SICO MIX</title>
 
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
 
-  <!-- Рекомендую підключати css перед js для кращої продуктивності -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -23,22 +24,22 @@
     </div>
 
     <div class="lang-switcher" role="group" aria-label="Вибір мови">
-      <button type="button" onclick="setLang('ua')" aria-label="Українська">UA</button>
-      <button type="button" onclick="setLang('pl')" aria-label="Polski">PL</button>
-      <button type="button" onclick="setLang('en')" aria-label="English">EN</button>
+      <button type="button" onclick="setLang('ua')" aria-label="Українська" aria-pressed="false">UA</button>
+      <button type="button" onclick="setLang('pl')" aria-label="Polski" aria-pressed="false">PL</button>
+      <button type="button" onclick="setLang('en')" aria-label="English" aria-pressed="false">EN</button>
     </div>
   </header>
 
-  <nav aria-label="Головне меню">
-    <button type="button" onclick="showTab('colors')"    data-i18n="paints"></button>
-    <button type="button" onclick="showTab('new')"       data-i18n="newRecipe"></button>
-    <button type="button" onclick="showTab('recipes')"   data-i18n="recipes"></button>
+  <nav role="tablist" aria-label="Головне меню">
+    <button type="button" role="tab" aria-controls="colors" aria-selected="true" onclick="showTab('colors')" data-i18n="paints"></button>
+    <button type="button" role="tab" aria-controls="new" aria-selected="false" onclick="showTab('new')" data-i18n="newRecipe"></button>
+    <button type="button" role="tab" aria-controls="recipes" aria-selected="false" onclick="showTab('recipes')" data-i18n="recipes"></button>
   </nav>
 
   <main>
 
     <!-- Каталог кольорів -->
-    <section id="colors" class="tab active" aria-labelledby="colors-heading">
+    <section id="colors" class="tab active" role="tabpanel" aria-labelledby="colors-heading">
       <h2 id="colors-heading" data-i18n="catalog"></h2>
 
       <div class="filter-row">
@@ -50,17 +51,26 @@
     </section>
 
     <!-- Новий рецепт -->
-    <section id="new" class="tab hidden" aria-labelledby="new-heading">
+    <section id="new" class="tab hidden" role="tabpanel" aria-labelledby="new-heading">
       <h2 id="new-heading" data-i18n="newRecipe"></h2>
 
-      <input type="text" id="recipeName" placeholder="" data-i18n-placeholder="recipeName" autocomplete="off">
+      <div class="form-group">
+        <label for="recipeName" data-i18n="recipeName"></label>
+        <input type="text" id="recipeName" placeholder="" data-i18n-placeholder="recipeName" autocomplete="off" aria-required="true">
+      </div>
 
-      <textarea id="recipeNote" rows="3" data-i18n-placeholder="recipeNote"></textarea>
+      <div class="form-group">
+        <label for="recipeNote" data-i18n="recipeNote"></label>
+        <textarea id="recipeNote" rows="3" data-i18n-placeholder="recipeNote"></textarea>
+      </div>
 
-      <label class="toggle-switch">
-        <input type="checkbox" id="unitToggle" onchange="toggleMode(this)">
-        <span class="slider" data-unit-text="% ↔ g"></span>
-      </label>
+      <div class="toggle-row">
+        <span data-i18n="mode"></span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="unitToggle" onchange="toggleMode(this)">
+          <span class="slider" data-unit-text="% ↔ g"></span>
+        </label>
+      </div>
 
       <div id="recipeItems" class="recipe-items"></div>
 
@@ -74,21 +84,45 @@
         </select>
       </div>
 
-      <button type="button" class="btn-primary" onclick="saveRecipe()" data-i18n="addRecipe"></button>
+      <div class="button-group">
+        <button type="button" class="btn-secondary" onclick="resetCurrentRecipe()" data-i18n="reset"></button>
+        <button type="button" class="btn-primary" onclick="saveRecipe()" data-i18n="addRecipe"></button>
+      </div>
     </section>
 
     <!-- Збережені рецепти -->
-    <section id="recipes" class="tab hidden" aria-labelledby="recipes-heading">
+    <section id="recipes" class="tab hidden" role="tabpanel" aria-labelledby="recipes-heading">
       <h2 id="recipes-heading" data-i18n="recipes"></h2>
       <div id="recipeList" class="recipe-list"></div>
     </section>
 
   </main>
 
-  <!-- Скрипти в кінці body – стандартна практика -->
+  <!-- Сповіщення -->
+  <div id="notification" class="notification hidden" role="alert" aria-live="assertive"></div>
+
+  <!-- Модальне вікно для підтвердження видалення -->
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 data-i18n="confirmDeleteTitle"></h3>
+        <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p data-i18n="confirmDeleteMessage"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeModal()" data-i18n="cancel"></button>
+        <button type="button" class="btn-danger" onclick="confirmDelete()" data-i18n="delete"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Скрипти -->
   <script src="js/data-colors.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/app.js" defer></script>
+  <script src="js/utils.js" defer></script>
 
 </body>
 </html>
