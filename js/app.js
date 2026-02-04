@@ -1,121 +1,218 @@
-const qs=id=>document.getElementById(id);
+// ────────────────────────────────────────────────
+// Helpers
+// ────────────────────────────────────────────────
+const qs = id => document.getElementById(id);
+const qsa = sel => document.querySelectorAll(sel);
 
-let recipes=JSON.parse(localStorage.getItem("sico_recipes")||"[]");
-let currentRecipe={items:[]};
-let currentSeries=null;
-let mode="percent";
+const getNumber = val => Number(val) || 0;
 
-function showTab(id){
- document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
- qs(id).classList.add("active");
- if(id==="recipes") renderRecipes();
+// ────────────────────────────────────────────────
+// State
+// ────────────────────────────────────────────────
+let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
+let currentRecipe = { items: [] };
+let currentSeries = null;
+let mode = "percent";           // "percent" | "gram"
+
+// ────────────────────────────────────────────────
+// Tab switching
+// ────────────────────────────────────────────────
+function showTab(tabId) {
+  qsa(".tab").forEach(tab => tab.classList.remove("active"));
+  qs(tabId)?.classList.add("active");
+
+  if (tabId === "recipes") {
+    renderRecipes();
+  }
 }
 
-function initSeries(){
- const s=qs("seriesFilter");
- s.innerHTML=`<option value="ALL">${t("allSeries")}</option>`;
- SERIES.filter(x=>x.id!=="ALL").forEach(x=>{
-  const o=document.createElement("option");
-  o.value=x.id;
-  o.textContent=x.id;
-  s.appendChild(o);
- });
- s.onchange=applySeriesFilter;
+// ────────────────────────────────────────────────
+// Series filter
+// ────────────────────────────────────────────────
+function initSeriesFilter() {
+  const select = qs("seriesFilter");
+  if (!select) return;
+
+  select.innerHTML = `<option value="ALL">${t("allSeries")}</option>`;
+
+  SERIES.forEach(series => {
+    if (series.id === "ALL") return;
+    const option = document.createElement("option");
+    option.value = series.id;
+    option.textContent = series.id;
+    select.appendChild(option);
+  });
+
+  select.addEventListener("change", applySeriesFilter);
 }
 
-function applySeriesFilter(){
- const v=qs("seriesFilter").value;
- renderColors(v==="ALL"?COLORS:COLORS.filter(c=>c.series===v));
+function applySeriesFilter() {
+  const value = qs("seriesFilter").value;
+  const filtered = value === "ALL" ? COLORS : COLORS.filter(c => c.series === value);
+  renderColors(filtered);
 }
 
-function renderColors(list=COLORS){
- const box=qs("colorList");
- box.innerHTML="";
- list.forEach(c=>{
-  box.innerHTML+=`
-   <div class="color">
-    <div class="swatch" style="background:${c.hex}"></div>
-    <div><strong>${c.code}</strong><br>${c.name[currentLang]}</div>
-    <button onclick="addColor('${c.code}')">+</button>
-   </div>`;
- });
+// ────────────────────────────────────────────────
+// Color catalog
+// ────────────────────────────────────────────────
+function renderColors(colors = COLORS) {
+  const container = qs("colorList");
+  if (!container) return;
+
+  container.innerHTML = colors.map(color => `
+    <div class="color">
+      <div class="swatch" style="background:${color.hex}"></div>
+      <div>
+        <strong>${color.code}</strong><br>
+        ${color.name[currentLang] || color.name.uk || color.code}
+      </div>
+      <button type="button" onclick="addColor('${color.code}')">+</button>
+    </div>
+  `).join("");
 }
 
-function addColor(code){
- const c=COLORS.find(x=>x.code===code);
- if(!currentSeries){
-  currentSeries=c.series;
-  qs("seriesFilter").value=c.series;
-  qs("seriesBadge").textContent=c.series;
-  qs("seriesBadge").style.display="inline-block";
- }
- if(c.series!==currentSeries){
-  alert(t("errorSeries"));
-  return;
- }
- currentRecipe.items.push({code:c.code,percent:0});
- renderCurrentRecipe();
+// ────────────────────────────────────────────────
+// Recipe management
+// ────────────────────────────────────────────────
+function addColor(code) {
+  const color = COLORS.find(c => c.code === code);
+  if (!color) return;
+
+  if (!currentSeries) {
+    currentSeries = color.series;
+    qs("seriesFilter").value = color.series;
+    qs("seriesBadge").textContent = color.series;
+    qs("seriesBadge").style.display = "inline-block";
+  }
+
+  if (color.series !== currentSeries) {
+    alert(t("errorSeries"));
+    return;
+  }
+
+  currentRecipe.items.push({ code: color.code, percent: 0 });
+  renderCurrentRecipe();
 }
 
-function renderCurrentRecipe(){
- const box=qs("recipeItems");
- const total=Number(qs("totalWeight").value||1000);
- let sum=0;
- box.innerHTML="";
- currentRecipe.items.forEach((i,idx)=>{
-  const val=mode==="percent"?i.percent:(i.percent*total/100).toFixed(1);
-  sum+=i.percent;
-  box.innerHTML+=`
-   <div class="recipe-item">
-    ${i.code}
-    <input type="number" value="${val}" onchange="updateItem(${idx},this.value)">
-    ${mode==="percent"?"%":"g"}
-    <button onclick="removeItem(${idx})">✕</button>
-   </div>`;
- });
- box.innerHTML+=`<strong>${t("sum")}: ${sum}%</strong>`;
+function updateItem(index, rawValue) {
+  const totalWeight = getNumber(qs("totalWeight")?.value) || 1000;
+  const value = getNumber(rawValue);
+
+  if (mode === "percent") {
+    currentRecipe.items[index].percent = value;
+  } else {
+    currentRecipe.items[index].percent = (value / totalWeight) * 100;
+  }
+
+  renderCurrentRecipe();
 }
 
-function updateItem(i,v){
- const total=Number(qs("totalWeight").value||1000);
- currentRecipe.items[i].percent=mode==="percent"?Number(v):(Number(v)/total*100);
- renderCurrentRecipe();
+function removeItem(index) {
+  currentRecipe.items.splice(index, 1);
+
+  if (currentRecipe.items.length === 0) {
+    currentSeries = null;
+    qs("seriesBadge").style.display = "none";
+  }
+
+  renderCurrentRecipe();
 }
 
-function removeItem(i){
- currentRecipe.items.splice(i,1);
- if(!currentRecipe.items.length){
-  currentSeries=null;
-  qs("seriesBadge").style.display="none";
- }
- renderCurrentRecipe();
+function renderCurrentRecipe() {
+  const container = qs("recipeItems");
+  const totalWeight = getNumber(qs("totalWeight")?.value) || 1000;
+  let sumPercent = 0;
+
+  if (!container) return;
+
+  container.innerHTML = currentRecipe.items.map((item, idx) => {
+    const displayValue = mode === "percent"
+      ? item.percent.toFixed(2)
+      : (item.percent * totalWeight / 100).toFixed(1);
+
+    sumPercent += item.percent;
+
+    return `
+      <div class="recipe-item">
+        <span class="code">${item.code}</span>
+        <input type="number" 
+               step="${mode === 'percent' ? '0.1' : '1'}" 
+               min="0" 
+               value="${displayValue}" 
+               onchange="updateItem(${idx}, this.value)">
+        <span class="unit">${mode === "percent" ? "%" : "g"}</span>
+        <button type="button" onclick="removeItem(${idx})">✕</button>
+      </div>
+    `;
+  }).join("");
+
+  container.innerHTML += `
+    <div class="sum-line">
+      <strong>${t("sum")}: ${sumPercent.toFixed(2)}%</strong>
+    </div>
+  `;
 }
 
-function toggleMode(el){
- mode=el.checked?"gram":"percent";
- renderCurrentRecipe();
+function toggleMode(checkbox) {
+  mode = checkbox.checked ? "gram" : "percent";
+  renderCurrentRecipe();
 }
 
-function saveRecipe(){
- currentRecipe.name=qs("recipeName").value;
- currentRecipe.note=qs("recipeNote").value;
- recipes.push({...currentRecipe,series:currentSeries});
- localStorage.setItem("sico_recipes",JSON.stringify(recipes));
- currentRecipe={items:[]};
- currentSeries=null;
- qs("seriesBadge").style.display="none";
- renderCurrentRecipe();
- showTab("recipes");
+function saveRecipe() {
+  const name = qs("recipeName")?.value.trim();
+  if (!name || currentRecipe.items.length === 0) {
+    alert(t("errorEmptyRecipe") || "Вкажіть назву та додайте хоча б один колір");
+    return;
+  }
+
+  const recipeToSave = {
+    name,
+    note: qs("recipeNote")?.value.trim() || "",
+    items: currentRecipe.items.map(i => ({ ...i })), // deep copy
+    series: currentSeries,
+    created: new Date().toISOString()
+  };
+
+  recipes.push(recipeToSave);
+  localStorage.setItem("sico_recipes", JSON.stringify(recipes));
+
+  // Reset
+  currentRecipe = { items: [] };
+  currentSeries = null;
+  qs("seriesBadge").style.display = "none";
+  qs("recipeName").value = "";
+  qs("recipeNote").value = "";
+
+  renderCurrentRecipe();
+  showTab("recipes");
 }
 
-function renderRecipes(){
- const box=qs("recipeList");
- box.innerHTML=recipes.length?recipes.map(r=>`
-  <div class="color"><strong>${r.name}</strong><br>${r.series}</div>`).join("")
-  :"<p>—</p>";
+// ────────────────────────────────────────────────
+// Saved recipes list
+// ────────────────────────────────────────────────
+function renderRecipes() {
+  const container = qs("recipeList");
+  if (!container) return;
+
+  if (recipes.length === 0) {
+    container.innerHTML = `<p data-i18n="noRecipes">—</p>`;
+    return;
+  }
+
+  container.innerHTML = recipes.map(recipe => `
+    <div class="recipe-preview">
+      <strong>${recipe.name}</strong>
+      <div class="meta">${recipe.series || "?"} • ${recipe.items.length} кол.</div>
+      ${recipe.note ? `<small>${recipe.note}</small>` : ""}
+    </div>
+  `).join("");
 }
 
-document.addEventListener("DOMContentLoaded",()=>{
- initSeries();
- renderColors();
+// ────────────────────────────────────────────────
+// Init
+// ────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  initSeriesFilter();
+  renderColors();
+  // Можна додати qs("seriesBadge").style.display = "none"; якщо потрібно
 });
