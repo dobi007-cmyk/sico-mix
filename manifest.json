@@ -1,21 +1,67 @@
 {
   "name": "SICO MIX",
   "short_name": "SICO MIX",
-  "description": "Manual mixing app for SICO screen printing inks",
+  "description": "Додаток для ручного змішування фарб SICO для трафаретного друку",
   "start_url": "./index.html",
   "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay"],
   "background_color": "#ffffff",
-  "theme_color": "#111111",
+  "theme_color": "#1a1a1a",
+  "orientation": "portrait-primary",
+  "lang": "uk",
+  "dir": "ltr",
+  "categories": ["productivity", "utilities"],
   "icons": [
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Новий рецепт",
+      "short_name": "Новий",
+      "description": "Створити новий рецепт змішування",
+      "url": "./index.html#new",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Каталог фарб",
+      "short_name": "Каталог",
+      "description": "Переглянути всі кольори SICO",
+      "url": "./index.html#colors",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "./index.html",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "name",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }
