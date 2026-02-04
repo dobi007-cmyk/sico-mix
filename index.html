@@ -1,79 +1,123 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<title>SICO MIX</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <title>SICO MIX</title>
+
+  <!-- MOBILE / PWA -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="SICO MIX">
+
+  <!-- ICONS -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!-- MANIFEST -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- STYLES -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<header>
-  <h1>SICO MIX</h1>
+<header style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+  <div style="display:flex; align-items:center; gap:10px;">
+    <img src="icons/icon-192.png" alt="SICO MIX" style="height:48px;">
+    <h1 style="margin:0;">SICO MIX</h1>
+  </div>
+
   <div>
-    <button onclick="setLang('ua')">UA</button>
-    <button onclick="setLang('pl')">PL</button>
-    <button onclick="setLang('en')">EN</button>
+    <button type="button" onclick="setLang('ua')">UA</button>
+    <button type="button" onclick="setLang('pl')">PL</button>
+    <button type="button" onclick="setLang('en')">EN</button>
   </div>
 </header>
 
 <nav>
-  <button onclick="showTab('colors')" data-i18n="paints"></button>
-  <button onclick="showTab('new')" data-i18n="newRecipe"></button>
-  <button onclick="showTab('recipes')" data-i18n="recipes"></button>
-  <button onclick="showTab('import')" data-i18n="import"></button>
+  <button type="button" onclick="showTab('colors')" data-i18n="paints"></button>
+  <button type="button" onclick="showTab('recipes')" data-i18n="recipes"></button>
+  <button type="button" onclick="showTab('new')" data-i18n="newRecipe"></button>
+  <button type="button" onclick="showTab('import')" data-i18n="import"></button>
 </nav>
 
 <main>
+
+<!-- COLORS -->
 <section id="colors" class="tab active">
-  <select id="seriesFilter" onchange="renderColors()"></select>
+  <h2 data-i18n="catalog"></h2>
+
+  <div style="margin-bottom:10px;">
+    <label data-i18n="filterSeries"></label>
+    <select id="seriesFilter" onchange="applySeriesFilter()">
+      <option value="ALL" data-i18n="allSeries"></option>
+    </select>
+  </div>
+
   <div id="colorList"></div>
 </section>
 
+<!-- NEW RECIPE -->
 <section id="new" class="tab">
+  <h2 data-i18n="newRecipe"></h2>
+
   <input id="recipeName" data-i18n-placeholder="recipeName">
+  <input id="recipeNote" data-i18n-placeholder="recipeNote">
+
+  <h3 data-i18n="catalog"></h3>
+
   <div id="recipeItems"></div>
-  <select id="totalWeight" onchange="calculateWeight()"></select>
-  <div id="weightResult"></div>
-  <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
-</section>
 
-<section id="recipes" class="tab">
-  <button onclick="exportTXT()" data-i18n="exportTxt"></button>
-  <button onclick="exportPDF()" data-i18n="exportPdf"></button>
-  <div id="recipeList"></div>
-</section>
-<section id="import" class="tab">
-  <h2 data-i18n="import"></h2>
-
-  <h3>TXT</h3>
-  <button onclick="exportTXT()">Export TXT</button>
+  <button type="button" onclick="addRecipeItem()" data-i18n="addColor"></button>
 
   <br><br>
 
-  <input type="file" id="importFile" accept=".txt" onchange="importTXT(this)">
+  <button type="button" onclick="saveRecipe()" data-i18n="addRecipe"></button>
 
   <hr>
 
-  <h3>PDF / Print</h3>
-  <button onclick="printRecipes()">Print / PDF</button>
+  <h3 data-i18n="weightCalc"></h3>
 
-  <hr>
+  <select id="totalWeight" onchange="calculateWeight()">
+    <option value="100">100 г</option>
+    <option value="500">500 г</option>
+    <option value="1000" selected>1 кг</option>
+    <option value="5000">5 кг</option>
+  </select>
 
-  <h3>Notes</h3>
-  <textarea id="globalNote" rows="4" placeholder="Notes..."></textarea>
-  <button onclick="saveGlobalNote()">Save note</button>
-
-  <hr>
-
-  <h3>Photo</h3>
-  <input type="file" accept="image/*" capture="environment" onchange="savePhoto(this)">
-  <div id="photoPreview"></div>
+  <div id="weightResult"></div>
 </section>
+
+<!-- RECIPES -->
+<section id="recipes" class="tab">
+  <h2 data-i18n="mixed"></h2>
+  <div id="recipeList"></div>
+</section>
+
+<!-- IMPORT / EXPORT -->
+<section id="import" class="tab">
+  <h2 data-i18n="import"></h2>
+
+  <button type="button" onclick="exportRecipes()" data-i18n="exportTxt"></button>
+  <br><br>
+
+  <input type="file" id="importFile" accept=".txt" onchange="handleImport(this)" hidden>
+  <button type="button" onclick="importRecipes()" data-i18n="importTxt"></button>
+
+  <p data-i18n="pasteText"></p>
+  <textarea id="importText" rows="8" style="width:100%"></textarea>
+  <br>
+  <button type="button" onclick="importFromText()" data-i18n="importTextBtn"></button>
+</section>
+
 </main>
 
+<!-- SCRIPTS -->
 <script src="js/data-colors.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/app.js"></script>
+
 </body>
 </html>
