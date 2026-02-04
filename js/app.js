@@ -1,29 +1,33 @@
 const qs = id => document.getElementById(id);
 
-/* ---------- STATE ---------- */
-let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
-let draft = JSON.parse(localStorage.getItem("sico_draft") || "null");
+/* =========================
+   STATE
+========================= */
+let currentLang = localStorage.getItem("sico_lang") || "ua";
+let mode = "percent"; // percent | gram
 
-let currentRecipe = draft || {
-  name: "",
+let currentRecipe = {
   items: [],
-  status: "draft",
-  version: 1,
   series: null
 };
 
-/* ---------- TABS ---------- */
+let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
+
+/* =========================
+   TABS
+========================= */
 function showTab(id) {
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   qs(id).classList.add("active");
 }
 
-/* ---------- SERIES ---------- */
+/* =========================
+   SERIES
+========================= */
 function initSeries() {
   const s = qs("seriesFilter");
-  if (!s) return;
-
   s.innerHTML = "";
+
   SERIES.forEach(x => {
     const o = document.createElement("option");
     o.value = x.id;
@@ -32,107 +36,154 @@ function initSeries() {
   });
 }
 
-/* ---------- COLORS ---------- */
+/* =========================
+   COLORS
+========================= */
 function renderColors() {
-  const filter = qs("seriesFilter");
-  if (!filter) return;
+  const filter = qs("seriesFilter").value;
+  const list = filter === "ALL"
+    ? COLORS
+    : COLORS.filter(c => c.series === filter);
 
-  const v = filter.value;
-  const list = v === "ALL" ? COLORS : COLORS.filter(c => c.series === v);
+  const box = qs("colorList");
+  box.innerHTML = "";
 
-  qs("colorList").innerHTML = list.map(c => `
-    <div class="color">
-      <div class="swatch" style="background:${c.hex}"></div>
-      <div>
-        <strong>${c.code}</strong><br>
-        ${c.name[currentLang]}
+  list.forEach(c => {
+    box.innerHTML += `
+      <div class="color">
+        <div class="swatch" style="background:${c.hex}"></div>
+        <div>
+          <strong>${c.code}</strong><br>
+          ${c.name[currentLang]}
+        </div>
+        <button onclick="addColor('${c.code}')">+</button>
       </div>
-      <button onclick="addColor('${c.code}')">+</button>
-    </div>
-  `).join("");
+    `;
+  });
 }
 
-/* ---------- RECIPE ---------- */
+/* =========================
+   RECIPE
+========================= */
 function addColor(code) {
   const c = COLORS.find(x => x.code === code);
   if (!c) return;
 
-  if (!currentRecipe.series) currentRecipe.series = c.series;
+  if (!currentRecipe.series) {
+    currentRecipe.series = c.series;
+  }
+
   if (c.series !== currentRecipe.series) {
-    alert(t("errorSeries"));
+    alert(t("errorSeries") + ": " + currentRecipe.series);
     return;
   }
 
-  currentRecipe.items.push({ code: c.code, percent: 0 });
-  autosave();
+  currentRecipe.items.push({
+    code: c.code,
+    percent: 0
+  });
+
   renderRecipe();
 }
 
 function renderRecipe() {
   const box = qs("recipeItems");
-  if (!box) return;
-
-  if (!currentRecipe.items.length) {
-    box.innerHTML = `<p>${t("noColors")}</p>`;
-    return;
-  }
+  box.innerHTML = "";
 
   let sum = 0;
-  box.innerHTML = currentRecipe.items.map((i, idx) => {
+  const totalWeight = Number(qs("totalWeight").value || 1000);
+
+  currentRecipe.items.forEach((i, idx) => {
     sum += i.percent;
-    return `
+
+    const value = mode === "percent"
+      ? i.percent
+      : ((totalWeight * i.percent) / 100).toFixed(1);
+
+    const unit = mode === "percent" ? "%" : t("grams");
+
+    box.innerHTML += `
       <div class="recipe-item">
         ${i.code}
-        <input type="number" value="${i.percent}"
-          onchange="updatePercent(${idx}, this.value)"> %
+        <input type="number"
+               value="${value}"
+               onchange="updateValue(${idx}, this.value)">
+        ${unit}
         <button onclick="removeColor(${idx})">✕</button>
       </div>
     `;
-  }).join("");
+  });
 
   box.innerHTML += `<strong>${t("sum")}: ${sum}%</strong>`;
-  calculateWeight();
+
+  renderWeightResult();
 }
 
-function updatePercent(i, v) {
-  currentRecipe.items[i].percent = Number(v);
-  autosave();
+function updateValue(index, value) {
+  const totalWeight = Number(qs("totalWeight").value || 1000);
+
+  if (mode === "percent") {
+    currentRecipe.items[index].percent = Number(value);
+  } else {
+    currentRecipe.items[index].percent =
+      (Number(value) / totalWeight) * 100;
+  }
+
   renderRecipe();
 }
 
 function removeColor(i) {
   currentRecipe.items.splice(i, 1);
   if (!currentRecipe.items.length) currentRecipe.series = null;
-  autosave();
   renderRecipe();
 }
 
-/* ---------- WEIGHT ---------- */
-function setWeight(v) {
-  qs("totalWeight").value = v;
-  calculateWeight();
+/* =========================
+   MODE
+========================= */
+function toggleMode() {
+  mode = mode === "percent" ? "gram" : "percent";
+  renderRecipe();
 }
 
-function calculateWeight() {
-  const w = Number(qs("totalWeight")?.value || 0);
-  const out = qs("weightResult");
-  if (!out) return;
-
-  out.innerHTML = currentRecipe.items.map(i =>
-    `${i.code}: ${(w * i.percent / 100).toFixed(1)} ${t("grams")}`
-  ).join("<br>");
+/* =========================
+   WEIGHT
+========================= */
+function renderWeightOptions() {
+  qs("totalWeight").innerHTML = `
+    <option value="100">100 ${t("grams")}</option>
+    <option value="500">500 ${t("grams")}</option>
+    <option value="1000">1 ${t("kilograms")}</option>
+    <option value="5000">5 ${t("kilograms")}</option>
+  `;
 }
 
-/* ---------- SAVE ---------- */
+function renderWeightResult() {
+  const total = Number(qs("totalWeight").value || 1000);
+  const box = qs("weightResult");
+
+  box.innerHTML = currentRecipe.items.map(i => {
+    const g = ((total * i.percent) / 100).toFixed(1);
+    return `${i.code}: <strong>${g} ${t("grams")}</strong>`;
+  }).join("<br>");
+}
+
+/* =========================
+   SAVE / LIST
+========================= */
 function saveRecipe() {
-  currentRecipe.name = qs("recipeName").value.trim();
-  if (!currentRecipe.name) return;
+  const name = qs("recipeName").value.trim();
+  if (!name) return;
 
-  recipes.push({ ...currentRecipe });
+  recipes.push({
+    name,
+    series: currentRecipe.series,
+    items: currentRecipe.items
+  });
+
   localStorage.setItem("sico_recipes", JSON.stringify(recipes));
-  localStorage.removeItem("sico_draft");
 
-  currentRecipe = { name: "", items: [], status: "draft", version: 1, series: null };
+  currentRecipe = { items: [], series: null };
   qs("recipeName").value = "";
 
   renderRecipe();
@@ -140,50 +191,20 @@ function saveRecipe() {
   showTab("recipes");
 }
 
-/* ---------- CLONE ---------- */
-function cloneRecipe(index) {
-  const r = recipes[index];
-  currentRecipe = {
-    ...r,
-    version: r.version + 1,
-    status: "draft"
-  };
-  qs("recipeName").value = `${r.name} v${currentRecipe.version}`;
-  autosave();
-  showTab("new");
-  renderRecipe();
-}
-
-/* ---------- AUTOSAVE ---------- */
-function autosave() {
-  localStorage.setItem("sico_draft", JSON.stringify(currentRecipe));
-}
-
-/* ---------- LIST ---------- */
 function renderRecipes() {
   const box = qs("recipeList");
-  if (!box) return;
-
-  if (!recipes.length) {
-    box.innerHTML = `<p>${t("noRecipes")}</p>`;
-    return;
-  }
-
-  box.innerHTML = recipes.map((r, i) => `
-    <div class="color">
-      <strong>${r.name} v${r.version}</strong><br>
-      ${t(r.status)}
-      <button onclick="cloneRecipe(${i})">📋</button>
-    </div>
-  `).join("");
+  box.innerHTML = recipes.length
+    ? recipes.map(r => `<div class="color"><strong>${r.name}</strong></div>`).join("")
+    : `<p>${t("noRecipes")}</p>`;
 }
 
-/* ---------- INIT ---------- */
+/* =========================
+   INIT
+========================= */
 document.addEventListener("DOMContentLoaded", () => {
   initSeries();
+  renderWeightOptions();
   renderColors();
   renderRecipe();
   renderRecipes();
-
-  if (draft) qs("recipeName").value = draft.name || "";
 });
