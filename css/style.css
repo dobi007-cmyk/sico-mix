@@ -1,102 +1,340 @@
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,Arial;
-  background:#f4f4f4;
-  color:#111;
+/* =========================
+   SICO MIX – Styles
+   2025–2026 modernized version
+   ========================= */
+
+:root {
+  --bg: #f5f5f5;
+  --bg-card: #ffffff;
+  --text: #111111;
+  --text-secondary: #555555;
+  --border: #e0e0e0;
+  --primary: #111111;
+  --primary-text: #ffffff;
+  --accent: #0066cc;
+  --danger: #d32f2f;
+  --radius: 10px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121212;
+    --bg-card: #1e1e1e;
+    --text: #e0e0e0;
+    --text-secondary: #aaaaaa;
+    --border: #333333;
+    --primary: #e0e0e0;
+    --primary-text: #111111;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-base);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* HEADER */
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px;
-  background:#fff;
-  border-bottom:1px solid #ddd;
-}
-.header-left{
-  display:flex;
-  gap:10px;
-  align-items:center;
-}
-#seriesBadge{
-  background:#111;
-  color:#fff;
-  padding:2px 8px;
-  border-radius:12px;
-  font-size:12px;
-  display:none;
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
 }
 
-/* NAV */
-nav{
-  display:flex;
-  gap:6px;
-  padding:8px;
-  background:#eee;
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
 }
-nav button{
-  flex:1;
-  padding:10px;
-  border:none;
-  border-radius:6px;
-  background:#fff;
-  font-size:14px;
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+#seriesBadge {
+  background: var(--primary);
+  color: var(--primary-text);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: none;
+}
+
+/* NAVIGATION */
+nav {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 60px; /* приблизно висота header */
+  z-index: 90;
+  backdrop-filter: blur(8px);
+}
+
+nav button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text);
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+nav button:hover {
+  background: var(--border);
+  transform: translateY(-1px);
+}
+
+nav button.active {
+  background: var(--primary);
+  color: var(--primary-text);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
 /* TABS */
-.tab{display:none}
-.tab.active{display:block}
-
-/* LISTS */
-.color{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  background:#fff;
-  padding:10px;
-  border-radius:8px;
-  margin-bottom:8px;
-}
-.swatch{
-  width:32px;
-  height:32px;
-  border-radius:4px;
-  border:1px solid #ccc;
-}
-.color button{
-  margin-left:auto;
-  width:34px;
-  height:34px;
-  border:none;
-  border-radius:50%;
-  background:#111;
-  color:#fff;
+.tab {
+  display: none;
+  padding: var(--spacing-lg);
 }
 
-/* RECIPE */
-.recipe-item{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  margin-bottom:6px;
-}
-.recipe-item input{
-  width:70px;
+.tab.active {
+  display: block;
 }
 
-/* INPUTS */
-input,select,textarea{
-  width:100%;
-  padding:8px;
-  margin-bottom:10px;
+/* COLOR CARDS */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
 }
 
-/* TOGGLE */
-.toggle{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin:10px 0;
+.color {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  background: var(--bg-card);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  transition: all 0.18s ease;
+}
+
+.color:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.swatch {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.color strong {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+}
+
+.color button {
+  margin-left: auto;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-text);
+  font-size: 1.3rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.color button:hover {
+  background: #333;
+  transform: scale(1.1);
+}
+
+/* RECIPE ITEMS */
+.recipe-items {
+  margin: var(--spacing-lg) 0;
+}
+
+.recipe-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--bg-card);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--border);
+}
+
+.recipe-item .code {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  min-width: 80px;
+}
+
+.recipe-item input {
+  width: 90px;
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+.recipe-item .unit {
+  font-weight: 500;
+  min-width: 30px;
+}
+
+.recipe-item button {
+  background: var(--danger);
+  color: white;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.sum-line {
+  padding: var(--spacing-md);
+  text-align: right;
+  font-size: 1.1rem;
+}
+
+/* FORM ELEMENTS */
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  margin: var(--spacing-sm) 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,102,204,0.15);
+}
+
+/* TOGGLE SWITCH */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  margin: var(--spacing-lg) 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "% ↔ g";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background: white;
+  transition: .4s;
+  border-radius: 50%;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+}
+
+input:checked + .slider {
+  background: var(--accent);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* BUTTONS */
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  color: var(--primary-text);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: var(--spacing-lg);
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background: #222;
+  transform: translateY(-2px);
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  header { padding: var(--spacing-md); }
+  nav    { padding: var(--spacing-sm); }
+  .tab   { padding: var(--spacing-md); }
+  
+  .color-grid {
+    grid-template-columns: 1fr;
+  }
 }
