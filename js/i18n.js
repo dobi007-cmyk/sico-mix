@@ -1,91 +1,99 @@
+/* =========================
+   SICO MIX – i18n
+   ========================= */
+
 const i18n = {
-  ua:{
-    paints:"Фарби",
-    recipes:"Рецепти",
-    newRecipe:"Новий рецепт",
-    import:"Імпорт / Експорт",
+  ua: {
+    paints: "Фарби",
+    recipes: "Рецепти",
+    newRecipe: "Новий рецепт",
+    import: "Імпорт / Експорт",
 
-    catalog:"Каталог фарб",
+    catalog: "Каталог фарб",
+    mixed: "Змішані рецепти",
 
-    recipeName:"Назва рецепта",
-    addRecipe:"Зберегти рецепт",
+    recipeName: "Назва рецепта",
+    recipeNote: "Нотатка",
+    addRecipe: "Зберегти рецепт",
 
-    weightCalc:"Калькулятор ваги",
-    sum:"Сума",
+    weightCalc: "Калькулятор ваги",
+    sum: "Сума",
+    noColors: "Немає фарб у рецепті",
 
-    grams:"г",
-    kilograms:"кг",
+    grams: "г",
+    kilograms: "кг",
 
-    filterSeries:"Серія фарб",
-    allSeries:"Всі серії",
+    filterSeries: "Серія фарб",
+    allSeries: "Всі серії",
 
-    status:"Статус",
-    draft:"Чернетка",
-    test:"Тест",
-    approved:"Підтверджений",
+    errorSeries: "Можна змішувати тільки в межах однієї серії",
+    currentSeries: "Поточна серія",
 
-    clone:"Клонувати",
-    noRecipes:"Немає рецептів"
+    noRecipes: "Немає рецептів"
   },
 
-  pl:{
-    paints:"Farby",
-    recipes:"Receptury",
-    newRecipe:"Nowa receptura",
-    import:"Import / Export",
+  pl: {
+    paints: "Farby",
+    recipes: "Receptury",
+    newRecipe: "Nowa receptura",
+    import: "Import / Export",
 
-    catalog:"Katalog farb",
+    catalog: "Katalog farb",
+    mixed: "Receptury mieszane",
 
-    recipeName:"Nazwa receptury",
-    addRecipe:"Zapisz",
+    recipeName: "Nazwa receptury",
+    recipeNote: "Notatka",
+    addRecipe: "Zapisz recepturę",
 
-    weightCalc:"Kalkulator wagi",
-    sum:"Suma",
+    weightCalc: "Kalkulator wagi",
+    sum: "Suma",
+    noColors: "Brak farb w recepturze",
 
-    grams:"g",
-    kilograms:"kg",
+    grams: "g",
+    kilograms: "kg",
 
-    filterSeries:"Seria farb",
-    allSeries:"Wszystkie serie",
+    filterSeries: "Seria farb",
+    allSeries: "Wszystkie serie",
 
-    status:"Status",
-    draft:"Szkic",
-    test:"Test",
-    approved:"Zatwierdzony",
+    errorSeries: "Można mieszać tylko w jednej serii",
+    currentSeries: "Aktualna seria",
 
-    clone:"Klonuj",
-    noRecipes:"Brak receptur"
+    noRecipes: "Brak receptur"
   },
 
-  en:{
-    paints:"Paints",
-    recipes:"Recipes",
-    newRecipe:"New recipe",
-    import:"Import / Export",
+  en: {
+    paints: "Paints",
+    recipes: "Recipes",
+    newRecipe: "New recipe",
+    import: "Import / Export",
 
-    catalog:"Paint catalog",
+    catalog: "Paint catalog",
+    mixed: "Mixed recipes",
 
-    recipeName:"Recipe name",
-    addRecipe:"Save",
+    recipeName: "Recipe name",
+    recipeNote: "Note",
+    addRecipe: "Save recipe",
 
-    weightCalc:"Weight calculator",
-    sum:"Total",
+    weightCalc: "Weight calculator",
+    sum: "Total",
+    noColors: "No colors in recipe",
 
-    grams:"g",
-    kilograms:"kg",
+    grams: "g",
+    kilograms: "kg",
 
-    filterSeries:"Paint series",
-    allSeries:"All series",
+    filterSeries: "Paint series",
+    allSeries: "All series",
 
-    status:"Status",
-    draft:"Draft",
-    test:"Test",
-    approved:"Approved",
+    errorSeries: "You can mix only within one series",
+    currentSeries: "Current series",
 
-    clone:"Clone",
-    noRecipes:"No recipes"
+    noRecipes: "No recipes"
   }
 };
+
+/* =========================
+   Language handling
+   ========================= */
 
 let currentLang = localStorage.getItem("sico_lang") || "ua";
 
@@ -105,18 +113,13 @@ function setLang(lang) {
     el.placeholder = t(el.dataset.i18nPlaceholder);
   });
 
-  if (typeof initSeries === "function") initSeries();
-  if (typeof renderColors === "function") renderColors();
+  // оновлення динамічних частин
   if (typeof renderWeightOptions === "function") renderWeightOptions();
-  if (typeof renderRecipe === "function") renderRecipe();
+  if (typeof renderColors === "function") renderColors();
   if (typeof renderRecipes === "function") renderRecipes();
+  if (typeof renderCurrentRecipe === "function") renderCurrentRecipe();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   setLang(currentLang);
 });
-
-
-  if(window.renderColors) renderColors();
-  if(window.renderRecipes) renderRecipes();
-}
