@@ -130,4 +130,112 @@ document.addEventListener("DOMContentLoaded",()=>{
   renderColors();
   renderWeight();
   setLang(currentLang);
+  /* =========================
+   EXPORT / IMPORT TXT
+   ========================= */
+
+function exportTXT(){
+  let txt = recipes.map(r=>{
+    return `# ${r.name}
+Series: ${r.series}
+${r.items.map(i=>`${i.code} ${i.percent}%`).join("\n")}
+`;
+  }).join("\n----------------\n");
+
+  const blob = new Blob([txt], {type:"text/plain"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "sico-recipes.txt";
+  a.click();
+}
+
+function importTXT(input){
+  const file = input.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const blocks = e.target.result.split("----------------");
+    blocks.forEach(b=>{
+      const lines = b.trim().split("\n");
+      if(!lines.length) return;
+
+      const name = lines[0].replace("#","").trim();
+      const seriesLine = lines.find(l=>l.startsWith("Series"));
+      const series = seriesLine ? seriesLine.split(":")[1].trim() : null;
+
+      const items = lines.filter(l=>l.includes("%")).map(l=>{
+        const [code,p] = l.split(" ");
+        return {code, percent:Number(p.replace("%",""))};
+      });
+
+      recipes.push({name, series, items});
+    });
+
+    localStorage.setItem("sico_recipes", JSON.stringify(recipes));
+    alert("Imported");
+    renderRecipes();
+  };
+  reader.readAsText(file);
+}
+
+/* =========================
+   PRINT / PDF
+   ========================= */
+
+function printRecipes(){
+  let html = `<h1>SICO MIX</h1>`;
+  recipes.forEach(r=>{
+    html += `<h2>${r.name}</h2>`;
+    html += `<p>Series: ${r.series}</p>`;
+    r.items.forEach(i=>{
+      html += `${i.code}: ${i.percent}%<br>`;
+    });
+    html += "<hr>";
+  });
+
+  const w = window.open("");
+  w.document.write(html);
+  w.print();
+}
+
+/* =========================
+   NOTES
+   ========================= */
+
+function saveGlobalNote(){
+  const note = qs("globalNote").value;
+  localStorage.setItem("sico_note", note);
+  alert("Saved");
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  const n = localStorage.getItem("sico_note");
+  if(n) qs("globalNote").value = n;
+});
+
+/* =========================
+   PHOTO
+   ========================= */
+
+function savePhoto(input){
+  const file = input.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e=>{
+    localStorage.setItem("sico_photo", e.target.result);
+    showPhoto();
+  };
+  reader.readAsDataURL(file);
+}
+
+function showPhoto(){
+  const img = localStorage.getItem("sico_photo");
+  if(img){
+    qs("photoPreview").innerHTML = `<img src="${img}" style="max-width:100%">`;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", showPhoto);
 });
