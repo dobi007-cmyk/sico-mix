@@ -1,82 +1,125 @@
+/* =========================
+   SICO MIX – i18n
+   ========================= */
+
 const i18n = {
-  ua:{
-    paints:"Фарби",
-    recipes:"Рецепти",
-    newRecipe:"Новий рецепт",
-    catalog:"Каталог фарб",
-    recipeName:"Назва рецепта",
-    addRecipe:"Зберегти рецепт",
-    weightCalc:"Калькулятор ваги",
-    grams:"г",
-    kilograms:"кг",
-    sum:"Сума",
-    filterSeries:"Серія фарб",
-    allSeries:"Всі серії",
-    addColor:"Додати фарбу",
-    errorSeries:"Можна змішувати тільки в межах однієї серії",
-    currentSeries:"Поточна серія",
-    exportTxt:"Експорт TXT",
-    exportPdf:"Експорт PDF",
-    importTxt:"Імпорт TXT",
-    noRecipes:"Немає рецептів"
+  ua: {
+    paints: "Фарби",
+    recipes: "Рецепти",
+    newRecipe: "Новий рецепт",
+    import: "Імпорт / Експорт",
+
+    catalog: "Каталог фарб",
+    mixed: "Змішані рецепти",
+
+    recipeName: "Назва рецепта",
+    recipeNote: "Нотатка",
+    addRecipe: "Зберегти рецепт",
+
+    weightCalc: "Калькулятор ваги",
+    sum: "Сума",
+    noColors: "Немає фарб у рецепті",
+
+    grams: "г",
+    kilograms: "кг",
+
+    filterSeries: "Серія фарб",
+    allSeries: "Всі серії",
+
+    errorSeries: "Можна змішувати тільки в межах однієї серії",
+    currentSeries: "Поточна серія",
+
+    noRecipes: "Немає рецептів"
   },
-  pl:{
-    paints:"Farby",
-    recipes:"Receptury",
-    newRecipe:"Nowa receptura",
-    catalog:"Katalog farb",
-    recipeName:"Nazwa receptury",
-    addRecipe:"Zapisz recepturę",
-    weightCalc:"Kalkulator wagi",
-    grams:"g",
-    kilograms:"kg",
-    sum:"Suma",
-    filterSeries:"Seria farb",
-    allSeries:"Wszystkie serie",
-    addColor:"Dodaj farbę",
-    errorSeries:"Można mieszać tylko w jednej serii",
-    currentSeries:"Aktualna seria",
-    exportTxt:"Eksport TXT",
-    exportPdf:"Eksport PDF",
-    importTxt:"Import TXT",
-    noRecipes:"Brak receptur"
+
+  pl: {
+    paints: "Farby",
+    recipes: "Receptury",
+    newRecipe: "Nowa receptura",
+    import: "Import / Export",
+
+    catalog: "Katalog farb",
+    mixed: "Receptury mieszane",
+
+    recipeName: "Nazwa receptury",
+    recipeNote: "Notatka",
+    addRecipe: "Zapisz recepturę",
+
+    weightCalc: "Kalkulator wagi",
+    sum: "Suma",
+    noColors: "Brak farb w recepturze",
+
+    grams: "g",
+    kilograms: "kg",
+
+    filterSeries: "Seria farb",
+    allSeries: "Wszystkie serie",
+
+    errorSeries: "Można mieszać tylko w jednej serii",
+    currentSeries: "Aktualna seria",
+
+    noRecipes: "Brak receptur"
   },
-  en:{
-    paints:"Paints",
-    recipes:"Recipes",
-    newRecipe:"New recipe",
-    catalog:"Paint catalog",
-    recipeName:"Recipe name",
-    addRecipe:"Save recipe",
-    weightCalc:"Weight calculator",
-    grams:"g",
-    kilograms:"kg",
-    sum:"Total",
-    filterSeries:"Paint series",
-    allSeries:"All series",
-    addColor:"Add color",
-    errorSeries:"You can mix only within one series",
-    currentSeries:"Current series",
-    exportTxt:"Export TXT",
-    exportPdf:"Export PDF",
-    importTxt:"Import TXT",
-    noRecipes:"No recipes"
+
+  en: {
+    paints: "Paints",
+    recipes: "Recipes",
+    newRecipe: "New recipe",
+    import: "Import / Export",
+
+    catalog: "Paint catalog",
+    mixed: "Mixed recipes",
+
+    recipeName: "Recipe name",
+    recipeNote: "Note",
+    addRecipe: "Save recipe",
+
+    weightCalc: "Weight calculator",
+    sum: "Total",
+    noColors: "No colors in recipe",
+
+    grams: "g",
+    kilograms: "kg",
+
+    filterSeries: "Paint series",
+    allSeries: "All series",
+
+    errorSeries: "You can mix only within one series",
+    currentSeries: "Current series",
+
+    noRecipes: "No recipes"
   }
 };
 
+/* =========================
+   Language handling
+   ========================= */
+
 let currentLang = localStorage.getItem("sico_lang") || "ua";
 
-function t(k){ return i18n[currentLang][k] || k; }
+function t(key) {
+  return i18n[currentLang][key] || key;
+}
 
-function setLang(lang){
+function setLang(lang) {
   currentLang = lang;
-  localStorage.setItem("sico_lang",lang);
+  localStorage.setItem("sico_lang", lang);
 
-  document.querySelectorAll("[data-i18n]").forEach(e=>{
-    e.textContent = t(e.dataset.i18n);
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    el.textContent = t(el.dataset.i18n);
   });
 
-  renderColors();
-  renderWeight();
-  renderRecipes();
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    el.placeholder = t(el.dataset.i18nPlaceholder);
+  });
+
+  // оновлення динамічних частин
+  if (typeof renderWeightOptions === "function") renderWeightOptions();
+  if (typeof renderColors === "function") renderColors();
+  if (typeof renderRecipes === "function") renderRecipes();
+  if (typeof renderCurrentRecipe === "function") renderCurrentRecipe();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  setLang(currentLang);
+});
