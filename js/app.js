@@ -1,75 +1,88 @@
+// ────────────────────────────────────────────────
+// Helpers
+// ────────────────────────────────────────────────
 const qs = id => document.getElementById(id);
 const qsa = sel => document.querySelectorAll(sel);
 
+const getNumber = val => Number(val) || 0;
+
+// ────────────────────────────────────────────────
+// State
+// ────────────────────────────────────────────────
 let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
 let currentRecipe = { items: [] };
 let currentSeries = null;
-let mode = "percent";
-let filteredColors = COLORS;
+let mode = "percent";           // "percent" | "gram"
 
-/* ================= TAB ================= */
+// ────────────────────────────────────────────────
+// Tab switching
+// ────────────────────────────────────────────────
+function showTab(tabId) {
+  qsa(".tab").forEach(tab => tab.classList.remove("active"));
+  qs(tabId)?.classList.add("active");
 
-function showTab(id) {
-  qsa(".tab").forEach(t => t.classList.remove("active"));
-  qsa("nav button").forEach(b => b.classList.remove("active"));
-
-  qs(id).classList.add("active");
-  document.querySelector(`nav button[data-tab="${id}"]`)?.classList.add("active");
-
-  if (id === "recipes") renderRecipes();
+  if (tabId === "recipes") {
+    renderRecipes();
+  }
 }
 
-/* ================= SERIES ================= */
-
+// ────────────────────────────────────────────────
+// Series filter
+// ────────────────────────────────────────────────
 function initSeriesFilter() {
   const select = qs("seriesFilter");
+  if (!select) return;
+
   select.innerHTML = `<option value="ALL">${t("allSeries")}</option>`;
 
-  const seriesSet = [...new Set(COLORS.map(c => c.series))];
-  seriesSet.forEach(s => {
-    const opt = document.createElement("option");
-    opt.value = s;
-    opt.textContent = s;
-    select.appendChild(opt);
+  SERIES.forEach(series => {
+    if (series.id === "ALL") return;
+    const option = document.createElement("option");
+    option.value = series.id;
+    option.textContent = series.id;
+    select.appendChild(option);
   });
 
-  select.onchange = applySeriesFilter;
+  select.addEventListener("change", applySeriesFilter);
 }
 
 function applySeriesFilter() {
-  const v = qs("seriesFilter").value;
-  filteredColors = v === "ALL" ? COLORS : COLORS.filter(c => c.series === v);
-  renderColors();
+  const value = qs("seriesFilter").value;
+  const filtered = value === "ALL" ? COLORS : COLORS.filter(c => c.series === value);
+  renderColors(filtered);
 }
 
-/* ================= COLORS ================= */
+// ────────────────────────────────────────────────
+// Color catalog
+// ────────────────────────────────────────────────
+function renderColors(colors = COLORS) {
+  const container = qs("colorList");
+  if (!container) return;
 
-function renderColors() {
-  const box = qs("colorList");
-  box.innerHTML = filteredColors.map(c => `
+  container.innerHTML = colors.map(color => `
     <div class="color">
-      <div class="swatch" style="background:${c.hex}"></div>
+      <div class="swatch" style="background:${color.hex}"></div>
       <div>
-        <strong>${c.code}</strong><br>
-        ${c.name[currentLang] || c.code}
+        <strong>${color.code}</strong><br>
+        ${color.name[currentLang] || color.name.uk || color.code}
       </div>
-      <button onclick="addColor('${c.code}')">+</button>
+      <button type="button" onclick="addColor('${color.code}')">+</button>
     </div>
   `).join("");
 }
 
-/* ================= RECIPE ================= */
-
+// ────────────────────────────────────────────────
+// Recipe management
+// ────────────────────────────────────────────────
 function addColor(code) {
   const color = COLORS.find(c => c.code === code);
   if (!color) return;
 
   if (!currentSeries) {
     currentSeries = color.series;
+    qs("seriesFilter").value = color.series;
     qs("seriesBadge").textContent = color.series;
     qs("seriesBadge").style.display = "inline-block";
-    qs("seriesFilter").value = color.series;
-    applySeriesFilter();
   }
 
   if (color.series !== currentSeries) {
@@ -77,86 +90,93 @@ function addColor(code) {
     return;
   }
 
-  currentRecipe.items.push({ code, percent: 0 });
+  currentRecipe.items.push({ code: color.code, percent: 0 });
+  renderCurrentRecipe();
+}
+
+function updateItem(index, rawValue) {
+  const totalWeight = getNumber(qs("totalWeight")?.value) || 1000;
+  const value = getNumber(rawValue);
+
+  if (mode === "percent") {
+    currentRecipe.items[index].percent = value;
+  } else {
+    currentRecipe.items[index].percent = (value / totalWeight) * 100;
+  }
+
+  renderCurrentRecipe();
+}
+
+function removeItem(index) {
+  currentRecipe.items.splice(index, 1);
+
+  if (currentRecipe.items.length === 0) {
+    currentSeries = null;
+    qs("seriesBadge").style.display = "none";
+  }
+
   renderCurrentRecipe();
 }
 
 function renderCurrentRecipe() {
-  const box = qs("recipeItems");
-  const totalWeight = Number(qs("totalWeight").value);
-  let sum = 0;
+  const container = qs("recipeItems");
+  const totalWeight = getNumber(qs("totalWeight")?.value) || 1000;
+  let sumPercent = 0;
 
-  box.innerHTML = currentRecipe.items.map((i, idx) => {
-    sum += i.percent;
-    const val = mode === "percent"
-      ? i.percent.toFixed(2)
-      : (i.percent * totalWeight / 100).toFixed(1);
+  if (!container) return;
+
+  container.innerHTML = currentRecipe.items.map((item, idx) => {
+    const displayValue = mode === "percent"
+      ? item.percent.toFixed(2)
+      : (item.percent * totalWeight / 100).toFixed(1);
+
+    sumPercent += item.percent;
 
     return `
       <div class="recipe-item">
-        <span class="code">${i.code}</span>
-        <input type="number" value="${val}"
-          onchange="updateItem(${idx}, this.value)">
-        <span>${mode === "percent" ? "%" : "g"}</span>
-        <button onclick="removeItem(${idx})">✕</button>
+        <span class="code">${item.code}</span>
+        <input type="number" 
+               step="${mode === 'percent' ? '0.1' : '1'}" 
+               min="0" 
+               value="${displayValue}" 
+               onchange="updateItem(${idx}, this.value)">
+        <span class="unit">${mode === "percent" ? "%" : "g"}</span>
+        <button type="button" onclick="removeItem(${idx})">✕</button>
       </div>
     `;
-  }).join("") + `
-    <div class="sum-line">${t("sum")}: ${sum.toFixed(2)}%</div>
+  }).join("");
+
+  container.innerHTML += `
+    <div class="sum-line">
+      <strong>${t("sum")}: ${sumPercent.toFixed(2)}%</strong>
+    </div>
   `;
 }
 
-function updateItem(i, val) {
-  const totalWeight = Number(qs("totalWeight").value);
-  const num = Number(val) || 0;
-
-  currentRecipe.items[i].percent =
-    mode === "percent" ? num : (num / totalWeight * 100);
-
+function toggleMode(checkbox) {
+  mode = checkbox.checked ? "gram" : "percent";
   renderCurrentRecipe();
 }
-
-function removeItem(i) {
-  currentRecipe.items.splice(i, 1);
-  if (!currentRecipe.items.length) {
-    currentSeries = null;
-    qs("seriesBadge").style.display = "none";
-    qs("seriesFilter").value = "ALL";
-    applySeriesFilter();
-  }
-  renderCurrentRecipe();
-}
-
-function toggleMode(cb) {
-  mode = cb.checked ? "gram" : "percent";
-  renderCurrentRecipe();
-}
-
-/* ================= SAVE ================= */
 
 function saveRecipe() {
-  const name = qs("recipeName").value.trim();
-  const sum = currentRecipe.items.reduce((s,i)=>s+i.percent,0);
-
-  if (!name || !currentRecipe.items.length) {
-    alert(t("errorEmptyRecipe"));
+  const name = qs("recipeName")?.value.trim();
+  if (!name || currentRecipe.items.length === 0) {
+    alert(t("errorEmptyRecipe") || "Вкажіть назву та додайте хоча б один колір");
     return;
   }
 
-  if (Math.round(sum) !== 100) {
-    alert(t("sum") + " ≠ 100%");
-    return;
-  }
-
-  recipes.push({
+  const recipeToSave = {
     name,
-    note: qs("recipeNote").value,
+    note: qs("recipeNote")?.value.trim() || "",
+    items: currentRecipe.items.map(i => ({ ...i })), // deep copy
     series: currentSeries,
-    items: currentRecipe.items
-  });
+    created: new Date().toISOString()
+  };
 
+  recipes.push(recipeToSave);
   localStorage.setItem("sico_recipes", JSON.stringify(recipes));
 
+  // Reset
   currentRecipe = { items: [] };
   currentSeries = null;
   qs("seriesBadge").style.display = "none";
@@ -167,23 +187,32 @@ function saveRecipe() {
   showTab("recipes");
 }
 
-/* ================= RECIPES ================= */
-
+// ────────────────────────────────────────────────
+// Saved recipes list
+// ────────────────────────────────────────────────
 function renderRecipes() {
-  const box = qs("recipeList");
-  box.innerHTML = recipes.length
-    ? recipes.map(r => `
-      <div class="color">
-        <strong>${r.name}</strong><br>
-        ${r.items.map(i=>`${i.code}: ${i.percent}%`).join("<br>")}
-      </div>
-    `).join("")
-    : `<p>${t("noRecipes")}</p>`;
+  const container = qs("recipeList");
+  if (!container) return;
+
+  if (recipes.length === 0) {
+    container.innerHTML = `<p data-i18n="noRecipes">—</p>`;
+    return;
+  }
+
+  container.innerHTML = recipes.map(recipe => `
+    <div class="recipe-preview">
+      <strong>${recipe.name}</strong>
+      <div class="meta">${recipe.series || "?"} • ${recipe.items.length} кол.</div>
+      ${recipe.note ? `<small>${recipe.note}</small>` : ""}
+    </div>
+  `).join("");
 }
 
-/* ================= INIT ================= */
-
+// ────────────────────────────────────────────────
+// Init
+// ────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initSeriesFilter();
-  applySeriesFilter();
+  renderColors();
+  // Можна додати qs("seriesBadge").style.display = "none"; якщо потрібно
 });
