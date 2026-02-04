@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<title>SICO MIX</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <title>SICO MIX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
 <header>
   <h1>SICO MIX</h1>
-  <div>
+
+  <div class="lang">
     <button onclick="setLang('ua')">UA</button>
     <button onclick="setLang('pl')">PL</button>
     <button onclick="setLang('en')">EN</button>
@@ -25,55 +27,61 @@
 </nav>
 
 <main>
-<section id="colors" class="tab active">
-  <select id="seriesFilter" onchange="renderColors()"></select>
-  <div id="colorList"></div>
-</section>
 
-<section id="new" class="tab">
-  <input id="recipeName" data-i18n-placeholder="recipeName">
-  <div id="recipeItems"></div>
-  <select id="totalWeight" onchange="calculateWeight()"></select>
-  <div id="weightResult"></div>
-  <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
-</section>
+  <!-- COLORS -->
+  <section id="colors" class="tab active">
+    <h2 data-i18n="catalog"></h2>
 
-<section id="recipes" class="tab">
-  <button onclick="exportTXT()" data-i18n="exportTxt"></button>
-  <button onclick="exportPDF()" data-i18n="exportPdf"></button>
-  <div id="recipeList"></div>
-</section>
-<section id="import" class="tab">
-  <h2 data-i18n="import"></h2>
+    <label data-i18n="filterSeries"></label>
+    <select id="seriesFilter" onchange="renderColors()"></select>
 
-  <h3>TXT</h3>
-  <button onclick="exportTXT()">Export TXT</button>
+    <div id="colorList"></div>
+  </section>
 
-  <br><br>
+  <!-- NEW RECIPE -->
+  <section id="new" class="tab">
+    <h2 data-i18n="newRecipe"></h2>
 
-  <input type="file" id="importFile" accept=".txt" onchange="importTXT(this)">
+    <input id="recipeName" data-i18n-placeholder="recipeName">
 
-  <hr>
+    <div class="mode">
+      <button onclick="toggleMode()">% ↔ g</button>
+    </div>
 
-  <h3>PDF / Print</h3>
-  <button onclick="printRecipes()">Print / PDF</button>
+    <div id="recipeItems"></div>
 
-  <hr>
+    <h3 data-i18n="weightCalc"></h3>
+    <select id="totalWeight" onchange="renderRecipe()"></select>
 
-  <h3>Notes</h3>
-  <textarea id="globalNote" rows="4" placeholder="Notes..."></textarea>
-  <button onclick="saveGlobalNote()">Save note</button>
+    <div id="weightResult"></div>
 
-  <hr>
+    <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
+  </section>
 
-  <h3>Photo</h3>
-  <input type="file" accept="image/*" capture="environment" onchange="savePhoto(this)">
-  <div id="photoPreview"></div>
-</section>
+  <!-- RECIPES -->
+  <section id="recipes" class="tab">
+    <h2 data-i18n="recipes"></h2>
+
+    <div class="actions">
+      <button onclick="exportTXT()">TXT</button>
+    </div>
+
+    <div id="recipeList"></div>
+  </section>
+
+  <!-- IMPORT / EXPORT -->
+  <section id="import" class="tab">
+    <h2 data-i18n="import"></h2>
+
+    <h3>TXT</h3>
+    <input type="file" accept=".txt" onchange="importTXT(this)">
+  </section>
+
 </main>
 
 <script src="js/data-colors.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/app.js"></script>
+
 </body>
 </html>
