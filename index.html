@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>SICO MIX</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>SICO MIX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
 </head>
 
 <body>
 
 <header>
-  <h1>SICO MIX</h1>
-  <div>
+  <div class="header-left">
+    <h1>SICO MIX</h1>
+    <span id="seriesBadge"></span>
+  </div>
+  <div class="langs">
     <button onclick="setLang('ua')">UA</button>
     <button onclick="setLang('pl')">PL</button>
     <button onclick="setLang('en')">EN</button>
@@ -28,7 +32,7 @@
 
 <main>
 
-<!-- ================= CATALOG ================= -->
+<!-- CATALOG -->
 <section id="colors" class="tab active">
   <h2 data-i18n="catalog"></h2>
 
@@ -38,33 +42,34 @@
   <div id="colorList"></div>
 </section>
 
-<!-- ================= NEW RECIPE ================= -->
+<!-- NEW RECIPE -->
 <section id="new" class="tab">
   <h2 data-i18n="newRecipe"></h2>
 
   <input id="recipeName" data-i18n-placeholder="recipeName">
   <textarea id="recipeNote" data-i18n-placeholder="recipeNote"></textarea>
 
+  <label class="toggle">
+    <input type="checkbox" onchange="toggleMode(this)">
+    <span>% ↔ g</span>
+  </label>
+
   <div id="recipeItems"></div>
 
-  <h3 data-i18n="weightCalc"></h3>
-  <select id="totalWeight" onchange="calculateWeight()">
-    <option value="100">100 г</option>
-    <option value="500">500 г</option>
-    <option value="1000" selected>1 кг</option>
-    <option value="5000">5 кг</option>
+  <label data-i18n="weightCalc"></label>
+  <select id="totalWeight" onchange="renderCurrentRecipe()">
+    <option value="100">100 g</option>
+    <option value="500">500 g</option>
+    <option value="1000" selected>1 kg</option>
+    <option value="5000">5 kg</option>
   </select>
-
-  <div id="weightResult"></div>
 
   <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
 </section>
 
-<!-- ================= RECIPES ================= -->
+<!-- RECIPES -->
 <section id="recipes" class="tab">
   <h2 data-i18n="recipes"></h2>
-
-  <button onclick="exportTxt()" data-i18n="exportTxt"></button>
   <div id="recipeList"></div>
 </section>
 
