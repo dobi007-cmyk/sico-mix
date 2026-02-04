@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<title>SICO MIX</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="css/style.css">
-<link rel="icon" href="icons/icon-192.png">
+  <meta charset="UTF-8">
+  <title>SICO MIX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="icons/icon-192.png">
 </head>
 
 <body>
@@ -23,10 +23,9 @@
 </header>
 
 <nav>
-  <button onclick="showTab('colors')" data-i18n="paints">Фарби</button>
-  <button onclick="showTab('new')" data-i18n="newRecipe">Новий рецепт</button>
-  <button onclick="showTab('recipes')" data-i18n="recipes">Рецепти</button>
-  <button onclick="showTab('import')" data-i18n="import">Імпорт</button>
+  <button onclick="showTab('colors')" data-i18n="paints"></button>
+  <button onclick="showTab('new')" data-i18n="newRecipe"></button>
+  <button onclick="showTab('recipes')" data-i18n="recipes"></button>
 </nav>
 
 <main>
@@ -48,23 +47,17 @@
   <input id="recipeName" data-i18n-placeholder="recipeName">
   <textarea id="recipeNote" data-i18n-placeholder="recipeNote"></textarea>
 
-  <label>📷 Фото</label>
-  <input type="file" accept="image/*" onchange="loadRecipePhoto(this)">
-  <img id="recipePhoto" style="max-width:100%;display:none;margin-bottom:10px;">
-
-  <label>
-    <input type="checkbox" id="modeToggle" onchange="toggleMode()"> % ↔ g
-  </label>
-
   <div id="recipeItems"></div>
 
   <h3 data-i18n="weightCalc"></h3>
-  <select id="totalWeight" onchange="renderCurrentRecipe()">
+  <select id="totalWeight" onchange="calculateWeight()">
     <option value="100">100 г</option>
     <option value="500">500 г</option>
     <option value="1000" selected>1 кг</option>
     <option value="5000">5 кг</option>
   </select>
+
+  <div id="weightResult"></div>
 
   <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
 </section>
@@ -73,14 +66,7 @@
 <section id="recipes" class="tab">
   <h2 data-i18n="recipes"></h2>
   <button onclick="exportTxt()" data-i18n="exportTxt"></button>
-  <button onclick="exportPdf()" data-i18n="exportPdf"></button>
   <div id="recipeList"></div>
-</section>
-
-<!-- IMPORT -->
-<section id="import" class="tab">
-  <h2 data-i18n="import"></h2>
-  <input type="file" accept=".txt" onchange="importTxt(this)">
 </section>
 
 </main>
