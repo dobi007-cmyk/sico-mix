@@ -55,23 +55,54 @@ const i18n = {
 
 let currentLang = localStorage.getItem("sico_lang") || "ua";
 
-function t(k){ return i18n[currentLang][k] || k; }
+// ────────────────────────────────────────────────
+// Translate function
+// ────────────────────────────────────────────────
+function t(key) {
+  return i18n[currentLang]?.[key] || i18n.ua[key] || key;
+}
 
-function setLang(lang){
+// ────────────────────────────────────────────────
+// Change language & update UI
+// ────────────────────────────────────────────────
+function setLang(lang) {
+  if (!["ua", "pl", "en"].includes(lang)) {
+    lang = "ua";
+  }
+
   currentLang = lang;
   localStorage.setItem("sico_lang", lang);
 
-  document.querySelectorAll("[data-i18n]").forEach(e=>{
-    e.textContent = t(e.dataset.i18n);
+  // Оновлюємо текстовий вміст
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    if (key) el.textContent = t(key);
   });
 
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(e=>{
-    e.placeholder = t(e.dataset.i18nPlaceholder);
+  // Оновлюємо плейсхолдери
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    if (key) el.placeholder = t(key);
   });
 
-  renderColors();
-  renderCurrentRecipe();
-  renderRecipes();
+  // Оновлюємо динамічний контент, якщо функції існують
+  if (typeof renderColors === "function") {
+    renderColors();
+  }
+  if (typeof renderCurrentRecipe === "function") {
+    renderCurrentRecipe();
+  }
+  if (typeof renderRecipes === "function") {
+    renderRecipes();
+  }
 }
 
-document.addEventListener("DOMContentLoaded", ()=>setLang(currentLang));
+// ────────────────────────────────────────────────
+// Ініціалізація при завантаженні сторінки
+// ────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  setLang(currentLang);
+});
+
+// Експорт (якщо перейдете на модулі пізніше)
+export { t, setLang, currentLang };
