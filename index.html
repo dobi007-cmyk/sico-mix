@@ -7,78 +7,88 @@
   <title>SICO MIX</title>
 
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icons/icon-192.png">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
 
+  <!-- Рекомендую підключати css перед js для кращої продуктивності -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-<header>
-  <div class="header-left">
-    <h1>SICO MIX</h1>
-    <span id="seriesBadge"></span>
-  </div>
+  <header>
+    <div class="header-left">
+      <h1>SICO MIX</h1>
+      <span id="seriesBadge" class="series-badge"></span>
+    </div>
 
-  <div class="lang-switcher">
-    <button onclick="setLang('ua')">UA</button>
-    <button onclick="setLang('pl')">PL</button>
-    <button onclick="setLang('en')">EN</button>
-  </div>
-</header>
+    <div class="lang-switcher" role="group" aria-label="Вибір мови">
+      <button type="button" onclick="setLang('ua')" aria-label="Українська">UA</button>
+      <button type="button" onclick="setLang('pl')" aria-label="Polski">PL</button>
+      <button type="button" onclick="setLang('en')" aria-label="English">EN</button>
+    </div>
+  </header>
 
-<nav>
-  <button data-tab="colors" onclick="showTab('colors')" data-i18n="paints"></button>
-  <button data-tab="new" onclick="showTab('new')" data-i18n="newRecipe"></button>
-  <button data-tab="recipes" onclick="showTab('recipes')" data-i18n="recipes"></button>
-</nav>
+  <nav aria-label="Головне меню">
+    <button type="button" onclick="showTab('colors')"    data-i18n="paints"></button>
+    <button type="button" onclick="showTab('new')"       data-i18n="newRecipe"></button>
+    <button type="button" onclick="showTab('recipes')"   data-i18n="recipes"></button>
+  </nav>
 
-<main>
+  <main>
 
-<section id="colors" class="tab active">
-  <h2 data-i18n="catalog"></h2>
+    <!-- Каталог кольорів -->
+    <section id="colors" class="tab active" aria-labelledby="colors-heading">
+      <h2 id="colors-heading" data-i18n="catalog"></h2>
 
-  <label data-i18n="filterSeries"></label>
-  <select id="seriesFilter"></select>
+      <div class="filter-row">
+        <label for="seriesFilter" data-i18n="filterSeries"></label>
+        <select id="seriesFilter" aria-describedby="seriesFilter-desc"></select>
+      </div>
 
-  <div id="colorList" class="color-grid"></div>
-</section>
+      <div id="colorList" class="color-grid"></div>
+    </section>
 
-<section id="new" class="tab">
-  <h2 data-i18n="newRecipe"></h2>
+    <!-- Новий рецепт -->
+    <section id="new" class="tab hidden" aria-labelledby="new-heading">
+      <h2 id="new-heading" data-i18n="newRecipe"></h2>
 
-  <input id="recipeName" data-i18n-placeholder="recipeName">
-  <textarea id="recipeNote" data-i18n-placeholder="recipeNote"></textarea>
+      <input type="text" id="recipeName" placeholder="" data-i18n-placeholder="recipeName" autocomplete="off">
 
-  <label class="mode-toggle">
-    <input type="checkbox" onchange="toggleMode(this)">
-    <span>% / g</span>
-  </label>
+      <textarea id="recipeNote" rows="3" data-i18n-placeholder="recipeNote"></textarea>
 
-  <div id="recipeItems" class="recipe-items"></div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="unitToggle" onchange="toggleMode(this)">
+        <span class="slider" data-unit-text="% ↔ g"></span>
+      </label>
 
-  <label data-i18n="weightCalc"></label>
-  <select id="totalWeight" onchange="renderCurrentRecipe()">
-    <option value="100">100 g</option>
-    <option value="500">500 g</option>
-    <option value="1000" selected>1 kg</option>
-    <option value="5000">5 kg</option>
-  </select>
+      <div id="recipeItems" class="recipe-items"></div>
 
-  <button class="btn-primary" onclick="saveRecipe()" data-i18n="addRecipe"></button>
-</section>
+      <div class="weight-row">
+        <label for="totalWeight" data-i18n="weightCalc"></label>
+        <select id="totalWeight" onchange="renderCurrentRecipe()">
+          <option value="100">100 g</option>
+          <option value="500">500 g</option>
+          <option value="1000" selected>1 kg</option>
+          <option value="5000">5 kg</option>
+        </select>
+      </div>
 
-<section id="recipes" class="tab">
-  <h2 data-i18n="recipes"></h2>
-  <div id="recipeList"></div>
-</section>
+      <button type="button" class="btn-primary" onclick="saveRecipe()" data-i18n="addRecipe"></button>
+    </section>
 
-</main>
+    <!-- Збережені рецепти -->
+    <section id="recipes" class="tab hidden" aria-labelledby="recipes-heading">
+      <h2 id="recipes-heading" data-i18n="recipes"></h2>
+      <div id="recipeList" class="recipe-list"></div>
+    </section>
 
-<script src="js/data-colors.js"></script>
-<script src="js/i18n.js"></script>
-<script src="js/app.js"></script>
+  </main>
+
+  <!-- Скрипти в кінці body – стандартна практика -->
+  <script src="js/data-colors.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js" defer></script>
 
 </body>
 </html>
