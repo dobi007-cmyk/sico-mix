@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<title>SICO MIX</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="css/style.css">
-<link rel="icon" href="icons/icon-192.png">
+  <meta charset="UTF-8">
+  <title>SICO MIX</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
+
+  <link rel="icon" href="icons/icon-192.png">
 </head>
 
 <body>
 
 <header>
   <div class="logo">
-    <img src="icons/icon-192.png" height="40">
+    <img src="icons/icon-192.png">
     <h1>SICO MIX</h1>
   </div>
-  <div>
+
+  <div class="langs">
     <button onclick="setLang('ua')">UA</button>
     <button onclick="setLang('pl')">PL</button>
     <button onclick="setLang('en')">EN</button>
@@ -26,12 +32,10 @@
   <button onclick="showTab('colors')" data-i18n="paints"></button>
   <button onclick="showTab('new')" data-i18n="newRecipe"></button>
   <button onclick="showTab('recipes')" data-i18n="recipes"></button>
-  <button onclick="showTab('import')" data-i18n="import"></button>
 </nav>
 
 <main>
 
-<!-- COLORS -->
 <section id="colors" class="tab active">
   <h2 data-i18n="catalog"></h2>
 
@@ -41,46 +45,24 @@
   <div id="colorList"></div>
 </section>
 
-<!-- NEW RECIPE -->
 <section id="new" class="tab">
   <h2 data-i18n="newRecipe"></h2>
 
   <input id="recipeName" data-i18n-placeholder="recipeName">
-  <textarea id="recipeNote" data-i18n-placeholder="recipeNote"></textarea>
-
-  <label>📷 Фото</label>
-  <input type="file" accept="image/*" onchange="loadRecipePhoto(this)">
-  <img id="recipePhoto" style="max-width:100%;display:none;margin-bottom:10px;">
-
-  <label>
-    <input type="checkbox" id="modeToggle" onchange="toggleMode()"> % ↔️ g
-  </label>
 
   <div id="recipeItems"></div>
 
   <h3 data-i18n="weightCalc"></h3>
-  <select id="totalWeight" onchange="renderCurrentRecipe()">
-    <option value="100">100 г</option>
-    <option value="500">500 г</option>
-    <option value="1000" selected>1 кг</option>
-    <option value="5000">5 кг</option>
-  </select>
+  <select id="totalWeight"></select>
+
+  <div id="weightResult"></div>
 
   <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
 </section>
 
-<!-- RECIPES -->
 <section id="recipes" class="tab">
   <h2 data-i18n="recipes"></h2>
-  <button onclick="exportTxt()" data-i18n="exportTxt"></button>
-  <button onclick="exportPdf()" data-i18n="exportPdf"></button>
   <div id="recipeList"></div>
-</section>
-
-<!-- IMPORT -->
-<section id="import" class="tab">
-  <h2 data-i18n="import"></h2>
-  <input type="file" accept=".txt" onchange="importTxt(this)">
 </section>
 
 </main>
@@ -88,5 +70,6 @@
 <script src="js/data-colors.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/app.js"></script>
+
 </body>
 </html>
