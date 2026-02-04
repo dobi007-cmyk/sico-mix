@@ -88,18 +88,34 @@ const i18n = {
 };
 
 let currentLang = localStorage.getItem("sico_lang") || "ua";
-const t = k => i18n[currentLang][k] || k;
 
-function setLang(lang){
+function t(key) {
+  return i18n[currentLang][key] || key;
+}
+
+function setLang(lang) {
   currentLang = lang;
-  localStorage.setItem("sico_lang",lang);
+  localStorage.setItem("sico_lang", lang);
 
-  document.querySelectorAll("[data-i18n]").forEach(e=>{
-    e.textContent = t(e.dataset.i18n);
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    el.textContent = t(el.dataset.i18n);
   });
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(e=>{
-    e.placeholder = t(e.dataset.i18nPlaceholder);
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    el.placeholder = t(el.dataset.i18nPlaceholder);
   });
+
+  if (typeof initSeries === "function") initSeries();
+  if (typeof renderColors === "function") renderColors();
+  if (typeof renderWeightOptions === "function") renderWeightOptions();
+  if (typeof renderRecipe === "function") renderRecipe();
+  if (typeof renderRecipes === "function") renderRecipes();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setLang(currentLang);
+});
+
 
   if(window.renderColors) renderColors();
   if(window.renderRecipes) renderRecipes();
