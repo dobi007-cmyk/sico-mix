@@ -44,4 +44,24 @@ const i18n = {
     recipeName:"Recipe name",
     recipeNote:"Note",
     addRecipe:"Save recipe",
-    noRecipes:
+    noRecipes:"No recipes",
+    weightCalc:"Weight calculator",
+    sum:"Total",
+    filterSeries:"Paint series",
+    allSeries:"All series",
+    errorSeries:"You can mix only within one series",
+    exportTxt:"Export TXT",
+    exportPdf:"Export PDF"
+  }
+};
+
+let currentLang = localStorage.getItem("sico_lang") || "ua";
+
+function t(k){ return i18n[currentLang][k] || k; }
+
+function setLang(lang){
+  currentLang = lang;
+  localStorage.setItem("sico_lang", lang);
+  document.querySelectorAll("[data-i18n]").forEach(e=>e.textContent=t(e.dataset.i18n));
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(e=>e.placeholder=t(e.dataset.i18nPlaceholder));
+}
