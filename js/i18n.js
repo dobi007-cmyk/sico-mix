@@ -19,6 +19,7 @@ const i18n = {
     weightCalc: "Калькулятор ваги",
     sum: "Сума",
     noColors: "Немає фарб у рецепті",
+    noRecipes: "Немає рецептів",
 
     grams: "г",
     kilograms: "кг",
@@ -29,7 +30,11 @@ const i18n = {
     errorSeries: "Можна змішувати тільки в межах однієї серії",
     currentSeries: "Поточна серія",
 
-    noRecipes: "Немає рецептів"
+    percentMode: "Відсотки",
+    gramMode: "Грами",
+
+    imported: "Імпорт завершено",
+    saved: "Збережено"
   },
 
   pl: {
@@ -48,6 +53,7 @@ const i18n = {
     weightCalc: "Kalkulator wagi",
     sum: "Suma",
     noColors: "Brak farb w recepturze",
+    noRecipes: "Brak receptur",
 
     grams: "g",
     kilograms: "kg",
@@ -58,7 +64,11 @@ const i18n = {
     errorSeries: "Można mieszać tylko w jednej serii",
     currentSeries: "Aktualna seria",
 
-    noRecipes: "Brak receptur"
+    percentMode: "Procenty",
+    gramMode: "Gramy",
+
+    imported: "Import zakończony",
+    saved: "Zapisano"
   },
 
   en: {
@@ -77,6 +87,7 @@ const i18n = {
     weightCalc: "Weight calculator",
     sum: "Total",
     noColors: "No colors in recipe",
+    noRecipes: "No recipes",
 
     grams: "g",
     kilograms: "kg",
@@ -87,7 +98,11 @@ const i18n = {
     errorSeries: "You can mix only within one series",
     currentSeries: "Current series",
 
-    noRecipes: "No recipes"
+    percentMode: "Percent",
+    gramMode: "Grams",
+
+    imported: "Import completed",
+    saved: "Saved"
   }
 };
 
@@ -113,13 +128,15 @@ function setLang(lang) {
     el.placeholder = t(el.dataset.i18nPlaceholder);
   });
 
-  // оновлення динамічних частин
-  if (typeof renderWeightOptions === "function") renderWeightOptions();
+  // оновлення динаміки
+  if (typeof initSeries === "function") initSeries();
   if (typeof renderColors === "function") renderColors();
+  if (typeof renderWeightOptions === "function") renderWeightOptions();
+  if (typeof renderRecipe === "function") renderRecipe();
   if (typeof renderRecipes === "function") renderRecipes();
-  if (typeof renderCurrentRecipe === "function") renderCurrentRecipe();
 }
 
+/* ---------- INIT ---------- */
 document.addEventListener("DOMContentLoaded", () => {
   setLang(currentLang);
 });
