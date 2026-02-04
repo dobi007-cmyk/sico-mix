@@ -5,12 +5,16 @@
 <title>SICO MIX</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="icons/icon-192.png">
 </head>
 
 <body>
 
 <header>
-  <h1>SICO MIX</h1>
+  <div class="logo">
+    <img src="icons/icon-192.png" height="40">
+    <h1>SICO MIX</h1>
+  </div>
   <div>
     <button onclick="setLang('ua')">UA</button>
     <button onclick="setLang('pl')">PL</button>
@@ -27,62 +31,55 @@
 
 <main>
 
-<!-- ================= COLORS ================= -->
+<!-- COLORS -->
 <section id="colors" class="tab active">
   <h2 data-i18n="catalog"></h2>
 
   <label data-i18n="filterSeries"></label>
-  <select id="seriesFilter" onchange="applySeriesFilter()">
-    <option value="ALL" data-i18n="allSeries"></option>
-  </select>
+  <select id="seriesFilter"></select>
 
   <div id="colorList"></div>
 </section>
 
-<!-- ================= NEW RECIPE ================= -->
+<!-- NEW RECIPE -->
 <section id="new" class="tab">
   <h2 data-i18n="newRecipe"></h2>
 
   <input id="recipeName" data-i18n-placeholder="recipeName">
-
   <textarea id="recipeNote" data-i18n-placeholder="recipeNote"></textarea>
 
-  <!-- PHOTO -->
-  <label>📷 Фото фарби / відбитка</label>
+  <label>📷 Фото</label>
   <input type="file" accept="image/*" onchange="loadRecipePhoto(this)">
-  <img id="recipePhoto" style="max-width:100%; display:none; margin-bottom:10px;">
+  <img id="recipePhoto" style="max-width:100%;display:none;margin-bottom:10px;">
 
-  <!-- MODE TOGGLE -->
-  <label style="display:block; margin:10px 0;">
-    <input type="checkbox" id="modeToggle" onchange="toggleMode()">
-    % ↔️ g
+  <label>
+    <input type="checkbox" id="modeToggle" onchange="toggleMode()"> % ↔️ g
   </label>
 
-  <!-- RECIPE ITEMS -->
   <div id="recipeItems"></div>
 
-  <!-- WEIGHT -->
   <h3 data-i18n="weightCalc"></h3>
-  <select id="totalWeight" onchange="calculateWeight()"></select>
-  <div id="weightResult"></div>
+  <select id="totalWeight" onchange="renderCurrentRecipe()">
+    <option value="100">100 г</option>
+    <option value="500">500 г</option>
+    <option value="1000" selected>1 кг</option>
+    <option value="5000">5 кг</option>
+  </select>
 
   <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
 </section>
 
-<!-- ================= RECIPES ================= -->
+<!-- RECIPES -->
 <section id="recipes" class="tab">
   <h2 data-i18n="recipes"></h2>
-
   <button onclick="exportTxt()" data-i18n="exportTxt"></button>
   <button onclick="exportPdf()" data-i18n="exportPdf"></button>
-
   <div id="recipeList"></div>
 </section>
 
-<!-- ================= IMPORT ================= -->
+<!-- IMPORT -->
 <section id="import" class="tab">
   <h2 data-i18n="import"></h2>
-
   <input type="file" accept=".txt" onchange="importTxt(this)">
 </section>
 
@@ -91,6 +88,5 @@
 <script src="js/data-colors.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/app.js"></script>
-
 </body>
 </html>
