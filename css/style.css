@@ -118,11 +118,4 @@ textarea {
   nav button {
     font-size: 16px;
   }
-  
-body {
-  background-image: url("../images/background.png");
-  background-size: cover;        /* щоб заповнювало екран */
-  background-position: center;   /* по центру */
-  background-repeat: no-repeat;  /* без повторів */
-  background-attachment: fixed;  /* красиво скролиться */
 }
