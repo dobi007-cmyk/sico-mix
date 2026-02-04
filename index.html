@@ -1,20 +1,15 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>SICO MIX</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="icons/icon-192.png">
+<meta charset="UTF-8">
+<title>SICO MIX</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
 <header>
-  <div class="logo">
-    <img src="icons/icon-192.png" height="40">
-    <h1>SICO MIX</h1>
-  </div>
+  <h1>SICO MIX</h1>
   <div>
     <button onclick="setLang('ua')">UA</button>
     <button onclick="setLang('pl')">PL</button>
@@ -29,37 +24,24 @@
 </nav>
 
 <main>
-
 <section id="colors" class="tab active">
-  <h2 data-i18n="catalog"></h2>
-  <label data-i18n="filterSeries"></label>
-  <select id="seriesFilter"></select>
+  <select id="seriesFilter" onchange="renderColors()"></select>
   <div id="colorList"></div>
 </section>
 
 <section id="new" class="tab">
-  <h2 data-i18n="newRecipe"></h2>
-
   <input id="recipeName" data-i18n-placeholder="recipeName">
-  <textarea id="recipeNote" data-i18n-placeholder="recipeNote"></textarea>
-
-  <button onclick="toggleMode()">% ↔ g</button>
-
   <div id="recipeItems"></div>
-
-  <h3 data-i18n="weightCalc"></h3>
   <select id="totalWeight" onchange="calculateWeight()"></select>
   <div id="weightResult"></div>
-
   <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
 </section>
 
 <section id="recipes" class="tab">
-  <h2 data-i18n="recipes"></h2>
-  <button onclick="exportTxt()" data-i18n="exportTxt"></button>
+  <button onclick="exportTXT()" data-i18n="exportTxt"></button>
+  <button onclick="exportPDF()" data-i18n="exportPdf"></button>
   <div id="recipeList"></div>
 </section>
-
 </main>
 
 <script src="js/data-colors.js"></script>
