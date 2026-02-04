@@ -1,125 +1,102 @@
-/* =========================
-   SICO MIX – Style
-   ========================= */
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-  background: #f4f4f4;
-  color: #111;
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,Arial;
+  background:#f4f4f4;
+  color:#111;
 }
 
 /* HEADER */
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px;
-  background: #fff;
-  border-bottom: 1px solid #ddd;
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px;
+  background:#fff;
+  border-bottom:1px solid #ddd;
 }
-
-header h1 {
-  margin: 0;
-  font-size: 22px;
+.header-left{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+#seriesBadge{
+  background:#111;
+  color:#fff;
+  padding:2px 8px;
+  border-radius:12px;
+  font-size:12px;
+  display:none;
 }
 
 /* NAV */
-nav {
-  display: flex;
-  gap: 8px;
-  padding: 10px;
-  background: #eee;
+nav{
+  display:flex;
+  gap:6px;
+  padding:8px;
+  background:#eee;
 }
-
-nav button {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
-  background: #fff;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-nav button:active {
-  background: #ddd;
-}
-
-/* MAIN */
-main {
-  padding: 14px;
+nav button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  background:#fff;
+  font-size:14px;
 }
 
 /* TABS */
-.tab {
-  display: none;
+.tab{display:none}
+.tab.active{display:block}
+
+/* LISTS */
+.color{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  background:#fff;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:8px;
 }
-.tab.active {
-  display: block;
+.swatch{
+  width:32px;
+  height:32px;
+  border-radius:4px;
+  border:1px solid #ccc;
+}
+.color button{
+  margin-left:auto;
+  width:34px;
+  height:34px;
+  border:none;
+  border-radius:50%;
+  background:#111;
+  color:#fff;
 }
 
-/* COLOR LIST */
-.color {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+/* RECIPE */
+.recipe-item{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin-bottom:6px;
 }
-
-.swatch {
-  width: 36px;
-  height: 36px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-.color button {
-  margin-left: auto;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: none;
-  background: #111;
-  color: #fff;
-  font-size: 20px;
-}
-
-/* RECIPE ITEMS */
-.recipe-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.recipe-item input {
-  width: 70px;
+.recipe-item input{
+  width:70px;
 }
 
 /* INPUTS */
-input,
-select,
-textarea {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 8px;
+input,select,textarea{
+  width:100%;
+  padding:8px;
+  margin-bottom:10px;
 }
 
-/* MOBILE */
-@media (max-width: 600px) {
-  nav {
-    flex-direction: column;
-  }
-  nav button {
-    font-size: 16px;
-  }
+/* TOGGLE */
+.toggle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:10px 0;
 }
