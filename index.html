@@ -1,85 +1,200 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SICO MIX</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <meta name="theme-color" content="#111111">
 </head>
 
 <body>
 
 <header>
-  <h1>SICO MIX</h1>
+  <div class="header-left">
+    <h1>SICO MIX</h1>
+    <span id="seriesBadge"></span>
+    <div class="theme-switcher">
+      <button onclick="setTheme('light')" title="Світла тема">☀️</button>
+      <button onclick="setTheme('dark')" title="Темна тема">🌙</button>
+      <button onclick="setTheme('system')" title="Системна">⚙️</button>
+    </div>
+  </div>
 
-  <div class="lang">
-    <button onclick="setLang('ua')">UA</button>
-    <button onclick="setLang('pl')">PL</button>
-    <button onclick="setLang('en')">EN</button>
-    <button onclick="toggleTheme()">🌗</button>
+  <div class="header-right">
+    <div class="lang-switcher">
+      <button onclick="setLang('ua')" aria-pressed="false">UA</button>
+      <button onclick="setLang('pl')" aria-pressed="false">PL</button>
+      <button onclick="setLang('en')" aria-pressed="false">EN</button>
+    </div>
   </div>
 </header>
 
 <nav>
-  <button onclick="showTab('colors')"  data-i18n="paints"></button>
-  <button onclick="showTab('new')"     data-i18n="newRecipe"></button>
-  <button onclick="showTab('recipes')"data-i18n="recipes"></button>
+  <button onclick="showTab('colors')" data-i18n="paints"></button>
+  <button onclick="showTab('new')" data-i18n="newRecipe"></button>
+  <button onclick="showTab('recipes')" data-i18n="recipes"></button>
 </nav>
 
 <main>
 
-<!-- COLORS -->
-<section id="colors" class="tab active">
-  <h2 data-i18n="catalog"></h2>
+  <section id="colors" class="tab active">
+    <h2 data-i18n="catalog"></h2>
+    
+    <div class="filter-row">
+      <label data-i18n="filterSeries"></label>
+      <select id="seriesFilter"></select>
+      
+      <label data-i18n="searchByCodeName"></label>
+      <input type="text" id="colorSearch" placeholder="EC10, синій..." 
+             data-i18n-placeholder="searchByCodeName">
+    </div>
 
-  <input id="colorSearch" placeholder="🔍" oninput="renderColors()">
+    <div id="colorList" class="color-grid"></div>
+  </section>
 
-  <select id="seriesFilter" onchange="renderColors()"></select>
-  <div id="colorList"></div>
-</section>
+  <section id="new" class="tab">
+    <div class="recipe-header">
+      <h2 data-i18n="newRecipe"></h2>
+      <div class="recipe-status">
+        <select id="recipeStatus" onchange="updateRecipeStatus()">
+          <option value="draft" data-i18n="draft"></option>
+          <option value="ready" data-i18n="ready"></option>
+        </select>
+        <span id="autoSaveStatus" class="save-status"></span>
+      </div>
+    </div>
 
-<!-- NEW RECIPE -->
-<section id="new" class="tab">
-  <h2 data-i18n="newRecipe"></h2>
+    <div class="recipe-info">
+      <input id="recipeName" placeholder="Назва рецепта" data-i18n-placeholder="recipeName">
+      <textarea id="recipeNote" placeholder="Нотатка..." data-i18n-placeholder="recipeNote" rows="3"></textarea>
+    </div>
 
-  <input id="recipeName" data-i18n-placeholder="recipeName">
-  <textarea id="recipeNote" data-i18n-placeholder="recipeNote"></textarea>
+    <div class="search-section">
+      <h3 data-i18n="addColor">Додати колір</h3>
+      <div class="search-row">
+        <input type="text" id="recipeColorSearch" placeholder="Пошук кольору..."
+               data-i18n-placeholder="searchByCodeName">
+        <button onclick="searchAndAddColor()" data-i18n="add">Додати</button>
+      </div>
+      <div id="colorSearchResults" class="color-search-results"></div>
+    </div>
 
-  <select id="recipeStatus">
-    <option value="draft">📝 Draft</option>
-    <option value="done">✅ Done</option>
-  </select>
+    <div class="controls-row">
+      <div class="mode-toggle">
+        <span data-i18n="switchMode"></span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="modeToggle" onchange="toggleMode(this)">
+          <span class="slider">
+            <span class="percent" data-i18n="percent"></span>
+            <span class="grams" data-i18n="grams"></span>
+          </span>
+        </label>
+        <small data-i18n="toggleModeHelp"></small>
+      </div>
 
-  <input type="file" accept="image/*" capture="environment" onchange="savePhoto(this)">
-  <div id="photoPreview"></div>
+      <div class="weight-selector">
+        <label data-i18n="totalWeight"></label>
+        <select id="totalWeight" onchange="updateTotalWeight()">
+          <option value="100">100 <span data-i18n="grams"></span></option>
+          <option value="250">250 <span data-i18n="grams"></span></option>
+          <option value="500">500 <span data-i18n="grams"></span></option>
+          <option value="1000" selected>1 kg</option>
+          <option value="2000">2 kg</option>
+          <option value="5000">5 kg</option>
+          <option value="custom" data-i18n="custom">Custom</option>
+        </select>
+        <input type="number" id="customWeight" placeholder="Custom weight" 
+               style="display:none;" min="1" max="100000">
+      </div>
+    </div>
 
-  <label class="switch">
-    <input type="checkbox" onchange="toggleMode(this)">
-    <span>% ↔ g</span>
-  </label>
+    <div class="photo-section">
+      <h3 data-i18n="recipePhoto"></h3>
+      <div id="photoContainer" class="photo-container">
+        <div id="photoPlaceholder" class="photo-placeholder">
+          <span data-i18n="noPhoto">Немає фото</span>
+        </div>
+        <img id="recipePhoto" style="display:none;" alt="Recipe result">
+      </div>
+      <div class="photo-buttons">
+        <button onclick="takePhoto()" data-i18n="takePhoto"></button>
+        <button onclick="addPhoto()" data-i18n="addPhoto"></button>
+        <button onclick="removePhoto()" data-i18n="removePhoto"></button>
+      </div>
+    </div>
 
-  <input id="recipeSearch" placeholder="🔍" oninput="renderRecipeSearch()">
-  <div id="recipeSearchList"></div>
+    <div id="recipeItems" class="recipe-items"></div>
 
-  <div id="recipeItems"></div>
+    <div class="recipe-actions">
+      <button onclick="saveRecipe()" class="btn-primary" data-i18n="addRecipe"></button>
+      <button onclick="clearRecipe()" class="btn-secondary" data-i18n="clear">Очистити</button>
+    </div>
+  </section>
 
-  <select id="totalWeight" onchange="renderCurrentRecipe()"></select>
+  <section id="recipes" class="tab">
+    <div class="recipes-header">
+      <h2 data-i18n="recipes"></h2>
+      <div class="recipes-actions">
+        <button onclick="importRecipes()" class="btn-secondary" data-i18n="importRecipes"></button>
+        <button onclick="exportRecipes('txt')" class="btn-secondary" data-i18n="exportTxt"></button>
+        <button onclick="exportRecipes('pdf')" class="btn-secondary" data-i18n="exportPdf"></button>
+      </div>
+    </div>
 
-  <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
-</section>
+    <div class="recipes-filter">
+      <input type="text" id="recipeSearch" placeholder="Пошук рецептів..."
+             data-i18n-placeholder="searchByCodeName">
+      <select id="recipeStatusFilter">
+        <option value="all" data-i18n="all">Всі</option>
+        <option value="draft" data-i18n="draft"></option>
+        <option value="ready" data-i18n="ready"></option>
+      </select>
+    </div>
 
-<!-- RECIPES -->
-<section id="recipes" class="tab">
-  <h2 data-i18n="recipes"></h2>
-
-  <button onclick="exportTXT()">TXT</button>
-  <button onclick="exportPDF()">PDF</button>
-  <input type="file" accept=".txt" onchange="importTXT(this)">
-
-  <div id="recipeList"></div>
-</section>
+    <div id="recipeList" class="recipe-list"></div>
+    
+    <input type="file" id="importFile" accept=".json,.txt" style="display:none;">
+  </section>
 
 </main>
+
+<!-- Модальне вікно для фото -->
+<div id="cameraModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 data-i18n="takePhoto"></h3>
+      <button onclick="closeCamera()" class="modal-close">×</button>
+    </div>
+    <div class="modal-body">
+      <video id="cameraView" autoplay playsinline style="width:100%; border-radius:8px;"></video>
+      <canvas id="cameraCanvas" style="display:none;"></canvas>
+    </div>
+    <div class="modal-footer">
+      <button onclick="capturePhoto()" class="btn-primary" data-i18n="capture">Зняти</button>
+      <button onclick="closeCamera()" class="btn-secondary" data-i18n="cancel"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Модальне вікно підтвердження -->
+<div id="confirmModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 data-i18n="confirmDelete"></h3>
+      <button onclick="closeConfirm()" class="modal-close">×</button>
+    </div>
+    <div class="modal-body">
+      <p data-i18n="recipeWillBeDeleted"></p>
+    </div>
+    <div class="modal-footer">
+      <button onclick="confirmDelete()" class="btn-danger" data-i18n="yes"></button>
+      <button onclick="closeConfirm()" class="btn-secondary" data-i18n="no"></button>
+    </div>
+  </div>
+</div>
 
 <script type="module" src="js/app.js"></script>
 </body>
