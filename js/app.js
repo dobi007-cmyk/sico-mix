@@ -1,3 +1,8 @@
+import { COLORS, SERIES, getColorByCode } from "./data-colors.js";
+import { t, setLang, currentLang } from "./i18n.js";
+
+window.setLang = setLang;
+
 const qs = id => document.getElementById(id);
 const qsa = sel => document.querySelectorAll(sel);
 
@@ -6,28 +11,31 @@ let currentRecipe = { items: [] };
 let currentSeries = null;
 let mode = "percent";
 
-function showTab(id) {
+window.showTab = function (id) {
   qsa(".tab").forEach(t => t.classList.remove("active"));
   qs(id).classList.add("active");
-}
+  if (id === "recipes") renderRecipes();
+};
 
 function initSeriesFilter() {
-  const s = qs("seriesFilter");
-  s.innerHTML = `<option value="ALL">${t("allSeries")}</option>`;
-  SERIES.forEach(x => {
+  const select = qs("seriesFilter");
+  select.innerHTML = `<option value="ALL">${t("allSeries")}</option>`;
+  SERIES.forEach(s => {
     const o = document.createElement("option");
-    o.value = x.id;
-    o.textContent = x.id;
-    s.appendChild(o);
+    o.value = s.id;
+    o.textContent = s.id;
+    select.appendChild(o);
   });
-  s.onchange = renderColors;
+  select.onchange = () => renderColors();
 }
 
 function renderColors() {
-  const v = qs("seriesFilter").value;
-  const list = v === "ALL" ? COLORS : COLORS.filter(c => c.series === v);
-  const box = qs("colorList");
-  box.innerHTML = list.map(c => `
+  const series = qs("seriesFilter").value;
+  const list = series === "ALL"
+    ? COLORS
+    : COLORS.filter(c => c.series === series);
+
+  qs("colorList").innerHTML = list.map(c => `
     <div class="color">
       <div class="swatch" style="background:${c.hex}"></div>
       <div>
@@ -39,76 +47,73 @@ function renderColors() {
   `).join("");
 }
 
-function addColor(code) {
-  const c = COLORS.find(x => x.code === code);
+window.addColor = function (code) {
+  const color = getColorByCode(code);
   if (!currentSeries) {
-    currentSeries = c.series;
-    qs("seriesBadge").textContent = c.series;
+    currentSeries = color.series;
+    qs("seriesBadge").textContent = currentSeries;
     qs("seriesBadge").style.display = "inline-block";
   }
-  if (c.series !== currentSeries) {
+  if (color.series !== currentSeries) {
     alert(t("errorSeries"));
     return;
   }
   currentRecipe.items.push({ code, percent: 0 });
   renderCurrentRecipe();
-}
+};
 
-function renderCurrentRecipe() {
-  const box = qs("recipeItems");
+window.toggleMode = checkbox => {
+  mode = checkbox.checked ? "gram" : "percent";
+  renderCurrentRecipe();
+};
+
+window.renderCurrentRecipe = function () {
   const total = Number(qs("totalWeight").value);
   let sum = 0;
 
-  box.innerHTML = currentRecipe.items.map((i, idx) => {
+  qs("recipeItems").innerHTML = currentRecipe.items.map((i, idx) => {
     const val = mode === "percent"
-      ? i.percent
+      ? i.percent.toFixed(2)
       : (i.percent * total / 100).toFixed(1);
     sum += i.percent;
     return `
       <div class="recipe-item">
-        <span class="code">${i.code}</span>
-        <input type="number" value="${val}" onchange="updateItem(${idx},this.value)">
-        <span class="unit">${mode === "percent" ? "%" : "g"}</span>
+        <span>${i.code}</span>
+        <input type="number" value="${val}"
+          onchange="updateItem(${idx}, this.value)">
+        <span>${mode === "percent" ? "%" : "g"}</span>
         <button onclick="removeItem(${idx})">✕</button>
-      </div>
-    `;
-  }).join("");
+      </div>`;
+  }).join("") + `<div class="sum-line">${t("sum")}: ${sum.toFixed(2)}%</div>`;
+};
 
-  box.innerHTML += `<div class="sum-line"><strong>${t("sum")}: ${sum.toFixed(2)}%</strong></div>`;
-}
-
-function updateItem(i, v) {
+window.updateItem = (i, val) => {
   const total = Number(qs("totalWeight").value);
   currentRecipe.items[i].percent =
-    mode === "percent" ? Number(v) : (Number(v) / total) * 100;
+    mode === "percent" ? Number(val) : (val / total) * 100;
   renderCurrentRecipe();
-}
+};
 
-function removeItem(i) {
+window.removeItem = i => {
   currentRecipe.items.splice(i, 1);
   if (!currentRecipe.items.length) {
     currentSeries = null;
     qs("seriesBadge").style.display = "none";
   }
   renderCurrentRecipe();
-}
+};
 
-function toggleMode(cb) {
-  mode = cb.checked ? "gram" : "percent";
-  renderCurrentRecipe();
-}
+window.saveRecipe = function () {
+  const name = qs("recipeName").value.trim();
+  if (!name || !currentRecipe.items.length) return;
 
-function saveRecipe() {
-  if (!qs("recipeName").value || !currentRecipe.items.length) {
-    alert(t("errorEmptyRecipe"));
-    return;
-  }
   recipes.push({
-    name: qs("recipeName").value,
+    name,
     note: qs("recipeNote").value,
-    items: currentRecipe.items,
-    series: currentSeries
+    series: currentSeries,
+    items: currentRecipe.items
   });
+
   localStorage.setItem("sico_recipes", JSON.stringify(recipes));
   currentRecipe = { items: [] };
   currentSeries = null;
@@ -116,17 +121,16 @@ function saveRecipe() {
   qs("recipeName").value = "";
   qs("recipeNote").value = "";
   showTab("recipes");
-  renderRecipes();
-}
+};
 
 function renderRecipes() {
-  const box = qs("recipeList");
-  box.innerHTML = recipes.length
-    ? recipes.map(r => `<div class="color"><strong>${r.name}</strong></div>`).join("")
+  qs("recipeList").innerHTML = recipes.length
+    ? recipes.map(r => `<div><strong>${r.name}</strong></div>`).join("")
     : `<p>${t("noRecipes")}</p>`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  setLang(currentLang);
   initSeriesFilter();
   renderColors();
 });
