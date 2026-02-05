@@ -9,24 +9,33 @@ const urlsToCache = [
   '/js/i18n.js',
   '/js/utils.js',
   '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap',
+  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js'
 ];
 
 // Install event
 self.addEventListener('install', event => {
+  console.log('Service Worker installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('Opened cache:', CACHE_NAME);
         return cache.addAll(urlsToCache);
       })
-      .then(() => self.skipWaiting())
+      .then(() => {
+        console.log('All resources cached');
+        return self.skipWaiting();
+      })
+      .catch(err => {
+        console.error('Cache installation failed:', err);
+      })
   );
 });
 
 // Activate event
 self.addEventListener('activate', event => {
+  console.log('Service Worker activating...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -37,81 +46,157 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => {
+      console.log('Service Worker activated');
+      return self.clients.claim();
+    })
   );
 });
 
-// Fetch event
+// Fetch event with stale-while-revalidate strategy
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-
-        // Clone the request
-        const fetchRequest = event.request.clone();
-
-        return fetch(fetchRequest).then(response => {
-          // Check if we received a valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
-
-          // Clone the response
-          const responseToCache = response.clone();
-
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
-
-          return response;
-        });
-      })
-      .catch(() => {
-        // If both cache and network fail, show offline page
-        if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
-        }
-      })
-  );
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') return;
+  
+  // Skip Chrome extensions
+  if (event.request.url.startsWith('chrome-extension://')) return;
+  
+  // Handle API requests differently
+  if (event.request.url.includes('/api/')) {
+    event.respondWith(networkFirst(event.request));
+    return;
+  }
+  
+  // For all other requests, use cache-first strategy
+  event.respondWith(cacheFirst(event.request));
 });
 
-// Background sync
+// Cache-first strategy
+async function cacheFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cachedResponse = await cache.match(request);
+  
+  if (cachedResponse) {
+    // Return cached response and update cache in background
+    event.waitUntil(updateCache(request, cache));
+    return cachedResponse;
+  }
+  
+  // If not in cache, fetch from network
+  try {
+    const networkResponse = await fetch(request);
+    
+    // Cache the new response
+    if (networkResponse.ok) {
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    // If network fails, return offline page for navigation requests
+    if (request.mode === 'navigate') {
+      return cache.match('/index.html');
+    }
+    
+    throw error;
+  }
+}
+
+// Network-first strategy for API requests
+async function networkFirst(request) {
+  try {
+    const networkResponse = await fetch(request);
+    
+    // Update cache with new response
+    const cache = await caches.open(CACHE_NAME);
+    cache.put(request, networkResponse.clone());
+    
+    return networkResponse;
+  } catch (error) {
+    // If network fails, try cache
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    throw error;
+  }
+}
+
+// Update cache in background
+async function updateCache(request, cache) {
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse.ok) {
+      cache.put(request, networkResponse.clone());
+    }
+  } catch (error) {
+    // Silent fail - we already have cached response
+    console.log('Background cache update failed:', error);
+  }
+}
+
+// Background sync for recipes
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-recipes') {
+    console.log('Background sync for recipes');
     event.waitUntil(syncRecipes());
   }
 });
 
-// Sync recipes in background
 async function syncRecipes() {
-  // Implement background sync logic here
-  console.log('Background sync for recipes');
+  try {
+    // Get pending recipes from IndexedDB
+    const pendingRecipes = await getPendingRecipes();
+    
+    if (pendingRecipes.length === 0) {
+      console.log('No pending recipes to sync');
+      return;
+    }
+    
+    // Sync each recipe
+    for (const recipe of pendingRecipes) {
+      await syncRecipe(recipe);
+    }
+    
+    console.log(`Successfully synced ${pendingRecipes.length} recipes`);
+  } catch (error) {
+    console.error('Background sync failed:', error);
+  }
+}
+
+// Helper function to get pending recipes (mock)
+async function getPendingRecipes() {
+  return [];
+}
+
+// Helper function to sync a recipe (mock)
+async function syncRecipe(recipe) {
+  return new Promise(resolve => setTimeout(resolve, 100));
 }
 
 // Push notifications
 self.addEventListener('push', event => {
+  if (!event.data) return;
+  
+  const data = event.data.json();
   const options = {
-    body: event.data.text(),
+    body: data.body || 'New notification from SICO MIX',
     icon: '/icons/icon-192.png',
     badge: '/icons/icon-72.png',
     vibrate: [100, 50, 100],
     data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
+      url: data.url || '/',
+      timestamp: Date.now()
     },
     actions: [
       {
-        action: 'explore',
+        action: 'open',
         title: 'Open App'
       },
       {
-        action: 'close',
-        title: 'Close'
+        action: 'dismiss',
+        title: 'Dismiss'
       }
     ]
   };
@@ -124,9 +209,16 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
 
-  if (event.action === 'explore') {
+  if (event.action === 'open') {
     event.waitUntil(
-      clients.openWindow('/')
+      clients.openWindow(event.notification.data.url || '/')
     );
+  }
+});
+
+// Handle messages from main thread
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
   }
 });
