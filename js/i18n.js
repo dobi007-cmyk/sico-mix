@@ -17,12 +17,16 @@ const i18n = {
     status: "Статус",
     statusDraft: "Чернетка",
     statusReady: "Готовий",
+    unnamed: "Без назви",
     
     // Colors
     colors: "фарб",
     addColors: "Додати фарби",
     colorAlreadyAdded: "Фарба вже додана",
+    colorNotFound: "Фарба не знайдена",
     seriesSet: "Встановлено серію",
+    added: "додано",
+    remove: "Видалити",
     
     // Calculator
     calculator: "Калькулятор",
@@ -33,6 +37,7 @@ const i18n = {
     percentMode: "% режим",
     gramMode: "г режим",
     modeChanged: "Режим змінено",
+    calculated: "Розраховано",
     
     // Search & Filter
     search: "Пошук",
@@ -88,6 +93,7 @@ const i18n = {
     // Notifications
     savedSuccess: "Рецепт збережено",
     saveError: "Помилка збереження",
+    saving: "Збереження...",
     draftCleared: "Чернетку очищено",
     recipeLoaded: "Рецепт завантажено",
     recipeDeleted: "Рецепт видалено",
@@ -142,11 +148,15 @@ const i18n = {
     status: "Status",
     statusDraft: "Szkic",
     statusReady: "Gotowy",
+    unnamed: "Bez nazwy",
     
     colors: "farby",
     addColors: "Dodaj farby",
     colorAlreadyAdded: "Farba już dodana",
+    colorNotFound: "Farba nie znaleziona",
     seriesSet: "Ustawiono serię",
+    added: "dodano",
+    remove: "Usuń",
     
     calculator: "Kalkulator",
     totalWeight: "Całkowita waga",
@@ -156,6 +166,7 @@ const i18n = {
     percentMode: "Tryb %",
     gramMode: "Tryb g",
     modeChanged: "Zmieniono tryb",
+    calculated: "Obliczono",
     
     search: "Szukaj",
     searchPlaceholder: "Szukaj po kodzie lub nazwie",
@@ -205,6 +216,7 @@ const i18n = {
     
     savedSuccess: "Receptura zapisana",
     saveError: "Błąd zapisu",
+    saving: "Zapisywanie...",
     draftCleared: "Szkic wyczyszczony",
     recipeLoaded: "Receptura załadowana",
     recipeDeleted: "Receptura usunięta",
@@ -253,11 +265,15 @@ const i18n = {
     status: "Status",
     statusDraft: "Draft",
     statusReady: "Ready",
+    unnamed: "Unnamed",
     
     colors: "colors",
     addColors: "Add colors",
     colorAlreadyAdded: "Color already added",
+    colorNotFound: "Color not found",
     seriesSet: "Series set to",
+    added: "added",
+    remove: "Remove",
     
     calculator: "Calculator",
     totalWeight: "Total weight",
@@ -267,6 +283,7 @@ const i18n = {
     percentMode: "% mode",
     gramMode: "g mode",
     modeChanged: "Mode changed",
+    calculated: "Calculated",
     
     search: "Search",
     searchPlaceholder: "Search by code or name",
@@ -316,6 +333,7 @@ const i18n = {
     
     savedSuccess: "Recipe saved",
     saveError: "Save error",
+    saving: "Saving...",
     draftCleared: "Draft cleared",
     recipeLoaded: "Recipe loaded",
     recipeDeleted: "Recipe deleted",
@@ -394,10 +412,10 @@ export function setLang(lang) {
   // Update HTML lang attribute
   document.documentElement.lang = lang;
   
-  // Trigger re-render if renderAll exists
-  if (typeof window.renderAll === 'function') {
-    window.renderAll();
-  }
+  // Trigger re-render
+  if (typeof window.renderColors === 'function') window.renderColors();
+  if (typeof window.renderAddColors === 'function') window.renderAddColors();
+  if (typeof window.renderRecipes === 'function') window.renderRecipes();
   
   console.log(`Language changed to: ${lang}`);
 }
