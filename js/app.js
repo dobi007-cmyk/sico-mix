@@ -1,142 +1,285 @@
-import { COLORS, SERIES } from "./data-colors.js";
+import { COLORS, SERIES, getColorByCode } from "./data-colors.js";
 import { t, setLang, currentLang } from "./i18n.js";
+import { formatNumber, clamp, generateId } from "./utils.js";
 
-window.setLang=setLang;
+window.setLang = setLang;
 
-const qs=id=>document.getElementById(id);
-let recipes=JSON.parse(localStorage.getItem("recipes")||"[]");
-let currentRecipe={items:[],photo:null};
-let mode="percent";
+const qs = id => document.getElementById(id);
+const qsa = sel => document.querySelectorAll(sel);
 
-/* tabs */
-window.showTab=id=>{
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  qs(id).classList.add("active");
+// Ініціалізація даних
+let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
+let currentRecipe = {
+  id: generateId(),
+  name: "",
+  note: "",
+  series: null,
+  status: "draft",
+  items: [],
+  photo: null,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
 };
+let currentSeries = null;
+let mode = "percent";
+let autoSaveTimer = null;
+let deleteRecipeId = null;
 
-/* colors */
-function initSeries(){
-  qs("seriesFilter").innerHTML=`<option value="ALL">${t("allSeries")||"ALL"}</option>`+
-  SERIES.map(s=>`<option>${s.id}</option>`).join("");
+// Ініціалізація теми
+function initTheme() {
+  const savedTheme = localStorage.getItem("sico_theme") || "system";
+  setTheme(savedTheme);
 }
 
-window.renderColors=()=>{
-  const f=qs("seriesFilter").value;
-  const q=qs("colorSearch").value.toLowerCase();
-  qs("colorList").innerHTML=COLORS
-    .filter(c=>(f==="ALL"||c.series===f)&&
-      (c.code.toLowerCase().includes(q)||c.name[currentLang].toLowerCase().includes(q)))
-    .map(c=>`
-      <div class="color">
-        <div class="swatch" style="background:${c.hex}"></div>
-        <b>${c.code}</b> ${c.name[currentLang]}
-        <button onclick="addColor('${c.code}')">+</button>
-      </div>`).join("");
+function setTheme(theme) {
+  const html = document.documentElement;
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+  if (theme === 'system') {
+    html.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+  } else {
+    html.setAttribute('data-theme', theme);
+  }
+  
+  localStorage.setItem("sico_theme", theme);
+  
+  // Оновити активну кнопку теми
+  qsa('.theme-switcher button').forEach(btn => {
+    const themeType = btn.textContent.includes('☀️') ? 'light' :
+                     btn.textContent.includes('🌙') ? 'dark' : 'system';
+    btn.style.background = theme === themeType ? 'var(--accent)' : '';
+    btn.style.color = theme === themeType ? 'white' : '';
+  });
+}
+
+window.setTheme = setTheme;
+
+// Ініціалізація фільтрів серій
+function initSeriesFilter() {
+  const select = qs("seriesFilter");
+  select.innerHTML = `<option value="ALL">${t("allSeries")}</option>`;
+  SERIES.forEach(s => {
+    const o = document.createElement("option");
+    o.value = s.id;
+    o.textContent = s.id;
+    select.appendChild(o);
+  });
+  select.onchange = () => renderColors();
+}
+
+// Пошук кольорів
+function searchColors(query) {
+  query = query.toLowerCase();
+  return COLORS.filter(c => 
+    c.code.toLowerCase().includes(query) ||
+    c.name[currentLang]?.toLowerCase().includes(query)
+  );
+}
+
+// Рендер кольорів з пошуком
+function renderColors() {
+  const series = qs("seriesFilter").value;
+  const searchQuery = qs("colorSearch").value;
+  
+  let list = series === "ALL" ? COLORS : COLORS.filter(c => c.series === series);
+  
+  if (searchQuery) {
+    list = searchColors(searchQuery);
+  }
+  
+  qs("colorList").innerHTML = list.map(c => `
+    <div class="color">
+      <div class="swatch" style="background:${c.hex}" title="${c.code}"></div>
+      <div>
+        <strong>${c.code}</strong><br>
+        ${c.name[currentLang]}
+      </div>
+      <button onclick="addColor('${c.code}')" title="${t('add')}">+</button>
+    </div>
+  `).join("");
+}
+
+// Пошук і додавання кольору в рецепт
+window.searchAndAddColor = function() {
+  const query = qs("recipeColorSearch").value;
+  if (!query) return;
+  
+  const results = searchColors(query);
+  const resultsContainer = qs("colorSearchResults");
+  
+  if (results.length === 0) {
+    resultsContainer.innerHTML = `<div class="color-search-item">${t('noResults')}</div>`;
+    return;
+  }
+  
+  resultsContainer.innerHTML = results.slice(0, 10).map(c => `
+    <div class="color-search-item" onclick="addColorFromSearch('${c.code}')">
+      <div class="swatch" style="background:${c.hex}"></div>
+      <div>
+        <strong>${c.code}</strong>
+        <div>${c.name[currentLang]}</div>
+      </div>
+    </div>
+  `).join("");
 };
 
-/* recipe */
-window.addColor=code=>{
-  const c=COLORS.find(x=>x.code===code);
-  currentRecipe.items.push({code:c.code,percent:0});
-  saveDraft(); renderCurrentRecipe();
+window.addColorFromSearch = function(code) {
+  addColor(code);
+  qs("recipeColorSearch").value = "";
+  qs("colorSearchResults").innerHTML = "";
 };
 
-window.renderCurrentRecipe=()=>{
-  const w=Number(qs("totalWeight").value||1000);
-  qs("recipeItems").innerHTML=currentRecipe.items.map((i,idx)=>{
-    const v=mode==="percent"?i.percent:(i.percent*w/100);
-    return `<div>
-      ${i.code}
-      <input type="number" value="${v}" onchange="updateItem(${idx},this.value)">
-      ${mode==="percent"?"%":"g"}
-      <button onclick="removeItem(${idx})">✕</button>
-    </div>`;
-  }).join("");
+// Додавання кольору
+window.addColor = function(code) {
+  const color = getColorByCode(code);
+  if (!color) return;
+  
+  if (!currentSeries) {
+    currentSeries = color.series;
+    qs("seriesBadge").textContent = currentSeries;
+    qs("seriesBadge").style.display = "inline-block";
+    currentRecipe.series = currentSeries;
+  }
+  
+  if (color.series !== currentSeries) {
+    alert(t("errorSeries"));
+    return;
+  }
+  
+  // Перевірка чи колір вже доданий
+  const existing = currentRecipe.items.find(item => item.code === code);
+  if (existing) {
+    existing.percent += 0.1; // Додати трохи відсотків
+  } else {
+    currentRecipe.items.push({ 
+      code, 
+      percent: 10, // Початкові 10%
+      baseCode: color.baseCode,
+      hex: color.hex 
+    });
+  }
+  
+  renderCurrentRecipe();
+  autoSave();
 };
 
-window.updateItem=(i,v)=>{
-  const w=Number(qs("totalWeight").value||1000);
-  currentRecipe.items[i].percent=mode==="percent"?Number(v):(Number(v)/w*100);
-  saveDraft();
-};
-
-window.removeItem=i=>{
-  currentRecipe.items.splice(i,1);
-  saveDraft(); renderCurrentRecipe();
-};
-
-window.toggleMode=cb=>{
-  mode=cb.checked?"gram":"percent";
+// Перемикач режиму
+window.toggleMode = function(checkbox) {
+  mode = checkbox.checked ? "gram" : "percent";
   renderCurrentRecipe();
 };
 
-/* save */
-window.saveRecipe=()=>{
-  recipes.push({
-    name:qs("recipeName").value,
-    note:qs("recipeNote").value,
-    status:qs("recipeStatus").value,
-    photo:currentRecipe.photo,
-    items:currentRecipe.items
-  });
-  localStorage.setItem("recipes",JSON.stringify(recipes));
-  currentRecipe={items:[]};
-  renderRecipes(); showTab("recipes");
+// Оновлення загальної ваги
+window.updateTotalWeight = function() {
+  const select = qs("totalWeight");
+  const customWeight = qs("customWeight");
+  
+  if (select.value === "custom") {
+    customWeight.style.display = "block";
+    customWeight.focus();
+  } else {
+    customWeight.style.display = "none";
+    renderCurrentRecipe();
+  }
 };
 
-/* draft */
-function saveDraft(){
-  localStorage.setItem("draft",JSON.stringify(currentRecipe));
+// Рендер поточного рецепту
+window.renderCurrentRecipe = function() {
+  const total = getTotalWeight();
+  let sum = 0;
+  
+  const itemsHtml = currentRecipe.items.map((i, idx) => {
+    const val = mode === "percent"
+      ? i.percent.toFixed(2)
+      : (i.percent * total / 100).toFixed(1);
+    sum += i.percent;
+    
+    const color = getColorByCode(i.code);
+    return `
+      <div class="recipe-item">
+        <div class="color-indicator">
+          <div class="swatch" style="background:${i.hex || '#ccc'}"></div>
+          <span class="code">${i.code}</span>
+        </div>
+        <input type="number" 
+               value="${val}" 
+               step="${mode === 'percent' ? '0.1' : '0.5'}"
+               min="0"
+               onchange="updateItem(${idx}, this.value)"
+               oninput="updateItem(${idx}, this.value)">
+        <span class="unit">${mode === "percent" ? "%" : t("grams")}</span>
+        <button onclick="removeItem(${idx})" class="remove-btn" title="${t('delete')}">✕</button>
+      </div>`;
+  }).join("");
+  
+  qs("recipeItems").innerHTML = itemsHtml + 
+    `<div class="sum-line">${t("sum")}: <strong>${sum.toFixed(2)}%</strong></div>`;
+  
+  updateAutoSaveStatus();
+};
+
+// Оновлення елемента
+window.updateItem = function(i, val) {
+  const total = getTotalWeight();
+  const numVal = parseFloat(val) || 0;
+  
+  currentRecipe.items[i].percent = mode === "percent" 
+    ? numVal 
+    : (numVal / total) * 100;
+  
+  renderCurrentRecipe();
+  autoSave();
+};
+
+// Видалення елемента
+window.removeItem = function(i) {
+  currentRecipe.items.splice(i, 1);
+  if (currentRecipe.items.length === 0) {
+    currentSeries = null;
+    qs("seriesBadge").style.display = "none";
+    currentRecipe.series = null;
+  }
+  renderCurrentRecipe();
+  autoSave();
+};
+
+// Оновлення статусу рецепту
+window.updateRecipeStatus = function() {
+  currentRecipe.status = qs("recipeStatus").value;
+  autoSave();
+};
+
+// Автозбереження
+function autoSave() {
+  const statusEl = qs("autoSaveStatus");
+  statusEl.textContent = t("saving");
+  statusEl.className = "save-status saving pulse";
+  
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(() => {
+    currentRecipe.updatedAt = new Date().toISOString();
+    localStorage.setItem("sico_current_recipe", JSON.stringify(currentRecipe));
+    
+    statusEl.textContent = t("saved");
+    statusEl.className = "save-status saved";
+    
+    setTimeout(() => {
+      statusEl.textContent = "";
+      statusEl.className = "save-status";
+    }, 2000);
+  }, 1000);
 }
-const d=localStorage.getItem("draft");
-if(d) currentRecipe=JSON.parse(d);
 
-/* photo */
-window.savePhoto=input=>{
-  const r=new FileReader();
-  r.onload=e=>{
-    currentRecipe.photo=e.target.result;
-    qs("photoPreview").innerHTML=`<img src="${e.target.result}" style="max-width:100%">`;
-    saveDraft();
-  };
-  r.readAsDataURL(input.files[0]);
-};
-
-/* recipes */
-function renderRecipes(){
-  qs("recipeList").innerHTML=recipes.map(r=>`
-    <div>
-      <b>${r.name}</b> (${r.status})
-      ${r.photo?`<img src="${r.photo}" width="60">`:""}
-    </div>`).join("");
-}
-window.exportTXT=()=>{
-  const t=recipes.map(r=>r.name).join("\n");
-  download(t,"recipes.txt","text/plain");
-};
-window.exportPDF=()=>window.print();
-window.importTXT=i=>{
-  const r=new FileReader();
-  r.onload=e=>{
-    e.target.result.split("\n").forEach(n=>recipes.push({name:n,items:[]}));
-    localStorage.setItem("recipes",JSON.stringify(recipes));
-    renderRecipes();
-  };
-  r.readAsText(i.files[0]);
-};
-function download(c,n,t){
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([c],{type:t}));
-  a.download=n; a.click();
+function updateAutoSaveStatus() {
+  const statusEl = qs("autoSaveStatus");
+  if (currentRecipe.items.length > 0 || currentRecipe.name.trim()) {
+    statusEl.textContent = t("autoSave");
+  } else {
+    statusEl.textContent = "";
+  }
 }
 
-/* theme */
-window.toggleTheme=()=>{
-  document.body.classList.toggle("dark");
-  localStorage.setItem("theme",document.body.classList.contains("dark"));
-};
-
-/* init */
-document.addEventListener("DOMContentLoaded",()=>{
-  initSeries(); renderColors(); renderRecipes(); setLang(currentLang);
-});
+// Завантаження збереженого рецепту
+function loadSavedRecipe() {
+  const saved = localStorage.getItem("sico_current_recipe");
+  if
