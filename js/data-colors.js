@@ -83,8 +83,7 @@ export const BASE_COLORS = [
   { code: "142",    name: { ua: "CMYK Magenta",        pl: "CMYK Magenta",      en: "CMYK Magenta"    }, hex: "#e91e63" },
   { code: "143",    name: { ua: "CMYK Black",          pl: "CMYK Black",        en: "CMYK Black"      }, hex: "#212121" }
 ];
-// data-colors.js
-const COLORS = [];
+export const COLORS = [];
 
 SERIES.forEach(series => {
   BASE_COLORS.forEach(base => {
@@ -98,17 +97,10 @@ SERIES.forEach(series => {
   });
 });
 
-COLORS.sort((a, b) => {
-  const numA = parseInt(a.baseCode.match(/\d+/)?.[0] || "0", 10);
-  const numB = parseInt(b.baseCode.match(/\d+/)?.[0] || "0", 10);
-  return numA - numB;
-});
+COLORS.sort((a, b) =>
+  a.code.localeCompare(b.code, undefined, { numeric: true })
+);
 
-// допоміжні функції — ГЛОБАЛЬНІ
-function getColorByCode(code) {
+export function getColorByCode(code) {
   return COLORS.find(c => c.code === code);
-}
-
-function getColorsBySeries(series) {
-  return COLORS.filter(c => c.series === series);
 }
