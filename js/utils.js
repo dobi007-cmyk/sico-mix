@@ -87,7 +87,7 @@ export function formatDate(date, includeTime = false) {
  */
 export function calculateWeights(items, totalWeight) {
   if (!Array.isArray(items) || typeof totalWeight !== 'number') {
-    return [];
+    return items || [];
   }
   
   return items.map(item => ({
@@ -166,8 +166,11 @@ export function deepClone(obj) {
  * @returns {string} 'light' or 'dark'
  */
 export function getColorBrightness(hexColor) {
+  if (!hexColor) return 'dark';
+  
   // Remove # if present
   const hex = hexColor.replace('#', '');
+  if (hex.length !== 6) return 'dark';
   
   // Convert to RGB
   const r = parseInt(hex.substr(0, 2), 16);
@@ -205,7 +208,10 @@ export function generateColorPalette(hexColor, count = 5) {
  * @returns {string} Adjusted color
  */
 export function adjustColorBrightness(hexColor, percent) {
+  if (!hexColor) return '#000000';
+  
   const hex = hexColor.replace('#', '');
+  if (hex.length !== 6) return hexColor;
   
   let r = parseInt(hex.substr(0, 2), 16);
   let g = parseInt(hex.substr(2, 2), 16);
@@ -242,7 +248,10 @@ export function getContrastRatio(color1, color2) {
  * @returns {number} Luminance value
  */
 function getLuminance(hexColor) {
+  if (!hexColor) return 0;
+  
   const hex = hexColor.replace('#', '');
+  if (hex.length !== 6) return 0;
   
   const r = parseInt(hex.substr(0, 2), 16) / 255;
   const g = parseInt(hex.substr(2, 2), 16) / 255;
@@ -376,6 +385,7 @@ export function set(obj, path, value) {
  * @returns {string} String without accents
  */
 export function removeAccents(str) {
+  if (!str) return '';
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
@@ -386,6 +396,7 @@ export function removeAccents(str) {
  * @returns {string} Truncated string
  */
 export function truncate(str, length) {
+  if (!str) return '';
   if (str.length <= length) return str;
   return str.substring(0, length) + '...';
 }
@@ -396,6 +407,8 @@ export function truncate(str, length) {
  * @returns {Object} RGB object
  */
 export function hexToRgb(hex) {
+  if (!hex) return null;
+  
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? {
     r: parseInt(result[1], 16),
@@ -413,6 +426,44 @@ export function hexToRgb(hex) {
  */
 export function rgbToHex(r, g, b) {
   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+/**
+ * Validate hex color
+ * @param {string} color - Color to validate
+ * @returns {boolean} True if valid hex color
+ */
+export function isValidHexColor(color) {
+  return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
+}
+
+/**
+ * Convert percentage to color
+ * @param {number} percent - Percentage (0-100)
+ * @returns {string} Color from red to green
+ */
+export function percentToColor(percent) {
+  const r = percent < 50 ? 255 : Math.floor(255 - (percent * 2 - 100) * 255 / 100);
+  const g = percent > 50 ? 255 : Math.floor((percent * 2) * 255 / 100);
+  return rgbToHex(r, g, 0);
+}
+
+/**
+ * Capitalize first letter
+ * @param {string} string - String to capitalize
+ * @returns {string} Capitalized string
+ */
+export function capitalize(string) {
+  if (!string) return '';
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+/**
+ * Generate random color
+ * @returns {string} Random hex color
+ */
+export function getRandomColor() {
+  return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
 }
 
 // Export all functions
@@ -442,5 +493,9 @@ export default {
   removeAccents,
   truncate,
   hexToRgb,
-  rgbToHex
+  rgbToHex,
+  isValidHexColor,
+  percentToColor,
+  capitalize,
+  getRandomColor
 };
