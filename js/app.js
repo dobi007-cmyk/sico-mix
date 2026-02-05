@@ -1,122 +1,102 @@
 const qs = id => document.getElementById(id);
+const qsa = s => document.querySelectorAll(s);
 
 let recipes = JSON.parse(localStorage.getItem("sico_recipes")||"[]");
-let currentRecipe = { items:[] };
+let currentRecipe = {items:[]};
 let currentSeries = null;
 let mode = "percent";
 
-/* Tabs */
 function showTab(id){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  qsa(".tab").forEach(t=>t.classList.remove("active"));
   qs(id).classList.add("active");
+
+  qsa("nav button").forEach(b=>b.classList.remove("active"));
+  document.querySelector(`nav button[onclick*="${id}"]`)?.classList.add("active");
+
   if(id==="recipes") renderRecipes();
 }
 
-/* Series */
-function initSeries(){
+function initSeriesFilter(){
   const s = qs("seriesFilter");
   s.innerHTML = `<option value="ALL">${t("allSeries")}</option>`;
   SERIES.forEach(x=>{
-    const o=document.createElement("option");
-    o.value=x.id;
-    o.textContent=x.id;
-    s.appendChild(o);
+    s.innerHTML += `<option value="${x.id}">${x.id}</option>`;
   });
-  s.onchange = renderColors;
+  s.onchange = ()=>renderColors();
 }
 
-/* Colors */
 function renderColors(){
-  const v = qs("seriesFilter").value;
-  const list = v==="ALL"?COLORS:COLORS.filter(c=>c.series===v);
+  const filter = qs("seriesFilter").value;
+  const list = filter==="ALL" ? COLORS : COLORS.filter(c=>c.series===filter);
   qs("colorList").innerHTML = list.map(c=>`
     <div class="color">
       <div class="swatch" style="background:${c.hex}"></div>
       <div><strong>${c.code}</strong><br>${c.name[currentLang]}</div>
       <button onclick="addColor('${c.code}')">+</button>
-    </div>
-  `).join("");
+    </div>`).join("");
 }
 
-/* Recipe */
 function addColor(code){
   const c = COLORS.find(x=>x.code===code);
   if(!currentSeries) currentSeries=c.series;
-  if(c.series!==currentSeries){
-    alert(t("errorSeries"));
-    return;
-  }
+  if(c.series!==currentSeries) return alert(t("errorSeries"));
   currentRecipe.items.push({code:c.code,percent:0});
-  qs("seriesBadge").textContent=currentSeries;
-  qs("seriesBadge").style.display="inline-block";
-  renderCurrentRecipe();
-}
-
-function toggleMode(cb){
-  mode = cb.checked ? "gram" : "percent";
   renderCurrentRecipe();
 }
 
 function renderCurrentRecipe(){
-  const w = Number(qs("totalWeight").value);
-  let sum=0;
+  const w = +qs("totalWeight").value || 1000;
+  let sum = 0;
   qs("recipeItems").innerHTML = currentRecipe.items.map((i,idx)=>{
+    const val = mode==="percent"?i.percent:(i.percent*w/100);
     sum+=i.percent;
-    const val = mode==="percent"?i.percent:(i.percent*w/100).toFixed(1);
     return `
-      <div class="recipe-item">
-        ${i.code}
-        <input type="number" value="${val}"
-          onchange="updateItem(${idx},this.value)">
-        ${mode==="percent"?"%":"g"}
-        <button onclick="removeItem(${idx})">✕</button>
-      </div>
-    `;
-  }).join("") + `<strong>${t("sum")}: ${sum.toFixed(1)}%</strong>`;
+    <div class="recipe-item">
+      <span class="code">${i.code}</span>
+      <input type="number" value="${val}" onchange="updateItem(${idx},this.value)">
+      <span>${mode==="percent"?"%":"g"}</span>
+      <button onclick="removeItem(${idx})">✕</button>
+    </div>`;
+  }).join("") + `<div class="sum-line">${t("sum")}: ${sum.toFixed(2)}%</div>`;
 }
 
 function updateItem(i,v){
-  const w = Number(qs("totalWeight").value);
-  currentRecipe.items[i].percent =
-    mode==="percent"?Number(v):(Number(v)/w*100);
+  const w = +qs("totalWeight").value || 1000;
+  currentRecipe.items[i].percent = mode==="percent"?+v:(+v/w*100);
   renderCurrentRecipe();
 }
 
 function removeItem(i){
   currentRecipe.items.splice(i,1);
-  if(!currentRecipe.items.length){
-    currentSeries=null;
-    qs("seriesBadge").style.display="none";
-  }
+  if(!currentRecipe.items.length) currentSeries=null;
   renderCurrentRecipe();
 }
 
-/* Save */
+function toggleMode(cb){
+  mode = cb.checked?"gram":"percent";
+  renderCurrentRecipe();
+}
+
 function saveRecipe(){
-  if(!qs("recipeName").value || !currentRecipe.items.length) return;
-  recipes.push({
-    name:qs("recipeName").value,
-    note:qs("recipeNote").value,
-    series:currentSeries,
-    items:currentRecipe.items
-  });
+  if(!qs("recipeName").value || !currentRecipe.items.length)
+    return alert(t("errorEmptyRecipe"));
+  recipes.push({...currentRecipe,name:qs("recipeName").value});
   localStorage.setItem("sico_recipes",JSON.stringify(recipes));
   currentRecipe={items:[]};
-  currentSeries=null;
-  qs("recipeName").value="";
-  qs("recipeNote").value="";
-  qs("seriesBadge").style.display="none";
+  renderRecipes();
   showTab("recipes");
 }
 
-/* List */
 function renderRecipes(){
-  qs("recipeList").innerHTML = recipes.length
-    ? recipes.map(r=>`<div><strong>${r.name}</strong> (${r.series})</div>`).join("")
-    : `<p>${t("noRecipes")}</p>`;
+  const c = qs("recipeList");
+  if(!recipes.length){
+    c.innerHTML = `<p>${t("noRecipes")}</p>`;
+    return;
+  }
+  c.innerHTML = recipes.map(r=>`<div><strong>${r.name}</strong></div>`).join("");
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
-  initSeries();
+  initSeriesFilter();
   renderColors();
 });
