@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+
+Sitemap: https://ваш-домен.com/sitemap.xml
+
+# SICO MIX Paint Calculator
+# Professional paint mixing application
