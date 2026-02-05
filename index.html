@@ -1,436 +1,167 @@
 <!DOCTYPE html>
 <html lang="uk" data-theme="auto">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="Professional paint mixing calculator for SICO screen printing paints">
-  <meta name="theme-color" content="#3b82f6">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="keywords" content="SICO, paint, mixing, calculator, screen printing, краски, смешивание, калькулятор">
-  <meta name="author" content="SICO MIX">
-  <meta property="og:title" content="SICO MIX | Professional Paint Calculator">
-  <meta property="og:description" content="Professional paint mixing calculator for screen printing">
-  <meta property="og:image" content="icons/icon-512.png">
-  <meta property="og:type" content="website">
-  
+  <meta charset="UTF-8" />
+
+  <!-- Mobile / PWA -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#3b82f6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- SEO -->
+  <meta name="description" content="Professional paint mixing calculator for SICO screen printing paints" />
+  <meta name="keywords" content="SICO, paint, mixing, calculator, screen printing" />
+  <meta name="author" content="SICO MIX" />
+
+  <!-- OpenGraph -->
+  <meta property="og:title" content="SICO MIX | Professional Paint Calculator" />
+  <meta property="og:description" content="Professional paint mixing calculator for screen printing" />
+  <meta property="og:image" content="icons/icon-512.png" />
+  <meta property="og:type" content="website" />
+
   <title>SICO MIX | Professional Paint Calculator</title>
-  
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
-  
+
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json" />
+
   <!-- Icons -->
-  <link rel="icon" href="icons/icon-192.png" type="image/png">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
   <!-- Styles -->
-  <link rel="stylesheet" href="css/style.css">
-  
-  <!-- External Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- PDF -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body>
-  <!-- App Container -->
-  <div class="app-container">
-    
-    <!-- Header -->
-    <header class="app-header">
-      <div class="header-left">
-        <div class="logo">
-          <div class="logo-icon">🎨</div>
-          <h1>SICO <span class="gradient-text">MIX</span></h1>
-        </div>
-        <div class="header-info">
-          <span id="seriesBadge" class="series-badge" style="display:none;"></span>
-          <span id="recipeStats" class="stats-badge">0 colors</span>
-        </div>
-      </div>
-      
-      <div class="header-controls">
-        <div class="lang-switcher">
-          <button class="lang-btn" onclick="setLang('ua')" title="Українська">UA</button>
-          <button class="lang-btn" onclick="setLang('pl')" title="Polski">PL</button>
-          <button class="lang-btn" onclick="setLang('en')" title="English">EN</button>
-        </div>
-        
-        <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
-          <span class="theme-icon">🌙</span>
-        </button>
-      </div>
-    </header>
 
-    <!-- Navigation -->
-    <nav class="app-nav">
-      <button class="nav-btn active" onclick="showTab('colors')" data-i18n="paints">
-        <span class="nav-icon">🎨</span>
-        <span class="nav-text">Paints</span>
-      </button>
-      <button class="nav-btn" onclick="showTab('new')" data-i18n="newRecipe">
-        <span class="nav-icon">➕</span>
-        <span class="nav-text">New</span>
-      </button>
-      <button class="nav-btn" onclick="showTab('recipes')" data-i18n="recipes">
-        <span class="nav-icon">📋</span>
-        <span class="nav-text">Recipes</span>
-      </button>
-      <button class="nav-btn" onclick="showTab('settings')" data-i18n="settings">
-        <span class="nav-icon">⚙️</span>
-        <span class="nav-text">Settings</span>
-      </button>
-    </nav>
+<div class="app-container">
 
-    <!-- Main Content -->
-    <main class="app-main">
-      
-      <!-- Colors Tab -->
-      <section id="colors" class="tab active">
-        <div class="tab-header">
-          <h2><span class="tab-icon">🎨</span> <span data-i18n="catalog">Catalog</span></h2>
-          <div class="tab-actions">
-            <button class="btn-secondary" onclick="exportAllColors()" data-i18n="exportAll">Export All</button>
-          </div>
-        </div>
-        
-        <div class="filter-section">
-          <div class="filter-group">
-            <label for="seriesFilter" data-i18n="filterSeries">Filter by Series</label>
-            <select id="seriesFilter" class="modern-select">
-              <option value="ALL" data-i18n="allSeries">All Series</option>
-            </select>
-          </div>
-          
-          <div class="filter-group">
-            <label for="colorSearch" data-i18n="search">Search</label>
-            <div class="search-box">
-              <input type="text" id="colorSearch" placeholder="Search by code or name" oninput="debouncedRenderColors()">
-              <span class="search-icon">🔍</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="color-grid-container">
-          <div id="colorCount" class="color-count">0 colors</div>
-          <div id="colorList" class="color-grid"></div>
-        </div>
-      </section>
+<header class="app-header">
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon">🎨</div>
+      <h1>SICO <span class="gradient-text">MIX</span></h1>
+    </div>
 
-      <!-- New Recipe Tab -->
-      <section id="new" class="tab">
-        <div class="tab-header">
-          <h2><span class="tab-icon">➕</span> <span data-i18n="newRecipe">New Recipe</span></h2>
-          <div class="tab-actions">
-            <button class="btn-secondary" onclick="clearDraft()" data-i18n="clear">Clear</button>
-            <button class="btn-primary" onclick="saveRecipe()" data-i18n="addRecipe">
-              <span class="btn-icon">💾</span>
-              <span class="btn-text">Save Recipe</span>
-            </button>
-          </div>
-        </div>
-        
-        <div class="recipe-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="recipeName" data-i18n="recipeName">Recipe Name</label>
-              <input type="text" id="recipeName" placeholder="Enter recipe name" class="modern-input">
-            </div>
-            
-            <div class="form-group">
-              <label for="recipeStatus" data-i18n="status">Status</label>
-              <select id="recipeStatus" class="modern-select">
-                <option value="draft" data-i18n="statusDraft">Draft</option>
-                <option value="ready" data-i18n="statusReady">Ready</option>
-              </select>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="recipeNote" data-i18n="recipeNote">Note</label>
-            <textarea id="recipeNote" placeholder="Add notes (optional)" class="modern-textarea" rows="2"></textarea>
-          </div>
-          
-          <div class="form-section">
-            <div class="section-header">
-              <h3><span class="section-icon">🔍</span> <span data-i18n="addColors">Add Colors</span></h3>
-              <div class="mode-toggle">
-                <span data-i18n="percentMode">% Mode</span>
-                <label class="switch">
-                  <input type="checkbox" id="modeToggle" onchange="toggleMode(this)">
-                  <span class="slider">
-                    <span class="slider-label">%</span>
-                    <span class="slider-label">g</span>
-                  </span>
-                </label>
-              </div>
-            </div>
-            
-            <div class="search-box">
-              <input type="text" id="recipeSearch" placeholder="Search colors..." oninput="debouncedRenderAddColors()">
-              <span class="search-icon">🔍</span>
-            </div>
-            
-            <div id="addColorList" class="color-grid compact"></div>
-          </div>
-          
-          <div class="form-section">
-            <div class="section-header">
-              <h3><span class="section-icon">⚖️</span> <span data-i18n="calculator">Calculator</span></h3>
-              <div class="weight-selector">
-                <label for="totalWeight" data-i18n="totalWeight">Total Weight:</label>
-                <select id="totalWeight" class="modern-select" onchange="handleWeightChange()">
-                  <option value="100">100 g</option>
-                  <option value="250">250 g</option>
-                  <option value="500">500 g</option>
-                  <option value="1000" selected>1 kg</option>
-                  <option value="5000">5 kg</option>
-                  <option value="custom">Custom</option>
-                </select>
-                <input type="number" id="customWeight" class="modern-input" placeholder="Enter weight" style="display:none;" min="1" step="1">
-              </div>
-            </div>
-            
-            <div id="recipeItems" class="recipe-items">
-              <div class="empty-state">
-                <div class="empty-icon">🎨</div>
-                <p data-i18n="noColorsAdded">No colors added yet</p>
-              </div>
-            </div>
-            
-            <div class="recipe-summary">
-              <div class="summary-item">
-                <span data-i18n="totalColors">Colors</span>
-                <span id="totalColors">0</span>
-              </div>
-              <div class="summary-item">
-                <span data-i18n="totalPercent">Total %</span>
-                <span id="totalPercent">0%</span>
-              </div>
-              <div class="summary-item">
-                <span data-i18n="totalWeightGrams">Total Weight</span>
-                <span id="totalWeightGrams">0 g</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="form-section">
-            <h3><span class="section-icon">📸</span> <span data-i18n="addPhoto">Add Photo</span></h3>
-            <div class="photo-upload">
-              <label for="recipePhoto" class="upload-area">
-                <div class="upload-icon">📸</div>
-                <div class="upload-text" data-i18n="clickToUpload">Click to upload photo</div>
-                <div class="upload-subtext" data-i18n="maxSize">Max 5MB</div>
-              </label>
-              <input type="file" id="recipePhoto" accept="image/*" capture="environment" style="display:none;">
-              <div id="photoPreview" class="photo-preview" style="display:none;">
-                <img src="" alt="Preview">
-                <button class="remove-photo" onclick="removePhoto()">✕</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Recipes Tab -->
-      <section id="recipes" class="tab">
-        <div class="tab-header">
-          <h2><span class="tab-icon">📋</span> <span data-i18n="recipes">Recipes</span></h2>
-          <div class="tab-actions">
-            <div class="button-group">
-              <button class="btn-secondary" onclick="importRecipes()" data-i18n="import">
-                <span class="btn-icon">📥</span>
-                <span class="btn-text">Import</span>
-              </button>
-              <button class="btn-primary" onclick="exportAllRecipes()" data-i18n="exportAll">
-                <span class="btn-icon">📤</span>
-                <span class="btn-text">Export All</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="recipes-toolbar">
-          <div class="search-box">
-            <input type="text" id="recipeSearchList" placeholder="Search recipes..." oninput="debouncedFilterRecipes()">
-            <span class="search-icon">🔍</span>
-          </div>
-          
-          <div class="filter-buttons">
-            <button class="filter-btn active" data-filter="all" onclick="setRecipeFilter('all')" data-i18n="all">All</button>
-            <button class="filter-btn" data-filter="draft" onclick="setRecipeFilter('draft')" data-i18n="drafts">Drafts</button>
-            <button class="filter-btn" data-filter="ready" onclick="setRecipeFilter('ready')" data-i18n="ready">Ready</button>
-          </div>
-        </div>
-        
-        <div id="recipeList" class="recipes-grid">
-          <div class="empty-state">
-            <div class="empty-icon">📋</div>
-            <h3 data-i18n="noRecipes">No recipes yet</h3>
-            <p data-i18n="createFirstRecipe">Create your first paint mixing recipe!</p>
-            <button class="btn-primary" onclick="showTab('new')" data-i18n="createRecipe">Create Recipe</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Settings Tab -->
-      <section id="settings" class="tab">
-        <div class="tab-header">
-          <h2><span class="tab-icon">⚙️</span> <span data-i18n="settings">Settings</span></h2>
-        </div>
-        
-        <div class="settings-container">
-          <div class="settings-card">
-            <h3><span class="settings-icon">🌍</span> <span data-i18n="language">Language</span></h3>
-            <div class="settings-options">
-              <button class="lang-option" onclick="setLang('ua')">
-                <span class="flag">🇺🇦</span>
-                <span>Українська</span>
-              </button>
-              <button class="lang-option" onclick="setLang('pl')">
-                <span class="flag">🇵🇱</span>
-                <span>Polski</span>
-              </button>
-              <button class="lang-option" onclick="setLang('en')">
-                <span class="flag">🇬🇧</span>
-                <span>English</span>
-              </button>
-            </div>
-          </div>
-          
-          <div class="settings-card">
-            <h3><span class="settings-icon">🎨</span> <span data-i18n="appearance">Appearance</span></h3>
-            <div class="theme-options">
-              <button class="theme-option" onclick="setTheme('light')">
-                <div class="theme-preview light"></div>
-                <span data-i18n="light">Light</span>
-              </button>
-              <button class="theme-option" onclick="setTheme('dark')">
-                <div class="theme-preview dark"></div>
-                <span data-i18n="dark">Dark</span>
-              </button>
-              <button class="theme-option" onclick="setTheme('auto')">
-                <div class="theme-preview auto"></div>
-                <span data-i18n="auto">Auto</span>
-              </button>
-            </div>
-          </div>
-          
-          <div class="settings-card">
-            <h3><span class="settings-icon">💾</span> <span data-i18n="dataManagement">Data Management</span></h3>
-            <div class="settings-buttons">
-              <button class="btn-secondary" onclick="exportAllData()" data-i18n="exportAllData">Export All Data</button>
-              <button class="btn-secondary" onclick="backupData()" data-i18n="backup">Backup Now</button>
-              <button class="btn-danger" onclick="confirmReset()" data-i18n="resetAll">Reset All Data</button>
-            </div>
-          </div>
-          
-          <div class="settings-card">
-            <h3><span class="settings-icon">ℹ️</span> <span data-i18n="about">About</span></h3>
-            <div class="about-info">
-              <div class="app-version">SICO MIX v2.0.0</div>
-              <div class="app-description" data-i18n="appDescription">Professional paint mixing calculator for screen printing</div>
-              <div class="copyright">© 2026 SICO MIX • All rights reserved</div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Quick Actions Bar -->
-    <div class="quick-actions">
-      <button class="quick-action" onclick="showTab('new')">
-        <span class="action-icon">➕</span>
-        <span class="action-text" data-i18n="quickNew">New</span>
-      </button>
-      <button class="quick-action" onclick="calculateWeights()">
-        <span class="action-icon">⚖️</span>
-        <span class="action-text" data-i18n="quickCalc">Calculate</span>
-      </button>
-      <button class="quick-action" onclick="showTab('recipes')">
-        <span class="action-icon">📋</span>
-        <span class="action-text" data-i18n="quickRecipes">Recipes</span>
-      </button>
+    <div class="header-info">
+      <span id="seriesBadge" class="series-badge" hidden></span>
+      <span id="recipeStats" class="stats-badge">0 colors</span>
     </div>
   </div>
 
-  <!-- Modal Dialog -->
-  <div id="modalOverlay" class="modal-overlay hidden">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 id="modalTitle">Confirm</h3>
-        <button class="modal-close" onclick="closeModal()">✕</button>
-      </div>
-      <div class="modal-body" id="modalBody">Are you sure?</div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal()" data-i18n="cancel">Cancel</button>
-        <button id="modalConfirm" class="btn-primary" data-i18n="confirm">Confirm</button>
-      </div>
+  <div class="header-controls">
+    <div class="lang-switcher">
+      <button onclick="setLang('ua')">UA</button>
+      <button onclick="setLang('pl')">PL</button>
+      <button onclick="setLang('en')">EN</button>
     </div>
+
+    <button id="themeToggle" onclick="toggleTheme()">🌙</button>
   </div>
+</header>
 
-  <!-- Toast Notifications -->
-  <div id="toastContainer" class="toast-container"></div>
 
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="loading-overlay hidden">
-    <div class="loading-spinner"></div>
-    <div class="loading-text" data-i18n="loading">Loading...</div>
-  </div>
+<nav class="app-nav">
+  <button class="nav-btn active" onclick="showTab('colors')">🎨 Paints</button>
+  <button class="nav-btn" onclick="showTab('new')">➕ New</button>
+  <button class="nav-btn" onclick="showTab('recipes')">📋 Recipes</button>
+  <button class="nav-btn" onclick="showTab('settings')">⚙ Settings</button>
+</nav>
 
-  <!-- Import File Input -->
-  <input type="file" id="importFile" accept=".json" style="display:none;">
-  
-  <!-- Scripts -->
-  <script type="module" src="js/data-colors.js"></script>
-  <script type="module" src="js/utils.js"></script>
-  <script type="module" src="js/i18n.js"></script>
-  <script type="module" src="js/app.js"></script>
-  
-  <!-- Service Worker Registration -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .then(reg => console.log('Service Worker registered:', reg.scope))
-          .catch(err => console.log('Service Worker registration failed:', err));
-      });
-    }
-    
-    // PWA install prompt
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      
-      // Show install button
-      const installBtn = document.createElement('button');
-      installBtn.textContent = 'Install App';
-      installBtn.className = 'btn-primary';
-      installBtn.style.position = 'fixed';
-      installBtn.style.bottom = '20px';
-      installBtn.style.left = '50%';
-      installBtn.style.transform = 'translateX(-50%)';
-      installBtn.style.zIndex = '10000';
-      installBtn.onclick = () => {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User accepted install');
-          }
-          deferredPrompt = null;
-        });
-      };
-      
-      setTimeout(() => {
-        document.body.appendChild(installBtn);
-        setTimeout(() => installBtn.remove(), 10000);
-      }, 3000);
-    });
-  </script>
+
+<main class="app-main">
+
+<section id="colors" class="tab active">
+  <h2>Catalog</h2>
+
+  <input id="colorSearch" placeholder="Search..." oninput="debouncedRenderColors()" />
+  <select id="seriesFilter"></select>
+
+  <div id="colorList" class="color-grid"></div>
+</section>
+
+
+<section id="new" class="tab">
+
+<h2>New Recipe</h2>
+
+<input id="recipeName" placeholder="Name" />
+<textarea id="recipeNote"></textarea>
+
+<input id="recipeSearch" placeholder="Search colors..." oninput="debouncedRenderAddColors()" />
+
+<div id="addColorList" class="color-grid compact"></div>
+
+<select id="totalWeight" onchange="handleWeightChange()">
+<option value="100">100g</option>
+<option value="500">500g</option>
+<option value="1000" selected>1kg</option>
+<option value="custom">Custom</option>
+</select>
+
+<input id="customWeight" style="display:none" />
+
+<div id="recipeItems"></div>
+
+<button onclick="saveRecipe()">SAVE</button>
+
+</section>
+
+
+<section id="recipes" class="tab">
+
+<h2>Recipes</h2>
+
+<input id="recipeSearchList" oninput="debouncedFilterRecipes()" />
+
+<div id="recipeList"></div>
+
+</section>
+
+
+<section id="settings" class="tab">
+<h2>Settings</h2>
+
+<button onclick="setTheme('light')">Light</button>
+<button onclick="setTheme('dark')">Dark</button>
+<button onclick="setTheme('auto')">Auto</button>
+
+<button onclick="exportAllData()">Export</button>
+<button onclick="backupData()">Backup</button>
+<button onclick="confirmReset()">Reset</button>
+
+</section>
+
+</main>
+
+</div>
+
+
+<!-- Modules -->
+<script type="module" src="js/data-colors.js"></script>
+<script type="module" src="js/utils.js"></script>
+<script type="module" src="js/i18n.js"></script>
+<script type="module" src="js/app.js"></script>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js');
+  });
+}
+</script>
+
 </body>
 </html>
