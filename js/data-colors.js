@@ -83,11 +83,8 @@ export const BASE_COLORS = [
   { code: "142",    name: { ua: "CMYK Magenta",        pl: "CMYK Magenta",      en: "CMYK Magenta"    }, hex: "#e91e63" },
   { code: "143",    name: { ua: "CMYK Black",          pl: "CMYK Black",        en: "CMYK Black"      }, hex: "#212121" }
 ];
-
-// ────────────────────────────────────────────────
-// Генерація повного списку кольорів
-// ────────────────────────────────────────────────
-export const COLORS = [];
+// data-colors.js
+const COLORS = [];
 
 SERIES.forEach(series => {
   BASE_COLORS.forEach(base => {
@@ -101,34 +98,17 @@ SERIES.forEach(series => {
   });
 });
 
-// Сортування за кодом (числове сортування)
 COLORS.sort((a, b) => {
-  // Витягуємо числову частину коду (після префікса серії)
   const numA = parseInt(a.baseCode.match(/\d+/)?.[0] || "0", 10);
   const numB = parseInt(b.baseCode.match(/\d+/)?.[0] || "0", 10);
   return numA - numB;
 });
 
-// ────────────────────────────────────────────────
-// Допоміжні функції для роботи з кольорами
-// ────────────────────────────────────────────────
-export function getColorByCode(code) {
+// допоміжні функції — ГЛОБАЛЬНІ
+function getColorByCode(code) {
   return COLORS.find(c => c.code === code);
 }
 
-export function getColorsBySeries(series) {
+function getColorsBySeries(series) {
   return COLORS.filter(c => c.series === series);
 }
-
-export function getBaseColors() {
-  return BASE_COLORS;
-}
-
-export default {
-  SERIES,
-  BASE_COLORS,
-  COLORS,
-  getColorByCode,
-  getColorsBySeries,
-  getBaseColors
-};
