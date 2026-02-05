@@ -1,6 +1,6 @@
 import { COLORS, SERIES, getColorByCode } from "./data-colors.js";
 import { t, setLang, currentLang } from "./i18n.js";
-import { formatNumber, clamp, generateId, calculateWeights } from "./utils.js";
+import { formatNumber, clamp, generateId, calculateWeights, debounce } from "./utils.js";
 
 // Global variables
 window.SICO = {
@@ -51,6 +51,11 @@ const elements = {
   loadingOverlay: qs('loadingOverlay')
 };
 
+// Debounced functions
+const debouncedRenderColors = debounce(renderColors, 300);
+const debouncedRenderAddColors = debounce(renderAddColors, 300);
+const debouncedFilterRecipes = debounce(filterRecipes, 300);
+
 // Initialize app
 window.addEventListener('DOMContentLoaded', () => {
   initApp();
@@ -69,6 +74,11 @@ function initApp() {
   // Initialize series filter
   initSeriesFilter();
   
+  // Set mode toggle state
+  if (elements.modeToggle) {
+    elements.modeToggle.checked = mode === "gram";
+  }
+  
   // Load draft recipe
   loadDraft();
   
@@ -81,59 +91,23 @@ function initApp() {
   // Update stats
   updateStats();
   
-  // Check for PWA installation
-  checkPWA();
+  // Check URL hash for tab
+  const hash = window.location.hash.substring(1);
+  if (hash && ['colors', 'new', 'recipes', 'settings'].includes(hash)) {
+    showTab(hash);
+  }
 }
 
 function setupEventListeners() {
-  // Theme toggle
-  window.toggleTheme = toggleTheme;
-  
-  // Language switcher
-  window.setLang = setLang;
-  
-  // Tab navigation
-  window.showTab = showTab;
-  
-  // Recipe operations
-  window.addColor = addColor;
-  window.updateItem = updateItem;
-  window.removeItem = removeItem;
-  window.saveRecipe = saveRecipe;
-  window.clearDraft = clearDraft;
-  window.editRecipe = editRecipe;
-  window.confirmDelete = confirmDelete;
-  window.deleteRecipe = deleteRecipe;
-  window.importRecipes = importRecipes;
-  window.exportRecipeJson = exportRecipeJson;
-  window.exportRecipePdf = exportRecipePdf;
-  
-  // Modal
-  window.closeModal = closeModal;
-  
-  // Mode toggle
-  window.toggleMode = toggleMode;
-  
-  // Settings
-  window.setTheme = setTheme;
-  window.exportAllData = exportAllData;
-  window.backupData = backupData;
-  window.confirmReset = confirmReset;
-  window.resetAllData = resetAllData;
+  // Search inputs
+  qs('colorSearch').addEventListener('input', () => debouncedRenderColors());
+  qs('recipeSearch').addEventListener('input', () => debouncedRenderAddColors());
+  qs('recipeSearchList').addEventListener('input', () => debouncedFilterRecipes());
   
   // Custom weight handling
-  qs('totalWeight').addEventListener('change', function() {
-    if (this.value === 'custom') {
-      qs('customWeight').style.display = 'block';
-      qs('customWeight').focus();
-    } else {
-      qs('customWeight').style.display = 'none';
-      renderCurrentRecipe();
-    }
-  });
-  
-  qs('customWeight').addEventListener('input', function() {
-    if (this.value) {
+  qs('totalWeight').addEventListener('change', handleWeightChange);
+  qs('customWeight').addEventListener('input', () => {
+    if (qs('customWeight').value) {
       renderCurrentRecipe();
     }
   });
@@ -141,18 +115,13 @@ function setupEventListeners() {
   // Photo upload
   qs('recipePhoto').addEventListener('change', handlePhotoUpload);
   
-  // Recipe search
-  qs('recipeSearchList').addEventListener('input', filterRecipes);
-  
   // Global keyboard shortcuts
   document.addEventListener('keydown', handleKeyboardShortcuts);
   
-  // Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js');
-    });
-  }
+  // Save draft on input
+  qs('recipeName').addEventListener('input', autoSaveDraft);
+  qs('recipeNote').addEventListener('input', autoSaveDraft);
+  qs('recipeStatus').addEventListener('change', autoSaveDraft);
 }
 
 // Theme Management
@@ -189,49 +158,47 @@ window.setTheme = (newTheme) => {
 
 // Tab Navigation
 window.showTab = function (id) {
-  // Hide all tabs
-  qsa(".tab").forEach(t => t.classList.remove("active"));
+  // Hide all tabs with animation
+  qsa(".tab").forEach(t => {
+    if (t.classList.contains("active")) {
+      t.style.animation = "fadeOut 0.2s ease";
+      setTimeout(() => {
+        t.classList.remove("active");
+        t.style.animation = "";
+      }, 200);
+    }
+  });
   
-  // Remove active class from all nav buttons
-  qsa(".nav-btn").forEach(btn => btn.classList.remove("active"));
-  
-  // Show selected tab
-  qs(id).classList.add("active");
-  
-  // Activate corresponding nav button
-  const navBtn = document.querySelector(`.nav-btn[onclick*="${id}"]`);
-  if (navBtn) {
-    navBtn.classList.add("active");
-  }
-  
-  // Load data for specific tabs
-  if (id === "recipes") {
-    renderRecipes();
-  } else if (id === "colors") {
-    renderColors();
-  } else if (id === "new") {
-    updateStats();
-  }
-  
-  // Update URL hash
-  window.history.pushState(null, null, `#${id}`);
+  // Show selected tab with animation
+  setTimeout(() => {
+    const tab = qs(id);
+    if (tab) {
+      tab.classList.add("active");
+      tab.style.animation = "fadeIn 0.3s ease";
+      
+      // Update navigation
+      qsa(".nav-btn").forEach(btn => btn.classList.remove("active"));
+      const navBtn = document.querySelector(`.nav-btn[onclick*="${id}"]`);
+      if (navBtn) {
+        navBtn.classList.add("active");
+      }
+      
+      // Focus on first input for "new" tab
+      if (id === "new") {
+        setTimeout(() => qs("recipeName")?.focus(), 100);
+      }
+      
+      // Update URL hash
+      window.history.pushState(null, null, `#${id}`);
+    }
+  }, 200);
 };
-
-// Check URL hash on load
-window.addEventListener('hashchange', () => {
-  const hash = window.location.hash.substring(1) || 'colors';
-  if (['colors', 'new', 'recipes', 'settings'].includes(hash)) {
-    showTab(hash);
-  }
-});
-
-// Initialize with hash or default
-const initialTab = window.location.hash.substring(1) || 'colors';
-showTab(initialTab);
 
 // Series Filter
 function initSeriesFilter() {
   const select = qs("seriesFilter");
+  if (!select) return;
+  
   select.innerHTML = `
     <option value="ALL">${t("allSeries")}</option>
     ${SERIES.map(s => `
@@ -262,27 +229,33 @@ function renderColors() {
   }
   
   // Update count
-  qs('colorCount').textContent = `${filteredColors.length} ${t('colors')}`;
+  const countElement = qs('colorCount');
+  if (countElement) {
+    countElement.textContent = `${filteredColors.length} ${t('colors')}`;
+  }
   
   // Render colors
-  elements.colorList.innerHTML = filteredColors.map(color => `
-    <div class="color-card" onclick="addColor('${color.code}')">
-      <div class="color-swatch" style="background:${color.hex}"></div>
-      <div class="color-info">
-        <div class="color-code">${color.code}</div>
-        <div class="color-name">${color.name[currentLang]}</div>
-        <div class="color-meta">
-          <span class="color-series">${color.series}</span>
-          <span class="color-hex">${color.hex}</span>
+  const colorList = elements.colorList;
+  if (colorList) {
+    colorList.innerHTML = filteredColors.map(color => `
+      <div class="color-card" onclick="addColor('${color.code}')">
+        <div class="color-swatch" style="background:${color.hex}"></div>
+        <div class="color-info">
+          <div class="color-code">${color.code}</div>
+          <div class="color-name">${color.name[currentLang]}</div>
+          <div class="color-meta">
+            <span class="color-series">${color.series}</span>
+            <span class="color-hex">${color.hex}</span>
+          </div>
+        </div>
+        <div class="color-actions">
+          <button class="color-btn" onclick="event.stopPropagation(); addColor('${color.code}')">
+            +
+          </button>
         </div>
       </div>
-      <div class="color-actions">
-        <button class="color-btn" onclick="event.stopPropagation(); addColor('${color.code}')">
-          +
-        </button>
-      </div>
-    </div>
-  `).join("");
+    `).join("");
+  }
 }
 
 function renderAddColors() {
@@ -302,26 +275,36 @@ function renderAddColors() {
     );
   }
   
-  elements.addColorList.innerHTML = filteredColors.map(color => `
-    <div class="color-card compact" onclick="addColor('${color.code}')">
-      <div class="color-swatch" style="background:${color.hex}"></div>
-      <div class="color-info">
-        <div class="color-code">${color.code}</div>
-        <div class="color-name">${color.name[currentLang]}</div>
+  const addColorList = elements.addColorList;
+  if (addColorList) {
+    addColorList.innerHTML = filteredColors.map(color => `
+      <div class="color-card compact" onclick="addColor('${color.code}')">
+        <div class="color-swatch" style="background:${color.hex}"></div>
+        <div class="color-info">
+          <div class="color-code">${color.code}</div>
+          <div class="color-name">${color.name[currentLang]}</div>
+        </div>
       </div>
-    </div>
-  `).join("");
+    `).join("");
+  }
 }
 
 // Recipe Operations
 window.addColor = function (code) {
   const color = getColorByCode(code);
+  if (!color) {
+    showToast(t('colorNotFound'), 'error');
+    return;
+  }
   
   // Check if we can add this color
   if (!currentSeries) {
     currentSeries = color.series;
-    elements.seriesBadge.textContent = currentSeries;
-    elements.seriesBadge.style.display = "inline-flex";
+    const badge = elements.seriesBadge;
+    if (badge) {
+      badge.textContent = currentSeries;
+      badge.style.display = "inline-flex";
+    }
     showToast(`${t('seriesSet')}: ${currentSeries}`, 'info');
   }
   
@@ -336,17 +319,18 @@ window.addColor = function (code) {
     return;
   }
   
-  // Add color with initial percentage based on existing colors
-  const initialPercent = currentRecipe.items.length === 0 ? 100 : 0;
+  // Add color with initial percentage
+  const totalItems = currentRecipe.items.length;
+  const initialPercent = totalItems === 0 ? 100 : Math.max(0, (100 / (totalItems + 1)));
   
   currentRecipe.items.push({ 
     code, 
-    percent: initialPercent,
+    percent: parseFloat(initialPercent.toFixed(2)),
     name: color.name[currentLang],
     hex: color.hex
   });
   
-  // Recalculate percentages if needed
+  // Recalculate percentages
   if (currentRecipe.items.length > 1) {
     redistributePercentages();
   }
@@ -355,6 +339,8 @@ window.addColor = function (code) {
   renderCurrentRecipe();
   renderAddColors();
   updateStats();
+  
+  showToast(`${color.code} ${t('added')}`, 'success');
 };
 
 function redistributePercentages() {
@@ -367,13 +353,15 @@ function redistributePercentages() {
 }
 
 window.updateItem = (index, value) => {
+  if (index < 0 || index >= currentRecipe.items.length) return;
+  
   const numValue = parseFloat(value) || 0;
   const total = getTotalWeight();
   
   if (mode === "percent") {
     currentRecipe.items[index].percent = clamp(numValue, 0, 100);
   } else {
-    const percent = (numValue / total) * 100;
+    const percent = total > 0 ? (numValue / total) * 100 : 0;
     currentRecipe.items[index].percent = clamp(percent, 0, 100);
   }
   
@@ -383,11 +371,16 @@ window.updateItem = (index, value) => {
 };
 
 window.removeItem = index => {
+  if (index < 0 || index >= currentRecipe.items.length) return;
+  
   currentRecipe.items.splice(index, 1);
   
   if (currentRecipe.items.length === 0) {
     currentSeries = null;
-    elements.seriesBadge.style.display = "none";
+    const badge = elements.seriesBadge;
+    if (badge) {
+      badge.style.display = "none";
+    }
   }
   
   autoSaveDraft();
@@ -398,10 +391,11 @@ window.removeItem = index => {
 
 // Recipe Rendering
 window.renderCurrentRecipe = function () {
-  const totalWeight = getTotalWeight();
+  const recipeItems = elements.recipeItems;
+  if (!recipeItems) return;
   
   if (currentRecipe.items.length === 0) {
-    elements.recipeItems.innerHTML = `
+    recipeItems.innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">🎨</div>
         <p>${t("noColorsAdded")}</p>
@@ -413,10 +407,9 @@ window.renderCurrentRecipe = function () {
     return;
   }
   
-  // Calculate total percentage
-  const totalPercent = currentRecipe.items.reduce((sum, item) => sum + item.percent, 0);
+  const totalWeight = getTotalWeight();
   
-  elements.recipeItems.innerHTML = currentRecipe.items.map((item, index) => {
+  recipeItems.innerHTML = currentRecipe.items.map((item, index) => {
     const color = getColorByCode(item.code);
     const value = mode === "percent" 
       ? item.percent 
@@ -426,10 +419,10 @@ window.renderCurrentRecipe = function () {
     return `
       <div class="recipe-item">
         <div class="recipe-color">
-          <div class="color-chip" style="background: ${color.hex}"></div>
+          <div class="color-chip" style="background: ${color?.hex || '#ccc'}"></div>
           <div>
             <div class="color-code">${item.code}</div>
-            <div class="color-name">${color.name[currentLang]}</div>
+            <div class="color-name">${color?.name[currentLang] || item.name}</div>
           </div>
         </div>
         <div class="recipe-input-group">
@@ -440,10 +433,11 @@ window.renderCurrentRecipe = function () {
             step="${mode === 'percent' ? '0.1' : '0.1'}"
             min="0"
             onchange="updateItem(${index}, this.value)"
+            oninput="updateItem(${index}, this.value)"
           >
           <span class="recipe-unit">${mode === "percent" ? "%" : "g"}</span>
         </div>
-        <button class="recipe-remove" onclick="removeItem(${index})">
+        <button class="recipe-remove" onclick="removeItem(${index})" title="${t('remove')}">
           ✕
         </button>
       </div>
@@ -451,17 +445,26 @@ window.renderCurrentRecipe = function () {
   }).join("");
   
   // Update summary
+  const totalPercent = currentRecipe.items.reduce((sum, item) => sum + item.percent, 0);
   updateRecipeSummary(totalPercent, totalWeight);
 };
 
 function updateRecipeSummary(totalPercent, totalWeight) {
   const percentClass = totalPercent < 95 || totalPercent > 105 ? 'warning' : '';
   
-  elements.totalColors.textContent = currentRecipe.items.length;
-  elements.totalPercent.innerHTML = `
-    <span class="${percentClass}">${formatNumber(totalPercent, 2)}%</span>
-  `;
-  elements.totalWeightGrams.textContent = `${formatNumber(totalWeight, 1)} g`;
+  if (elements.totalColors) {
+    elements.totalColors.textContent = currentRecipe.items.length;
+  }
+  
+  if (elements.totalPercent) {
+    elements.totalPercent.innerHTML = `
+      <span class="${percentClass}">${formatNumber(totalPercent, 2)}%</span>
+    `;
+  }
+  
+  if (elements.totalWeightGrams) {
+    elements.totalWeightGrams.textContent = `${formatNumber(totalWeight, 1)} g`;
+  }
   
   // Update warning if needed
   if (totalPercent < 95 || totalPercent > 105) {
@@ -471,11 +474,28 @@ function updateRecipeSummary(totalPercent, totalWeight) {
 
 function getTotalWeight() {
   const weightSelect = qs('totalWeight');
+  if (!weightSelect) return 1000;
+  
   if (weightSelect.value === 'custom') {
-    return parseFloat(qs('customWeight').value) || 1000;
+    const customWeight = parseFloat(qs('customWeight').value) || 0;
+    return customWeight > 0 ? customWeight : 1000;
   }
   return parseFloat(weightSelect.value) || 1000;
 }
+
+// Weight change handler
+window.handleWeightChange = function() {
+  const weightSelect = qs('totalWeight');
+  const customWeight = qs('customWeight');
+  
+  if (weightSelect.value === 'custom') {
+    customWeight.style.display = 'block';
+    customWeight.focus();
+  } else {
+    customWeight.style.display = 'none';
+    renderCurrentRecipe();
+  }
+};
 
 // Mode Toggle
 window.toggleMode = checkbox => {
@@ -495,7 +515,7 @@ function validateRecipe() {
     showModal(
       t("warning"),
       `${t("sumWarning")} (${formatNumber(totalPercent, 2)}%)`,
-      () => {} // Empty callback for confirmation
+      () => {}
     );
     return false;
   }
@@ -519,7 +539,7 @@ function validateRecipe() {
 window.saveRecipe = function () {
   if (!validateRecipe()) return;
   
-  showLoading();
+  showLoading(t('saving'));
   
   try {
     // Update recipe data
@@ -545,6 +565,7 @@ window.saveRecipe = function () {
     
     // Save to localStorage
     localStorage.setItem("sico_recipes", JSON.stringify(recipes));
+    localStorage.removeItem("sico_draft");
     
     // Show success
     showToast(t("savedSuccess"), 'success');
@@ -580,17 +601,25 @@ function loadDraft() {
     currentSeries = draft.series || null;
     
     // Update UI
-    elements.seriesBadge.textContent = currentSeries || '';
-    elements.seriesBadge.style.display = currentSeries ? "inline-flex" : "none";
+    const badge = elements.seriesBadge;
+    if (badge) {
+      badge.textContent = currentSeries || '';
+      badge.style.display = currentSeries ? "inline-flex" : "none";
+    }
+    
     qs("recipeName").value = draft.name || '';
     qs("recipeNote").value = draft.note || '';
     qs("recipeStatus").value = draft.status || 'draft';
     
     // Handle photo
     if (draft.photo) {
-      elements.photoPreview.querySelector('img').src = draft.photo;
-      elements.photoPreview.querySelector('img').style.display = 'block';
-      elements.photoPreview.style.display = 'block';
+      const img = elements.photoPreview.querySelector('img');
+      const preview = elements.photoPreview;
+      if (img && preview) {
+        img.src = draft.photo;
+        img.style.display = 'block';
+        preview.style.display = 'block';
+      }
     }
     
     renderCurrentRecipe();
@@ -611,13 +640,22 @@ window.clearDraft = function () {
   currentSeries = null;
   
   // Reset UI
-  elements.seriesBadge.style.display = "none";
+  const badge = elements.seriesBadge;
+  if (badge) {
+    badge.style.display = "none";
+  }
+  
   qs("recipeName").value = "";
   qs("recipeNote").value = "";
   qs("recipeStatus").value = "draft";
-  elements.photoPreview.querySelector('img').src = "";
-  elements.photoPreview.querySelector('img').style.display = 'none';
-  elements.photoPreview.style.display = 'none';
+  
+  const img = elements.photoPreview?.querySelector('img');
+  const preview = elements.photoPreview;
+  if (img && preview) {
+    img.src = "";
+    img.style.display = 'none';
+    preview.style.display = 'none';
+  }
   
   // Clear localStorage
   localStorage.removeItem("sico_draft");
@@ -632,8 +670,11 @@ window.clearDraft = function () {
 
 // Recipes List
 window.renderRecipes = function () {
+  const recipeList = elements.recipeList;
+  if (!recipeList) return;
+  
   if (recipes.length === 0) {
-    elements.recipeList.innerHTML = `
+    recipeList.innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">📋</div>
         <h3>${t("noRecipes")}</h3>
@@ -656,16 +697,16 @@ window.renderRecipes = function () {
   const searchTerm = qs('recipeSearchList').value.toLowerCase();
   if (searchTerm) {
     filteredRecipes = filteredRecipes.filter(r => 
-      r.name.toLowerCase().includes(searchTerm) ||
-      r.note.toLowerCase().includes(searchTerm) ||
-      r.series.toLowerCase().includes(searchTerm)
+      (r.name?.toLowerCase() || '').includes(searchTerm) ||
+      (r.note?.toLowerCase() || '').includes(searchTerm) ||
+      (r.series?.toLowerCase() || '').includes(searchTerm)
     );
   }
   
   // Render recipes
-  elements.recipeList.innerHTML = filteredRecipes.map(recipe => {
+  recipeList.innerHTML = filteredRecipes.map(recipe => {
     const date = new Date(recipe.updatedAt).toLocaleDateString(currentLang);
-    const colorDots = recipe.items.slice(0, 12).map(item => 
+    const colorDots = (recipe.items || []).slice(0, 12).map(item => 
       `<div class="color-dot" style="background: ${getColorByCode(item.code)?.hex || '#ccc'}"></div>`
     ).join('');
     
@@ -673,24 +714,24 @@ window.renderRecipes = function () {
       <div class="recipe-card" onclick="editRecipe('${recipe.id}')">
         <div class="recipe-card-header">
           <div>
-            <div class="recipe-name">${recipe.name}</div>
+            <div class="recipe-name">${recipe.name || t('unnamed')}</div>
             <div class="recipe-meta">
-              <span>${recipe.series}</span>
+              <span>${recipe.series || ''}</span>
               <span>•</span>
-              <span>${recipe.items.length} ${t('colors')}</span>
+              <span>${(recipe.items || []).length} ${t('colors')}</span>
               <span>•</span>
               <span>${date}</span>
             </div>
           </div>
-          <span class="recipe-status ${recipe.status}">${t(recipe.status)}</span>
+          <span class="recipe-status ${recipe.status || 'draft'}">${t(recipe.status || 'draft')}</span>
         </div>
         
         ${recipe.note ? `<div class="recipe-note">${recipe.note}</div>` : ''}
         
-        ${recipe.items.length > 0 ? `
+        ${(recipe.items || []).length > 0 ? `
           <div class="recipe-colors">
             ${colorDots}
-            ${recipe.items.length > 12 ? `<span class="more-colors">+${recipe.items.length - 12}</span>` : ''}
+            ${(recipe.items || []).length > 12 ? `<span class="more-colors">+${(recipe.items || []).length - 12}</span>` : ''}
           </div>
         ` : ''}
         
@@ -730,7 +771,7 @@ window.editRecipe = function (id) {
   const recipe = recipes.find(r => r.id === id);
   
   if (recipe) {
-    currentRecipe = JSON.parse(JSON.stringify(recipe)); // Deep clone
+    currentRecipe = JSON.parse(JSON.stringify(recipe));
     loadDraft();
     showTab('new');
     showToast(t('recipeLoaded'), 'success');
@@ -763,6 +804,8 @@ window.importRecipes = function () {
   
   input.onchange = e => {
     const file = e.target.files[0];
+    if (!file) return;
+    
     const reader = new FileReader();
     
     reader.onload = event => {
@@ -772,7 +815,7 @@ window.importRecipes = function () {
         
         // Validate recipes
         const validRecipes = newRecipes.filter(r => 
-          r && r.id && r.name && Array.isArray(r.items)
+          r && r.id && (r.name || r.items?.length > 0)
         );
         
         // Merge with existing (avoid duplicates by ID)
@@ -806,7 +849,7 @@ window.exportRecipeJson = function (id) {
   
   const link = document.createElement('a');
   link.href = dataUri;
-  link.download = `sico-recipe-${recipe.name.replace(/\s+/g, '-')}.json`;
+  link.download = `sico-recipe-${(recipe.name || 'unnamed').replace(/\s+/g, '-')}.json`;
   link.click();
   
   showToast(t('exportSuccess'), 'success');
@@ -831,35 +874,39 @@ window.exportRecipePdf = function (id) {
     // Recipe info
     doc.setFontSize(16);
     doc.setTextColor(0, 0, 0);
-    doc.text(recipe.name, 20, 45);
+    doc.text(recipe.name || t('unnamed'), 20, 45);
     
     doc.setFontSize(10);
-    doc.text(`Series: ${recipe.series}`, 20, 55);
-    doc.text(`Status: ${t(recipe.status)}`, 20, 60);
+    doc.text(`Series: ${recipe.series || 'N/A'}`, 20, 55);
+    doc.text(`Status: ${t(recipe.status || 'draft')}`, 20, 60);
     doc.text(`Created: ${new Date(recipe.createdAt).toLocaleDateString()}`, 20, 65);
     
     if (recipe.note) {
-      doc.text(`Note: ${recipe.note}`, 20, 75);
+      const splitNote = doc.splitTextToSize(`Note: ${recipe.note}`, 170);
+      doc.text(splitNote, 20, 75);
     }
     
     // Table data
-    const tableData = recipe.items.map((item, index) => [
+    const startY = recipe.note ? 85 + (splitNote?.length || 0) * 5 : 85;
+    const tableData = (recipe.items || []).map((item, index) => [
       index + 1,
       item.code,
-      item.name,
-      `${formatNumber(item.percent, 2)}%`,
+      item.name || '',
+      `${formatNumber(item.percent || 0, 2)}%`,
       `${formatNumber(item.weight || 0, 1)}g`
     ]);
     
     // Create table
-    doc.autoTable({
-      head: [['#', 'Code', 'Name', 'Percentage', 'Weight']],
-      body: tableData,
-      startY: 85,
-      theme: 'striped',
-      headStyles: { fillColor: [59, 130, 246] },
-      margin: { left: 20 }
-    });
+    if (tableData.length > 0) {
+      doc.autoTable({
+        head: [['#', 'Code', 'Name', 'Percentage', 'Weight']],
+        body: tableData,
+        startY: startY,
+        theme: 'striped',
+        headStyles: { fillColor: [59, 130, 246] },
+        margin: { left: 20 }
+      });
+    }
     
     // Footer
     const pageCount = doc.getNumberOfPages();
@@ -876,7 +923,7 @@ window.exportRecipePdf = function (id) {
     }
     
     // Save PDF
-    doc.save(`sico-recipe-${recipe.name.replace(/\s+/g, '-')}.pdf`);
+    doc.save(`sico-recipe-${(recipe.name || 'unnamed').replace(/\s+/g, '-')}.pdf`);
     showToast(t('pdfExported'), 'success');
     
   } catch (error) {
@@ -965,10 +1012,13 @@ function handlePhotoUpload(e) {
     currentRecipe.photo = event.target.result;
     
     // Update preview
-    const img = elements.photoPreview.querySelector('img');
-    img.src = currentRecipe.photo;
-    img.style.display = 'block';
-    elements.photoPreview.style.display = 'block';
+    const img = elements.photoPreview?.querySelector('img');
+    const preview = elements.photoPreview;
+    if (img && preview) {
+      img.src = currentRecipe.photo;
+      img.style.display = 'block';
+      preview.style.display = 'block';
+    }
     
     autoSaveDraft();
     showToast(t('photoAdded'), 'success');
@@ -977,49 +1027,67 @@ function handlePhotoUpload(e) {
   reader.readAsDataURL(file);
 }
 
-function removePhoto() {
+window.removePhoto = function() {
   currentRecipe.photo = null;
   
-  const img = elements.photoPreview.querySelector('img');
-  img.src = '';
-  img.style.display = 'none';
-  elements.photoPreview.style.display = 'none';
+  const img = elements.photoPreview?.querySelector('img');
+  const preview = elements.photoPreview;
+  if (img && preview) {
+    img.src = '';
+    img.style.display = 'none';
+    preview.style.display = 'none';
+  }
   
   autoSaveDraft();
   showToast(t('photoRemoved'), 'success');
-}
+};
 
 // Stats & Updates
 function updateStats() {
   const totalColors = currentRecipe.items.length;
   const totalPercent = currentRecipe.items.reduce((sum, item) => sum + item.percent, 0);
   
-  elements.recipeStats.textContent = `${totalColors} ${t('colors')}`;
-  elements.totalColors.textContent = totalColors;
-  elements.totalPercent.textContent = `${formatNumber(totalPercent, 2)}%`;
+  if (elements.recipeStats) {
+    elements.recipeStats.textContent = `${totalColors} ${t('colors')}`;
+  }
+  if (elements.totalColors) {
+    elements.totalColors.textContent = totalColors;
+  }
+  if (elements.totalPercent) {
+    elements.totalPercent.textContent = `${formatNumber(totalPercent, 2)}%`;
+  }
 }
 
 // Modal System
 window.showModal = function (title, message, onConfirm) {
-  elements.modalTitle.textContent = title;
-  elements.modalBody.textContent = message;
+  if (elements.modalTitle) elements.modalTitle.textContent = title;
+  if (elements.modalBody) elements.modalBody.textContent = message;
   
-  elements.modalConfirm.onclick = () => {
-    if (typeof onConfirm === 'function') {
-      onConfirm();
-    }
-    closeModal();
-  };
+  if (elements.modalConfirm) {
+    elements.modalConfirm.onclick = () => {
+      if (typeof onConfirm === 'function') {
+        onConfirm();
+      }
+      closeModal();
+    };
+  }
   
-  elements.modalOverlay.classList.remove('hidden');
+  if (elements.modalOverlay) {
+    elements.modalOverlay.classList.remove('hidden');
+  }
 };
 
 window.closeModal = function () {
-  elements.modalOverlay.classList.add('hidden');
+  if (elements.modalOverlay) {
+    elements.modalOverlay.classList.add('hidden');
+  }
 };
 
 // Toast System
 function showToast(message, type = 'info', duration = 3000) {
+  const container = elements.toastContainer;
+  if (!container) return;
+  
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.innerHTML = `
@@ -1027,18 +1095,26 @@ function showToast(message, type = 'info', duration = 3000) {
     <span class="toast-message">${message}</span>
   `;
   
-  elements.toastContainer.appendChild(toast);
+  container.appendChild(toast);
   
   // Auto-remove after duration
   setTimeout(() => {
     toast.style.animation = 'slideInRight 0.3s ease reverse';
-    setTimeout(() => toast.remove(), 300);
+    setTimeout(() => {
+      if (toast.parentNode === container) {
+        container.removeChild(toast);
+      }
+    }, 300);
   }, duration);
   
   // Click to dismiss
   toast.onclick = () => {
     toast.style.animation = 'slideInRight 0.3s ease reverse';
-    setTimeout(() => toast.remove(), 300);
+    setTimeout(() => {
+      if (toast.parentNode === container) {
+        container.removeChild(toast);
+      }
+    }, 300);
   };
 }
 
@@ -1053,34 +1129,54 @@ function getToastIcon(type) {
 }
 
 // Loading Overlay
-function showLoading(message = 'Loading...') {
-  elements.loadingOverlay.querySelector('.loading-text').textContent = message;
-  elements.loadingOverlay.classList.remove('hidden');
+function showLoading(message = t('loading')) {
+  const overlay = elements.loadingOverlay;
+  const text = overlay?.querySelector('.loading-text');
+  if (overlay && text) {
+    text.textContent = message;
+    overlay.classList.remove('hidden');
+  }
 }
 
 function hideLoading() {
-  elements.loadingOverlay.classList.add('hidden');
+  const overlay = elements.loadingOverlay;
+  if (overlay) {
+    overlay.classList.add('hidden');
+  }
 }
 
 // Keyboard Shortcuts
 function handleKeyboardShortcuts(e) {
   // Don't trigger shortcuts when typing in inputs
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
   
   switch (e.key) {
     case '1':
-      if (e.ctrlKey || e.metaKey) showTab('colors');
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        showTab('colors');
+      }
       break;
     case '2':
-      if (e.ctrlKey || e.metaKey) showTab('new');
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        showTab('new');
+      }
       break;
     case '3':
-      if (e.ctrlKey || e.metaKey) showTab('recipes');
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        showTab('recipes');
+      }
       break;
     case '4':
-      if (e.ctrlKey || e.metaKey) showTab('settings');
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        showTab('settings');
+      }
       break;
     case 's':
+    case 'S':
       if (e.ctrlKey || e.metaKey) {
         e.preventDefault();
         saveRecipe();
@@ -1090,35 +1186,13 @@ function handleKeyboardShortcuts(e) {
       closeModal();
       break;
     case 't':
+    case 'T':
       if (e.ctrlKey || e.metaKey) {
         e.preventDefault();
         toggleTheme();
       }
       break;
   }
-}
-
-// PWA Features
-function checkPWA() {
-  // Check if app is installed
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    console.log('Running as PWA');
-  }
-  
-  // Register beforeinstallprompt for install button
-  let deferredPrompt;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    
-    // Show install button if needed
-    showInstallButton();
-  });
-}
-
-function showInstallButton() {
-  // You can add an install button to the UI here
-  console.log('PWA installation available');
 }
 
 // Export utility functions to window for debugging
@@ -1132,7 +1206,63 @@ window.SICO_DEBUG = {
     currentLang
   }),
   clearAll: resetAllData,
-  exportData: exportAllData
+  exportData: exportAllData,
+  addTestRecipe: () => {
+    const testRecipe = {
+      id: generateId(),
+      name: "Test Recipe",
+      series: "MIX",
+      status: "draft",
+      items: [
+        { code: "MIX-001", percent: 50, name: "Red", hex: "#ff0000" },
+        { code: "MIX-002", percent: 50, name: "Blue", hex: "#0000ff" }
+      ],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    recipes.push(testRecipe);
+    localStorage.setItem("sico_recipes", JSON.stringify(recipes));
+    renderRecipes();
+    showToast("Test recipe added", 'success');
+  }
+};
+
+// Quick calculate function
+window.calculateWeights = function() {
+  if (currentRecipe.items.length === 0) {
+    showToast(t('noColorsAdded'), 'warning');
+    return;
+  }
+  
+  const totalWeight = getTotalWeight();
+  currentRecipe.items = calculateWeights(currentRecipe.items, totalWeight);
+  renderCurrentRecipe();
+  showToast(t('calculated'), 'success');
+};
+
+// Export all colors
+window.exportAllColors = function() {
+  const data = {
+    version: '2.0.0',
+    exportedAt: new Date().toISOString(),
+    colors: COLORS,
+    series: SERIES
+  };
+  
+  const dataStr = JSON.stringify(data, null, 2);
+  const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+  
+  const link = document.createElement('a');
+  link.href = dataUri;
+  link.download = `sico-colors-${new Date().toISOString().split('T')[0]}.json`;
+  link.click();
+  
+  showToast('Colors exported', 'success');
+};
+
+// Export all recipes
+window.exportAllRecipes = function() {
+  exportAllData();
 };
 
 // Initialize
