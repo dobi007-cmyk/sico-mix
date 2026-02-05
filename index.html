@@ -4,11 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="Professional paint mixing calculator for SICO screen printing paints">
-  <meta name="theme-color" content="#4361ee">
+  <meta name="theme-color" content="#3b82f6">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="keywords" content="SICO, paint, mixing, calculator, screen printing, краски, смешивание, калькулятор">
+  <meta name="author" content="SICO MIX">
+  <meta property="og:title" content="SICO MIX | Professional Paint Calculator">
+  <meta property="og:description" content="Professional paint mixing calculator for screen printing">
+  <meta property="og:image" content="icons/icon-512.png">
+  <meta property="og:type" content="website">
   
-  <title>SICO MIX | Paint Calculator</title>
+  <title>SICO MIX | Professional Paint Calculator</title>
   
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
@@ -42,7 +48,7 @@
           <h1>SICO <span class="gradient-text">MIX</span></h1>
         </div>
         <div class="header-info">
-          <span id="seriesBadge" class="series-badge"></span>
+          <span id="seriesBadge" class="series-badge" style="display:none;"></span>
           <span id="recipeStats" class="stats-badge">0 colors</span>
         </div>
       </div>
@@ -62,7 +68,7 @@
 
     <!-- Navigation -->
     <nav class="app-nav">
-      <button class="nav-btn" onclick="showTab('colors')" data-i18n="paints">
+      <button class="nav-btn active" onclick="showTab('colors')" data-i18n="paints">
         <span class="nav-icon">🎨</span>
         <span class="nav-text">Paints</span>
       </button>
@@ -86,7 +92,7 @@
       <!-- Colors Tab -->
       <section id="colors" class="tab active">
         <div class="tab-header">
-          <h2><span class="tab-icon">🎨</span> <span data-i18n="catalog"></span></h2>
+          <h2><span class="tab-icon">🎨</span> <span data-i18n="catalog">Catalog</span></h2>
           <div class="tab-actions">
             <button class="btn-secondary" onclick="exportAllColors()" data-i18n="exportAll">Export All</button>
           </div>
@@ -94,14 +100,16 @@
         
         <div class="filter-section">
           <div class="filter-group">
-            <label for="seriesFilter" data-i18n="filterSeries"></label>
-            <select id="seriesFilter" class="modern-select"></select>
+            <label for="seriesFilter" data-i18n="filterSeries">Filter by Series</label>
+            <select id="seriesFilter" class="modern-select">
+              <option value="ALL" data-i18n="allSeries">All Series</option>
+            </select>
           </div>
           
           <div class="filter-group">
-            <label for="colorSearch" data-i18n="search"></label>
+            <label for="colorSearch" data-i18n="search">Search</label>
             <div class="search-box">
-              <input type="text" id="colorSearch" data-i18n-placeholder="searchPlaceholder" oninput="renderColors()">
+              <input type="text" id="colorSearch" placeholder="Search by code or name" oninput="debouncedRenderColors()">
               <span class="search-icon">🔍</span>
             </div>
           </div>
@@ -116,7 +124,7 @@
       <!-- New Recipe Tab -->
       <section id="new" class="tab">
         <div class="tab-header">
-          <h2><span class="tab-icon">➕</span> <span data-i18n="newRecipe"></span></h2>
+          <h2><span class="tab-icon">➕</span> <span data-i18n="newRecipe">New Recipe</span></h2>
           <div class="tab-actions">
             <button class="btn-secondary" onclick="clearDraft()" data-i18n="clear">Clear</button>
             <button class="btn-primary" onclick="saveRecipe()" data-i18n="addRecipe">
@@ -129,29 +137,29 @@
         <div class="recipe-form">
           <div class="form-row">
             <div class="form-group">
-              <label for="recipeName" data-i18n="recipeName"></label>
-              <input type="text" id="recipeName" data-i18n-placeholder="recipeName" class="modern-input">
+              <label for="recipeName" data-i18n="recipeName">Recipe Name</label>
+              <input type="text" id="recipeName" placeholder="Enter recipe name" class="modern-input">
             </div>
             
             <div class="form-group">
-              <label for="recipeStatus" data-i18n="status"></label>
+              <label for="recipeStatus" data-i18n="status">Status</label>
               <select id="recipeStatus" class="modern-select">
-                <option value="draft" data-i18n="statusDraft"></option>
-                <option value="ready" data-i18n="statusReady"></option>
+                <option value="draft" data-i18n="statusDraft">Draft</option>
+                <option value="ready" data-i18n="statusReady">Ready</option>
               </select>
             </div>
           </div>
           
           <div class="form-group">
-            <label for="recipeNote" data-i18n="recipeNote"></label>
-            <textarea id="recipeNote" data-i18n-placeholder="recipeNote" class="modern-textarea" rows="2"></textarea>
+            <label for="recipeNote" data-i18n="recipeNote">Note</label>
+            <textarea id="recipeNote" placeholder="Add notes (optional)" class="modern-textarea" rows="2"></textarea>
           </div>
           
           <div class="form-section">
             <div class="section-header">
-              <h3><span class="section-icon">🔍</span> <span data-i18n="addColors"></span></h3>
+              <h3><span class="section-icon">🔍</span> <span data-i18n="addColors">Add Colors</span></h3>
               <div class="mode-toggle">
-                <span data-i18n="percentMode"></span>
+                <span data-i18n="percentMode">% Mode</span>
                 <label class="switch">
                   <input type="checkbox" id="modeToggle" onchange="toggleMode(this)">
                   <span class="slider">
@@ -163,7 +171,7 @@
             </div>
             
             <div class="search-box">
-              <input type="text" id="recipeSearch" data-i18n-placeholder="searchPlaceholder" oninput="renderAddColors()">
+              <input type="text" id="recipeSearch" placeholder="Search colors..." oninput="debouncedRenderAddColors()">
               <span class="search-icon">🔍</span>
             </div>
             
@@ -172,10 +180,10 @@
           
           <div class="form-section">
             <div class="section-header">
-              <h3><span class="section-icon">⚖️</span> <span data-i18n="calculator"></span></h3>
+              <h3><span class="section-icon">⚖️</span> <span data-i18n="calculator">Calculator</span></h3>
               <div class="weight-selector">
-                <label for="totalWeight" data-i18n="totalWeight"></label>
-                <select id="totalWeight" class="modern-select" onchange="renderCurrentRecipe()">
+                <label for="totalWeight" data-i18n="totalWeight">Total Weight:</label>
+                <select id="totalWeight" class="modern-select" onchange="handleWeightChange()">
                   <option value="100">100 g</option>
                   <option value="250">250 g</option>
                   <option value="500">500 g</option>
@@ -183,7 +191,7 @@
                   <option value="5000">5 kg</option>
                   <option value="custom">Custom</option>
                 </select>
-                <input type="number" id="customWeight" class="modern-input" placeholder="Custom weight" style="display:none;">
+                <input type="number" id="customWeight" class="modern-input" placeholder="Enter weight" style="display:none;" min="1" step="1">
               </div>
             </div>
             
@@ -196,22 +204,22 @@
             
             <div class="recipe-summary">
               <div class="summary-item">
-                <span data-i18n="totalColors"></span>
+                <span data-i18n="totalColors">Colors</span>
                 <span id="totalColors">0</span>
               </div>
               <div class="summary-item">
-                <span data-i18n="totalPercent"></span>
+                <span data-i18n="totalPercent">Total %</span>
                 <span id="totalPercent">0%</span>
               </div>
               <div class="summary-item">
-                <span data-i18n="totalWeightGrams"></span>
+                <span data-i18n="totalWeightGrams">Total Weight</span>
                 <span id="totalWeightGrams">0 g</span>
               </div>
             </div>
           </div>
           
           <div class="form-section">
-            <h3><span class="section-icon">📸</span> <span data-i18n="addPhoto"></span></h3>
+            <h3><span class="section-icon">📸</span> <span data-i18n="addPhoto">Add Photo</span></h3>
             <div class="photo-upload">
               <label for="recipePhoto" class="upload-area">
                 <div class="upload-icon">📸</div>
@@ -219,8 +227,8 @@
                 <div class="upload-subtext" data-i18n="maxSize">Max 5MB</div>
               </label>
               <input type="file" id="recipePhoto" accept="image/*" capture="environment" style="display:none;">
-              <div id="photoPreview" class="photo-preview">
-                <img src="" alt="Preview" style="display:none;">
+              <div id="photoPreview" class="photo-preview" style="display:none;">
+                <img src="" alt="Preview">
                 <button class="remove-photo" onclick="removePhoto()">✕</button>
               </div>
             </div>
@@ -231,7 +239,7 @@
       <!-- Recipes Tab -->
       <section id="recipes" class="tab">
         <div class="tab-header">
-          <h2><span class="tab-icon">📋</span> <span data-i18n="recipes"></span></h2>
+          <h2><span class="tab-icon">📋</span> <span data-i18n="recipes">Recipes</span></h2>
           <div class="tab-actions">
             <div class="button-group">
               <button class="btn-secondary" onclick="importRecipes()" data-i18n="import">
@@ -248,7 +256,7 @@
         
         <div class="recipes-toolbar">
           <div class="search-box">
-            <input type="text" id="recipeSearchList" data-i18n-placeholder="searchRecipes" oninput="filterRecipes()">
+            <input type="text" id="recipeSearchList" placeholder="Search recipes..." oninput="debouncedFilterRecipes()">
             <span class="search-icon">🔍</span>
           </div>
           
@@ -272,12 +280,12 @@
       <!-- Settings Tab -->
       <section id="settings" class="tab">
         <div class="tab-header">
-          <h2><span class="tab-icon">⚙️</span> <span data-i18n="settings"></span></h2>
+          <h2><span class="tab-icon">⚙️</span> <span data-i18n="settings">Settings</span></h2>
         </div>
         
         <div class="settings-container">
           <div class="settings-card">
-            <h3><span class="settings-icon">🌍</span> <span data-i18n="language"></span></h3>
+            <h3><span class="settings-icon">🌍</span> <span data-i18n="language">Language</span></h3>
             <div class="settings-options">
               <button class="lang-option" onclick="setLang('ua')">
                 <span class="flag">🇺🇦</span>
@@ -295,7 +303,7 @@
           </div>
           
           <div class="settings-card">
-            <h3><span class="settings-icon">🎨</span> <span data-i18n="appearance"></span></h3>
+            <h3><span class="settings-icon">🎨</span> <span data-i18n="appearance">Appearance</span></h3>
             <div class="theme-options">
               <button class="theme-option" onclick="setTheme('light')">
                 <div class="theme-preview light"></div>
@@ -313,7 +321,7 @@
           </div>
           
           <div class="settings-card">
-            <h3><span class="settings-icon">💾</span> <span data-i18n="dataManagement"></span></h3>
+            <h3><span class="settings-icon">💾</span> <span data-i18n="dataManagement">Data Management</span></h3>
             <div class="settings-buttons">
               <button class="btn-secondary" onclick="exportAllData()" data-i18n="exportAllData">Export All Data</button>
               <button class="btn-secondary" onclick="backupData()" data-i18n="backup">Backup Now</button>
@@ -322,7 +330,7 @@
           </div>
           
           <div class="settings-card">
-            <h3><span class="settings-icon">ℹ️</span> <span data-i18n="about"></span></h3>
+            <h3><span class="settings-icon">ℹ️</span> <span data-i18n="about">About</span></h3>
             <div class="about-info">
               <div class="app-version">SICO MIX v2.0.0</div>
               <div class="app-description" data-i18n="appDescription">Professional paint mixing calculator for screen printing</div>
@@ -354,13 +362,13 @@
   <div id="modalOverlay" class="modal-overlay hidden">
     <div class="modal">
       <div class="modal-header">
-        <h3 id="modalTitle"></h3>
+        <h3 id="modalTitle">Confirm</h3>
         <button class="modal-close" onclick="closeModal()">✕</button>
       </div>
-      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-body" id="modalBody">Are you sure?</div>
       <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal()" data-i18n="cancel"></button>
-        <button id="modalConfirm" class="btn-primary" data-i18n="confirm"></button>
+        <button class="btn-secondary" onclick="closeModal()" data-i18n="cancel">Cancel</button>
+        <button id="modalConfirm" class="btn-primary" data-i18n="confirm">Confirm</button>
       </div>
     </div>
   </div>
@@ -378,8 +386,8 @@
   <input type="file" id="importFile" accept=".json" style="display:none;">
   
   <!-- Scripts -->
-  <script type="module" src="js/utils.js"></script>
   <script type="module" src="js/data-colors.js"></script>
+  <script type="module" src="js/utils.js"></script>
   <script type="module" src="js/i18n.js"></script>
   <script type="module" src="js/app.js"></script>
   
@@ -387,11 +395,42 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(reg => console.log('Service Worker registered'))
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('Service Worker registered:', reg.scope))
           .catch(err => console.log('Service Worker registration failed:', err));
       });
     }
+    
+    // PWA install prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Show install button
+      const installBtn = document.createElement('button');
+      installBtn.textContent = 'Install App';
+      installBtn.className = 'btn-primary';
+      installBtn.style.position = 'fixed';
+      installBtn.style.bottom = '20px';
+      installBtn.style.left = '50%';
+      installBtn.style.transform = 'translateX(-50%)';
+      installBtn.style.zIndex = '10000';
+      installBtn.onclick = () => {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted install');
+          }
+          deferredPrompt = null;
+        });
+      };
+      
+      setTimeout(() => {
+        document.body.appendChild(installBtn);
+        setTimeout(() => installBtn.remove(), 10000);
+      }, 3000);
+    });
   </script>
 </body>
 </html>
