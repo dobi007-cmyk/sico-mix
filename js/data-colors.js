@@ -83,24 +83,25 @@ export const BASE_COLORS = [
   { code: "142",    name: { ua: "CMYK Magenta",        pl: "CMYK Magenta",      en: "CMYK Magenta"    }, hex: "#e91e63" },
   { code: "143",    name: { ua: "CMYK Black",          pl: "CMYK Black",        en: "CMYK Black"      }, hex: "#212121" }
 ];
-export const COLORS = [];
+export const SERIES = [
+  { id:"PLUV", name:{ua:"PLUV",pl:"PLUV",en:"PLUV"} }
+];
 
-SERIES.forEach(series => {
-  BASE_COLORS.forEach(base => {
+export const BASE_COLORS = [
+  { code:"10", name:{ua:"Фіолетовий",pl:"Fioletowy",en:"Violet"}, hex:"#4b3b8f" },
+  { code:"20", name:{ua:"Синій",pl:"Niebieski",en:"Blue"}, hex:"#0033a0" }
+];
+
+export const COLORS = [];
+SERIES.forEach(s=>{
+  BASE_COLORS.forEach(b=>{
     COLORS.push({
-      series: series.id,
-      code: `${series.id}${base.code}`,
-      baseCode: base.code,
-      name: base.name,
-      hex: base.hex
+      series:s.id,
+      code:`${s.id}${b.code}`,
+      baseCode:b.code,
+      name:b.name,
+      hex:b.hex
     });
   });
 });
 
-COLORS.sort((a, b) =>
-  a.code.localeCompare(b.code, undefined, { numeric: true })
-);
-
-export function getColorByCode(code) {
-  return COLORS.find(c => c.code === code);
-}
