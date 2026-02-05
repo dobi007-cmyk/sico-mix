@@ -23,5 +23,37 @@ function isNumeric(value) {
   return !isNaN(parseFloat(value)) && isFinite(value);
 }
 
+// Форматування дати
+function formatDate(date, includeTime = false) {
+  const d = new Date(date);
+  const options = { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  };
+  
+  if (includeTime) {
+    options.hour = '2-digit';
+    options.minute = '2-digit';
+  }
+  
+  return d.toLocaleDateString(undefined, options);
+}
+
+// Обчислення загальної ваги з відсотків
+function calculateWeights(items, totalWeight) {
+  return items.map(item => ({
+    ...item,
+    weight: (item.percent * totalWeight) / 100
+  }));
+}
+
 // Експорт
-export { formatNumber, clamp, generateId, isNumeric };
+export { 
+  formatNumber, 
+  clamp, 
+  generateId, 
+  isNumeric, 
+  formatDate,
+  calculateWeights 
+};
