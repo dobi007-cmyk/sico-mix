@@ -1,136 +1,142 @@
-import { COLORS, SERIES, getColorByCode } from "./data-colors.js";
+import { COLORS, SERIES } from "./data-colors.js";
 import { t, setLang, currentLang } from "./i18n.js";
 
-window.setLang = setLang;
+window.setLang=setLang;
 
-const qs = id => document.getElementById(id);
-const qsa = sel => document.querySelectorAll(sel);
+const qs=id=>document.getElementById(id);
+let recipes=JSON.parse(localStorage.getItem("recipes")||"[]");
+let currentRecipe={items:[],photo:null};
+let mode="percent";
 
-let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
-let currentRecipe = { items: [] };
-let currentSeries = null;
-let mode = "percent";
-
-window.showTab = function (id) {
-  qsa(".tab").forEach(t => t.classList.remove("active"));
+/* tabs */
+window.showTab=id=>{
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   qs(id).classList.add("active");
-  if (id === "recipes") renderRecipes();
 };
 
-function initSeriesFilter() {
-  const select = qs("seriesFilter");
-  select.innerHTML = `<option value="ALL">${t("allSeries")}</option>`;
-  SERIES.forEach(s => {
-    const o = document.createElement("option");
-    o.value = s.id;
-    o.textContent = s.id;
-    select.appendChild(o);
-  });
-  select.onchange = () => renderColors();
+/* colors */
+function initSeries(){
+  qs("seriesFilter").innerHTML=`<option value="ALL">${t("allSeries")||"ALL"}</option>`+
+  SERIES.map(s=>`<option>${s.id}</option>`).join("");
 }
 
-function renderColors() {
-  const series = qs("seriesFilter").value;
-  const list = series === "ALL"
-    ? COLORS
-    : COLORS.filter(c => c.series === series);
+window.renderColors=()=>{
+  const f=qs("seriesFilter").value;
+  const q=qs("colorSearch").value.toLowerCase();
+  qs("colorList").innerHTML=COLORS
+    .filter(c=>(f==="ALL"||c.series===f)&&
+      (c.code.toLowerCase().includes(q)||c.name[currentLang].toLowerCase().includes(q)))
+    .map(c=>`
+      <div class="color">
+        <div class="swatch" style="background:${c.hex}"></div>
+        <b>${c.code}</b> ${c.name[currentLang]}
+        <button onclick="addColor('${c.code}')">+</button>
+      </div>`).join("");
+};
 
-  qs("colorList").innerHTML = list.map(c => `
-    <div class="color">
-      <div class="swatch" style="background:${c.hex}"></div>
-      <div>
-        <strong>${c.code}</strong><br>
-        ${c.name[currentLang]}
-      </div>
-      <button onclick="addColor('${c.code}')">+</button>
-    </div>
-  `).join("");
-}
+/* recipe */
+window.addColor=code=>{
+  const c=COLORS.find(x=>x.code===code);
+  currentRecipe.items.push({code:c.code,percent:0});
+  saveDraft(); renderCurrentRecipe();
+};
 
-window.addColor = function (code) {
-  const color = getColorByCode(code);
-  if (!currentSeries) {
-    currentSeries = color.series;
-    qs("seriesBadge").textContent = currentSeries;
-    qs("seriesBadge").style.display = "inline-block";
-  }
-  if (color.series !== currentSeries) {
-    alert(t("errorSeries"));
-    return;
-  }
-  currentRecipe.items.push({ code, percent: 0 });
+window.renderCurrentRecipe=()=>{
+  const w=Number(qs("totalWeight").value||1000);
+  qs("recipeItems").innerHTML=currentRecipe.items.map((i,idx)=>{
+    const v=mode==="percent"?i.percent:(i.percent*w/100);
+    return `<div>
+      ${i.code}
+      <input type="number" value="${v}" onchange="updateItem(${idx},this.value)">
+      ${mode==="percent"?"%":"g"}
+      <button onclick="removeItem(${idx})">✕</button>
+    </div>`;
+  }).join("");
+};
+
+window.updateItem=(i,v)=>{
+  const w=Number(qs("totalWeight").value||1000);
+  currentRecipe.items[i].percent=mode==="percent"?Number(v):(Number(v)/w*100);
+  saveDraft();
+};
+
+window.removeItem=i=>{
+  currentRecipe.items.splice(i,1);
+  saveDraft(); renderCurrentRecipe();
+};
+
+window.toggleMode=cb=>{
+  mode=cb.checked?"gram":"percent";
   renderCurrentRecipe();
 };
 
-window.toggleMode = checkbox => {
-  mode = checkbox.checked ? "gram" : "percent";
-  renderCurrentRecipe();
-};
-
-window.renderCurrentRecipe = function () {
-  const total = Number(qs("totalWeight").value);
-  let sum = 0;
-
-  qs("recipeItems").innerHTML = currentRecipe.items.map((i, idx) => {
-    const val = mode === "percent"
-      ? i.percent.toFixed(2)
-      : (i.percent * total / 100).toFixed(1);
-    sum += i.percent;
-    return `
-      <div class="recipe-item">
-        <span>${i.code}</span>
-        <input type="number" value="${val}"
-          onchange="updateItem(${idx}, this.value)">
-        <span>${mode === "percent" ? "%" : "g"}</span>
-        <button onclick="removeItem(${idx})">✕</button>
-      </div>`;
-  }).join("") + `<div class="sum-line">${t("sum")}: ${sum.toFixed(2)}%</div>`;
-};
-
-window.updateItem = (i, val) => {
-  const total = Number(qs("totalWeight").value);
-  currentRecipe.items[i].percent =
-    mode === "percent" ? Number(val) : (val / total) * 100;
-  renderCurrentRecipe();
-};
-
-window.removeItem = i => {
-  currentRecipe.items.splice(i, 1);
-  if (!currentRecipe.items.length) {
-    currentSeries = null;
-    qs("seriesBadge").style.display = "none";
-  }
-  renderCurrentRecipe();
-};
-
-window.saveRecipe = function () {
-  const name = qs("recipeName").value.trim();
-  if (!name || !currentRecipe.items.length) return;
-
+/* save */
+window.saveRecipe=()=>{
   recipes.push({
-    name,
-    note: qs("recipeNote").value,
-    series: currentSeries,
-    items: currentRecipe.items
+    name:qs("recipeName").value,
+    note:qs("recipeNote").value,
+    status:qs("recipeStatus").value,
+    photo:currentRecipe.photo,
+    items:currentRecipe.items
   });
-
-  localStorage.setItem("sico_recipes", JSON.stringify(recipes));
-  currentRecipe = { items: [] };
-  currentSeries = null;
-  qs("seriesBadge").style.display = "none";
-  qs("recipeName").value = "";
-  qs("recipeNote").value = "";
-  showTab("recipes");
+  localStorage.setItem("recipes",JSON.stringify(recipes));
+  currentRecipe={items:[]};
+  renderRecipes(); showTab("recipes");
 };
 
-function renderRecipes() {
-  qs("recipeList").innerHTML = recipes.length
-    ? recipes.map(r => `<div><strong>${r.name}</strong></div>`).join("")
-    : `<p>${t("noRecipes")}</p>`;
+/* draft */
+function saveDraft(){
+  localStorage.setItem("draft",JSON.stringify(currentRecipe));
+}
+const d=localStorage.getItem("draft");
+if(d) currentRecipe=JSON.parse(d);
+
+/* photo */
+window.savePhoto=input=>{
+  const r=new FileReader();
+  r.onload=e=>{
+    currentRecipe.photo=e.target.result;
+    qs("photoPreview").innerHTML=`<img src="${e.target.result}" style="max-width:100%">`;
+    saveDraft();
+  };
+  r.readAsDataURL(input.files[0]);
+};
+
+/* recipes */
+function renderRecipes(){
+  qs("recipeList").innerHTML=recipes.map(r=>`
+    <div>
+      <b>${r.name}</b> (${r.status})
+      ${r.photo?`<img src="${r.photo}" width="60">`:""}
+    </div>`).join("");
+}
+window.exportTXT=()=>{
+  const t=recipes.map(r=>r.name).join("\n");
+  download(t,"recipes.txt","text/plain");
+};
+window.exportPDF=()=>window.print();
+window.importTXT=i=>{
+  const r=new FileReader();
+  r.onload=e=>{
+    e.target.result.split("\n").forEach(n=>recipes.push({name:n,items:[]}));
+    localStorage.setItem("recipes",JSON.stringify(recipes));
+    renderRecipes();
+  };
+  r.readAsText(i.files[0]);
+};
+function download(c,n,t){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([c],{type:t}));
+  a.download=n; a.click();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  setLang(currentLang);
-  initSeriesFilter();
-  renderColors();
+/* theme */
+window.toggleTheme=()=>{
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme",document.body.classList.contains("dark"));
+};
+
+/* init */
+document.addEventListener("DOMContentLoaded",()=>{
+  initSeries(); renderColors(); renderRecipes(); setLang(currentLang);
 });
