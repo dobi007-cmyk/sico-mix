@@ -49,13 +49,13 @@ const i18n = {
   }
 };
 
-let currentLang = localStorage.getItem("sico_lang") || "ua";
+export let currentLang = localStorage.getItem("sico_lang") || "ua";
 
-function t(key) {
-  return i18n[currentLang]?.[key] || i18n.ua[key] || key;
+export function t(key) {
+  return i18n[currentLang]?.[key] || key;
 }
 
-function setLang(lang) {
+export function setLang(lang) {
   currentLang = lang;
   localStorage.setItem("sico_lang", lang);
 
@@ -66,12 +66,4 @@ function setLang(lang) {
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
     el.placeholder = t(el.dataset.i18nPlaceholder);
   });
-
-  if (typeof renderColors === "function") renderColors();
-  if (typeof renderRecipes === "function") renderRecipes();
-  if (typeof renderCurrentRecipe === "function") renderCurrentRecipe();
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  setLang(currentLang);
-});
