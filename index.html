@@ -1,72 +1,83 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>SICO MIX</title>
-
   <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
 <header>
-  <div class="header-left">
-    <h1>SICO MIX</h1>
-    <span id="seriesBadge"></span>
-  </div>
+  <h1>SICO MIX</h1>
 
-  <div class="lang-switcher">
+  <div class="lang">
     <button onclick="setLang('ua')">UA</button>
     <button onclick="setLang('pl')">PL</button>
     <button onclick="setLang('en')">EN</button>
+    <button onclick="toggleTheme()">🌗</button>
   </div>
 </header>
 
 <nav>
-  <button onclick="showTab('colors')" data-i18n="paints"></button>
-  <button onclick="showTab('new')" data-i18n="newRecipe"></button>
-  <button onclick="showTab('recipes')" data-i18n="recipes"></button>
+  <button onclick="showTab('colors')"  data-i18n="paints"></button>
+  <button onclick="showTab('new')"     data-i18n="newRecipe"></button>
+  <button onclick="showTab('recipes')"data-i18n="recipes"></button>
 </nav>
 
 <main>
 
-  <section id="colors" class="tab active">
-    <h2 data-i18n="catalog"></h2>
+<!-- COLORS -->
+<section id="colors" class="tab active">
+  <h2 data-i18n="catalog"></h2>
 
-    <label data-i18n="filterSeries"></label>
-    <select id="seriesFilter"></select>
+  <input id="colorSearch" placeholder="🔍" oninput="renderColors()">
 
-    <div id="colorList" class="color-grid"></div>
-  </section>
+  <select id="seriesFilter" onchange="renderColors()"></select>
+  <div id="colorList"></div>
+</section>
 
-  <section id="new" class="tab">
-    <h2 data-i18n="newRecipe"></h2>
+<!-- NEW RECIPE -->
+<section id="new" class="tab">
+  <h2 data-i18n="newRecipe"></h2>
 
-    <input id="recipeName" data-i18n-placeholder="recipeName">
-    <textarea id="recipeNote" data-i18n-placeholder="recipeNote"></textarea>
+  <input id="recipeName" data-i18n-placeholder="recipeName">
+  <textarea id="recipeNote" data-i18n-placeholder="recipeNote"></textarea>
 
-    <label class="toggle-switch">
-      <input type="checkbox" onchange="toggleMode(this)">
-      <span class="slider"></span>
-    </label>
+  <select id="recipeStatus">
+    <option value="draft">📝 Draft</option>
+    <option value="done">✅ Done</option>
+  </select>
 
-    <div id="recipeItems"></div>
+  <input type="file" accept="image/*" capture="environment" onchange="savePhoto(this)">
+  <div id="photoPreview"></div>
 
-    <select id="totalWeight" onchange="renderCurrentRecipe()">
-      <option value="100">100 g</option>
-      <option value="500">500 g</option>
-      <option value="1000" selected>1 kg</option>
-      <option value="5000">5 kg</option>
-    </select>
+  <label class="switch">
+    <input type="checkbox" onchange="toggleMode(this)">
+    <span>% ↔ g</span>
+  </label>
 
-    <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
-  </section>
+  <input id="recipeSearch" placeholder="🔍" oninput="renderRecipeSearch()">
+  <div id="recipeSearchList"></div>
 
-  <section id="recipes" class="tab">
-    <h2 data-i18n="recipes"></h2>
-    <div id="recipeList"></div>
-  </section>
+  <div id="recipeItems"></div>
+
+  <select id="totalWeight" onchange="renderCurrentRecipe()"></select>
+
+  <button onclick="saveRecipe()" data-i18n="addRecipe"></button>
+</section>
+
+<!-- RECIPES -->
+<section id="recipes" class="tab">
+  <h2 data-i18n="recipes"></h2>
+
+  <button onclick="exportTXT()">TXT</button>
+  <button onclick="exportPDF()">PDF</button>
+  <input type="file" accept=".txt" onchange="importTXT(this)">
+
+  <div id="recipeList"></div>
+</section>
 
 </main>
 
