@@ -1,350 +1,1139 @@
 import { COLORS, SERIES, getColorByCode } from "./data-colors.js";
 import { t, setLang, currentLang } from "./i18n.js";
-import { formatNumber, clamp, generateId } from "./utils.js";
+import { formatNumber, clamp, generateId, calculateWeights } from "./utils.js";
 
-window.setLang = setLang;
+// Global variables
+window.SICO = {
+  version: '2.0.0',
+  colors: COLORS,
+  series: SERIES
+};
 
 const qs = id => document.getElementById(id);
 const qsa = sel => document.querySelectorAll(sel);
 
+// App state
 let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
-let currentRecipe = { id: generateId(), items: [], status: 'draft', photo: null };
+let currentRecipe = { 
+  id: generateId(), 
+  items: [], 
+  status: 'draft', 
+  photo: null,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+};
 let currentSeries = null;
 let mode = localStorage.getItem("sico_mode") || "percent";
 let theme = localStorage.getItem("sico_theme") || "auto";
+let recipeFilter = 'all';
 
+// DOM Elements
+const elements = {
+  themeToggle: qs('themeToggle'),
+  seriesBadge: qs('seriesBadge'),
+  recipeStats: qs('recipeStats'),
+  totalColors: qs('totalColors'),
+  totalPercent: qs('totalPercent'),
+  totalWeightGrams: qs('totalWeightGrams'),
+  colorList: qs('colorList'),
+  addColorList: qs('addColorList'),
+  recipeItems: qs('recipeItems'),
+  recipeList: qs('recipeList'),
+  recipeSearchList: qs('recipeSearchList'),
+  customWeight: qs('customWeight'),
+  modeToggle: qs('modeToggle'),
+  photoPreview: qs('photoPreview'),
+  modalOverlay: qs('modalOverlay'),
+  modalTitle: qs('modalTitle'),
+  modalBody: qs('modalBody'),
+  modalConfirm: qs('modalConfirm'),
+  toastContainer: qs('toastContainer'),
+  loadingOverlay: qs('loadingOverlay')
+};
+
+// Initialize app
+window.addEventListener('DOMContentLoaded', () => {
+  initApp();
+  setupEventListeners();
+});
+
+function initApp() {
+  console.log('SICO MIX v2.0.0 initialized');
+  
+  // Set theme
+  applyTheme();
+  
+  // Set language
+  setLang(currentLang);
+  
+  // Initialize series filter
+  initSeriesFilter();
+  
+  // Load draft recipe
+  loadDraft();
+  
+  // Render initial views
+  renderColors();
+  renderAddColors();
+  renderCurrentRecipe();
+  renderRecipes();
+  
+  // Update stats
+  updateStats();
+  
+  // Check for PWA installation
+  checkPWA();
+}
+
+function setupEventListeners() {
+  // Theme toggle
+  window.toggleTheme = toggleTheme;
+  
+  // Language switcher
+  window.setLang = setLang;
+  
+  // Tab navigation
+  window.showTab = showTab;
+  
+  // Recipe operations
+  window.addColor = addColor;
+  window.updateItem = updateItem;
+  window.removeItem = removeItem;
+  window.saveRecipe = saveRecipe;
+  window.clearDraft = clearDraft;
+  window.editRecipe = editRecipe;
+  window.confirmDelete = confirmDelete;
+  window.deleteRecipe = deleteRecipe;
+  window.importRecipes = importRecipes;
+  window.exportRecipeJson = exportRecipeJson;
+  window.exportRecipePdf = exportRecipePdf;
+  
+  // Modal
+  window.closeModal = closeModal;
+  
+  // Mode toggle
+  window.toggleMode = toggleMode;
+  
+  // Settings
+  window.setTheme = setTheme;
+  window.exportAllData = exportAllData;
+  window.backupData = backupData;
+  window.confirmReset = confirmReset;
+  window.resetAllData = resetAllData;
+  
+  // Custom weight handling
+  qs('totalWeight').addEventListener('change', function() {
+    if (this.value === 'custom') {
+      qs('customWeight').style.display = 'block';
+      qs('customWeight').focus();
+    } else {
+      qs('customWeight').style.display = 'none';
+      renderCurrentRecipe();
+    }
+  });
+  
+  qs('customWeight').addEventListener('input', function() {
+    if (this.value) {
+      renderCurrentRecipe();
+    }
+  });
+  
+  // Photo upload
+  qs('recipePhoto').addEventListener('change', handlePhotoUpload);
+  
+  // Recipe search
+  qs('recipeSearchList').addEventListener('input', filterRecipes);
+  
+  // Global keyboard shortcuts
+  document.addEventListener('keydown', handleKeyboardShortcuts);
+  
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js');
+    });
+  }
+}
+
+// Theme Management
 function applyTheme() {
-  document.body.classList.toggle('dark', theme === 'dark' || (theme === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches));
-  qs('themeToggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+  const prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = theme === 'dark' || (theme === 'auto' && prefersDark);
+  
+  document.documentElement.setAttribute('data-theme', theme);
+  document.body.classList.toggle('dark', isDark);
+  
+  // Update theme icon
+  const icon = qs('themeToggle').querySelector('.theme-icon');
+  icon.textContent = isDark ? '☀️' : '🌙';
+  
+  // Update meta theme-color
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', 
+    isDark ? '#0f172a' : '#f8fafc'
+  );
 }
 
 window.toggleTheme = () => {
   theme = theme === 'dark' ? 'light' : 'dark';
   localStorage.setItem("sico_theme", theme);
   applyTheme();
+  showToast(t('themeChanged'), 'success');
 };
 
+window.setTheme = (newTheme) => {
+  theme = newTheme;
+  localStorage.setItem("sico_theme", theme);
+  applyTheme();
+  showToast(t('themeChanged'), 'success');
+};
+
+// Tab Navigation
 window.showTab = function (id) {
+  // Hide all tabs
   qsa(".tab").forEach(t => t.classList.remove("active"));
+  
+  // Remove active class from all nav buttons
+  qsa(".nav-btn").forEach(btn => btn.classList.remove("active"));
+  
+  // Show selected tab
   qs(id).classList.add("active");
-  if (id === "recipes") renderRecipes();
-  if (id === "new") loadDraft();
+  
+  // Activate corresponding nav button
+  const navBtn = document.querySelector(`.nav-btn[onclick*="${id}"]`);
+  if (navBtn) {
+    navBtn.classList.add("active");
+  }
+  
+  // Load data for specific tabs
+  if (id === "recipes") {
+    renderRecipes();
+  } else if (id === "colors") {
+    renderColors();
+  } else if (id === "new") {
+    updateStats();
+  }
+  
+  // Update URL hash
+  window.history.pushState(null, null, `#${id}`);
 };
 
+// Check URL hash on load
+window.addEventListener('hashchange', () => {
+  const hash = window.location.hash.substring(1) || 'colors';
+  if (['colors', 'new', 'recipes', 'settings'].includes(hash)) {
+    showTab(hash);
+  }
+});
+
+// Initialize with hash or default
+const initialTab = window.location.hash.substring(1) || 'colors';
+showTab(initialTab);
+
+// Series Filter
 function initSeriesFilter() {
   const select = qs("seriesFilter");
-  select.innerHTML = `<option value="ALL">${t("allSeries")}</option>`;
-  SERIES.forEach(s => {
-    const o = document.createElement("option");
-    o.value = s.id;
-    o.textContent = s.id;
-    select.appendChild(o);
-  });
+  select.innerHTML = `
+    <option value="ALL">${t("allSeries")}</option>
+    ${SERIES.map(s => `
+      <option value="${s.id}">${s.id} - ${s.name[currentLang]}</option>
+    `).join('')}
+  `;
   select.onchange = () => renderColors();
 }
 
+// Color Rendering
 function renderColors() {
   const series = qs("seriesFilter").value;
   const search = qs("colorSearch").value.toLowerCase();
-  let list = COLORS;
-  if (series !== "ALL") list = list.filter(c => c.series === series);
-  if (search) list = list.filter(c => c.code.toLowerCase().includes(search) || c.name[currentLang].toLowerCase().includes(search));
-
-  qs("colorList").innerHTML = list.map(c => `
-    <div class="color">
-      <div class="swatch" style="background:${c.hex}"></div>
-      <div>
-        <strong>${c.code}</strong><br>
-        ${c.name[currentLang]}
+  
+  let filteredColors = COLORS;
+  
+  // Filter by series
+  if (series !== "ALL") {
+    filteredColors = filteredColors.filter(c => c.series === series);
+  }
+  
+  // Filter by search
+  if (search) {
+    filteredColors = filteredColors.filter(c => 
+      c.code.toLowerCase().includes(search) || 
+      c.name[currentLang].toLowerCase().includes(search)
+    );
+  }
+  
+  // Update count
+  qs('colorCount').textContent = `${filteredColors.length} ${t('colors')}`;
+  
+  // Render colors
+  elements.colorList.innerHTML = filteredColors.map(color => `
+    <div class="color-card" onclick="addColor('${color.code}')">
+      <div class="color-swatch" style="background:${color.hex}"></div>
+      <div class="color-info">
+        <div class="color-code">${color.code}</div>
+        <div class="color-name">${color.name[currentLang]}</div>
+        <div class="color-meta">
+          <span class="color-series">${color.series}</span>
+          <span class="color-hex">${color.hex}</span>
+        </div>
       </div>
-      <button onclick="addColor('${c.code}')">+</button>
+      <div class="color-actions">
+        <button class="color-btn" onclick="event.stopPropagation(); addColor('${color.code}')">
+          +
+        </button>
+      </div>
     </div>
   `).join("");
 }
 
 function renderAddColors() {
   const search = qs("recipeSearch").value.toLowerCase();
-  let list = COLORS;
-  if (currentSeries) list = list.filter(c => c.series === currentSeries);
-  if (search) list = list.filter(c => c.code.toLowerCase().includes(search) || c.name[currentLang].toLowerCase().includes(search));
-
-  qs("addColorList").innerHTML = list.map(c => `
-    <div class="color">
-      <div class="swatch" style="background:${c.hex}"></div>
-      <div>
-        <strong>${c.code}</strong><br>
-        ${c.name[currentLang]}
+  let filteredColors = COLORS;
+  
+  // Filter by current series
+  if (currentSeries) {
+    filteredColors = filteredColors.filter(c => c.series === currentSeries);
+  }
+  
+  // Filter by search
+  if (search) {
+    filteredColors = filteredColors.filter(c => 
+      c.code.toLowerCase().includes(search) || 
+      c.name[currentLang].toLowerCase().includes(search)
+    );
+  }
+  
+  elements.addColorList.innerHTML = filteredColors.map(color => `
+    <div class="color-card compact" onclick="addColor('${color.code}')">
+      <div class="color-swatch" style="background:${color.hex}"></div>
+      <div class="color-info">
+        <div class="color-code">${color.code}</div>
+        <div class="color-name">${color.name[currentLang]}</div>
       </div>
-      <button onclick="addColor('${c.code}')">+</button>
     </div>
   `).join("");
 }
 
+// Recipe Operations
 window.addColor = function (code) {
   const color = getColorByCode(code);
+  
+  // Check if we can add this color
   if (!currentSeries) {
     currentSeries = color.series;
-    qs("seriesBadge").textContent = currentSeries;
-    qs("seriesBadge").style.display = "inline-block";
+    elements.seriesBadge.textContent = currentSeries;
+    elements.seriesBadge.style.display = "inline-flex";
+    showToast(`${t('seriesSet')}: ${currentSeries}`, 'info');
   }
+  
   if (color.series !== currentSeries) {
-    showNotification(t("errorSeries"), 'error');
+    showToast(t("errorSeries"), 'error');
     return;
   }
-  if (currentRecipe.items.find(i => i.code === code)) return; // Не дублювати
-  currentRecipe.items.push({ code, percent: 0 });
+  
+  // Check for duplicates
+  if (currentRecipe.items.find(i => i.code === code)) {
+    showToast(t("colorAlreadyAdded"), 'warning');
+    return;
+  }
+  
+  // Add color with initial percentage based on existing colors
+  const initialPercent = currentRecipe.items.length === 0 ? 100 : 0;
+  
+  currentRecipe.items.push({ 
+    code, 
+    percent: initialPercent,
+    name: color.name[currentLang],
+    hex: color.hex
+  });
+  
+  // Recalculate percentages if needed
+  if (currentRecipe.items.length > 1) {
+    redistributePercentages();
+  }
+  
   autoSaveDraft();
   renderCurrentRecipe();
   renderAddColors();
+  updateStats();
 };
 
+function redistributePercentages() {
+  const totalItems = currentRecipe.items.length;
+  const equalPercent = 100 / totalItems;
+  
+  currentRecipe.items.forEach(item => {
+    item.percent = parseFloat(equalPercent.toFixed(2));
+  });
+}
+
+window.updateItem = (index, value) => {
+  const numValue = parseFloat(value) || 0;
+  const total = getTotalWeight();
+  
+  if (mode === "percent") {
+    currentRecipe.items[index].percent = clamp(numValue, 0, 100);
+  } else {
+    const percent = (numValue / total) * 100;
+    currentRecipe.items[index].percent = clamp(percent, 0, 100);
+  }
+  
+  autoSaveDraft();
+  renderCurrentRecipe();
+  updateStats();
+};
+
+window.removeItem = index => {
+  currentRecipe.items.splice(index, 1);
+  
+  if (currentRecipe.items.length === 0) {
+    currentSeries = null;
+    elements.seriesBadge.style.display = "none";
+  }
+  
+  autoSaveDraft();
+  renderCurrentRecipe();
+  renderAddColors();
+  updateStats();
+};
+
+// Recipe Rendering
+window.renderCurrentRecipe = function () {
+  const totalWeight = getTotalWeight();
+  
+  if (currentRecipe.items.length === 0) {
+    elements.recipeItems.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🎨</div>
+        <p>${t("noColorsAdded")}</p>
+        <button class="btn-secondary" onclick="showTab('colors')">
+          ${t("browseColors")}
+        </button>
+      </div>
+    `;
+    return;
+  }
+  
+  // Calculate total percentage
+  const totalPercent = currentRecipe.items.reduce((sum, item) => sum + item.percent, 0);
+  
+  elements.recipeItems.innerHTML = currentRecipe.items.map((item, index) => {
+    const color = getColorByCode(item.code);
+    const value = mode === "percent" 
+      ? item.percent 
+      : (item.percent * totalWeight / 100);
+    const formattedValue = formatNumber(value, mode === "percent" ? 2 : 1);
+    
+    return `
+      <div class="recipe-item">
+        <div class="recipe-color">
+          <div class="color-chip" style="background: ${color.hex}"></div>
+          <div>
+            <div class="color-code">${item.code}</div>
+            <div class="color-name">${color.name[currentLang]}</div>
+          </div>
+        </div>
+        <div class="recipe-input-group">
+          <input 
+            type="number" 
+            class="recipe-input" 
+            value="${formattedValue}"
+            step="${mode === 'percent' ? '0.1' : '0.1'}"
+            min="0"
+            onchange="updateItem(${index}, this.value)"
+          >
+          <span class="recipe-unit">${mode === "percent" ? "%" : "g"}</span>
+        </div>
+        <button class="recipe-remove" onclick="removeItem(${index})">
+          ✕
+        </button>
+      </div>
+    `;
+  }).join("");
+  
+  // Update summary
+  updateRecipeSummary(totalPercent, totalWeight);
+};
+
+function updateRecipeSummary(totalPercent, totalWeight) {
+  const percentClass = totalPercent < 95 || totalPercent > 105 ? 'warning' : '';
+  
+  elements.totalColors.textContent = currentRecipe.items.length;
+  elements.totalPercent.innerHTML = `
+    <span class="${percentClass}">${formatNumber(totalPercent, 2)}%</span>
+  `;
+  elements.totalWeightGrams.textContent = `${formatNumber(totalWeight, 1)} g`;
+  
+  // Update warning if needed
+  if (totalPercent < 95 || totalPercent > 105) {
+    showToast(t("sumWarning"), 'warning', 5000);
+  }
+}
+
+function getTotalWeight() {
+  const weightSelect = qs('totalWeight');
+  if (weightSelect.value === 'custom') {
+    return parseFloat(qs('customWeight').value) || 1000;
+  }
+  return parseFloat(weightSelect.value) || 1000;
+}
+
+// Mode Toggle
 window.toggleMode = checkbox => {
   mode = checkbox.checked ? "gram" : "percent";
   localStorage.setItem("sico_mode", mode);
   renderCurrentRecipe();
+  showToast(`${t('modeChanged')}: ${mode === 'percent' ? '%' : 'g'}`, 'info');
 };
 
-window.renderCurrentRecipe = function () {
-  const total = Number(qs("totalWeight").value);
-  let sum = 0;
-
-  qs("recipeItems").innerHTML = currentRecipe.items.map((i, idx) => {
-    let val = mode === "percent"
-      ? i.percent
-      : (i.percent * total / 100);
-    val = clamp(val, 0, Infinity);
-    val = formatNumber(val, mode === "percent" ? 2 : 1);
-    sum += i.percent;
-    return `
-      <div class="recipe-item">
-        <span>${i.code}</span>
-        <input type="number" value="${val}"
-          onchange="updateItem(${idx}, this.value)">
-        <span>${mode === "percent" ? "%" : "g"}</span>
-        <button onclick="removeItem(${idx})">✕</button>
-      </div>`;
-  }).join("") + `<div class="sum-line ${sum > 105 || sum < 95 ? 'warning' : ''}">${t("sum")}: ${formatNumber(sum, 2)}%</div>`;
-};
-
-window.updateItem = (i, val) => {
-  val = Number(val);
-  const total = Number(qs("totalWeight").value);
-  currentRecipe.items[i].percent =
-    mode === "percent" ? clamp(val, 0, 100) : clamp((val / total) * 100, 0, 100);
-  autoSaveDraft();
-  renderCurrentRecipe();
-};
-
-window.removeItem = i => {
-  currentRecipe.items.splice(i, 1);
-  if (!currentRecipe.items.length) {
-    currentSeries = null;
-    qs("seriesBadge").style.display = "none";
-  }
-  autoSaveDraft();
-  renderCurrentRecipe();
-  renderAddColors();
-};
-
+// Recipe Validation
 function validateRecipe() {
-  const sum = currentRecipe.items.reduce((s, i) => s + i.percent, 0);
-  if (sum < 95 || sum > 105) {
-    showNotification(t("sumWarning"), 'warning');
+  const totalPercent = currentRecipe.items.reduce((sum, item) => sum + item.percent, 0);
+  const recipeName = qs("recipeName").value.trim();
+  
+  // Check percentage sum
+  if (totalPercent < 95 || totalPercent > 105) {
+    showModal(
+      t("warning"),
+      `${t("sumWarning")} (${formatNumber(totalPercent, 2)}%)`,
+      () => {} // Empty callback for confirmation
+    );
     return false;
   }
-  if (!qs("recipeName").value.trim() || !currentRecipe.items.length) {
-    showNotification(t("errorEmptyRecipe"), 'error');
+  
+  // Check required fields
+  if (!recipeName) {
+    showToast(t("errorEmptyName"), 'error');
+    qs("recipeName").focus();
     return false;
   }
+  
+  if (!currentRecipe.items.length) {
+    showToast(t("errorEmptyRecipe"), 'error');
+    return false;
+  }
+  
   return true;
 }
 
+// Save Recipe
 window.saveRecipe = function () {
   if (!validateRecipe()) return;
-
-  currentRecipe.name = qs("recipeName").value.trim();
-  currentRecipe.note = qs("recipeNote").value;
-  currentRecipe.series = currentSeries;
-  currentRecipe.status = qs("recipeStatus").value;
-
-  const existingIdx = recipes.findIndex(r => r.id === currentRecipe.id);
-  if (existingIdx > -1) {
-    recipes[existingIdx] = currentRecipe;
-  } else {
-    recipes.push(currentRecipe);
+  
+  showLoading();
+  
+  try {
+    // Update recipe data
+    currentRecipe.name = qs("recipeName").value.trim();
+    currentRecipe.note = qs("recipeNote").value;
+    currentRecipe.series = currentSeries;
+    currentRecipe.status = qs("recipeStatus").value;
+    currentRecipe.updatedAt = new Date().toISOString();
+    currentRecipe.totalPercent = currentRecipe.items.reduce((sum, item) => sum + item.percent, 0);
+    currentRecipe.totalWeight = getTotalWeight();
+    
+    // Calculate weights for each item
+    currentRecipe.items = calculateWeights(currentRecipe.items, currentRecipe.totalWeight);
+    
+    // Check if updating existing or creating new
+    const existingIndex = recipes.findIndex(r => r.id === currentRecipe.id);
+    
+    if (existingIndex > -1) {
+      recipes[existingIndex] = { ...currentRecipe };
+    } else {
+      recipes.push({ ...currentRecipe });
+    }
+    
+    // Save to localStorage
+    localStorage.setItem("sico_recipes", JSON.stringify(recipes));
+    
+    // Show success
+    showToast(t("savedSuccess"), 'success');
+    
+    // Clear draft and show recipes
+    setTimeout(() => {
+      clearDraft();
+      showTab("recipes");
+      hideLoading();
+    }, 1000);
+    
+  } catch (error) {
+    hideLoading();
+    showToast(t("saveError"), 'error');
+    console.error('Save error:', error);
   }
-
-  localStorage.setItem("sico_recipes", JSON.stringify(recipes));
-  showNotification(t("savedSuccess"), 'success');
-  clearDraft();
-  showTab("recipes");
 };
 
+// Draft Management
 function autoSaveDraft() {
   currentRecipe.name = qs("recipeName").value.trim();
   currentRecipe.note = qs("recipeNote").value;
   currentRecipe.status = qs("recipeStatus").value;
+  currentRecipe.updatedAt = new Date().toISOString();
   localStorage.setItem("sico_draft", JSON.stringify(currentRecipe));
 }
 
 function loadDraft() {
   const draft = JSON.parse(localStorage.getItem("sico_draft"));
+  
   if (draft) {
     currentRecipe = draft;
     currentSeries = draft.series || null;
-    qs("seriesBadge").textContent = currentSeries || '';
-    qs("seriesBadge").style.display = currentSeries ? "inline-block" : "none";
+    
+    // Update UI
+    elements.seriesBadge.textContent = currentSeries || '';
+    elements.seriesBadge.style.display = currentSeries ? "inline-flex" : "none";
     qs("recipeName").value = draft.name || '';
     qs("recipeNote").value = draft.note || '';
-    qs("recipeStatus").value = draft.status;
-    qs("photoPreview").src = draft.photo || '';
-    qs("photoPreview").style.display = draft.photo ? "block" : "none";
+    qs("recipeStatus").value = draft.status || 'draft';
+    
+    // Handle photo
+    if (draft.photo) {
+      elements.photoPreview.querySelector('img').src = draft.photo;
+      elements.photoPreview.querySelector('img').style.display = 'block';
+      elements.photoPreview.style.display = 'block';
+    }
+    
     renderCurrentRecipe();
     renderAddColors();
+    updateStats();
   }
 }
 
-function clearDraft() {
-  currentRecipe = { id: generateId(), items: [], status: 'draft', photo: null };
+window.clearDraft = function () {
+  currentRecipe = { 
+    id: generateId(), 
+    items: [], 
+    status: 'draft', 
+    photo: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
   currentSeries = null;
-  qs("seriesBadge").style.display = "none";
+  
+  // Reset UI
+  elements.seriesBadge.style.display = "none";
   qs("recipeName").value = "";
   qs("recipeNote").value = "";
   qs("recipeStatus").value = "draft";
-  qs("photoPreview").src = "";
-  qs("photoPreview").style.display = "none";
+  elements.photoPreview.querySelector('img').src = "";
+  elements.photoPreview.querySelector('img').style.display = 'none';
+  elements.photoPreview.style.display = 'none';
+  
+  // Clear localStorage
   localStorage.removeItem("sico_draft");
+  
+  // Re-render
   renderCurrentRecipe();
   renderAddColors();
-}
+  updateStats();
+  
+  showToast(t("draftCleared"), 'success');
+};
 
-function renderRecipes() {
-  qs("recipeList").innerHTML = recipes.length
-    ? recipes.map(r => `
-      <div class="recipe-preview" onclick="editRecipe('${r.id}')">
-        <strong>${r.name}</strong>
-        <span class="meta">${r.series} | ${r.items.length} ${t('paints')} | ${t(r.status)}</span>
-        <small>${r.note.slice(0, 100)}...</small>
-        ${r.photo ? '<img src="' + r.photo + '" style="max-height:50px;">' : ''}
-        <div class="recipe-actions">
-          <button onclick="exportRecipeJson('${r.id}')" data-i18n="exportText"></button>
-          <button onclick="exportRecipePdf('${r.id}')" data-i18n="exportPdf"></button>
-          <button class="btn-danger" onclick="confirmDelete('${r.id}')" data-i18n="delete"></button>
+// Recipes List
+window.renderRecipes = function () {
+  if (recipes.length === 0) {
+    elements.recipeList.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>${t("noRecipes")}</h3>
+        <p>${t("createFirstRecipe")}</p>
+        <button class="btn-primary" onclick="showTab('new')">
+          ${t("createRecipe")}
+        </button>
+      </div>
+    `;
+    return;
+  }
+  
+  // Apply filters
+  let filteredRecipes = recipes;
+  
+  if (recipeFilter !== 'all') {
+    filteredRecipes = filteredRecipes.filter(r => r.status === recipeFilter);
+  }
+  
+  const searchTerm = qs('recipeSearchList').value.toLowerCase();
+  if (searchTerm) {
+    filteredRecipes = filteredRecipes.filter(r => 
+      r.name.toLowerCase().includes(searchTerm) ||
+      r.note.toLowerCase().includes(searchTerm) ||
+      r.series.toLowerCase().includes(searchTerm)
+    );
+  }
+  
+  // Render recipes
+  elements.recipeList.innerHTML = filteredRecipes.map(recipe => {
+    const date = new Date(recipe.updatedAt).toLocaleDateString(currentLang);
+    const colorDots = recipe.items.slice(0, 12).map(item => 
+      `<div class="color-dot" style="background: ${getColorByCode(item.code)?.hex || '#ccc'}"></div>`
+    ).join('');
+    
+    return `
+      <div class="recipe-card" onclick="editRecipe('${recipe.id}')">
+        <div class="recipe-card-header">
+          <div>
+            <div class="recipe-name">${recipe.name}</div>
+            <div class="recipe-meta">
+              <span>${recipe.series}</span>
+              <span>•</span>
+              <span>${recipe.items.length} ${t('colors')}</span>
+              <span>•</span>
+              <span>${date}</span>
+            </div>
+          </div>
+          <span class="recipe-status ${recipe.status}">${t(recipe.status)}</span>
         </div>
-      </div>`).join("")
-    : `<p class="empty-state">${t("noRecipes")}</p>`;
-  setLang(currentLang); // Оновити тексти кнопок
-}
+        
+        ${recipe.note ? `<div class="recipe-note">${recipe.note}</div>` : ''}
+        
+        ${recipe.items.length > 0 ? `
+          <div class="recipe-colors">
+            ${colorDots}
+            ${recipe.items.length > 12 ? `<span class="more-colors">+${recipe.items.length - 12}</span>` : ''}
+          </div>
+        ` : ''}
+        
+        <div class="recipe-actions">
+          <button class="btn-secondary" onclick="event.stopPropagation(); exportRecipeJson('${recipe.id}')">
+            JSON
+          </button>
+          <button class="btn-secondary" onclick="event.stopPropagation(); exportRecipePdf('${recipe.id}')">
+            PDF
+          </button>
+          <button class="btn-danger" onclick="event.stopPropagation(); confirmDelete('${recipe.id}')">
+            ${t('delete')}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+};
 
-window.editRecipe = id => {
+window.filterRecipes = function () {
+  renderRecipes();
+};
+
+window.setRecipeFilter = function (filter) {
+  recipeFilter = filter;
+  
+  // Update filter buttons
+  qsa('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  
+  renderRecipes();
+};
+
+// Recipe Operations
+window.editRecipe = function (id) {
   const recipe = recipes.find(r => r.id === id);
+  
   if (recipe) {
-    currentRecipe = { ...recipe };
-    loadDraft(); // Використовуємо load для заповнення форми
+    currentRecipe = JSON.parse(JSON.stringify(recipe)); // Deep clone
+    loadDraft();
     showTab('new');
+    showToast(t('recipeLoaded'), 'success');
   }
 };
 
-window.confirmDelete = id => {
-  showModal(t('confirmDelete'), t('confirmDeleteMsg'), () => deleteRecipe(id));
+window.confirmDelete = function (id) {
+  const recipe = recipes.find(r => r.id === id);
+  if (!recipe) return;
+  
+  showModal(
+    t('confirmDelete'),
+    `${t('confirmDeleteMsg')} "${recipe.name}"?`,
+    () => deleteRecipe(id)
+  );
 };
 
 function deleteRecipe(id) {
   recipes = recipes.filter(r => r.id !== id);
   localStorage.setItem("sico_recipes", JSON.stringify(recipes));
   renderRecipes();
+  showToast(t('recipeDeleted'), 'success');
 }
 
-window.importRecipes = () => {
-  qs('importFile').click();
-  qs('importFile').onchange = e => {
+// Import/Export
+window.importRecipes = function () {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  
+  input.onchange = e => {
     const file = e.target.files[0];
     const reader = new FileReader();
-    reader.onload = ev => {
+    
+    reader.onload = event => {
       try {
-        const imported = JSON.parse(ev.target.result);
-        recipes = recipes.concat(Array.isArray(imported) ? imported : [imported]);
+        const imported = JSON.parse(event.target.result);
+        const newRecipes = Array.isArray(imported) ? imported : [imported];
+        
+        // Validate recipes
+        const validRecipes = newRecipes.filter(r => 
+          r && r.id && r.name && Array.isArray(r.items)
+        );
+        
+        // Merge with existing (avoid duplicates by ID)
+        const existingIds = new Set(recipes.map(r => r.id));
+        const uniqueNewRecipes = validRecipes.filter(r => !existingIds.has(r.id));
+        
+        recipes = [...recipes, ...uniqueNewRecipes];
         localStorage.setItem("sico_recipes", JSON.stringify(recipes));
+        
         renderRecipes();
-        showNotification(t('importSuccess'), 'success');
-      } catch (err) {
-        showNotification(t('error'), 'error');
+        showToast(`${t('importSuccess')}: ${uniqueNewRecipes.length}`, 'success');
+        
+      } catch (error) {
+        showToast(t('importError'), 'error');
+        console.error('Import error:', error);
       }
     };
+    
     reader.readAsText(file);
   };
+  
+  input.click();
 };
 
-window.exportRecipeJson = id => {
+window.exportRecipeJson = function (id) {
   const recipe = recipes.find(r => r.id === id);
-  const blob = new Blob([JSON.stringify(recipe, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${recipe.name}.json`;
-  a.click();
+  if (!recipe) return;
+  
+  const dataStr = JSON.stringify(recipe, null, 2);
+  const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+  
+  const link = document.createElement('a');
+  link.href = dataUri;
+  link.download = `sico-recipe-${recipe.name.replace(/\s+/g, '-')}.json`;
+  link.click();
+  
+  showToast(t('exportSuccess'), 'success');
 };
 
-window.exportRecipePdf = id => {
+window.exportRecipePdf = function (id) {
   const recipe = recipes.find(r => r.id === id);
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  doc.text(`${t('recipeName')}: ${recipe.name}`, 10, 10);
-  doc.text(`${t('note')}: ${recipe.note}`, 10, 20);
-  doc.text(`${t('series')}: ${recipe.series}`, 10, 30);
-  doc.text(`${t('status')}: ${t(recipe.status)}`, 10, 40);
-
-  doc.autoTable({
-    head: [[t('code'), t('percent')]],
-    body: recipe.items.map(i => [i.code, formatNumber(i.percent, 2) + '%']),
-    startY: 50
-  });
-
-  doc.save(`${recipe.name}.pdf`);
+  if (!recipe) return;
+  
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Add logo/title
+    doc.setFontSize(20);
+    doc.setTextColor(59, 130, 246);
+    doc.text('SICO MIX', 20, 20);
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Paint Mixing Recipe', 20, 30);
+    
+    // Recipe info
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text(recipe.name, 20, 45);
+    
+    doc.setFontSize(10);
+    doc.text(`Series: ${recipe.series}`, 20, 55);
+    doc.text(`Status: ${t(recipe.status)}`, 20, 60);
+    doc.text(`Created: ${new Date(recipe.createdAt).toLocaleDateString()}`, 20, 65);
+    
+    if (recipe.note) {
+      doc.text(`Note: ${recipe.note}`, 20, 75);
+    }
+    
+    // Table data
+    const tableData = recipe.items.map((item, index) => [
+      index + 1,
+      item.code,
+      item.name,
+      `${formatNumber(item.percent, 2)}%`,
+      `${formatNumber(item.weight || 0, 1)}g`
+    ]);
+    
+    // Create table
+    doc.autoTable({
+      head: [['#', 'Code', 'Name', 'Percentage', 'Weight']],
+      body: tableData,
+      startY: 85,
+      theme: 'striped',
+      headStyles: { fillColor: [59, 130, 246] },
+      margin: { left: 20 }
+    });
+    
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(
+        `Page ${i} of ${pageCount} • Generated by SICO MIX`,
+        doc.internal.pageSize.width / 2,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
+    
+    // Save PDF
+    doc.save(`sico-recipe-${recipe.name.replace(/\s+/g, '-')}.pdf`);
+    showToast(t('pdfExported'), 'success');
+    
+  } catch (error) {
+    showToast(t('exportError'), 'error');
+    console.error('PDF export error:', error);
+  }
 };
 
-qs('recipePhoto').onchange = e => {
-  const file = e.target.files[0];
-  const reader = new FileReader();
-  reader.onload = ev => {
-    currentRecipe.photo = ev.target.result;
-    qs('photoPreview').src = currentRecipe.photo;
-    qs('photoPreview').style.display = 'block';
-    autoSaveDraft();
+window.exportAllData = function () {
+  const data = {
+    version: '2.0.0',
+    exportedAt: new Date().toISOString(),
+    recipes: recipes,
+    settings: {
+      mode: mode,
+      theme: theme,
+      language: currentLang
+    }
   };
-  reader.readAsDataURL(file);
+  
+  const dataStr = JSON.stringify(data, null, 2);
+  const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+  
+  const link = document.createElement('a');
+  link.href = dataUri;
+  link.download = `sico-mix-backup-${new Date().toISOString().split('T')[0]}.json`;
+  link.click();
+  
+  showToast(t('backupCreated'), 'success');
 };
 
-function showNotification(msg, type = 'info') {
-  const notif = qs('notification');
-  notif.textContent = msg;
-  notif.className = `notification ${type}`;
-  notif.classList.remove('hidden');
-  setTimeout(() => notif.classList.add('hidden'), 3000);
-}
+window.backupData = function () {
+  exportAllData();
+};
 
-function showModal(title, body, onConfirm) {
-  qs('modalTitle').textContent = title;
-  qs('modalBody').innerHTML = body;
-  qs('modalConfirm').onclick = () => { onConfirm(); closeModal(); };
-  qs('modalOverlay').classList.remove('hidden');
-}
+window.confirmReset = function () {
+  showModal(
+    t('confirmReset'),
+    t('confirmResetMsg'),
+    resetAllData
+  );
+};
 
-window.closeModal = () => qs('modalOverlay').classList.add('hidden');
-
-function renderAll() {
-  renderColors();
-  renderAddColors();
-  renderCurrentRecipe();
-  renderRecipes();
-}
-
-document.addEventListener("DOMContentLoaded", () => {
+function resetAllData() {
+  // Clear all data
+  recipes = [];
+  localStorage.removeItem("sico_recipes");
+  localStorage.removeItem("sico_draft");
+  localStorage.removeItem("sico_mode");
+  localStorage.removeItem("sico_theme");
+  localStorage.removeItem("sico_lang");
+  
+  // Reset state
+  clearDraft();
+  mode = "percent";
+  theme = "auto";
+  currentLang = "ua";
+  
+  // Reinitialize
   setLang(currentLang);
-  initSeriesFilter();
   applyTheme();
-  qs('totalWeight').setAttribute('data-i18n', 'weightCalc'); // Для перекладу, але оскільки опції фіксовані, лишаємо як є
-  renderColors();
-  loadDraft();
-});
+  renderRecipes();
+  
+  showToast(t('dataReset'), 'success');
+};
+
+// Photo Handling
+function handlePhotoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  // Check file size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    showToast(t('fileTooLarge'), 'error');
+    return;
+  }
+  
+  // Check file type
+  if (!file.type.startsWith('image/')) {
+    showToast(t('invalidImage'), 'error');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = event => {
+    currentRecipe.photo = event.target.result;
+    
+    // Update preview
+    const img = elements.photoPreview.querySelector('img');
+    img.src = currentRecipe.photo;
+    img.style.display = 'block';
+    elements.photoPreview.style.display = 'block';
+    
+    autoSaveDraft();
+    showToast(t('photoAdded'), 'success');
+  };
+  
+  reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+  currentRecipe.photo = null;
+  
+  const img = elements.photoPreview.querySelector('img');
+  img.src = '';
+  img.style.display = 'none';
+  elements.photoPreview.style.display = 'none';
+  
+  autoSaveDraft();
+  showToast(t('photoRemoved'), 'success');
+}
+
+// Stats & Updates
+function updateStats() {
+  const totalColors = currentRecipe.items.length;
+  const totalPercent = currentRecipe.items.reduce((sum, item) => sum + item.percent, 0);
+  
+  elements.recipeStats.textContent = `${totalColors} ${t('colors')}`;
+  elements.totalColors.textContent = totalColors;
+  elements.totalPercent.textContent = `${formatNumber(totalPercent, 2)}%`;
+}
+
+// Modal System
+window.showModal = function (title, message, onConfirm) {
+  elements.modalTitle.textContent = title;
+  elements.modalBody.textContent = message;
+  
+  elements.modalConfirm.onclick = () => {
+    if (typeof onConfirm === 'function') {
+      onConfirm();
+    }
+    closeModal();
+  };
+  
+  elements.modalOverlay.classList.remove('hidden');
+};
+
+window.closeModal = function () {
+  elements.modalOverlay.classList.add('hidden');
+};
+
+// Toast System
+function showToast(message, type = 'info', duration = 3000) {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <span class="toast-icon">${getToastIcon(type)}</span>
+    <span class="toast-message">${message}</span>
+  `;
+  
+  elements.toastContainer.appendChild(toast);
+  
+  // Auto-remove after duration
+  setTimeout(() => {
+    toast.style.animation = 'slideInRight 0.3s ease reverse';
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+  
+  // Click to dismiss
+  toast.onclick = () => {
+    toast.style.animation = 'slideInRight 0.3s ease reverse';
+    setTimeout(() => toast.remove(), 300);
+  };
+}
+
+function getToastIcon(type) {
+  const icons = {
+    success: '✅',
+    error: '❌',
+    warning: '⚠️',
+    info: 'ℹ️'
+  };
+  return icons[type] || icons.info;
+}
+
+// Loading Overlay
+function showLoading(message = 'Loading...') {
+  elements.loadingOverlay.querySelector('.loading-text').textContent = message;
+  elements.loadingOverlay.classList.remove('hidden');
+}
+
+function hideLoading() {
+  elements.loadingOverlay.classList.add('hidden');
+}
+
+// Keyboard Shortcuts
+function handleKeyboardShortcuts(e) {
+  // Don't trigger shortcuts when typing in inputs
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  
+  switch (e.key) {
+    case '1':
+      if (e.ctrlKey || e.metaKey) showTab('colors');
+      break;
+    case '2':
+      if (e.ctrlKey || e.metaKey) showTab('new');
+      break;
+    case '3':
+      if (e.ctrlKey || e.metaKey) showTab('recipes');
+      break;
+    case '4':
+      if (e.ctrlKey || e.metaKey) showTab('settings');
+      break;
+    case 's':
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        saveRecipe();
+      }
+      break;
+    case 'Escape':
+      closeModal();
+      break;
+    case 't':
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        toggleTheme();
+      }
+      break;
+  }
+}
+
+// PWA Features
+function checkPWA() {
+  // Check if app is installed
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    console.log('Running as PWA');
+  }
+  
+  // Register beforeinstallprompt for install button
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // Show install button if needed
+    showInstallButton();
+  });
+}
+
+function showInstallButton() {
+  // You can add an install button to the UI here
+  console.log('PWA installation available');
+}
+
+// Export utility functions to window for debugging
+window.SICO_DEBUG = {
+  getState: () => ({
+    recipes,
+    currentRecipe,
+    currentSeries,
+    mode,
+    theme,
+    currentLang
+  }),
+  clearAll: resetAllData,
+  exportData: exportAllData
+};
+
+// Initialize
+console.log('SICO MIX initialized successfully');
