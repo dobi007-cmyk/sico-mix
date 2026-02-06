@@ -1,152 +1,45 @@
 {
-  "name": "SICO MIX - Paint Calculator",
+  "name": "SICO MIX",
   "short_name": "SICO MIX",
-  "description": "Professional paint mixing calculator for screen printing",
+  "description": "Система управління рецептами фарб",
   "start_url": "/",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone"],
-  "background_color": "#f8fafc",
-  "theme_color": "#3b82f6",
+  "background_color": "#ffffff",
+  "theme_color": "#4361ee",
   "orientation": "portrait",
   "scope": "/",
   "lang": "uk",
-  "dir": "ltr",
-  "categories": ["productivity", "business", "utilities"],
-  "id": "/",
-  
   "icons": [
     {
-      "src": "/icons/icon-72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-192.png",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-256.png",
-      "sizes": "256x256",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-512.png",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  
-  "screenshots": [
-    {
-      "src": "/screenshots/desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "SICO MIX on desktop"
-    },
-    {
-      "src": "/screenshots/mobile.png",
-      "sizes": "414x896",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "SICO MIX on mobile"
-    }
-  ],
-  
+  "categories": ["business", "productivity", "utilities"],
   "shortcuts": [
     {
-      "name": "New Recipe",
-      "short_name": "New",
-      "description": "Create new paint mixing recipe",
-      "url": "/?tab=new",
-      "icons": [
-        {
-          "src": "/icons/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
+      "name": "Новий рецепт",
+      "short_name": "Новий",
+      "description": "Створити новий рецепт фарби",
+      "url": "/?page=new-recipe",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Color Catalog",
-      "short_name": "Catalog",
-      "description": "Browse all SICO paint colors",
-      "url": "/?tab=colors",
-      "icons": [
-        {
-          "src": "/icons/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Recipes",
-      "short_name": "Recipes",
-      "description": "View saved paint mixing recipes",
-      "url": "/?tab=recipes",
-      "icons": [
-        {
-          "src": "/icons/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
+      "name": "Мої рецепти",
+      "short_name": "Рецепти",
+      "description": "Переглянути всі рецепти",
+      "url": "/?page=recipes",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     }
   ],
-  
-  "share_target": {
-    "action": "/",
-    "method": "GET",
-    "enctype": "application/x-www-form-urlencoded",
-    "params": {
-      "title": "name",
-      "text": "description",
-      "url": "link"
-    }
-  },
-  
-  "launch_handler": {
-    "client_mode": ["auto", "focus-existing", "navigate-existing"]
-  },
-  
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-  
-  "protocol_handlers": [
-    {
-      "protocol": "web+sico",
-      "url": "/?recipe=%s"
-    }
-  ]
+  "related_applications": [],
+  "prefer_related_applications": false
 }
