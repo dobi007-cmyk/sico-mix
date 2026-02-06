@@ -1,1589 +1,848 @@
-// i18n.js
-const i18n = {
-  ua: {
-    // Navigation
-    paints: "Фарби",
-    recipes: "Рецепти",
-    newRecipe: "Новий рецепт",
-    settings: "Налаштування",
-    catalog: "Каталог фарб",
-    
-    // Recipe Form
-    recipeName: "Назва рецепта",
-    recipeNote: "Нотатка",
-    addRecipe: "Зберегти рецепт",
-    clear: "Очистити",
-    draft: "Чернетка",
-    ready: "Готовий",
-    status: "Статус",
-    statusDraft: "Чернетка",
-    statusReady: "Готовий",
-    
-    // Colors
-    colors: "фарб",
-    addColors: "Додати фарби",
-    colorAlreadyAdded: "Фарба вже додана",
-    seriesSet: "Встановлено серію",
-    
-    // Calculator
-    calculator: "Калькулятор",
-    totalWeight: "Загальна вага",
-    totalWeightGrams: "Загальна вага",
-    totalColors: "Фарб",
-    totalPercent: "Загальний %",
-    percentMode: "% режим",
-    gramMode: "г режим",
-    modeChanged: "Режим змінено",
-    
-    // Search & Filter
-    search: "Пошук",
-    searchPlaceholder: "Пошук за кодом або назвою",
-    searchRecipes: "Пошук рецептів",
-    filterSeries: "Серія фарб",
-    allSeries: "Всі серії",
-    all: "Всі",
-    drafts: "Чернетки",
-    ready: "Готові",
-    
-    // Photo
-    addPhoto: "Додати фото змішаної фарби",
-    clickToUpload: "Натисніть для завантаження",
-    maxSize: "Макс. 5МБ",
-    photoAdded: "Фото додано",
-    photoRemoved: "Фото видалено",
-    fileTooLarge: "Файл занадто великий",
-    invalidImage: "Невірний формат зображення",
-    
-    // Theme & Language
-    themeToggle: "Змінити тему",
-    themeChanged: "Тему змінено",
-    light: "Світла",
-    dark: "Темна",
-    auto: "Авто",
-    language: "Мова",
-    appearance: "Зовнішній вигляд",
-    
-    // Data Management
-    dataManagement: "Управління даними",
-    exportAllData: "Експортувати всі дані",
-    backup: "Резервна копія",
-    backupNow: "Створити резервну копію",
-    resetAll: "Скинути все",
-    confirmReset: "Підтвердити скидання",
-    confirmResetMsg: "Ви дійсно хочете скинути всі дані? Цю дію неможливо скасувати.",
-    dataReset: "Дані скинуто",
-    backupCreated: "Резервна копія створена",
-    
-    // Import/Export
-    import: "Імпорт",
-    export: "Експорт",
-    exportAll: "Експортувати все",
-    exportText: "Експорт JSON",
-    exportPdf: "Експорт PDF",
-    exportSuccess: "Експорт успішний",
-    pdfExported: "PDF експортовано",
-    importSuccess: "Імпорт успішний",
-    importError: "Помилка імпорту",
-    exportError: "Помилка експорту",
-    
-    // Notifications
-    savedSuccess: "Рецепт збережено",
-    saveError: "Помилка збереження",
-    draftCleared: "Чернетку очищено",
-    recipeLoaded: "Рецепт завантажено",
-    recipeDeleted: "Рецепт видалено",
-    
-    // Errors & Warnings
-    error: "Помилка",
-    errorSeries: "Можна змішувати тільки в межах однієї серії",
-    errorEmptyRecipe: "Вкажіть назву та додайте хоча б один колір",
-    errorEmptyName: "Введіть назву рецепта",
-    sumWarning: "Сума повинна бути близько 100%",
-    warning: "Попередження",
-    
-    // Empty States
-    noRecipes: "Немає рецептів",
-    noColorsAdded: "Ще не додано фарб",
-    createFirstRecipe: "Створіть свій перший рецепт змішування фарб!",
-    createRecipe: "Створити рецепт",
-    browseColors: "Переглянути фарби",
-    
-    // Modal
-    confirmDelete: "Видалити рецепт",
-    confirmDeleteMsg: "Видалити рецепт",
-    cancel: "Скасувати",
-    confirm: "Підтвердити",
-    
-    // About
-    about: "Про додаток",
-    appDescription: "Професійний калькулятор змішування фарб для трафаретного друку",
-    
-    // Quick Actions
-    quickNew: "Новий",
-    quickCalc: "Розрахувати",
-    quickRecipes: "Рецепти",
-    
-    // Loading
-    loading: "Завантаження..."
-  },
-  
-  pl: {
-    paints: "Farby",
-    recipes: "Receptury",
-    newRecipe: "Nowa receptura",
-    settings: "Ustawienia",
-    catalog: "Katalog farb",
-    
-    recipeName: "Nazwa receptury",
-    recipeNote: "Notatka",
-    addRecipe: "Zapisz recepturę",
-    clear: "Wyczyść",
-    draft: "Szkic",
-    ready: "Gotowy",
-    status: "Status",
-    statusDraft: "Szkic",
-    statusReady: "Gotowy",
-    
-    colors: "farby",
-    addColors: "Dodaj farby",
-    colorAlreadyAdded: "Farba już dodana",
-    seriesSet: "Ustawiono serię",
-    
-    calculator: "Kalkulator",
-    totalWeight: "Całkowita waga",
-    totalWeightGrams: "Całkowita waga",
-    totalColors: "Farby",
-    totalPercent: "Suma %",
-    percentMode: "Tryb %",
-    gramMode: "Tryb g",
-    modeChanged: "Zmieniono tryb",
-    
-    search: "Szukaj",
-    searchPlaceholder: "Szukaj po kodzie lub nazwie",
-    searchRecipes: "Szukaj receptur",
-    filterSeries: "Seria farb",
-    allSeries: "Wszystkie serie",
-    all: "Wszystkie",
-    drafts: "Szkice",
-    ready: "Gotowe",
-    
-    addPhoto: "Dodaj zdjęcie zmieszanej farby",
-    clickToUpload: "Kliknij, aby przesłać",
-    maxSize: "Maks. 5MB",
-    photoAdded: "Zdjęcie dodane",
-    photoRemoved: "Zdjęcie usunięte",
-    fileTooLarge: "Plik za duży",
-    invalidImage: "Nieprawidłowy format obrazu",
-    
-    themeToggle: "Zmień motyw",
-    themeChanged: "Zmieniono motyw",
-    light: "Jasny",
-    dark: "Ciemny",
-    auto: "Auto",
-    language: "Język",
-    appearance: "Wygląd",
-    
-    dataManagement: "Zarządzanie danymi",
-    exportAllData: "Eksportuj wszystkie dane",
-    backup: "Kopia zapasowa",
-    backupNow: "Utwórz kopię zapasową",
-    resetAll: "Resetuj wszystko",
-    confirmReset: "Potwierdź reset",
-    confirmResetMsg: "Czy na pewno chcesz zresetować wszystkie dane? Tej operacji nie można cofnąć.",
-    dataReset: "Dane zresetowane",
-    backupCreated: "Utworzono kopię zapasową",
-    
-    import: "Import",
-    export: "Eksport",
-    exportAll: "Eksportuj wszystko",
-    exportText: "Eksport JSON",
-    exportPdf: "Eksport PDF",
-    exportSuccess: "Eksport udany",
-    pdfExported: "PDF wyeksportowany",
-    importSuccess: "Import udany",
-    importError: "Błąd importu",
-    exportError: "Błąd eksportu",
-    
-    savedSuccess: "Receptura zapisana",
-    saveError: "Błąd zapisu",
-    draftCleared: "Szkic wyczyszczony",
-    recipeLoaded: "Receptura załadowana",
-    recipeDeleted: "Receptura usunięta",
-    
-    error: "Błąd",
-    errorSeries: "Można mieszać tylko w jednej serii",
-    errorEmptyRecipe: "Podaj nazwę i dodaj kolor",
-    errorEmptyName: "Wprowadź nazwę receptury",
-    sumWarning: "Suma powinna być około 100%",
-    warning: "Ostrzeżenie",
-    
-    noRecipes: "Brak receptur",
-    noColorsAdded: "Nie dodano farb",
-    createFirstRecipe: "Utwórz swoją pierwszą recepturę mieszania farb!",
-    createRecipe: "Utwórz recepturę",
-    browseColors: "Przeglądaj farby",
-    
-    confirmDelete: "Usuń recepturę",
-    confirmDeleteMsg: "Usunąć recepturę",
-    cancel: "Anuluj",
-    confirm: "Potwierdź",
-    
-    about: "O aplikacji",
-    appDescription: "Profesjonalny kalkulator mieszania farb do druku sitowego",
-    
-    quickNew: "Nowy",
-    quickCalc: "Oblicz",
-    quickRecipes: "Receptury",
-    
-    loading: "Ładowanie..."
-  },
-  
-  en: {
-    paints: "Paints",
-    recipes: "Recipes",
-    newRecipe: "New recipe",
-    settings: "Settings",
-    catalog: "Paint catalog",
-    
-    recipeName: "Recipe name",
-    recipeNote: "Note",
-    addRecipe: "Save recipe",
-    clear: "Clear",
-    draft: "Draft",
-    ready: "Ready",
-    status: "Status",
-    statusDraft: "Draft",
-    statusReady: "Ready",
-    
-    colors: "colors",
-    addColors: "Add colors",
-    colorAlreadyAdded: "Color already added",
-    seriesSet: "Series set to",
-    
-    calculator: "Calculator",
-    totalWeight: "Total weight",
-    totalWeightGrams: "Total weight",
-    totalColors: "Colors",
-    totalPercent: "Total %",
-    percentMode: "% mode",
-    gramMode: "g mode",
-    modeChanged: "Mode changed",
-    
-    search: "Search",
-    searchPlaceholder: "Search by code or name",
-    searchRecipes: "Search recipes",
-    filterSeries: "Paint series",
-    allSeries: "All series",
-    all: "All",
-    drafts: "Drafts",
-    ready: "Ready",
-    
-    addPhoto: "Add photo of mixed paint",
-    clickToUpload: "Click to upload",
-    maxSize: "Max 5MB",
-    photoAdded: "Photo added",
-    photoRemoved: "Photo removed",
-    fileTooLarge: "File too large",
-    invalidImage: "Invalid image format",
-    
-    themeToggle: "Toggle theme",
-    themeChanged: "Theme changed",
-    light: "Light",
-    dark: "Dark",
-    auto: "Auto",
-    language: "Language",
-    appearance: "Appearance",
-    
-    dataManagement: "Data management",
-    exportAllData: "Export all data",
-    backup: "Backup",
-    backupNow: "Backup now",
-    resetAll: "Reset all",
-    confirmReset: "Confirm reset",
-    confirmResetMsg: "Are you sure you want to reset all data? This action cannot be undone.",
-    dataReset: "Data reset",
-    backupCreated: "Backup created",
-    
-    import: "Import",
-    export: "Export",
-    exportAll: "Export all",
-    exportText: "Export JSON",
-    exportPdf: "Export PDF",
-    exportSuccess: "Export successful",
-    pdfExported: "PDF exported",
-    importSuccess: "Import successful",
-    importError: "Import error",
-    exportError: "Export error",
-    
-    savedSuccess: "Recipe saved",
-    saveError: "Save error",
-    draftCleared: "Draft cleared",
-    recipeLoaded: "Recipe loaded",
-    recipeDeleted: "Recipe deleted",
-    
-    error: "Error",
-    errorSeries: "You can mix only within one series",
-    errorEmptyRecipe: "Enter name and add color",
-    errorEmptyName: "Enter recipe name",
-    sumWarning: "Sum should be around 100%",
-    warning: "Warning",
-    
-    noRecipes: "No recipes",
-    noColorsAdded: "No colors added",
-    createFirstRecipe: "Create your first paint mixing recipe!",
-    createRecipe: "Create recipe",
-    browseColors: "Browse colors",
-    
-    confirmDelete: "Delete recipe",
-    confirmDeleteMsg: "Delete recipe",
-    cancel: "Cancel",
-    confirm: "Confirm",
-    
-    about: "About",
-    appDescription: "Professional paint mixing calculator for screen printing",
-    
-    quickNew: "New",
-    quickCalc: "Calculate",
-    quickRecipes: "Recipes",
-    
-    loading: "Loading..."
-  }
-};
+// ========== ГЛОБАЛЬНІ ЗМІННІ ==========
+let recipes = [];
+let paintCatalog = [];
+let selectedIngredients = [];
+let selectedRecipes = [];
 
-let currentLang = localStorage.getItem("sico_lang") || "ua";
+// ========== DOM ЕЛЕМЕНТИ ==========
+const sidebar = document.getElementById('sidebar');
+const menuToggle = document.getElementById('menuToggle');
+const desktopMenuToggle = document.getElementById('desktopMenuToggle');
+const closeSidebar = document.getElementById('closeSidebar');
+const mainContainer = document.getElementById('mainContainer');
+const navLinks = document.querySelectorAll('.nav-link');
+const pageContents = document.querySelectorAll('.page-content');
+const totalPaintsElement = document.getElementById('totalPaints');
+const headerPaintCount = document.getElementById('headerPaintCount');
+const colorPreview = document.getElementById('colorPreview');
+const recipeColor = document.getElementById('recipeColor');
+const ingredientsList = document.getElementById('ingredientsList');
+const paintSearch = document.getElementById('paintSearch');
+const categoryFilter = document.getElementById('categoryFilter');
+const addIngredientBtn = document.getElementById('addIngredientBtn');
+const saveRecipeBtn = document.getElementById('saveRecipeBtn');
+const clearRecipeBtn = document.getElementById('clearRecipeBtn');
+const calculatePercentagesBtn = document.getElementById('calculatePercentagesBtn');
+const recipesContainer = document.getElementById('recipesContainer');
+const exportRecipesBtn = document.getElementById('exportRecipesBtn');
+const importRecipesBtn = document.getElementById('importRecipesBtn');
+const printRecipesBtn = document.getElementById('printRecipesBtn');
+const deleteSelectedRecipesBtn = document.getElementById('deleteSelectedRecipesBtn');
+const paintCatalogElement = document.getElementById('paintCatalog');
+const addNewPaintBtn = document.getElementById('addNewPaintBtn');
+const addPaintModal = document.getElementById('addPaintModal');
+const closePaintModal = document.getElementById('closePaintModal');
+const savePaintBtn = document.getElementById('savePaintBtn');
+const cancelPaintBtn = document.getElementById('cancelPaintBtn');
+const confirmationModal = document.getElementById('confirmationModal');
+const confirmationTitle = document.getElementById('confirmationTitle');
+const confirmationMessage = document.getElementById('confirmationMessage');
+const confirmActionBtn = document.getElementById('confirmActionBtn');
+const cancelActionBtn = document.getElementById('cancelActionBtn');
+const closeConfirmationModal = document.getElementById('closeConfirmationModal');
+const actionCards = document.querySelectorAll('.action-card');
 
-function t(key) {
-  return i18n[currentLang]?.[key] || key;
-}
-
-function setLang(lang) {
-  if (!i18n[lang]) return;
-  
-  currentLang = lang;
-  localStorage.setItem("sico_lang", lang);
-  
-  // Update all elements with data-i18n
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.dataset.i18n;
-    const translation = t(key);
-    
-    if (translation !== key) {
-      el.textContent = translation;
-    }
-  });
-  
-  // Update placeholders
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-    el.placeholder = t(el.dataset.i18nPlaceholder);
-  });
-  
-  // Update select options
-  document.querySelectorAll("option[data-i18n]").forEach(opt => {
-    opt.textContent = t(opt.dataset.i18n);
-  });
-  
-  // Update title attributes
-  document.querySelectorAll("[data-i18n-title]").forEach(el => {
-    el.title = t(el.dataset.i18nTitle);
-  });
-  
-  // Update aria-labels
-  document.querySelectorAll("[data-i18n-aria-label]").forEach(el => {
-    el.setAttribute('aria-label', t(el.dataset.i18nAriaLabel));
-  });
-  
-  // Update HTML lang attribute
-  document.documentElement.lang = lang;
-  
-  // Trigger re-render if renderAll exists
-  if (typeof window.renderAll === 'function') {
-    window.renderAll();
-  }
-  
-  console.log(`Language changed to: ${lang}`);
-}
-
-// utils.js
-function formatNumber(num, decimals = 2) {
-  if (typeof num !== 'number' || isNaN(num)) {
-    return '0';
-  }
-  
-  const options = {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-    useGrouping: true
-  };
-  
-  return num.toLocaleString(undefined, options);
-}
-
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function generateId() {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
-}
-
-function calculateWeights(items, totalWeight) {
-  if (!Array.isArray(items) || typeof totalWeight !== 'number') {
-    return [];
-  }
-  
-  return items.map(item => ({
-    ...item,
-    weight: (item.percent * totalWeight) / 100
-  }));
-}
-
-// data-colors.js (example data)
-const SERIES = [
-  { id: "SICO", name: { ua: "Стандартна серія", pl: "Seria standardowa", en: "Standard series" } },
-  { id: "METAL", name: { ua: "Металік", pl: "Metalik", en: "Metallic" } },
-  { id: "PEARL", name: { ua: "Перламутр", pl: "Perłowy", en: "Pearl" } }
-];
-
-const COLORS = [
-  { code: "SICO-001", name: { ua: "Чистий білий", pl: "Czysty biały", en: "Pure White" }, hex: "#FFFFFF", series: "SICO" },
-  { code: "SICO-002", name: { ua: "Глибокий чорний", pl: "Głęboka czerń", en: "Deep Black" }, hex: "#000000", series: "SICO" },
-  { code: "SICO-003", name: { ua: "Яскраво-червоний", pl: "Jaskrawa czerwień", en: "Bright Red" }, hex: "#FF0000", series: "SICO" },
-  { code: "METAL-001", name: { ua: "Золотий металік", pl: "Złoty metalik", en: "Gold Metallic" }, hex: "#D4AF37", series: "METAL" },
-  { code: "PEARL-001", name: { ua: "Білий перламутр", pl: "Biały perłowy", en: "White Pearl" }, hex: "#F5F5F5", series: "PEARL" }
-];
-
-function getColorByCode(code) {
-  return COLORS.find(color => color.code === code);
-}
-
-// Main App Code
-const qs = id => document.getElementById(id);
-const qsa = sel => document.querySelectorAll(sel);
-
-// App state
-let recipes = JSON.parse(localStorage.getItem("sico_recipes") || "[]");
-let currentRecipe = { 
-  id: generateId(), 
-  items: [], 
-  status: 'draft', 
-  photo: null,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
-};
-let currentSeries = null;
-let mode = localStorage.getItem("sico_mode") || "percent";
-let theme = localStorage.getItem("sico_theme") || "auto";
-let recipeFilter = 'all';
-
-// DOM Elements
-const elements = {
-  themeToggle: qs('themeToggle'),
-  seriesBadge: qs('seriesBadge'),
-  recipeStats: qs('recipeStats'),
-  totalColors: qs('totalColors'),
-  totalPercent: qs('totalPercent'),
-  totalWeightGrams: qs('totalWeightGrams'),
-  colorList: qs('colorList'),
-  addColorList: qs('addColorList'),
-  recipeItems: qs('recipeItems'),
-  recipeList: qs('recipeList'),
-  recipeSearchList: qs('recipeSearchList'),
-  customWeight: qs('customWeight'),
-  modeToggle: qs('modeToggle'),
-  photoPreview: qs('photoPreview'),
-  modalOverlay: qs('modalOverlay'),
-  modalTitle: qs('modalTitle'),
-  modalBody: qs('modalBody'),
-  modalConfirm: qs('modalConfirm'),
-  toastContainer: qs('toastContainer'),
-  loadingOverlay: qs('loadingOverlay'),
-  mobileMenuToggle: qs('mobileMenuToggle'),
-  appNav: qs('appNav')
-};
-
-// Initialize app
-window.addEventListener('DOMContentLoaded', () => {
-  initApp();
-  setupEventListeners();
-});
-
+// ========== ФУНКЦІЇ ІНІЦІАЛІЗАЦІЇ ==========
 function initApp() {
-  console.log('SICO MIX v2.0.0 initialized');
-  
-  // Set theme
-  applyTheme();
-  
-  // Set language
-  setLang(currentLang);
-  
-  // Initialize series filter
-  initSeriesFilter();
-  
-  // Load draft recipe
-  loadDraft();
-  
-  // Render initial views
-  renderColors();
-  renderAddColors();
-  renderCurrentRecipe();
-  renderRecipes();
-  
-  // Update stats
-  updateStats();
-  
-  // Check for PWA installation
-  checkPWA();
+    loadData();
+    setupEventListeners();
+    updatePaintCount();
+    renderPaintCatalog();
+    loadRecipes();
+    renderIngredientsList();
+    
+    // Ініціалізація міжнародного перекладу
+    initializeI18n();
 }
 
-function setupEventListeners() {
-  // Theme toggle
-  window.toggleTheme = toggleTheme;
-  
-  // Language switcher
-  window.setLang = setLang;
-  
-  // Tab navigation
-  window.showTab = showTab;
-  
-  // Recipe operations
-  window.addColor = addColor;
-  window.updateItem = updateItem;
-  window.removeItem = removeItem;
-  window.saveRecipe = saveRecipe;
-  window.clearDraft = clearDraft;
-  window.editRecipe = editRecipe;
-  window.confirmDelete = confirmDelete;
-  window.deleteRecipe = deleteRecipe;
-  window.importRecipes = importRecipes;
-  window.exportRecipeJson = exportRecipeJson;
-  window.exportRecipePdf = exportRecipePdf;
-  
-  // Modal
-  window.closeModal = closeModal;
-  
-  // Mode toggle
-  window.toggleMode = toggleMode;
-  
-  // Settings
-  window.setTheme = setTheme;
-  window.exportAllData = exportAllData;
-  window.backupData = backupData;
-  window.confirmReset = confirmReset;
-  window.resetAllData = resetAllData;
-  
-  // Mobile menu toggle
-  if (elements.mobileMenuToggle) {
-    elements.mobileMenuToggle.addEventListener('click', toggleMobileMenu);
-  }
-  
-  // Custom weight handling
-  qs('totalWeight').addEventListener('change', function() {
-    if (this.value === 'custom') {
-      qs('customWeight').style.display = 'block';
-      qs('customWeight').focus();
-    } else {
-      qs('customWeight').style.display = 'none';
-      renderCurrentRecipe();
-    }
-  });
-  
-  qs('customWeight').addEventListener('input', function() {
-    if (this.value) {
-      renderCurrentRecipe();
-    }
-  });
-  
-  // Photo upload
-  qs('recipePhoto').addEventListener('change', handlePhotoUpload);
-  
-  // Recipe search
-  qs('recipeSearchList').addEventListener('input', filterRecipes);
-  
-  // Global keyboard shortcuts
-  document.addEventListener('keydown', handleKeyboardShortcuts);
-  
-  // Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js');
+function loadData() {
+    const savedRecipes = localStorage.getItem('sicoMixRecipes');
+    const savedPaints = localStorage.getItem('sicoMixPaints');
+    
+    recipes = savedRecipes ? JSON.parse(savedRecipes) : getInitialData().recipes;
+    paintCatalog = savedPaints ? JSON.parse(savedPaints) : getInitialData().paints;
+}
+
+function saveData() {
+    localStorage.setItem('sicoMixRecipes', JSON.stringify(recipes));
+    localStorage.setItem('sicoMixPaints', JSON.stringify(paintCatalog));
+}
+
+// ========== НАВІГАЦІЯ ==========
+function setupNavigation() {
+    // Mobile menu toggle
+    menuToggle.addEventListener('click', () => {
+        sidebar.classList.add('active');
+        document.body.style.overflow = 'hidden';
     });
-  }
+
+    desktopMenuToggle.addEventListener('click', () => {
+        sidebar.classList.add('active');
+        mainContainer.classList.add('sidebar-open');
+    });
+
+    closeSidebar.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        mainContainer.classList.remove('sidebar-open');
+        document.body.style.overflow = 'auto';
+    });
+
+    // Navigation links
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const pageId = this.getAttribute('data-page');
+            switchPage(pageId);
+            sidebar.classList.remove('active');
+            mainContainer.classList.remove('sidebar-open');
+            document.body.style.overflow = 'auto';
+        });
+    });
+
+    // Action cards
+    actionCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            e.preventDefault();
+            const pageId = this.getAttribute('data-page');
+            switchPage(pageId);
+        });
+    });
 }
 
-// Mobile Menu
-function toggleMobileMenu() {
-  elements.appNav.classList.toggle('active');
-}
-
-// Theme Management
-function applyTheme() {
-  const prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
-  const isDark = theme === 'dark' || (theme === 'auto' && prefersDark);
-  
-  document.documentElement.setAttribute('data-theme', theme);
-  document.body.classList.toggle('dark', isDark);
-  
-  // Update theme icon
-  const icon = qs('themeToggle').querySelector('.theme-icon');
-  icon.textContent = isDark ? '☀️' : '🌙';
-  
-  // Update meta theme-color
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', 
-    isDark ? '#0f172a' : '#f8fafc'
-  );
-}
-
-window.toggleTheme = () => {
-  theme = theme === 'dark' ? 'light' : 'dark';
-  localStorage.setItem("sico_theme", theme);
-  applyTheme();
-  showToast(t('themeChanged'), 'success');
-};
-
-window.setTheme = (newTheme) => {
-  theme = newTheme;
-  localStorage.setItem("sico_theme", theme);
-  applyTheme();
-  showToast(t('themeChanged'), 'success');
-};
-
-// Tab Navigation
-window.showTab = function (id) {
-  // Hide all tabs
-  qsa(".tab").forEach(t => t.classList.remove("active"));
-  
-  // Remove active class from all nav buttons
-  qsa(".nav-btn").forEach(btn => btn.classList.remove("active"));
-  
-  // Show selected tab
-  qs(id).classList.add("active");
-  
-  // Activate corresponding nav button
-  const navBtn = document.querySelector(`.nav-btn[onclick*="${id}"]`);
-  if (navBtn) {
-    navBtn.classList.add("active");
-  }
-  
-  // Load data for specific tabs
-  if (id === "recipes") {
-    renderRecipes();
-  } else if (id === "colors") {
-    renderColors();
-  } else if (id === "new") {
-    updateStats();
-  }
-  
-  // Close mobile menu if open
-  if (window.innerWidth <= 768) {
-    elements.appNav.classList.remove('active');
-  }
-  
-  // Update URL hash
-  window.history.pushState(null, null, `#${id}`);
-};
-
-// Check URL hash on load
-window.addEventListener('hashchange', () => {
-  const hash = window.location.hash.substring(1) || 'colors';
-  if (['colors', 'new', 'recipes', 'settings'].includes(hash)) {
-    showTab(hash);
-  }
-});
-
-// Initialize with hash or default
-const initialTab = window.location.hash.substring(1) || 'colors';
-showTab(initialTab);
-
-// Series Filter
-function initSeriesFilter() {
-  const select = qs("seriesFilter");
-  select.innerHTML = `
-    <option value="ALL">${t("allSeries")}</option>
-    ${SERIES.map(s => `
-      <option value="${s.id}">${s.id} - ${s.name[currentLang]}</option>
-    `).join('')}
-  `;
-  select.onchange = () => renderColors();
-}
-
-// Color Rendering
-function renderColors() {
-  const series = qs("seriesFilter").value;
-  const search = qs("colorSearch").value.toLowerCase();
-  
-  let filteredColors = COLORS;
-  
-  // Filter by series
-  if (series !== "ALL") {
-    filteredColors = filteredColors.filter(c => c.series === series);
-  }
-  
-  // Filter by search
-  if (search) {
-    filteredColors = filteredColors.filter(c => 
-      c.code.toLowerCase().includes(search) || 
-      c.name[currentLang].toLowerCase().includes(search)
-    );
-  }
-  
-  // Update count
-  qs('colorCount').textContent = `${filteredColors.length} ${t('colors')}`;
-  
-  // Render colors
-  elements.colorList.innerHTML = filteredColors.map(color => `
-    <div class="color-card" onclick="addColor('${color.code}')">
-      <div class="color-swatch" style="background:${color.hex}"></div>
-      <div class="color-info">
-        <div class="color-code">${color.code}</div>
-        <div class="color-name">${color.name[currentLang]}</div>
-        <div class="color-meta">
-          <span class="color-series">${color.series}</span>
-          <span class="color-hex">${color.hex}</span>
-        </div>
-      </div>
-      <div class="color-actions">
-        <button class="color-btn" onclick="event.stopPropagation(); addColor('${color.code}')">
-          +
-        </button>
-      </div>
-    </div>
-  `).join("");
-}
-
-function renderAddColors() {
-  const search = qs("recipeSearch").value.toLowerCase();
-  let filteredColors = COLORS;
-  
-  // Filter by current series
-  if (currentSeries) {
-    filteredColors = filteredColors.filter(c => c.series === currentSeries);
-  }
-  
-  // Filter by search
-  if (search) {
-    filteredColors = filteredColors.filter(c => 
-      c.code.toLowerCase().includes(search) || 
-      c.name[currentLang].toLowerCase().includes(search)
-    );
-  }
-  
-  elements.addColorList.innerHTML = filteredColors.map(color => `
-    <div class="color-card compact" onclick="addColor('${color.code}')">
-      <div class="color-swatch" style="background:${color.hex}"></div>
-      <div class="color-info">
-        <div class="color-code">${color.code}</div>
-        <div class="color-name">${color.name[currentLang]}</div>
-      </div>
-    </div>
-  `).join("");
-}
-
-// Recipe Operations
-window.addColor = function (code) {
-  const color = getColorByCode(code);
-  
-  // Check if we can add this color
-  if (!currentSeries) {
-    currentSeries = color.series;
-    elements.seriesBadge.textContent = currentSeries;
-    elements.seriesBadge.style.display = "inline-flex";
-    showToast(`${t('seriesSet')}: ${currentSeries}`, 'info');
-  }
-  
-  if (color.series !== currentSeries) {
-    showToast(t("errorSeries"), 'error');
-    return;
-  }
-  
-  // Check for duplicates
-  if (currentRecipe.items.find(i => i.code === code)) {
-    showToast(t("colorAlreadyAdded"), 'warning');
-    return;
-  }
-  
-  // Add color with initial percentage based on existing colors
-  const initialPercent = currentRecipe.items.length === 0 ? 100 : 0;
-  
-  currentRecipe.items.push({ 
-    code, 
-    percent: initialPercent,
-    name: color.name[currentLang],
-    hex: color.hex
-  });
-  
-  // Recalculate percentages if needed
-  if (currentRecipe.items.length > 1) {
-    redistributePercentages();
-  }
-  
-  autoSaveDraft();
-  renderCurrentRecipe();
-  renderAddColors();
-  updateStats();
-};
-
-function redistributePercentages() {
-  const totalItems = currentRecipe.items.length;
-  const equalPercent = 100 / totalItems;
-  
-  currentRecipe.items.forEach(item => {
-    item.percent = parseFloat(equalPercent.toFixed(2));
-  });
-}
-
-window.updateItem = (index, value) => {
-  const numValue = parseFloat(value) || 0;
-  const total = getTotalWeight();
-  
-  if (mode === "percent") {
-    currentRecipe.items[index].percent = clamp(numValue, 0, 100);
-  } else {
-    const percent = (numValue / total) * 100;
-    currentRecipe.items[index].percent = clamp(percent, 0, 100);
-  }
-  
-  autoSaveDraft();
-  renderCurrentRecipe();
-  updateStats();
-};
-
-window.removeItem = index => {
-  currentRecipe.items.splice(index, 1);
-  
-  if (currentRecipe.items.length === 0) {
-    currentSeries = null;
-    elements.seriesBadge.style.display = "none";
-  }
-  
-  autoSaveDraft();
-  renderCurrentRecipe();
-  renderAddColors();
-  updateStats();
-};
-
-// Recipe Rendering
-window.renderCurrentRecipe = function () {
-  const totalWeight = getTotalWeight();
-  
-  if (currentRecipe.items.length === 0) {
-    elements.recipeItems.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🎨</div>
-        <p>${t("noColorsAdded")}</p>
-        <button class="btn-secondary" onclick="showTab('colors')">
-          ${t("browseColors")}
-        </button>
-      </div>
-    `;
-    return;
-  }
-  
-  // Calculate total percentage
-  const totalPercent = currentRecipe.items.reduce((sum, item) => sum + item.percent, 0);
-  
-  elements.recipeItems.innerHTML = currentRecipe.items.map((item, index) => {
-    const color = getColorByCode(item.code);
-    const value = mode === "percent" 
-      ? item.percent 
-      : (item.percent * totalWeight / 100);
-    const formattedValue = formatNumber(value, mode === "percent" ? 2 : 1);
+function switchPage(pageId) {
+    // Hide all pages
+    pageContents.forEach(page => {
+        page.classList.remove('active');
+    });
     
-    return `
-      <div class="recipe-item">
-        <div class="recipe-color">
-          <div class="color-chip" style="background: ${color.hex}"></div>
-          <div>
-            <div class="color-code">${item.code}</div>
-            <div class="color-name">${color.name[currentLang]}</div>
-          </div>
-        </div>
-        <div class="recipe-input-group">
-          <input 
-            type="number" 
-            class="recipe-input" 
-            value="${formattedValue}"
-            step="${mode === 'percent' ? '0.1' : '0.1'}"
-            min="0"
-            onchange="updateItem(${index}, this.value)"
-          >
-          <span class="recipe-unit">${mode === "percent" ? "%" : "g"}</span>
-        </div>
-        <button class="recipe-remove" onclick="removeItem(${index})">
-          ✕
-        </button>
-      </div>
-    `;
-  }).join("");
-  
-  // Update summary
-  updateRecipeSummary(totalPercent, totalWeight);
-};
-
-function updateRecipeSummary(totalPercent, totalWeight) {
-  const percentClass = totalPercent < 95 || totalPercent > 105 ? 'warning' : '';
-  
-  elements.totalColors.textContent = currentRecipe.items.length;
-  elements.totalPercent.innerHTML = `
-    <span class="${percentClass}">${formatNumber(totalPercent, 2)}%</span>
-  `;
-  elements.totalWeightGrams.textContent = `${formatNumber(totalWeight, 1)} g`;
-  
-  // Update warning if needed
-  if (totalPercent < 95 || totalPercent > 105) {
-    showToast(t("sumWarning"), 'warning', 5000);
-  }
-}
-
-function getTotalWeight() {
-  const weightSelect = qs('totalWeight');
-  if (weightSelect.value === 'custom') {
-    return parseFloat(qs('customWeight').value) || 1000;
-  }
-  return parseFloat(weightSelect.value) || 1000;
-}
-
-// Mode Toggle
-window.toggleMode = checkbox => {
-  mode = checkbox.checked ? "gram" : "percent";
-  localStorage.setItem("sico_mode", mode);
-  renderCurrentRecipe();
-  showToast(`${t('modeChanged')}: ${mode === 'percent' ? '%' : 'g'}`, 'info');
-};
-
-// Recipe Validation
-function validateRecipe() {
-  const totalPercent = currentRecipe.items.reduce((sum, item) => sum + item.percent, 0);
-  const recipeName = qs("recipeName").value.trim();
-  
-  // Check percentage sum
-  if (totalPercent < 95 || totalPercent > 105) {
-    showModal(
-      t("warning"),
-      `${t("sumWarning")} (${formatNumber(totalPercent, 2)}%)`,
-      () => {} // Empty callback for confirmation
-    );
-    return false;
-  }
-  
-  // Check required fields
-  if (!recipeName) {
-    showToast(t("errorEmptyName"), 'error');
-    qs("recipeName").focus();
-    return false;
-  }
-  
-  if (!currentRecipe.items.length) {
-    showToast(t("errorEmptyRecipe"), 'error');
-    return false;
-  }
-  
-  return true;
-}
-
-// Save Recipe
-window.saveRecipe = function () {
-  if (!validateRecipe()) return;
-  
-  showLoading();
-  
-  try {
-    // Update recipe data
-    currentRecipe.name = qs("recipeName").value.trim();
-    currentRecipe.note = qs("recipeNote").value;
-    currentRecipe.series = currentSeries;
-    currentRecipe.status = qs("recipeStatus").value;
-    currentRecipe.updatedAt = new Date().toISOString();
-    currentRecipe.totalPercent = currentRecipe.items.reduce((sum, item) => sum + item.percent, 0);
-    currentRecipe.totalWeight = getTotalWeight();
-    
-    // Calculate weights for each item
-    currentRecipe.items = calculateWeights(currentRecipe.items, currentRecipe.totalWeight);
-    
-    // Check if updating existing or creating new
-    const existingIndex = recipes.findIndex(r => r.id === currentRecipe.id);
-    
-    if (existingIndex > -1) {
-      recipes[existingIndex] = { ...currentRecipe };
-    } else {
-      recipes.push({ ...currentRecipe });
+    // Show selected page
+    const selectedPage = document.getElementById(`${pageId}-page`);
+    if (selectedPage) {
+        selectedPage.classList.add('active');
+        
+        // Update page specific data
+        if (pageId === 'recipes') {
+            renderRecipes();
+        } else if (pageId === 'catalog') {
+            renderPaintCatalog();
+        }
     }
     
-    // Save to localStorage
-    localStorage.setItem("sico_recipes", JSON.stringify(recipes));
-    
-    // Show success
-    showToast(t("savedSuccess"), 'success');
-    
-    // Clear draft and show recipes
-    setTimeout(() => {
-      clearDraft();
-      showTab("recipes");
-      hideLoading();
-    }, 1000);
-    
-  } catch (error) {
-    hideLoading();
-    showToast(t("saveError"), 'error');
-    console.error('Save error:', error);
-  }
-};
-
-// Draft Management
-function autoSaveDraft() {
-  currentRecipe.name = qs("recipeName").value.trim();
-  currentRecipe.note = qs("recipeNote").value;
-  currentRecipe.status = qs("recipeStatus").value;
-  currentRecipe.updatedAt = new Date().toISOString();
-  localStorage.setItem("sico_draft", JSON.stringify(currentRecipe));
+    // Update active navigation link
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('data-page') === pageId) {
+            link.classList.add('active');
+        }
+    });
 }
 
-function loadDraft() {
-  const draft = JSON.parse(localStorage.getItem("sico_draft"));
-  
-  if (draft) {
-    currentRecipe = draft;
-    currentSeries = draft.series || null;
+// ========== НОВИЙ РЕЦЕПТ ==========
+function renderIngredientsList() {
+    ingredientsList.innerHTML = '';
     
-    // Update UI
-    elements.seriesBadge.textContent = currentSeries || '';
-    elements.seriesBadge.style.display = currentSeries ? "inline-flex" : "none";
-    qs("recipeName").value = draft.name || '';
-    qs("recipeNote").value = draft.note || '';
-    qs("recipeStatus").value = draft.status || 'draft';
+    selectedIngredients.forEach((ingredient, index) => {
+        const paint = paintCatalog.find(p => p.id === ingredient.paintId);
+        if (!paint) return;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 20px; height: 20px; background: ${paint.color}; border-radius: 4px;"></div>
+                    <div>
+                        <div style="font-weight: 600;">${paint.name}</div>
+                        <div style="font-size: 12px; color: var(--gray);">${paint.category}</div>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <input type="number" class="input-small" value="${ingredient.amount}" 
+                       data-index="${index}" data-field="amount" min="0" step="0.1">
+            </td>
+            <td>
+                <select class="unit-select" data-index="${index}" data-field="unit">
+                    <option value="г" ${ingredient.unit === 'г' ? 'selected' : ''}>г</option>
+                    <option value="кг" ${ingredient.unit === 'кг' ? 'selected' : ''}>кг</option>
+                    <option value="мл" ${ingredient.unit === 'мл' ? 'selected' : ''}>мл</option>
+                    <option value="л" ${ingredient.unit === 'л' ? 'selected' : ''}>л</option>
+                </select>
+            </td>
+            <td>
+                <input type="number" class="input-small" value="${ingredient.percentage || 0}" 
+                       data-index="${index}" data-field="percentage" min="0" max="100" step="0.1" readonly>
+                <span style="margin-left: 5px;">%</span>
+            </td>
+            <td>
+                <button class="btn-icon delete-ingredient" data-index="${index}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        ingredientsList.appendChild(row);
+    });
+
+    // Add event listeners
+    ingredientsList.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('change', handleIngredientChange);
+    });
+
+    ingredientsList.querySelectorAll('.delete-ingredient').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            deleteIngredient(index);
+        });
+    });
+}
+
+function handleIngredientChange(e) {
+    const index = parseInt(e.target.getAttribute('data-index'));
+    const field = e.target.getAttribute('data-field');
+    const value = e.target.value;
     
-    // Handle photo
-    if (draft.photo) {
-      elements.photoPreview.querySelector('img').src = draft.photo;
-      elements.photoPreview.querySelector('img').style.display = 'block';
-      elements.photoPreview.style.display = 'block';
+    selectedIngredients[index][field] = field === 'amount' ? parseFloat(value) : value;
+    
+    // If amount changed, recalculate percentages
+    if (field === 'amount') {
+        calculatePercentages();
     }
-    
-    renderCurrentRecipe();
-    renderAddColors();
-    updateStats();
-  }
 }
 
-window.clearDraft = function () {
-  currentRecipe = { 
-    id: generateId(), 
-    items: [], 
-    status: 'draft', 
-    photo: null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-  currentSeries = null;
-  
-  // Reset UI
-  elements.seriesBadge.style.display = "none";
-  qs("recipeName").value = "";
-  qs("recipeNote").value = "";
-  qs("recipeStatus").value = "draft";
-  elements.photoPreview.querySelector('img').src = "";
-  elements.photoPreview.querySelector('img').style.display = 'none';
-  elements.photoPreview.style.display = 'none';
-  
-  // Clear localStorage
-  localStorage.removeItem("sico_draft");
-  
-  // Re-render
-  renderCurrentRecipe();
-  renderAddColors();
-  updateStats();
-  
-  showToast(t("draftCleared"), 'success');
-};
-
-// Recipes List
-window.renderRecipes = function () {
-  if (recipes.length === 0) {
-    elements.recipeList.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <h3>${t("noRecipes")}</h3>
-        <p>${t("createFirstRecipe")}</p>
-        <button class="btn-primary" onclick="showTab('new')">
-          ${t("createRecipe")}
-        </button>
-      </div>
-    `;
-    return;
-  }
-  
-  // Apply filters
-  let filteredRecipes = recipes;
-  
-  if (recipeFilter !== 'all') {
-    filteredRecipes = filteredRecipes.filter(r => r.status === recipeFilter);
-  }
-  
-  const searchTerm = qs('recipeSearchList').value.toLowerCase();
-  if (searchTerm) {
-    filteredRecipes = filteredRecipes.filter(r => 
-      r.name.toLowerCase().includes(searchTerm) ||
-      r.note.toLowerCase().includes(searchTerm) ||
-      r.series.toLowerCase().includes(searchTerm)
-    );
-  }
-  
-  // Render recipes
-  elements.recipeList.innerHTML = filteredRecipes.map(recipe => {
-    const date = new Date(recipe.updatedAt).toLocaleDateString(currentLang);
-    const colorDots = recipe.items.slice(0, 12).map(item => 
-      `<div class="color-dot" style="background: ${getColorByCode(item.code)?.hex || '#ccc'}"></div>`
-    ).join('');
+function addIngredient() {
+    const searchTerm = paintSearch.value.toLowerCase();
+    const category = categoryFilter.value;
     
-    return `
-      <div class="recipe-card" onclick="editRecipe('${recipe.id}')">
-        <div class="recipe-card-header">
-          <div>
-            <div class="recipe-name">${recipe.name}</div>
-            <div class="recipe-meta">
-              <span>${recipe.series}</span>
-              <span>•</span>
-              <span>${recipe.items.length} ${t('colors')}</span>
-              <span>•</span>
-              <span>${date}</span>
-            </div>
-          </div>
-          <span class="recipe-status ${recipe.status}">${t(recipe.status)}</span>
-        </div>
-        
-        ${recipe.note ? `<div class="recipe-note">${recipe.note}</div>` : ''}
-        
-        ${recipe.items.length > 0 ? `
-          <div class="recipe-colors">
-            ${colorDots}
-            ${recipe.items.length > 12 ? `<span class="more-colors">+${recipe.items.length - 12}</span>` : ''}
-          </div>
-        ` : ''}
-        
-        <div class="recipe-actions">
-          <button class="btn-secondary" onclick="event.stopPropagation(); exportRecipeJson('${recipe.id}')">
-            JSON
-          </button>
-          <button class="btn-secondary" onclick="event.stopPropagation(); exportRecipePdf('${recipe.id}')">
-            PDF
-          </button>
-          <button class="btn-danger" onclick="event.stopPropagation(); confirmDelete('${recipe.id}')">
-            ${t('delete')}
-          </button>
-        </div>
-      </div>
-    `;
-  }).join("");
-};
-
-window.filterRecipes = function () {
-  renderRecipes();
-};
-
-window.setRecipeFilter = function (filter) {
-  recipeFilter = filter;
-  
-  // Update filter buttons
-  qsa('.filter-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.filter === filter);
-  });
-  
-  renderRecipes();
-};
-
-// Recipe Operations
-window.editRecipe = function (id) {
-  const recipe = recipes.find(r => r.id === id);
-  
-  if (recipe) {
-    currentRecipe = JSON.parse(JSON.stringify(recipe)); // Deep clone
-    loadDraft();
-    showTab('new');
-    showToast(t('recipeLoaded'), 'success');
-  }
-};
-
-window.confirmDelete = function (id) {
-  const recipe = recipes.find(r => r.id === id);
-  if (!recipe) return;
-  
-  showModal(
-    t('confirmDelete'),
-    `${t('confirmDeleteMsg')} "${recipe.name}"?`,
-    () => deleteRecipe(id)
-  );
-};
-
-function deleteRecipe(id) {
-  recipes = recipes.filter(r => r.id !== id);
-  localStorage.setItem("sico_recipes", JSON.stringify(recipes));
-  renderRecipes();
-  showToast(t('recipeDeleted'), 'success');
-}
-
-// Import/Export
-window.importRecipes = function () {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  
-  input.onchange = e => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
+    let filteredPaints = paintCatalog;
     
-    reader.onload = event => {
-      try {
-        const imported = JSON.parse(event.target.result);
-        const newRecipes = Array.isArray(imported) ? imported : [imported];
-        
-        // Validate recipes
-        const validRecipes = newRecipes.filter(r => 
-          r && r.id && r.name && Array.isArray(r.items)
+    if (searchTerm) {
+        filteredPaints = filteredPaints.filter(paint => 
+            paint.name.toLowerCase().includes(searchTerm) ||
+            paint.category.toLowerCase().includes(searchTerm)
         );
-        
-        // Merge with existing (avoid duplicates by ID)
-        const existingIds = new Set(recipes.map(r => r.id));
-        const uniqueNewRecipes = validRecipes.filter(r => !existingIds.has(r.id));
-        
-        recipes = [...recipes, ...uniqueNewRecipes];
-        localStorage.setItem("sico_recipes", JSON.stringify(recipes));
-        
-        renderRecipes();
-        showToast(`${t('importSuccess')}: ${uniqueNewRecipes.length}`, 'success');
-        
-      } catch (error) {
-        showToast(t('importError'), 'error');
-        console.error('Import error:', error);
-      }
+    }
+    
+    if (category) {
+        filteredPaints = filteredPaints.filter(paint => paint.category === category);
+    }
+    
+    if (filteredPaints.length === 0) {
+        showNotification('Фарб не знайдено', 'error');
+        return;
+    }
+    
+    // Show paint selection modal
+    showPaintSelection(filteredPaints);
+}
+
+function showPaintSelection(paints) {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Оберіть фарбу</h3>
+                <button class="modal-close close-paint-selection">&times;</button>
+            </div>
+            <div style="max-height: 400px; overflow-y: auto;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; padding: 10px;">
+                    ${paints.map(paint => `
+                        <div class="paint-selection-card" data-id="${paint.id}" 
+                             style="padding: 15px; border: 2px solid var(--light-gray); border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s ease;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <div style="width: 30px; height: 30px; background: ${paint.color}; border-radius: 6px;"></div>
+                                <div style="font-weight: 600;">${paint.name}</div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--gray);">
+                                ${paint.category} • ${paint.manufacturer}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Event listeners
+    modal.querySelector('.close-paint-selection').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    modal.querySelectorAll('.paint-selection-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const paintId = parseInt(this.getAttribute('data-id'));
+            
+            // Check if paint already added
+            if (selectedIngredients.some(ing => ing.paintId === paintId)) {
+                showNotification('Ця фарба вже додана до рецепту', 'warning');
+                return;
+            }
+            
+            selectedIngredients.push({
+                paintId: paintId,
+                amount: 100,
+                unit: 'г',
+                percentage: 0
+            });
+            
+            calculatePercentages();
+            renderIngredientsList();
+            document.body.removeChild(modal);
+            showNotification('Фарбу додано до рецепту');
+        });
+    });
+}
+
+function deleteIngredient(index) {
+    selectedIngredients.splice(index, 1);
+    calculatePercentages();
+    renderIngredientsList();
+}
+
+function calculatePercentages() {
+    const totalAmount = selectedIngredients.reduce((sum, ing) => sum + ing.amount, 0);
+    
+    if (totalAmount === 0) return;
+    
+    selectedIngredients.forEach((ingredient, index) => {
+        ingredient.percentage = ((ingredient.amount / totalAmount) * 100).toFixed(1);
+    });
+    
+    renderIngredientsList();
+}
+
+function saveRecipe() {
+    const name = document.getElementById('recipeName').value;
+    const category = document.getElementById('recipeCategory').value;
+    const color = document.getElementById('recipeColor').value;
+    const description = document.getElementById('recipeDescription').value;
+    
+    if (!name || !category || selectedIngredients.length === 0) {
+        showNotification('Будь ласка, заповніть всі обов\'язкові поля та додайте хоча б один інгредієнт', 'error');
+        return;
+    }
+    
+    const newRecipe = {
+        id: Date.now(),
+        name,
+        category,
+        color,
+        description,
+        ingredients: [...selectedIngredients],
+        date: new Date().toLocaleDateString('uk-UA'),
+        photo: null
     };
     
-    reader.readAsText(file);
-  };
-  
-  input.click();
-};
+    recipes.push(newRecipe);
+    saveData();
+    
+    showNotification(`Рецепт "${name}" успішно збережено!`);
+    clearRecipeForm();
+    switchPage('recipes');
+}
 
-window.exportRecipeJson = function (id) {
-  const recipe = recipes.find(r => r.id === id);
-  if (!recipe) return;
-  
-  const dataStr = JSON.stringify(recipe, null, 2);
-  const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-  
-  const link = document.createElement('a');
-  link.href = dataUri;
-  link.download = `sico-recipe-${recipe.name.replace(/\s+/g, '-')}.json`;
-  link.click();
-  
-  showToast(t('exportSuccess'), 'success');
-};
+function clearRecipeForm() {
+    document.getElementById('recipeName').value = '';
+    document.getElementById('recipeCategory').value = '';
+    document.getElementById('recipeColor').value = '#4361ee';
+    document.getElementById('recipeDescription').value = '';
+    colorPreview.style.background = '#4361ee';
+    selectedIngredients = [];
+    renderIngredientsList();
+}
 
-window.exportRecipePdf = function (id) {
-  const recipe = recipes.find(r => r.id === id);
-  if (!recipe) return;
-  
-  try {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+// ========== РЕЦЕПТИ ==========
+function renderRecipes() {
+    const searchTerm = document.getElementById('recipeSearch')?.value.toLowerCase() || '';
+    const category = document.getElementById('recipeCategoryFilter')?.value || '';
     
-    // Add logo/title
-    doc.setFontSize(20);
-    doc.setTextColor(59, 130, 246);
-    doc.text('SICO MIX', 20, 20);
-    doc.setFontSize(12);
-    doc.setTextColor(100, 100, 100);
-    doc.text('Paint Mixing Recipe', 20, 30);
+    let filteredRecipes = recipes;
     
-    // Recipe info
-    doc.setFontSize(16);
-    doc.setTextColor(0, 0, 0);
-    doc.text(recipe.name, 20, 45);
-    
-    doc.setFontSize(10);
-    doc.text(`Series: ${recipe.series}`, 20, 55);
-    doc.text(`Status: ${t(recipe.status)}`, 20, 60);
-    doc.text(`Created: ${new Date(recipe.createdAt).toLocaleDateString()}`, 20, 65);
-    
-    if (recipe.note) {
-      doc.text(`Note: ${recipe.note}`, 20, 75);
+    if (searchTerm) {
+        filteredRecipes = filteredRecipes.filter(recipe => 
+            recipe.name.toLowerCase().includes(searchTerm) ||
+            recipe.description?.toLowerCase().includes(searchTerm)
+        );
     }
     
-    // Table data
-    const tableData = recipe.items.map((item, index) => [
-      index + 1,
-      item.code,
-      item.name,
-      `${formatNumber(item.percent, 2)}%`,
-      `${formatNumber(item.weight || 0, 1)}g`
-    ]);
+    if (category) {
+        filteredRecipes = filteredRecipes.filter(recipe => recipe.category === category);
+    }
     
-    // Create table
-    doc.autoTable({
-      head: [['#', 'Code', 'Name', 'Percentage', 'Weight']],
-      body: tableData,
-      startY: 85,
-      theme: 'striped',
-      headStyles: { fillColor: [59, 130, 246] },
-      margin: { left: 20 }
+    recipesContainer.innerHTML = filteredRecipes.map(recipe => {
+        const totalAmount = recipe.ingredients.reduce((sum, ing) => sum + ing.amount, 0);
+        
+        return `
+            <div class="recipe-card" data-id="${recipe.id}">
+                ${recipe.photo ? 
+                    `<img src="${recipe.photo}" class="recipe-image" alt="${recipe.name}">` :
+                    `<div class="recipe-image" style="background: linear-gradient(135deg, ${recipe.color}30, ${recipe.color}60); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-palette" style="font-size: 60px; color: ${recipe.color};"></i>
+                    </div>`
+                }
+                <div class="recipe-content">
+                    <div class="recipe-header">
+                        <div>
+                            <h3 class="recipe-title">${recipe.name}</h3>
+                            <span class="recipe-category">${recipe.category}</span>
+                        </div>
+                        <label style="display: flex; align-items: center;">
+                            <input type="checkbox" class="recipe-select" value="${recipe.id}" style="margin-right: 5px;">
+                            Обрати
+                        </label>
+                    </div>
+                    <p class="recipe-description">${recipe.description || 'Опис відсутній'}</p>
+                    <div class="recipe-meta">
+                        <div>
+                            <div style="font-size: 12px; color: var(--gray);">Інгредієнтів</div>
+                            <div style="font-weight: 600;">${recipe.ingredients.length}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--gray);">Загальна вага</div>
+                            <div style="font-weight: 600;">${totalAmount} г</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--gray);">Дата</div>
+                            <div style="font-weight: 600;">${recipe.date}</div>
+                        </div>
+                    </div>
+                    <div class="recipe-actions">
+                        <button class="recipe-btn" style="background: var(--primary); color: white;" onclick="editRecipe(${recipe.id})">
+                            <i class="fas fa-edit"></i> Редагувати
+                        </button>
+                        <button class="recipe-btn" style="background: var(--danger); color: white;" onclick="deleteRecipe(${recipe.id})">
+                            <i class="fas fa-trash"></i> Видалити
+                        </button>
+                        <button class="recipe-btn" style="background: var(--success); color: white;" onclick="exportRecipe(${recipe.id})">
+                            <i class="fas fa-download"></i> Експорт
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('') || '<p style="text-align: center; color: var(--gray); padding: 40px;">Рецептів не знайдено</p>';
+    
+    // Update recipe selection
+    updateRecipeSelection();
+}
+
+function updateRecipeSelection() {
+    const checkboxes = recipesContainer.querySelectorAll('.recipe-select');
+    selectedRecipes = [];
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const recipeId = parseInt(this.value);
+            
+            if (this.checked) {
+                selectedRecipes.push(recipeId);
+            } else {
+                selectedRecipes = selectedRecipes.filter(id => id !== recipeId);
+            }
+        });
+    });
+}
+
+function deleteRecipe(id) {
+    showConfirmation(
+        'Видалення рецепту',
+        'Ви впевнені, що хочете видалити цей рецепт?',
+        () => {
+            recipes = recipes.filter(recipe => recipe.id !== id);
+            saveData();
+            renderRecipes();
+            showNotification('Рецепт видалено');
+        }
+    );
+}
+
+function deleteSelectedRecipes() {
+    if (selectedRecipes.length === 0) {
+        showNotification('Оберіть рецепти для видалення', 'warning');
+        return;
+    }
+    
+    showConfirmation(
+        'Видалення рецептів',
+        `Ви впевнені, що хочете видалити ${selectedRecipes.length} рецептів?`,
+        () => {
+            recipes = recipes.filter(recipe => !selectedRecipes.includes(recipe.id));
+            selectedRecipes = [];
+            saveData();
+            renderRecipes();
+            showNotification(`Видалено ${selectedRecipes.length} рецептів`);
+        }
+    );
+}
+
+function exportRecipe(id) {
+    const recipe = recipes.find(r => r.id === id);
+    if (!recipe) return;
+    
+    const dataStr = JSON.stringify(recipe, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const exportFileDefaultName = `${recipe.name.replace(/\s+/g, '_')}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    showNotification(`Рецепт "${recipe.name}" експортовано`);
+}
+
+function exportAllRecipes() {
+    if (recipes.length === 0) {
+        showNotification('Немає рецептів для експорту', 'warning');
+        return;
+    }
+    
+    const dataStr = JSON.stringify(recipes, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const exportFileDefaultName = `sico_mix_recipes_${new Date().toISOString().split('T')[0]}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    showNotification(`Експортовано ${recipes.length} рецептів`);
+}
+
+function importRecipes() {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+    
+    fileInput.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = event => {
+            try {
+                const importedRecipes = JSON.parse(event.target.result);
+                
+                if (!Array.isArray(importedRecipes)) {
+                    showNotification('Невірний формат файлу', 'error');
+                    return;
+                }
+                
+                showConfirmation(
+                    'Імпорт рецептів',
+                    `Виявлено ${importedRecipes.length} рецептів. Імпортувати?`,
+                    () => {
+                        importedRecipes.forEach(recipe => {
+                            recipe.id = Date.now() + Math.random();
+                            recipes.push(recipe);
+                        });
+                        
+                        saveData();
+                        renderRecipes();
+                        showNotification(`Імпортовано ${importedRecipes.length} рецептів`);
+                    }
+                );
+            } catch (error) {
+                showNotification('Помилка читання файлу', 'error');
+            }
+        };
+        reader.readAsText(file);
+    };
+    
+    fileInput.click();
+}
+
+function printRecipes() {
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Друк рецептів SICO MIX</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                h1 { color: #4361ee; }
+                .recipe { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; }
+                table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background: #f5f5f5; }
+            </style>
+        </head>
+        <body>
+            <h1>Рецепти SICO MIX</h1>
+            <p>Дата друку: ${new Date().toLocaleDateString('uk-UA')}</p>
+            <hr>
+            ${recipes.map(recipe => `
+                <div class="recipe">
+                    <h2>${recipe.name}</h2>
+                    <p><strong>Категорія:</strong> ${recipe.category}</p>
+                    <p><strong>Дата створення:</strong> ${recipe.date}</p>
+                    <p><strong>Опис:</strong> ${recipe.description || '—'}</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Фарба</th>
+                                <th>Кількість</th>
+                                <th>Відсоток</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${recipe.ingredients.map(ing => {
+                                const paint = paintCatalog.find(p => p.id === ing.paintId);
+                                return `
+                                    <tr>
+                                        <td>${paint ? paint.name : 'Невідомо'}</td>
+                                        <td>${ing.amount} ${ing.unit}</td>
+                                        <td>${ing.percentage || 0}%</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `).join('')}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+// ========== КАТАЛОГ ФАРБ ==========
+function renderPaintCatalog() {
+    paintCatalogElement.innerHTML = paintCatalog.map(paint => `
+        <div class="recipe-card">
+            <div class="recipe-image" style="background: ${paint.color};"></div>
+            <div class="recipe-content">
+                <div class="recipe-header">
+                    <div>
+                        <h3 class="recipe-title">${paint.name}</h3>
+                        <span class="recipe-category">${paint.category}</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div style="display: flex; gap: 15px; margin-bottom: 10px;">
+                        <div>
+                            <div style="font-size: 12px; color: var(--gray);">Виробник</div>
+                            <div style="font-weight: 600;">${paint.manufacturer}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--gray);">Артикул</div>
+                            <div style="font-weight: 600;">${paint.article}</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 14px; color: var(--gray); line-height: 1.5;">
+                        ${paint.description || 'Опис відсутній'}
+                    </div>
+                </div>
+                <div class="recipe-actions">
+                    <button class="recipe-btn" style="background: var(--primary); color: white;" onclick="editPaint(${paint.id})">
+                        <i class="fas fa-edit"></i> Редагувати
+                    </button>
+                    <button class="recipe-btn" style="background: var(--danger); color: white;" onclick="deletePaint(${paint.id})">
+                        <i class="fas fa-trash"></i> Видалити
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('') || '<p style="text-align: center; color: var(--gray); padding: 40px;">Каталог порожній</p>';
+    
+    updatePaintCount();
+}
+
+function addNewPaint() {
+    // Reset form
+    document.getElementById('paintName').value = '';
+    document.getElementById('paintCategory').value = '';
+    document.getElementById('paintColorCode').value = '';
+    document.getElementById('paintDescription').value = '';
+    document.getElementById('paintManufacturer').value = '';
+    document.getElementById('paintArticle').value = '';
+    
+    addPaintModal.classList.add('active');
+}
+
+function saveNewPaint() {
+    const name = document.getElementById('paintName').value;
+    const category = document.getElementById('paintCategory').value;
+    const color = document.getElementById('paintColorCode').value;
+    const description = document.getElementById('paintDescription').value;
+    const manufacturer = document.getElementById('paintManufacturer').value;
+    const article = document.getElementById('paintArticle').value;
+    
+    if (!name || !category) {
+        showNotification('Будь ласка, заповніть обов\'язкові поля', 'error');
+        return;
+    }
+    
+    const newPaint = {
+        id: Date.now(),
+        name,
+        category,
+        color: color || '#000000',
+        description,
+        manufacturer: manufacturer || 'SICO',
+        article: article || ''
+    };
+    
+    paintCatalog.push(newPaint);
+    saveData();
+    
+    addPaintModal.classList.remove('active');
+    renderPaintCatalog();
+    showNotification(`Фарбу "${name}" додано до каталогу`);
+}
+
+function deletePaint(id) {
+    showConfirmation(
+        'Видалення фарби',
+        'Ви впевнені, що хочете видалити цю фарбу з каталогу?',
+        () => {
+            paintCatalog = paintCatalog.filter(paint => paint.id !== id);
+            saveData();
+            renderPaintCatalog();
+            showNotification('Фарбу видалено з каталогу');
+        }
+    );
+}
+
+function updatePaintCount() {
+    const count = paintCatalog.length;
+    totalPaintsElement.textContent = count;
+    headerPaintCount.textContent = count;
+}
+
+// ========== УТІЛІТИ ==========
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    const bgColor = type === 'success' ? 'var(--primary)' : 
+                   type === 'error' ? 'var(--danger)' : 
+                   type === 'warning' ? 'var(--warning)' : 'var(--gray)';
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: white;
+        padding: 15px 25px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-hover);
+        z-index: 1001;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    const icon = type === 'success' ? 'fa-check-circle' :
+                type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+    
+    notification.innerHTML = `
+        <i class="fas ${icon}"></i>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+function showConfirmation(title, message, onConfirm) {
+    confirmationTitle.textContent = title;
+    confirmationMessage.textContent = message;
+    confirmationModal.classList.add('active');
+    
+    const handleConfirm = () => {
+        onConfirm();
+        confirmationModal.classList.remove('active');
+    };
+    
+    const handleCancel = () => {
+        confirmationModal.classList.remove('active');
+    };
+    
+    confirmActionBtn.onclick = handleConfirm;
+    cancelActionBtn.onclick = handleCancel;
+    closeConfirmationModal.onclick = handleCancel;
+}
+
+// ========== НАЛАШТУВАННЯ ПОДІЙ ==========
+function setupEventListeners() {
+    setupNavigation();
+    
+    // Color picker
+    recipeColor.addEventListener('input', function() {
+        colorPreview.style.background = this.value;
     });
     
-    // Footer
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text(
-        `Page ${i} of ${pageCount} • Generated by SICO MIX`,
-        doc.internal.pageSize.width / 2,
-        doc.internal.pageSize.height - 10,
-        { align: 'center' }
-      );
-    }
+    // File upload
+    const recipePhotoInput = document.getElementById('recipePhoto');
+    recipePhotoInput.addEventListener('change', function() {
+        const fileName = this.files[0]?.name || 'Завантажити фото';
+        document.getElementById('fileName').textContent = fileName;
+    });
     
-    // Save PDF
-    doc.save(`sico-recipe-${recipe.name.replace(/\s+/g, '-')}.pdf`);
-    showToast(t('pdfExported'), 'success');
+    // New recipe buttons
+    addIngredientBtn.addEventListener('click', addIngredient);
+    saveRecipeBtn.addEventListener('click', saveRecipe);
+    clearRecipeBtn.addEventListener('click', clearRecipeForm);
+    calculatePercentagesBtn.addEventListener('click', calculatePercentages);
     
-  } catch (error) {
-    showToast(t('exportError'), 'error');
-    console.error('PDF export error:', error);
-  }
-};
-
-window.exportAllData = function () {
-  const data = {
-    version: '2.0.0',
-    exportedAt: new Date().toISOString(),
-    recipes: recipes,
-    settings: {
-      mode: mode,
-      theme: theme,
-      language: currentLang
-    }
-  };
-  
-  const dataStr = JSON.stringify(data, null, 2);
-  const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-  
-  const link = document.createElement('a');
-  link.href = dataUri;
-  link.download = `sico-mix-backup-${new Date().toISOString().split('T')[0]}.json`;
-  link.click();
-  
-  showToast(t('backupCreated'), 'success');
-};
-
-window.backupData = function () {
-  exportAllData();
-};
-
-window.confirmReset = function () {
-  showModal(
-    t('confirmReset'),
-    t('confirmResetMsg'),
-    resetAllData
-  );
-};
-
-function resetAllData() {
-  // Clear all data
-  recipes = [];
-  localStorage.removeItem("sico_recipes");
-  localStorage.removeItem("sico_draft");
-  localStorage.removeItem("sico_mode");
-  localStorage.removeItem("sico_theme");
-  localStorage.removeItem("sico_lang");
-  
-  // Reset state
-  clearDraft();
-  mode = "percent";
-  theme = "auto";
-  currentLang = "ua";
-  
-  // Reinitialize
-  setLang(currentLang);
-  applyTheme();
-  renderRecipes();
-  
-  showToast(t('dataReset'), 'success');
-};
-
-// Photo Handling
-function handlePhotoUpload(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  
-  // Check file size (max 5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    showToast(t('fileTooLarge'), 'error');
-    return;
-  }
-  
-  // Check file type
-  if (!file.type.startsWith('image/')) {
-    showToast(t('invalidImage'), 'error');
-    return;
-  }
-  
-  const reader = new FileReader();
-  reader.onload = event => {
-    currentRecipe.photo = event.target.result;
+    // Recipes page buttons
+    exportRecipesBtn.addEventListener('click', exportAllRecipes);
+    importRecipesBtn.addEventListener('click', importRecipes);
+    printRecipesBtn.addEventListener('click', printRecipes);
+    deleteSelectedRecipesBtn.addEventListener('click', deleteSelectedRecipes);
     
-    // Update preview
-    const img = elements.photoPreview.querySelector('img');
-    img.src = currentRecipe.photo;
-    img.style.display = 'block';
-    elements.photoPreview.style.display = 'block';
+    // Catalog page buttons
+    addNewPaintBtn.addEventListener('click', addNewPaint);
     
-    autoSaveDraft();
-    showToast(t('photoAdded'), 'success');
-  };
-  
-  reader.readAsDataURL(file);
+    // Paint modal buttons
+    closePaintModal.addEventListener('click', () => {
+        addPaintModal.classList.remove('active');
+    });
+    
+    cancelPaintBtn.addEventListener('click', () => {
+        addPaintModal.classList.remove('active');
+    });
+    
+    savePaintBtn.addEventListener('click', saveNewPaint);
+    
+    // Search functionality
+    paintSearch?.addEventListener('input', renderIngredientsList);
+    categoryFilter?.addEventListener('change', renderIngredientsList);
 }
 
-function removePhoto() {
-  currentRecipe.photo = null;
-  
-  const img = elements.photoPreview.querySelector('img');
-  img.src = '';
-  img.style.display = 'none';
-  elements.photoPreview.style.display = 'none';
-  
-  autoSaveDraft();
-  showToast(t('photoRemoved'), 'success');
-}
-
-// Stats & Updates
-function updateStats() {
-  const totalColors = currentRecipe.items.length;
-  const totalPercent = currentRecipe.items.reduce((sum, item) => sum + item.percent, 0);
-  
-  elements.recipeStats.textContent = `${totalColors} ${t('colors')}`;
-  elements.totalColors.textContent = totalColors;
-  elements.totalPercent.textContent = `${formatNumber(totalPercent, 2)}%`;
-}
-
-// Modal System
-window.showModal = function (title, message, onConfirm) {
-  elements.modalTitle.textContent = title;
-  elements.modalBody.textContent = message;
-  
-  elements.modalConfirm.onclick = () => {
-    if (typeof onConfirm === 'function') {
-      onConfirm();
-    }
-    closeModal();
-  };
-  
-  elements.modalOverlay.classList.remove('hidden');
+// ========== ГЛОБАЛЬНІ ФУНКЦІЇ ==========
+window.editRecipe = function(id) {
+    const recipe = recipes.find(r => r.id === id);
+    if (!recipe) return;
+    
+    showNotification('Функція редагування в розробці', 'info');
 };
 
-window.closeModal = function () {
-  elements.modalOverlay.classList.add('hidden');
+window.deleteRecipe = function(id) {
+    deleteRecipe(id);
 };
 
-// Toast System
-function showToast(message, type = 'info', duration = 3000) {
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.innerHTML = `
-    <span class="toast-icon">${getToastIcon(type)}</span>
-    <span class="toast-message">${message}</span>
-  `;
-  
-  elements.toastContainer.appendChild(toast);
-  
-  // Auto-remove after duration
-  setTimeout(() => {
-    toast.style.animation = 'slideInRight 0.3s ease reverse';
-    setTimeout(() => toast.remove(), 300);
-  }, duration);
-  
-  // Click to dismiss
-  toast.onclick = () => {
-    toast.style.animation = 'slideInRight 0.3s ease reverse';
-    setTimeout(() => toast.remove(), 300);
-  };
-}
+window.exportRecipe = function(id) {
+    exportRecipe(id);
+};
 
-function getToastIcon(type) {
-  const icons = {
-    success: '✅',
-    error: '❌',
-    warning: '⚠️',
-    info: 'ℹ️'
-  };
-  return icons[type] || icons.info;
-}
+window.editPaint = function(id) {
+    showNotification('Функція редагування фарб в розробці', 'info');
+};
 
-// Loading Overlay
-function showLoading(message = 'Loading...') {
-  elements.loadingOverlay.querySelector('.loading-text').textContent = message;
-  elements.loadingOverlay.classList.remove('hidden');
-}
+window.deletePaint = function(id) {
+    deletePaint(id);
+};
 
-function hideLoading() {
-  elements.loadingOverlay.classList.add('hidden');
-}
-
-// Keyboard Shortcuts
-function handleKeyboardShortcuts(e) {
-  // Don't trigger shortcuts when typing in inputs
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  
-  switch (e.key) {
-    case '1':
-      if (e.ctrlKey || e.metaKey) showTab('colors');
-      break;
-    case '2':
-      if (e.ctrlKey || e.metaKey) showTab('new');
-      break;
-    case '3':
-      if (e.ctrlKey || e.metaKey) showTab('recipes');
-      break;
-    case '4':
-      if (e.ctrlKey || e.metaKey) showTab('settings');
-      break;
-    case 's':
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        saveRecipe();
-      }
-      break;
-    case 'Escape':
-      closeModal();
-      break;
-    case 't':
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        toggleTheme();
-      }
-      break;
-  }
-}
-
-// PWA Features
-function checkPWA() {
-  // Check if app is installed
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    console.log('Running as PWA');
-  }
-  
-  // Register beforeinstallprompt for install button
-  let deferredPrompt;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    
-    // Show install button if needed
-    showInstallButton();
-  });
-}
-
-function showInstallButton() {
-  console.log('PWA installation available');
-}
-
-// Initialize
-console.log('SICO MIX initialized successfully');
+// ========== ЗАПУСК ДОДАТКУ ==========
+document.addEventListener('DOMContentLoaded', initApp);
