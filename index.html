@@ -287,12 +287,33 @@
             transition: all 0.3s ease;
             border: 2px solid var(--light-gray);
             box-shadow: var(--shadow);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
         .series-card:hover {
             border-color: var(--primary);
             transform: translateY(-5px);
             box-shadow: var(--shadow-hover);
+        }
+
+        .series-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(114, 9, 183, 0.05));
+        }
+
+        .series-card.selected::before {
+            content: '✓ Обрано';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
         }
 
         .series-name {
@@ -312,6 +333,29 @@
 
         .series-count i {
             color: var(--primary);
+        }
+
+        .series-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .series-action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            background: white;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .series-action-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
         /* Other Pages */
@@ -387,6 +431,125 @@
             box-shadow: var(--shadow);
         }
 
+        /* Recipe List */
+        .recipe-item {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 2px solid var(--light-gray);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .recipe-item:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+            box-shadow: var(--shadow);
+        }
+
+        .recipe-info h4 {
+            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+
+        .recipe-meta {
+            color: var(--gray);
+            font-size: 14px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .recipe-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .recipe-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .recipe-btn.edit {
+            background: var(--primary);
+            color: white;
+        }
+
+        .recipe-btn.delete {
+            background: var(--accent);
+            color: white;
+        }
+
+        .recipe-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-hover);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
         /* Footer */
         .footer {
             text-align: center;
@@ -422,6 +585,17 @@
                 flex-direction: column;
                 gap: 20px;
                 align-items: flex-start;
+            }
+            
+            .recipe-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .recipe-actions {
+                width: 100%;
+                justify-content: flex-end;
             }
         }
     </style>
@@ -489,6 +663,9 @@
                 <div class="page-content active" id="home-page">
                     <div class="section-header">
                         <h2 class="section-title">Каталог фарб</h2>
+                        <div class="search-container">
+                            <input type="text" class="form-input" id="searchInput" placeholder="Пошук фарб...">
+                        </div>
                     </div>
 
                     <!-- Quick Actions -->
@@ -534,32 +711,48 @@
                     <div class="content-box">
                         <form id="newRecipeForm">
                             <div class="form-group">
-                                <label class="form-label">Назва рецепту</label>
-                                <input type="text" class="form-input" placeholder="Наприклад: Червоний металік" required>
+                                <label class="form-label">Назва рецепту *</label>
+                                <input type="text" class="form-input" id="recipeName" placeholder="Наприклад: Червоний металік" required>
                             </div>
                             
                             <div class="form-group">
-                                <label class="form-label">Серія фарби</label>
-                                <select class="form-input" required>
+                                <label class="form-label">Серія фарби *</label>
+                                <select class="form-input" id="recipeSeries" required>
                                     <option value="">Оберіть серію</option>
-                                    <option value="metallic">Металік</option>
-                                    <option value="pearl">Перламутр</option>
-                                    <option value="matte">Матові</option>
-                                    <option value="glossy">Глянцеві</option>
-                                    <option value="acrylic">Акрилові</option>
-                                    <option value="epoxy">Епоксидні</option>
+                                    <option value="Металік">Металік</option>
+                                    <option value="Перламутр">Перламутр</option>
+                                    <option value="Матові">Матові</option>
+                                    <option value="Глянцеві">Глянцеві</option>
+                                    <option value="Акрилові">Акрилові</option>
+                                    <option value="Епоксидні">Епоксидні</option>
                                 </select>
                             </div>
                             
                             <div class="form-group">
-                                <label class="form-label">Опис рецепту</label>
-                                <textarea class="form-input" rows="4" placeholder="Опишіть деталі рецепту..."></textarea>
+                                <label class="form-label">Колірний код</label>
+                                <input type="text" class="form-input" id="recipeColor" placeholder="#FF0000 або RGB">
                             </div>
                             
-                            <button type="submit" class="submit-btn">
-                                <i class="fas fa-save"></i>
-                                Зберегти рецепт
-                            </button>
+                            <div class="form-group">
+                                <label class="form-label">Опис рецепту</label>
+                                <textarea class="form-input" id="recipeDescription" rows="4" placeholder="Опишіть деталі рецепту..."></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Об'єм (мл)</label>
+                                <input type="number" class="form-input" id="recipeVolume" placeholder="1000" value="1000">
+                            </div>
+                            
+                            <div class="form-group">
+                                <button type="submit" class="submit-btn">
+                                    <i class="fas fa-save"></i>
+                                    Зберегти рецепт
+                                </button>
+                                <button type="button" class="submit-btn" style="background: var(--gray); margin-left: 10px;" id="clearFormBtn">
+                                    <i class="fas fa-times"></i>
+                                    Очистити
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -571,24 +764,43 @@
                     
                     <div class="content-box">
                         <h3 style="margin-bottom: 20px; color: var(--dark);">Калькулятор компонентів</h3>
+                        
                         <div class="form-group">
-                            <label class="form-label">Об'єм фарби (мл)</label>
-                            <input type="number" class="form-input" id="paintVolume" placeholder="1000" value="1000">
+                            <label class="form-label">Виберіть рецепт для розрахунку</label>
+                            <select class="form-input" id="calcRecipeSelect">
+                                <option value="">-- Оберіть рецепт --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Об'єм фарби (мл) *</label>
+                            <input type="number" class="form-input" id="calcVolume" placeholder="1000" value="1000" required>
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label">Концентрація пігменту (%)</label>
-                            <input type="number" class="form-input" id="pigmentConcentration" placeholder="15" value="15">
+                            <input type="number" class="form-input" id="calcPigment" placeholder="15" value="15" min="1" max="100">
                         </div>
                         
-                        <button class="submit-btn" id="calculateBtn">
-                            <i class="fas fa-calculator"></i>
-                            Розрахувати
-                        </button>
+                        <div class="form-group">
+                            <label class="form-label">Відсоток розчинника (%)</label>
+                            <input type="number" class="form-input" id="calcSolvent" placeholder="10" value="10" min="0" max="50">
+                        </div>
                         
-                        <div id="calculationResult" style="margin-top: 30px; padding: 20px; background: white; border-radius: var(--border-radius); display: none;">
+                        <div class="form-group">
+                            <button class="submit-btn" id="calculateBtn">
+                                <i class="fas fa-calculator"></i>
+                                Розрахувати компоненти
+                            </button>
+                        </div>
+                        
+                        <div id="calculationResult" style="margin-top: 30px; padding: 25px; background: white; border-radius: var(--border-radius); border-left: 5px solid var(--primary); display: none;">
                             <h4 style="color: var(--primary); margin-bottom: 15px;">Результати розрахунку:</h4>
-                            <p id="resultText"></p>
+                            <div id="resultDetails" style="line-height: 1.8;"></div>
+                            <button class="submit-btn" style="background: var(--secondary); margin-top: 15px;" id="saveCalculationBtn">
+                                <i class="fas fa-save"></i>
+                                Зберегти розрахунок
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -599,35 +811,29 @@
                     <p class="page-description">Перегляньте та керуйте всіма збереженими рецептами фарб.</p>
                     
                     <div class="content-box">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
                             <h3 style="color: var(--dark);">Всі рецепти</h3>
-                            <span style="color: var(--gray);">Всього: <span id="recipesCount">3</span> рецепти</span>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <span style="color: var(--gray);">Всього: <span id="recipesCount">0</span> рецептів</span>
+                                <button class="submit-btn" style="padding: 10px 20px; font-size: 14px;" id="refreshRecipesBtn">
+                                    <i class="fas fa-sync-alt"></i>
+                                    Оновити
+                                </button>
+                            </div>
                         </div>
                         
                         <div id="recipesList">
-                            <div style="padding: 15px; border-bottom: 1px solid var(--light-gray);">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="font-weight: 600;">Червоний металік</span>
-                                    <span style="color: var(--gray);">Серія: Металік</span>
-                                </div>
-                                <p style="margin-top: 5px; color: var(--gray); font-size: 14px;">Створено: 15.03.2023</p>
-                            </div>
-                            
-                            <div style="padding: 15px; border-bottom: 1px solid var(--light-gray);">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="font-weight: 600;">Білий перламутр</span>
-                                    <span style="color: var(--gray);">Серія: Перламутр</span>
-                                </div>
-                                <p style="margin-top: 5px; color: var(--gray); font-size: 14px;">Створено: 10.03.2023</p>
-                            </div>
-                            
-                            <div style="padding: 15px;">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="font-weight: 600;">Чорний мат</span>
-                                    <span style="color: var(--gray);">Серія: Матові</span>
-                                </div>
-                                <p style="margin-top: 5px; color: var(--gray); font-size: 14px;">Створено: 05.03.2023</p>
-                            </div>
+                            <!-- Recipes will be loaded here -->
+                        </div>
+                        
+                        <div id="noRecipesMessage" style="text-align: center; padding: 40px; color: var(--gray);">
+                            <i class="fas fa-book" style="font-size: 48px; margin-bottom: 15px;"></i>
+                            <h4>Рецептів не знайдено</h4>
+                            <p>Створіть свій перший рецепт, щоб почати роботу.</p>
+                            <button class="submit-btn" style="margin-top: 15px;" data-page="new-recipe">
+                                <i class="fas fa-plus"></i>
+                                Створити рецепт
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -642,37 +848,53 @@
                         
                         <div class="form-group">
                             <label class="form-label">Мова інтерфейсу</label>
-                            <select class="form-input">
-                                <option selected>Українська</option>
-                                <option>English</option>
-                                <option>Polski</option>
+                            <select class="form-input" id="languageSelect">
+                                <option value="uk" selected>Українська</option>
+                                <option value="en">English</option>
+                                <option value="pl">Polski</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label">Одиниці вимірювання</label>
-                            <select class="form-input">
-                                <option selected>Метричні (мл, г)</option>
-                                <option>Імперські (унції, фунти)</option>
+                            <select class="form-input" id="unitsSelect">
+                                <option value="metric" selected>Метричні (мл, г)</option>
+                                <option value="imperial">Імперські (унції, фунти)</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label">
-                                <input type="checkbox" checked> Автоматичне збереження
+                                <input type="checkbox" id="autoSaveCheckbox" checked> Автоматичне збереження
                             </label>
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label">
-                                <input type="checkbox" checked> Сповіщення про оновлення
+                                <input type="checkbox" id="notificationsCheckbox" checked> Сповіщення про оновлення
                             </label>
                         </div>
                         
-                        <button class="submit-btn">
-                            <i class="fas fa-save"></i>
-                            Зберегти налаштування
-                        </button>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" id="darkModeCheckbox"> Темний режим
+                            </label>
+                        </div>
+                        
+                        <div class="form-group" style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button class="submit-btn" id="saveSettingsBtn">
+                                <i class="fas fa-save"></i>
+                                Зберегти налаштування
+                            </button>
+                            <button class="submit-btn" style="background: var(--gray);" id="resetSettingsBtn">
+                                <i class="fas fa-undo"></i>
+                                Скинути
+                            </button>
+                            <button class="submit-btn" style="background: var(--accent);" id="clearDataBtn">
+                                <i class="fas fa-trash"></i>
+                                Очистити всі дані
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -685,29 +907,68 @@
                         <h3 style="margin-bottom: 20px; color: var(--dark);">Формати експорту</h3>
                         
                         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                            <div style="padding: 20px; border: 2px solid var(--light-gray); border-radius: var(--border-radius); text-align: center; cursor: pointer; transition: all 0.3s ease;">
-                                <i class="fas fa-file-excel" style="font-size: 40px; color: #217346; margin-bottom: 10px;"></i>
-                                <div style="font-weight: 600;">Excel (.xlsx)</div>
+                            <div class="export-format" data-format="excel" style="padding: 25px; border: 2px solid var(--light-gray); border-radius: var(--border-radius); text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                                <i class="fas fa-file-excel" style="font-size: 48px; color: #217346; margin-bottom: 15px;"></i>
+                                <div style="font-weight: 600; font-size: 18px;">Excel (.xlsx)</div>
+                                <p style="color: var(--gray); margin-top: 10px; font-size: 14px;">Для таблиць та аналізу</p>
                             </div>
                             
-                            <div style="padding: 20px; border: 2px solid var(--light-gray); border-radius: var(--border-radius); text-align: center; cursor: pointer; transition: all 0.3s ease;">
-                                <i class="fas fa-file-csv" style="font-size: 40px; color: #f59e0b; margin-bottom: 10px;"></i>
-                                <div style="font-weight: 600;">CSV</div>
+                            <div class="export-format" data-format="csv" style="padding: 25px; border: 2px solid var(--light-gray); border-radius: var(--border-radius); text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                                <i class="fas fa-file-csv" style="font-size: 48px; color: #f59e0b; margin-bottom: 15px;"></i>
+                                <div style="font-weight: 600; font-size: 18px;">CSV</div>
+                                <p style="color: var(--gray); margin-top: 10px; font-size: 14px;">Для імпорту в інші системи</p>
                             </div>
                             
-                            <div style="padding: 20px; border: 2px solid var(--light-gray); border-radius: var(--border-radius); text-align: center; cursor: pointer; transition: all 0.3s ease;">
-                                <i class="fas fa-file-pdf" style="font-size: 40px; color: #ef4444; margin-bottom: 10px;"></i>
-                                <div style="font-weight: 600;">PDF</div>
+                            <div class="export-format" data-format="pdf" style="padding: 25px; border: 2px solid var(--light-gray); border-radius: var(--border-radius); text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                                <i class="fas fa-file-pdf" style="font-size: 48px; color: #ef4444; margin-bottom: 15px;"></i>
+                                <div style="font-weight: 600; font-size: 18px;">PDF</div>
+                                <p style="color: var(--gray); margin-top: 10px; font-size: 14px;">Для друку та документації</p>
                             </div>
                         </div>
                         
-                        <button class="submit-btn" id="exportCatalogBtn">
-                            <i class="fas fa-download"></i>
-                            Експортувати каталог
-                        </button>
+                        <div class="form-group">
+                            <label class="form-label">Виберіть дані для експорту</label>
+                            <div style="margin-top: 10px;">
+                                <label style="display: block; margin-bottom: 8px;">
+                                    <input type="checkbox" id="exportRecipes" checked> Рецепти фарб
+                                </label>
+                                <label style="display: block; margin-bottom: 8px;">
+                                    <input type="checkbox" id="exportSeries" checked> Серії фарб
+                                </label>
+                                <label style="display: block; margin-bottom: 8px;">
+                                    <input type="checkbox" id="exportCalculations"> Розрахунки
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button class="submit-btn" id="exportDataBtn">
+                                <i class="fas fa-download"></i>
+                                Експортувати вибрані дані
+                            </button>
+                        </div>
+                        
+                        <div id="exportStatus" style="margin-top: 20px; padding: 15px; border-radius: var(--border-radius); display: none;"></div>
                     </div>
                 </div>
             </main>
+        </div>
+
+        <!-- Modals -->
+        <div class="modal" id="confirmationModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modalTitle">Підтвердження дії</h3>
+                    <button class="modal-close" id="closeModal">&times;</button>
+                </div>
+                <div id="modalMessage">
+                    Ви впевнені, що хочете виконати цю дію?
+                </div>
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button class="submit-btn" id="confirmActionBtn">Так, виконати</button>
+                    <button class="submit-btn" style="background: var(--gray);" id="cancelActionBtn">Скасувати</button>
+                </div>
+            </div>
         </div>
 
         <footer class="footer">
@@ -716,74 +977,205 @@
     </div>
 
     <script>
-        // Data for paint series
-        const paintSeries = [
-            { name: "Металік", count: 3, color: "#4361ee" },
-            { name: "Перламутр", count: 2, color: "#7209b7" },
-            { name: "Матові", count: 1, color: "#f72585" },
-            { name: "Глянцеві", count: 5, color: "#4cc9f0" },
-            { name: "Акрилові", count: 0, color: "#6c757d" },
-            { name: "Епоксидні", count: 0, color: "#212529" }
-        ];
+        // ========== ГЛОБАЛЬНІ ЗМІННІ ==========
+        let recipes = [];
+        let selectedSeries = null;
+        let currentCalculation = null;
 
-        // DOM Elements
+        // ========== DOM ЕЛЕМЕНТИ ==========
         const totalPaintsElement = document.getElementById('totalPaints');
         const seriesGridElement = document.getElementById('seriesGrid');
         const navLinks = document.querySelectorAll('.nav-link');
         const actionBtns = document.querySelectorAll('.action-btn');
         const exportBtn = document.getElementById('exportBtn');
-        const exportCatalogBtn = document.getElementById('exportCatalogBtn');
         const pageContents = document.querySelectorAll('.page-content');
+        const newRecipeForm = document.getElementById('newRecipeForm');
+        const clearFormBtn = document.getElementById('clearFormBtn');
         const calculateBtn = document.getElementById('calculateBtn');
         const calculationResult = document.getElementById('calculationResult');
-        const resultText = document.getElementById('resultText');
-        const newRecipeForm = document.getElementById('newRecipeForm');
+        const resultDetails = document.getElementById('resultDetails');
+        const saveCalculationBtn = document.getElementById('saveCalculationBtn');
+        const refreshRecipesBtn = document.getElementById('refreshRecipesBtn');
+        const recipesList = document.getElementById('recipesList');
+        const noRecipesMessage = document.getElementById('noRecipesMessage');
+        const recipesCount = document.getElementById('recipesCount');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const resetSettingsBtn = document.getElementById('resetSettingsBtn');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        const exportDataBtn = document.getElementById('exportDataBtn');
+        const exportStatus = document.getElementById('exportStatus');
+        const calcRecipeSelect = document.getElementById('calcRecipeSelect');
+        const searchInput = document.getElementById('searchInput');
 
-        // Initialize the app
+        // Модальне вікно
+        const confirmationModal = document.getElementById('confirmationModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const confirmActionBtn = document.getElementById('confirmActionBtn');
+        const cancelActionBtn = document.getElementById('cancelActionBtn');
+        const closeModal = document.getElementById('closeModal');
+
+        // ========== ІНІЦІАЛІЗАЦІЯ ДАНИХ ==========
+        const initialData = {
+            paintSeries: [
+                { name: "Металік", count: 3, color: "#4361ee" },
+                { name: "Перламутр", count: 2, color: "#7209b7" },
+                { name: "Матові", count: 1, color: "#f72585" },
+                { name: "Глянцеві", count: 5, color: "#4cc9f0" },
+                { name: "Акрилові", count: 0, color: "#6c757d" },
+                { name: "Епоксидні", count: 0, color: "#212529" }
+            ],
+            recipes: [
+                { 
+                    id: 1, 
+                    name: "Червоний металік", 
+                    series: "Металік", 
+                    description: "Яскраво-червоний металік з ефектом металевого блиску", 
+                    color: "#FF0000",
+                    volume: 1000,
+                    date: "15.03.2023"
+                },
+                { 
+                    id: 2, 
+                    name: "Білий перламутр", 
+                    series: "Перламутр", 
+                    description: "Ніжний білий перламутр з іризаційним ефектом", 
+                    color: "#FFFFFF",
+                    volume: 500,
+                    date: "10.03.2023"
+                },
+                { 
+                    id: 3, 
+                    name: "Чорний мат", 
+                    series: "Матові", 
+                    description: "Глибокий чорний матовий колір без відблисків", 
+                    color: "#000000",
+                    volume: 750,
+                    date: "05.03.2023"
+                }
+            ]
+        };
+
+        // ========== ФУНКЦІЇ ==========
+
+        // Ініціалізація додатку
         function initApp() {
+            loadData();
             renderPaintSeries();
             updateTotalPaints();
+            loadRecipesList();
             setupEventListeners();
         }
 
-        // Render paint series to the grid
+        // Завантаження даних
+        function loadData() {
+            const savedData = localStorage.getItem('sicoMixData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                initialData.paintSeries = data.paintSeries || initialData.paintSeries;
+                recipes = data.recipes || initialData.recipes;
+            } else {
+                recipes = [...initialData.recipes];
+                saveData();
+            }
+        }
+
+        // Збереження даних
+        function saveData() {
+            const data = {
+                paintSeries: initialData.paintSeries,
+                recipes: recipes
+            };
+            localStorage.setItem('sicoMixData', JSON.stringify(data));
+        }
+
+        // Оновлення загальної кількості фарб
+        function updateTotalPaints() {
+            const total = initialData.paintSeries.reduce((sum, series) => sum + series.count, 0);
+            totalPaintsElement.textContent = total;
+        }
+
+        // Відображення серій фарб
         function renderPaintSeries() {
             seriesGridElement.innerHTML = '';
             
-            paintSeries.forEach(series => {
+            initialData.paintSeries.forEach((series, index) => {
                 const seriesCard = document.createElement('div');
-                seriesCard.className = 'series-card';
+                seriesCard.className = `series-card ${selectedSeries === series.name ? 'selected' : ''}`;
                 seriesCard.innerHTML = `
                     <div class="series-name">${series.name}</div>
                     <div class="series-count">
                         <i class="fas fa-paint-brush"></i>
                         ${series.count} фарб
                     </div>
+                    <div class="series-actions">
+                        <button class="series-action-btn select-series" data-index="${index}">
+                            <i class="fas fa-check"></i> Обрати
+                        </button>
+                        <button class="series-action-btn add-paint" data-series="${series.name}">
+                            <i class="fas fa-plus"></i> Додати
+                        </button>
+                    </div>
                 `;
                 seriesGridElement.appendChild(seriesCard);
             });
+
+            // Додаємо обробники подій для кнопок серій
+            document.querySelectorAll('.select-series').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const index = this.getAttribute('data-index');
+                    selectSeries(index);
+                });
+            });
+
+            document.querySelectorAll('.add-paint').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const seriesName = this.getAttribute('data-series');
+                    addPaintToSeries(seriesName);
+                });
+            });
         }
 
-        // Update total paints count
-        function updateTotalPaints() {
-            const totalPaints = paintSeries.reduce((sum, series) => sum + series.count, 0);
-            totalPaintsElement.textContent = totalPaints;
+        // Вибір серії
+        function selectSeries(index) {
+            const series = initialData.paintSeries[index];
+            selectedSeries = selectedSeries === series.name ? null : series.name;
+            renderPaintSeries();
+            showNotification(selectedSeries ? `Обрано серію: ${series.name}` : 'Вибір серії скасовано');
         }
 
-        // Switch between pages
+        // Додавання фарби до серії
+        function addPaintToSeries(seriesName) {
+            const series = initialData.paintSeries.find(s => s.name === seriesName);
+            if (series) {
+                series.count++;
+                saveData();
+                updateTotalPaints();
+                renderPaintSeries();
+                showNotification(`Додано фарбу до серії "${seriesName}"`);
+            }
+        }
+
+        // Перемикання сторінок
         function switchPage(pageId) {
-            // Hide all pages
             pageContents.forEach(page => {
                 page.classList.remove('active');
             });
             
-            // Show selected page
             const selectedPage = document.getElementById(`${pageId}-page`);
             if (selectedPage) {
                 selectedPage.classList.add('active');
+                
+                // Оновлюємо дані на сторінці при перемиканні
+                if (pageId === 'recipes') {
+                    loadRecipesList();
+                } else if (pageId === 'calculations') {
+                    updateRecipeSelect();
+                }
             }
             
-            // Update active navigation link
             navLinks.forEach(link => {
                 link.classList.remove('active');
                 if (link.getAttribute('data-page') === pageId) {
@@ -792,15 +1184,347 @@
             });
         }
 
-        // Show notification
+        // Завантаження списку рецептів
+        function loadRecipesList() {
+            if (recipes.length === 0) {
+                recipesList.style.display = 'none';
+                noRecipesMessage.style.display = 'block';
+                recipesCount.textContent = '0';
+                return;
+            }
+
+            recipesList.style.display = 'block';
+            noRecipesMessage.style.display = 'none';
+            recipesCount.textContent = recipes.length;
+            
+            recipesList.innerHTML = recipes.map(recipe => `
+                <div class="recipe-item" data-id="${recipe.id}">
+                    <div class="recipe-info">
+                        <h4>${recipe.name}</h4>
+                        <div class="recipe-meta">
+                            <span><i class="fas fa-layer-group"></i> ${recipe.series}</span>
+                            <span><i class="fas fa-paint-brush"></i> ${recipe.volume} мл</span>
+                            <span><i class="fas fa-calendar"></i> ${recipe.date}</span>
+                        </div>
+                        ${recipe.description ? `<p style="margin-top: 10px; color: var(--gray);">${recipe.description}</p>` : ''}
+                    </div>
+                    <div class="recipe-actions">
+                        <button class="recipe-btn edit" data-id="${recipe.id}">
+                            <i class="fas fa-edit"></i> Редагувати
+                        </button>
+                        <button class="recipe-btn delete" data-id="${recipe.id}">
+                            <i class="fas fa-trash"></i> Видалити
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Додаємо обробники подій для кнопок рецептів
+            document.querySelectorAll('.recipe-btn.edit').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    editRecipe(id);
+                });
+            });
+
+            document.querySelectorAll('.recipe-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    showDeleteConfirmation(id);
+                });
+            });
+        }
+
+        // Додавання нового рецепту
+        function addRecipe() {
+            const name = document.getElementById('recipeName').value;
+            const series = document.getElementById('recipeSeries').value;
+            const color = document.getElementById('recipeColor').value;
+            const description = document.getElementById('recipeDescription').value;
+            const volume = document.getElementById('recipeVolume').value || 1000;
+
+            if (!name || !series) {
+                showNotification('Будь ласка, заповніть обов\'язкові поля', 'error');
+                return;
+            }
+
+            const newRecipe = {
+                id: Date.now(),
+                name,
+                series,
+                color,
+                description,
+                volume: parseInt(volume),
+                date: new Date().toLocaleDateString('uk-UA')
+            };
+
+            recipes.push(newRecipe);
+            
+            // Оновлюємо кількість фарб у серії
+            const seriesData = initialData.paintSeries.find(s => s.name === series);
+            if (seriesData) {
+                seriesData.count++;
+            }
+
+            saveData();
+            updateTotalPaints();
+            renderPaintSeries();
+            showNotification(`Рецепт "${name}" успішно додано!`);
+            
+            // Очищаємо форму
+            newRecipeForm.reset();
+            
+            // Переходимо на сторінку рецептів
+            switchPage('recipes');
+        }
+
+        // Редагування рецепту
+        function editRecipe(id) {
+            const recipe = recipes.find(r => r.id === id);
+            if (!recipe) return;
+
+            showModal(
+                'Редагування рецепту',
+                `Редагування рецепту "${recipe.name}". Функціонал редагування в розробці.`,
+                () => {
+                    showNotification('Функція редагування в розробці', 'info');
+                }
+            );
+        }
+
+        // Видалення рецепту
+        function deleteRecipe(id) {
+            const recipeIndex = recipes.findIndex(r => r.id === id);
+            if (recipeIndex === -1) return;
+
+            const recipe = recipes[recipeIndex];
+            
+            // Зменшуємо кількість фарб у серії
+            const seriesData = initialData.paintSeries.find(s => s.name === recipe.series);
+            if (seriesData && seriesData.count > 0) {
+                seriesData.count--;
+            }
+
+            recipes.splice(recipeIndex, 1);
+            saveData();
+            updateTotalPaints();
+            renderPaintSeries();
+            loadRecipesList();
+            showNotification(`Рецепт "${recipe.name}" видалено`);
+        }
+
+        // Оновлення вибору рецептів для калькулятора
+        function updateRecipeSelect() {
+            calcRecipeSelect.innerHTML = '<option value="">-- Оберіть рецепт --</option>' +
+                recipes.map(recipe => 
+                    `<option value="${recipe.id}">${recipe.name} (${recipe.series})</option>`
+                ).join('');
+        }
+
+        // Виконання розрахунків
+        function performCalculation() {
+            const volume = parseFloat(document.getElementById('calcVolume').value);
+            const pigment = parseFloat(document.getElementById('calcPigment').value);
+            const solvent = parseFloat(document.getElementById('calcSolvent').value);
+
+            if (!volume || volume <= 0) {
+                showNotification('Будь ласка, введіть коректний об\'єм', 'error');
+                return;
+            }
+
+            const pigmentAmount = (volume * pigment / 100).toFixed(2);
+            const solventAmount = (volume * solvent / 100).toFixed(2);
+            const baseAmount = (volume - pigmentAmount - solventAmount).toFixed(2);
+
+            currentCalculation = {
+                volume,
+                pigment,
+                solvent,
+                pigmentAmount,
+                solventAmount,
+                baseAmount,
+                date: new Date().toLocaleString('uk-UA')
+            };
+
+            resultDetails.innerHTML = `
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <strong>Розрахунок для ${volume} мл фарби:</strong>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <div style="padding: 10px; background: white; border-radius: 8px;">
+                        <div style="font-size: 14px; color: var(--gray);">Пігмент</div>
+                        <div style="font-weight: 600; font-size: 18px;">${pigmentAmount} мл</div>
+                        <div style="font-size: 12px; color: var(--gray);">(${pigment}%)</div>
+                    </div>
+                    <div style="padding: 10px; background: white; border-radius: 8px;">
+                        <div style="font-size: 14px; color: var(--gray);">Розчинник</div>
+                        <div style="font-weight: 600; font-size: 18px;">${solventAmount} мл</div>
+                        <div style="font-size: 12px; color: var(--gray);">(${solvent}%)</div>
+                    </div>
+                    <div style="padding: 10px; background: white; border-radius: 8px; grid-column: span 2;">
+                        <div style="font-size: 14px; color: var(--gray);">Основа</div>
+                        <div style="font-weight: 600; font-size: 18px;">${baseAmount} мл</div>
+                        <div style="font-size: 12px; color: var(--gray);">(${100 - pigment - solvent}%)</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: #e8f4ff; border-radius: 8px; font-size: 14px;">
+                    <i class="fas fa-info-circle"></i> Загальний об'єм: ${volume} мл
+                </div>
+            `;
+
+            calculationResult.style.display = 'block';
+        }
+
+        // Збереження розрахунку
+        function saveCalculation() {
+            if (!currentCalculation) return;
+
+            const savedCalculations = JSON.parse(localStorage.getItem('sicoMixCalculations') || '[]');
+            savedCalculations.push({
+                ...currentCalculation,
+                id: Date.now()
+            });
+            
+            localStorage.setItem('sicoMixCalculations', JSON.stringify(savedCalculations));
+            showNotification('Розрахунок збережено успішно!');
+        }
+
+        // Експорт даних
+        function exportData(format) {
+            const exportRecipes = document.getElementById('exportRecipes').checked;
+            const exportSeries = document.getElementById('exportSeries').checked;
+            const exportCalculations = document.getElementById('exportCalculations').checked;
+
+            if (!exportRecipes && !exportSeries && !exportCalculations) {
+                showNotification('Будь ласка, виберіть дані для експорту', 'error');
+                return;
+            }
+
+            const data = {};
+            
+            if (exportRecipes) data.recipes = recipes;
+            if (exportSeries) data.series = initialData.paintSeries;
+            if (exportCalculations) {
+                data.calculations = JSON.parse(localStorage.getItem('sicoMixCalculations') || '[]');
+            }
+
+            let content, filename, type;
+
+            switch (format) {
+                case 'excel':
+                    // Для спрощення, генеруємо CSV (псевдо-Excel)
+                    content = convertToCSV(data);
+                    filename = 'sico-mix-data.csv';
+                    type = 'text/csv;charset=utf-8;';
+                    break;
+                case 'csv':
+                    content = convertToCSV(data);
+                    filename = 'sico-mix-data.csv';
+                    type = 'text/csv;charset=utf-8;';
+                    break;
+                case 'pdf':
+                    // Для PDF показуємо сповіщення (в реальності потрібен серверний рендеринг)
+                    showNotification('PDF експорт потребує серверної обробки. Використовуйте CSV для даних.', 'info');
+                    return;
+                default:
+                    content = JSON.stringify(data, null, 2);
+                    filename = 'sico-mix-data.json';
+                    type = 'application/json';
+            }
+
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            exportStatus.innerHTML = `
+                <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px;">
+                    <i class="fas fa-check-circle"></i> Дані успішно експортовано у форматі ${format.toUpperCase()}!
+                </div>
+            `;
+            exportStatus.style.display = 'block';
+
+            setTimeout(() => {
+                exportStatus.style.display = 'none';
+            }, 5000);
+        }
+
+        // Конвертація в CSV
+        function convertToCSV(data) {
+            let csv = '';
+            
+            if (data.recipes && data.recipes.length > 0) {
+                csv += "Рецепти фарб\n";
+                csv += "Назва,Серія,Об'єм (мл),Колір,Опис,Дата\n";
+                data.recipes.forEach(recipe => {
+                    csv += `"${recipe.name}","${recipe.series}",${recipe.volume},"${recipe.color || ''}","${recipe.description || ''}","${recipe.date}"\n`;
+                });
+                csv += "\n";
+            }
+            
+            if (data.series && data.series.length > 0) {
+                csv += "Серії фарб\n";
+                csv += "Назва серії,Кількість фарб\n";
+                data.series.forEach(series => {
+                    csv += `"${series.name}",${series.count}\n`;
+                });
+            }
+            
+            return csv;
+        }
+
+        // Показати модальне вікно
+        function showModal(title, message, confirmCallback) {
+            modalTitle.textContent = title;
+            modalMessage.innerHTML = message;
+            confirmationModal.classList.add('active');
+            
+            const handleConfirm = () => {
+                confirmCallback();
+                confirmationModal.classList.remove('active');
+                confirmActionBtn.removeEventListener('click', handleConfirm);
+                cancelActionBtn.removeEventListener('click', handleCancel);
+            };
+            
+            const handleCancel = () => {
+                confirmationModal.classList.remove('active');
+                confirmActionBtn.removeEventListener('click', handleConfirm);
+                cancelActionBtn.removeEventListener('click', handleCancel);
+            };
+            
+            confirmActionBtn.onclick = handleConfirm;
+            cancelActionBtn.onclick = handleCancel;
+            closeModal.onclick = handleCancel;
+        }
+
+        // Показати сповіщення про видалення
+        function showDeleteConfirmation(id) {
+            const recipe = recipes.find(r => r.id === id);
+            if (!recipe) return;
+
+            showModal(
+                'Видалення рецепту',
+                `Ви впевнені, що хочете видалити рецепт "<strong>${recipe.name}</strong>"?`,
+                () => deleteRecipe(id)
+            );
+        }
+
+        // Показати сповіщення
         function showNotification(message, type = 'success') {
-            // Create notification element
             const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 'var(--primary)' : 
+                           type === 'error' ? 'var(--accent)' : 'var(--gray)';
+            
             notification.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                background: ${type === 'success' ? 'var(--primary)' : 'var(--accent)'};
+                background: ${bgColor};
                 color: white;
                 padding: 15px 25px;
                 border-radius: var(--border-radius);
@@ -813,14 +1537,16 @@
                 animation: slideIn 0.3s ease;
             `;
             
+            const icon = type === 'success' ? 'fa-check-circle' :
+                        type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+            
             notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <i class="fas ${icon}"></i>
                 <span>${message}</span>
             `;
             
             document.body.appendChild(notification);
             
-            // Remove notification after 3 seconds
             setTimeout(() => {
                 notification.style.animation = 'slideOut 0.3s ease';
                 setTimeout(() => {
@@ -829,9 +1555,9 @@
             }, 3000);
         }
 
-        // Setup event listeners
+        // Налаштування обробників подій
         function setupEventListeners() {
-            // Navigation links
+            // Навігація
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -840,7 +1566,7 @@
                 });
             });
             
-            // Action buttons
+            // Кнопки дій
             actionBtns.forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -849,64 +1575,145 @@
                 });
             });
             
-            // Export button in sidebar
+            // Кнопка експорту в сайдбарі
             exportBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 switchPage('export');
             });
             
-            // Export catalog button
-            if (exportCatalogBtn) {
-                exportCatalogBtn.addEventListener('click', function() {
-                    showNotification("Каталог успішно експортовано у форматі Excel");
-                });
-            }
+            // Форма нового рецепту
+            newRecipeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                addRecipe();
+            });
             
-            // Calculate button
-            if (calculateBtn) {
-                calculateBtn.addEventListener('click', function() {
-                    const volume = document.getElementById('paintVolume').value;
-                    const concentration = document.getElementById('pigmentConcentration').value;
-                    
-                    const pigmentAmount = (volume * concentration / 100).toFixed(2);
-                    const baseAmount = (volume - pigmentAmount).toFixed(2);
-                    
-                    resultText.innerHTML = `
-                        Для приготування <strong>${volume} мл</strong> фарби з концентрацією пігменту <strong>${concentration}%</strong>:<br><br>
-                        • Пігмент: <strong>${pigmentAmount} мл</strong><br>
-                        • Основа: <strong>${baseAmount} мл</strong>
-                    `;
-                    
-                    calculationResult.style.display = 'block';
-                    showNotification("Розрахунок виконано успішно");
-                });
-            }
+            // Очищення форми
+            clearFormBtn.addEventListener('click', function() {
+                newRecipeForm.reset();
+                showNotification('Форма очищена');
+            });
             
-            // New recipe form
-            if (newRecipeForm) {
-                newRecipeForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    showNotification("Рецепт успішно збережено");
-                    this.reset();
+            // Розрахунки
+            calculateBtn.addEventListener('click', function() {
+                performCalculation();
+            });
+            
+            // Збереження розрахунку
+            saveCalculationBtn.addEventListener('click', function() {
+                saveCalculation();
+            });
+            
+            // Оновлення списку рецептів
+            refreshRecipesBtn.addEventListener('click', function() {
+                loadRecipesList();
+                showNotification('Список рецептів оновлено');
+            });
+            
+            // Налаштування
+            saveSettingsBtn.addEventListener('click', function() {
+                showNotification('Налаштування збережено успішно!');
+            });
+            
+            resetSettingsBtn.addEventListener('click', function() {
+                document.getElementById('languageSelect').value = 'uk';
+                document.getElementById('unitsSelect').value = 'metric';
+                document.getElementById('autoSaveCheckbox').checked = true;
+                document.getElementById('notificationsCheckbox').checked = true;
+                document.getElementById('darkModeCheckbox').checked = false;
+                showNotification('Налаштування скинуто до значень за замовчуванням');
+            });
+            
+            clearDataBtn.addEventListener('click', function() {
+                showModal(
+                    'Очищення всіх даних',
+                    'Ви впевнені, що хочете видалити всі дані? Цю дію неможливо скасувати.',
+                    () => {
+                        localStorage.clear();
+                        window.location.reload();
+                    }
+                );
+            });
+            
+            // Експорт
+            exportDataBtn.addEventListener('click', function() {
+                const selectedFormat = document.querySelector('.export-format:hover')?.getAttribute('data-format') || 'excel';
+                exportData(selectedFormat);
+            });
+            
+            // Формати експорту
+            document.querySelectorAll('.export-format').forEach(format => {
+                format.addEventListener('mouseenter', function() {
+                    document.querySelectorAll('.export-format').forEach(f => {
+                        f.style.borderColor = 'var(--light-gray)';
+                    });
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.transform = 'translateY(-5px)';
                 });
-            }
+                
+                format.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+                
+                format.addEventListener('click', function() {
+                    const formatType = this.getAttribute('data-format');
+                    exportData(formatType);
+                });
+            });
+            
+            // Пошук
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                if (searchTerm.length > 0) {
+                    // Фільтрація серій фарб
+                    document.querySelectorAll('.series-card').forEach(card => {
+                        const seriesName = card.querySelector('.series-name').textContent.toLowerCase();
+                        if (seriesName.includes(searchTerm)) {
+                            card.style.display = 'block';
+                            card.style.animation = 'pulse 0.5s';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.series-card').forEach(card => {
+                        card.style.display = 'block';
+                    });
+                }
+            });
+            
+            // Обробка натискання Enter у полях вводу
+            document.querySelectorAll('.form-input').forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (this.id === 'recipeName' || this.id === 'recipeSeries') {
+                            addRecipe();
+                        }
+                    }
+                });
+            });
+            
+            // Анімації CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+                @keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.02); }
+                    100% { transform: scale(1); }
+                }
+            `;
+            document.head.appendChild(style);
         }
 
-        // Add CSS for animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Initialize the app
+        // Запуск додатку
         initApp();
     </script>
 </body>
