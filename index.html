@@ -3,6 +3,706 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SICO MIX • Paint Mixing Calculator</title>
+    <meta name="theme-color" content="#f8fafc">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo" onclick="showTab('colors')">
+                    <div class="logo-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h1>SICO <span class="gradient-text">MIX</span></h1>
+                </div>
+                <div class="header-info">
+                    <div class="series-badge" id="seriesBadge" style="display: none;">
+                        <i class="fas fa-layer-group"></i>
+                        <span>SICO</span>
+                    </div>
+                    <div class="stats-badge" id="recipeStats">
+                        <i class="fas fa-paint-brush"></i>
+                        <span>0 colors</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <button class="btn-secondary" onclick="toggleTheme()" id="themeToggle">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="app-nav" id="appNav">
+            <button class="nav-btn active" onclick="showTab('colors')">
+                <i class="fas fa-palette nav-icon"></i>
+                <span class="nav-text" data-i18n="paints">Фарби</span>
+            </button>
+            <button class="nav-btn" onclick="showTab('new')">
+                <i class="fas fa-plus-circle nav-icon"></i>
+                <span class="nav-text" data-i18n="newRecipe">Новий рецепт</span>
+            </button>
+            <button class="nav-btn" onclick="showTab('recipes')">
+                <i class="fas fa-book-open nav-icon"></i>
+                <span class="nav-text" data-i18n="recipes">Рецепти</span>
+            </button>
+            <button class="nav-btn" onclick="showTab('settings')">
+                <i class="fas fa-cog nav-icon"></i>
+                <span class="nav-text" data-i18n="settings">Налаштування</span>
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Colors Tab -->
+            <div class="tab active" id="colors">
+                <div class="tab-header">
+                    <h2>
+                        <i class="fas fa-palette tab-icon"></i>
+                        <span data-i18n="catalog">Каталог фарб</span>
+                    </h2>
+                    <div class="search-box">
+                        <input type="text" id="colorSearch" data-i18n-placeholder="searchPlaceholder" placeholder="Пошук за кодом або назвою">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label data-i18n="filterSeries">Серія фарб</label>
+                    <select class="modern-select" id="seriesFilter">
+                        <option value="ALL" data-i18n="allSeries">Всі серії</option>
+                    </select>
+                </div>
+                
+                <div class="color-grid-container">
+                    <div class="color-count" id="colorCount">0 colors</div>
+                    <div class="color-grid" id="colorList">
+                        <!-- Colors will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Recipe Tab -->
+            <div class="tab" id="new">
+                <div class="tab-header">
+                    <h2>
+                        <i class="fas fa-plus-circle tab-icon"></i>
+                        <span data-i18n="newRecipe">Новий рецепт</span>
+                    </h2>
+                    <button class="btn-secondary" onclick="clearDraft()" data-i18n="clear">Очистити</button>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label data-i18n="recipeName">Назва рецепта</label>
+                        <input type="text" class="modern-input" id="recipeName" placeholder="Назва рецепта">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="status">Статус</label>
+                        <select class="modern-select" id="recipeStatus">
+                            <option value="draft" data-i18n="statusDraft">Чернетка</option>
+                            <option value="ready" data-i18n="statusReady">Готовий</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label data-i18n="recipeNote">Нотатка</label>
+                    <textarea class="modern-textarea" id="recipeNote" placeholder="Нотатка (необов'язково)"></textarea>
+                </div>
+                
+                <h3 data-i18n="addColors">Додати фарби</h3>
+                <div class="search-box">
+                    <input type="text" id="recipeSearch" data-i18n-placeholder="searchPlaceholder" placeholder="Пошук за кодом або назвою">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                
+                <div class="color-grid compact" id="addColorList">
+                    <!-- Add colors list will be loaded here -->
+                </div>
+                
+                <div class="recipe-items" id="recipeItems">
+                    <!-- Recipe items will be loaded here -->
+                </div>
+                
+                <div class="recipe-summary">
+                    <div class="summary-item">
+                        <span data-i18n="totalColors">Фарб</span>
+                        <span id="totalColors">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span data-i18n="totalPercent">Загальний %</span>
+                        <span id="totalPercent">0%</span>
+                    </div>
+                    <div class="summary-item">
+                        <span data-i18n="totalWeight">Загальна вага</span>
+                        <span id="totalWeightGrams">0 g</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label data-i18n="totalWeight">Загальна вага</label>
+                    <select class="modern-select" id="totalWeight">
+                        <option value="100">100 г</option>
+                        <option value="500">500 г</option>
+                        <option value="1000" selected>1000 г</option>
+                        <option value="5000">5000 г</option>
+                        <option value="custom">Custom...</option>
+                    </select>
+                    <input type="number" class="modern-input" id="customWeight" placeholder="Custom weight (g)" style="display: none;">
+                </div>
+                
+                <div class="photo-upload">
+                    <label data-i18n="addPhoto">Додати фото змішаної фарби</label>
+                    <div class="upload-area" onclick="document.getElementById('recipePhoto').click()">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <div class="upload-text" data-i18n="clickToUpload">Натисніть для завантаження</div>
+                        <div class="upload-subtext" data-i18n="maxSize">Макс. 5МБ</div>
+                    </div>
+                    <input type="file" id="recipePhoto" accept="image/*" style="display: none;">
+                    <div class="photo-preview" id="photoPreview" style="display: none;">
+                        <img id="previewImage" src="" alt="Preview">
+                        <button class="remove-photo" onclick="removePhoto()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <span data-i18n="modeChanged">Режим:</span>
+                        <label class="switch" style="margin-left: 10px;">
+                            <input type="checkbox" id="modeToggle" onchange="toggleMode(this)">
+                            <span class="slider">
+                                <span class="slider-label" data-i18n="percentMode">%</span>
+                                <span class="slider-label" data-i18n="gramMode">г</span>
+                            </span>
+                        </label>
+                    </label>
+                </div>
+                
+                <div style="text-align: center; margin-top: var(--space-xl);">
+                    <button class="btn-primary" onclick="saveRecipe()" data-i18n="addRecipe">Зберегти рецепт</button>
+                </div>
+            </div>
+
+            <!-- Recipes Tab -->
+            <div class="tab" id="recipes">
+                <div class="tab-header">
+                    <h2>
+                        <i class="fas fa-book-open tab-icon"></i>
+                        <span data-i18n="recipes">Рецепти</span>
+                    </h2>
+                    <div style="display: flex; gap: var(--space-sm);">
+                        <button class="btn-secondary" onclick="importRecipes()" data-i18n="import">Імпорт</button>
+                        <button class="btn-secondary" onclick="exportAllData()" data-i18n="exportAll">Експорт</button>
+                    </div>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="recipeSearchList" data-i18n-placeholder="searchRecipes" placeholder="Пошук рецептів">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                
+                <div style="display: flex; gap: var(--space-sm); margin: var(--space-md) 0;">
+                    <button class="btn-secondary filter-btn active" data-filter="all" onclick="setRecipeFilter('all')" data-i18n="all">Всі</button>
+                    <button class="btn-secondary filter-btn" data-filter="draft" onclick="setRecipeFilter('draft')" data-i18n="drafts">Чернетки</button>
+                    <button class="btn-secondary filter-btn" data-filter="ready" onclick="setRecipeFilter('ready')" data-i18n="ready">Готові</button>
+                </div>
+                
+                <div class="recipes-grid" id="recipeList">
+                    <!-- Recipes will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab" id="settings">
+                <div class="tab-header">
+                    <h2>
+                        <i class="fas fa-cog tab-icon"></i>
+                        <span data-i18n="settings">Налаштування</span>
+                    </h2>
+                </div>
+                
+                <div class="settings-container">
+                    <!-- Language Settings -->
+                    <div class="settings-card">
+                        <h3>
+                            <i class="fas fa-globe"></i>
+                            <span data-i18n="language">Мова</span>
+                        </h3>
+                        <div class="settings-options">
+                            <div class="lang-option active" onclick="setLang('ua')">
+                                <div class="flag">🇺🇦</div>
+                                <span>Українська</span>
+                            </div>
+                            <div class="lang-option" onclick="setLang('pl')">
+                                <div class="flag">🇵🇱</div>
+                                <span>Polski</span>
+                            </div>
+                            <div class="lang-option" onclick="setLang('en')">
+                                <div class="flag">🇺🇸</div>
+                                <span>English</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Theme Settings -->
+                    <div class="settings-card">
+                        <h3>
+                            <i class="fas fa-palette"></i>
+                            <span data-i18n="appearance">Зовнішній вигляд</span>
+                        </h3>
+                        <div class="settings-options">
+                            <div class="theme-option" onclick="setTheme('light')">
+                                <div class="theme-preview light"></div>
+                                <span data-i18n="light">Світла</span>
+                            </div>
+                            <div class="theme-option active" onclick="setTheme('auto')">
+                                <div class="theme-preview auto"></div>
+                                <span data-i18n="auto">Авто</span>
+                            </div>
+                            <div class="theme-option" onclick="setTheme('dark')">
+                                <div class="theme-preview dark"></div>
+                                <span data-i18n="dark">Темна</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Management -->
+                    <div class="settings-card">
+                        <h3>
+                            <i class="fas fa-database"></i>
+                            <span data-i18n="dataManagement">Управління даними</span>
+                        </h3>
+                        <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+                            <button class="btn-secondary" onclick="backupData()" data-i18n="backupNow">Створити резервну копію</button>
+                            <button class="btn-danger" onclick="confirmReset()" data-i18n="resetAll">Скинути все</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="showTab('new')">
+                <i class="fas fa-plus action-icon"></i>
+                <span class="action-text" data-i18n="quickNew">Новий</span>
+            </div>
+            <div class="quick-action" onclick="calculatePercentages()">
+                <i class="fas fa-calculator action-icon"></i>
+                <span class="action-text" data-i18n="quickCalc">Розрахувати</span>
+            </div>
+            <div class="quick-action" onclick="showTab('recipes')">
+                <i class="fas fa-book action-icon"></i>
+                <span class="action-text" data-i18n="quickRecipes">Рецепти</span>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal-overlay hidden" id="modalOverlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Modal Title</h3>
+                    <button class="modal-close" onclick="closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="modalBody">Modal content goes here...</div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeModal()" data-i18n="cancel">Скасувати</button>
+                    <button class="btn-primary" id="modalConfirm" data-i18n="confirm">Підтвердити</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay hidden" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" data-i18n="loading">Завантаження...</div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js');
+            });
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SICO MIX • Paint Mixing Calculator</title>
+    <meta name="theme-color" content="#f8fafc">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo" onclick="showTab('colors')">
+                    <div class="logo-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h1>SICO <span class="gradient-text">MIX</span></h1>
+                </div>
+                <div class="header-info">
+                    <div class="series-badge" id="seriesBadge" style="display: none;">
+                        <i class="fas fa-layer-group"></i>
+                        <span>SICO</span>
+                    </div>
+                    <div class="stats-badge" id="recipeStats">
+                        <i class="fas fa-paint-brush"></i>
+                        <span>0 colors</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <button class="btn-secondary" onclick="toggleTheme()" id="themeToggle">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="app-nav" id="appNav">
+            <button class="nav-btn active" onclick="showTab('colors')">
+                <i class="fas fa-palette nav-icon"></i>
+                <span class="nav-text" data-i18n="paints">Фарби</span>
+            </button>
+            <button class="nav-btn" onclick="showTab('new')">
+                <i class="fas fa-plus-circle nav-icon"></i>
+                <span class="nav-text" data-i18n="newRecipe">Новий рецепт</span>
+            </button>
+            <button class="nav-btn" onclick="showTab('recipes')">
+                <i class="fas fa-book-open nav-icon"></i>
+                <span class="nav-text" data-i18n="recipes">Рецепти</span>
+            </button>
+            <button class="nav-btn" onclick="showTab('settings')">
+                <i class="fas fa-cog nav-icon"></i>
+                <span class="nav-text" data-i18n="settings">Налаштування</span>
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Colors Tab -->
+            <div class="tab active" id="colors">
+                <div class="tab-header">
+                    <h2>
+                        <i class="fas fa-palette tab-icon"></i>
+                        <span data-i18n="catalog">Каталог фарб</span>
+                    </h2>
+                    <div class="search-box">
+                        <input type="text" id="colorSearch" data-i18n-placeholder="searchPlaceholder" placeholder="Пошук за кодом або назвою">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label data-i18n="filterSeries">Серія фарб</label>
+                    <select class="modern-select" id="seriesFilter">
+                        <option value="ALL" data-i18n="allSeries">Всі серії</option>
+                    </select>
+                </div>
+                
+                <div class="color-grid-container">
+                    <div class="color-count" id="colorCount">0 colors</div>
+                    <div class="color-grid" id="colorList">
+                        <!-- Colors will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Recipe Tab -->
+            <div class="tab" id="new">
+                <div class="tab-header">
+                    <h2>
+                        <i class="fas fa-plus-circle tab-icon"></i>
+                        <span data-i18n="newRecipe">Новий рецепт</span>
+                    </h2>
+                    <button class="btn-secondary" onclick="clearDraft()" data-i18n="clear">Очистити</button>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label data-i18n="recipeName">Назва рецепта</label>
+                        <input type="text" class="modern-input" id="recipeName" placeholder="Назва рецепта">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="status">Статус</label>
+                        <select class="modern-select" id="recipeStatus">
+                            <option value="draft" data-i18n="statusDraft">Чернетка</option>
+                            <option value="ready" data-i18n="statusReady">Готовий</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label data-i18n="recipeNote">Нотатка</label>
+                    <textarea class="modern-textarea" id="recipeNote" placeholder="Нотатка (необов'язково)"></textarea>
+                </div>
+                
+                <h3 data-i18n="addColors">Додати фарби</h3>
+                <div class="search-box">
+                    <input type="text" id="recipeSearch" data-i18n-placeholder="searchPlaceholder" placeholder="Пошук за кодом або назвою">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                
+                <div class="color-grid compact" id="addColorList">
+                    <!-- Add colors list will be loaded here -->
+                </div>
+                
+                <div class="recipe-items" id="recipeItems">
+                    <!-- Recipe items will be loaded here -->
+                </div>
+                
+                <div class="recipe-summary">
+                    <div class="summary-item">
+                        <span data-i18n="totalColors">Фарб</span>
+                        <span id="totalColors">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span data-i18n="totalPercent">Загальний %</span>
+                        <span id="totalPercent">0%</span>
+                    </div>
+                    <div class="summary-item">
+                        <span data-i18n="totalWeight">Загальна вага</span>
+                        <span id="totalWeightGrams">0 g</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label data-i18n="totalWeight">Загальна вага</label>
+                    <select class="modern-select" id="totalWeight">
+                        <option value="100">100 г</option>
+                        <option value="500">500 г</option>
+                        <option value="1000" selected>1000 г</option>
+                        <option value="5000">5000 г</option>
+                        <option value="custom">Custom...</option>
+                    </select>
+                    <input type="number" class="modern-input" id="customWeight" placeholder="Custom weight (g)" style="display: none;">
+                </div>
+                
+                <div class="photo-upload">
+                    <label data-i18n="addPhoto">Додати фото змішаної фарби</label>
+                    <div class="upload-area" onclick="document.getElementById('recipePhoto').click()">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <div class="upload-text" data-i18n="clickToUpload">Натисніть для завантаження</div>
+                        <div class="upload-subtext" data-i18n="maxSize">Макс. 5МБ</div>
+                    </div>
+                    <input type="file" id="recipePhoto" accept="image/*" style="display: none;">
+                    <div class="photo-preview" id="photoPreview" style="display: none;">
+                        <img id="previewImage" src="" alt="Preview">
+                        <button class="remove-photo" onclick="removePhoto()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <span data-i18n="modeChanged">Режим:</span>
+                        <label class="switch" style="margin-left: 10px;">
+                            <input type="checkbox" id="modeToggle" onchange="toggleMode(this)">
+                            <span class="slider">
+                                <span class="slider-label" data-i18n="percentMode">%</span>
+                                <span class="slider-label" data-i18n="gramMode">г</span>
+                            </span>
+                        </label>
+                    </label>
+                </div>
+                
+                <div style="text-align: center; margin-top: var(--space-xl);">
+                    <button class="btn-primary" onclick="saveRecipe()" data-i18n="addRecipe">Зберегти рецепт</button>
+                </div>
+            </div>
+
+            <!-- Recipes Tab -->
+            <div class="tab" id="recipes">
+                <div class="tab-header">
+                    <h2>
+                        <i class="fas fa-book-open tab-icon"></i>
+                        <span data-i18n="recipes">Рецепти</span>
+                    </h2>
+                    <div style="display: flex; gap: var(--space-sm);">
+                        <button class="btn-secondary" onclick="importRecipes()" data-i18n="import">Імпорт</button>
+                        <button class="btn-secondary" onclick="exportAllData()" data-i18n="exportAll">Експорт</button>
+                    </div>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="recipeSearchList" data-i18n-placeholder="searchRecipes" placeholder="Пошук рецептів">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                
+                <div style="display: flex; gap: var(--space-sm); margin: var(--space-md) 0;">
+                    <button class="btn-secondary filter-btn active" data-filter="all" onclick="setRecipeFilter('all')" data-i18n="all">Всі</button>
+                    <button class="btn-secondary filter-btn" data-filter="draft" onclick="setRecipeFilter('draft')" data-i18n="drafts">Чернетки</button>
+                    <button class="btn-secondary filter-btn" data-filter="ready" onclick="setRecipeFilter('ready')" data-i18n="ready">Готові</button>
+                </div>
+                
+                <div class="recipes-grid" id="recipeList">
+                    <!-- Recipes will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab" id="settings">
+                <div class="tab-header">
+                    <h2>
+                        <i class="fas fa-cog tab-icon"></i>
+                        <span data-i18n="settings">Налаштування</span>
+                    </h2>
+                </div>
+                
+                <div class="settings-container">
+                    <!-- Language Settings -->
+                    <div class="settings-card">
+                        <h3>
+                            <i class="fas fa-globe"></i>
+                            <span data-i18n="language">Мова</span>
+                        </h3>
+                        <div class="settings-options">
+                            <div class="lang-option active" onclick="setLang('ua')">
+                                <div class="flag">🇺🇦</div>
+                                <span>Українська</span>
+                            </div>
+                            <div class="lang-option" onclick="setLang('pl')">
+                                <div class="flag">🇵🇱</div>
+                                <span>Polski</span>
+                            </div>
+                            <div class="lang-option" onclick="setLang('en')">
+                                <div class="flag">🇺🇸</div>
+                                <span>English</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Theme Settings -->
+                    <div class="settings-card">
+                        <h3>
+                            <i class="fas fa-palette"></i>
+                            <span data-i18n="appearance">Зовнішній вигляд</span>
+                        </h3>
+                        <div class="settings-options">
+                            <div class="theme-option" onclick="setTheme('light')">
+                                <div class="theme-preview light"></div>
+                                <span data-i18n="light">Світла</span>
+                            </div>
+                            <div class="theme-option active" onclick="setTheme('auto')">
+                                <div class="theme-preview auto"></div>
+                                <span data-i18n="auto">Авто</span>
+                            </div>
+                            <div class="theme-option" onclick="setTheme('dark')">
+                                <div class="theme-preview dark"></div>
+                                <span data-i18n="dark">Темна</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Management -->
+                    <div class="settings-card">
+                        <h3>
+                            <i class="fas fa-database"></i>
+                            <span data-i18n="dataManagement">Управління даними</span>
+                        </h3>
+                        <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+                            <button class="btn-secondary" onclick="backupData()" data-i18n="backupNow">Створити резервну копію</button>
+                            <button class="btn-danger" onclick="confirmReset()" data-i18n="resetAll">Скинути все</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="showTab('new')">
+                <i class="fas fa-plus action-icon"></i>
+                <span class="action-text" data-i18n="quickNew">Новий</span>
+            </div>
+            <div class="quick-action" onclick="calculatePercentages()">
+                <i class="fas fa-calculator action-icon"></i>
+                <span class="action-text" data-i18n="quickCalc">Розрахувати</span>
+            </div>
+            <div class="quick-action" onclick="showTab('recipes')">
+                <i class="fas fa-book action-icon"></i>
+                <span class="action-text" data-i18n="quickRecipes">Рецепти</span>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal-overlay hidden" id="modalOverlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Modal Title</h3>
+                    <button class="modal-close" onclick="closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="modalBody">Modal content goes here...</div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeModal()" data-i18n="cancel">Скасувати</button>
+                    <button class="btn-primary" id="modalConfirm" data-i18n="confirm">Підтвердити</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay hidden" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" data-i18n="loading">Завантаження...</div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js');
+            });
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SICO MIX • Управління рецептами фарб</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
