@@ -1,5 +1,14 @@
+// Notification system
 function showNotification(message, type = 'success') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => {
+        document.body.removeChild(notification);
+    });
+    
     const notification = document.createElement('div');
+    notification.className = 'notification';
+    
     const bgColor = type === 'success' ? 'var(--primary)' : 
                    type === 'error' ? 'var(--danger)' : 
                    type === 'warning' ? 'var(--warning)' : 'var(--gray)';
@@ -34,11 +43,14 @@ function showNotification(message, type = 'success') {
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => {
-            document.body.removeChild(notification);
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
         }, 300);
     }, 3000);
 }
 
+// Confirmation modal
 function showConfirmation(title, message, onConfirm) {
     const confirmationModal = document.getElementById('confirmationModal');
     const confirmationTitle = document.getElementById('confirmationTitle');
@@ -47,6 +59,11 @@ function showConfirmation(title, message, onConfirm) {
     const cancelActionBtn = document.getElementById('cancelActionBtn');
     const closeConfirmationModal = document.getElementById('closeConfirmationModal');
     
+    if (!confirmationModal || !confirmationTitle || !confirmationMessage) {
+        console.error('Confirmation modal elements not found');
+        return;
+    }
+    
     confirmationTitle.textContent = title;
     confirmationMessage.textContent = message;
     confirmationModal.classList.add('active');
@@ -54,17 +71,27 @@ function showConfirmation(title, message, onConfirm) {
     const handleConfirm = () => {
         onConfirm();
         confirmationModal.classList.remove('active');
+        // Remove event listeners
+        confirmActionBtn.removeEventListener('click', handleConfirm);
+        cancelActionBtn.removeEventListener('click', handleCancel);
+        closeConfirmationModal.removeEventListener('click', handleCancel);
     };
     
     const handleCancel = () => {
         confirmationModal.classList.remove('active');
+        // Remove event listeners
+        confirmActionBtn.removeEventListener('click', handleConfirm);
+        cancelActionBtn.removeEventListener('click', handleCancel);
+        closeConfirmationModal.removeEventListener('click', handleCancel);
     };
     
-    confirmActionBtn.onclick = handleConfirm;
-    cancelActionBtn.onclick = handleCancel;
-    closeConfirmationModal.onclick = handleCancel;
+    // Add event listeners
+    confirmActionBtn.addEventListener('click', handleConfirm);
+    cancelActionBtn.addEventListener('click', handleCancel);
+    closeConfirmationModal.addEventListener('click', handleCancel);
 }
 
+// Add notification styles if not present
 if (!document.querySelector('#notification-styles')) {
     const style = document.createElement('style');
     style.id = 'notification-styles';
@@ -81,17 +108,37 @@ if (!document.querySelector('#notification-styles')) {
     document.head.appendChild(style);
 }
 
-// Допоміжні функції
-function formatDate(dateString, lang) {
-    const date = new Date(dateString);
+// Helper functions
+function formatDate(date, lang = 'pl') {
+    const d = new Date(date);
     const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-    return date.toLocaleDateString(lang === 'pl' ? 'pl-PL' : 
-                                  lang === 'uk' ? 'uk-UA' : 'en-US', options);
+    const locales = {
+        'pl': 'pl-PL',
+        'uk': 'uk-UA',
+        'en': 'en-US'
+    };
+    return d.toLocaleDateString(locales[lang] || 'pl-PL', options);
 }
 
-function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
+function downloadFile(filename, content, type = 'application/json') {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function readFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (e) => reject(e);
+        reader.readAsText(file);
+    });
 }
 
 function debounce(func, wait) {
