@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /private/
 
 Sitemap: https://twoja-domena.com/sitemap.xml
