@@ -116,11 +116,23 @@ const translations = {
         'confirmYes': 'Tak, wykonaj',
         
         // Powiadomienia
-        'recipeSaved': 'Przepis zapisany',
+        'recipeSaved': 'Przepis zapisany pomyślnie!',
         'recipeDeleted': 'Przepis usunięty',
-        'paintAdded': 'Farba dodana',
-        'paintDeleted': 'Farba usunięta',
+        'paintAdded': 'Farba dodana do katalogu',
+        'paintDeleted': 'Farba usunięta z katalogu',
         'selectForDelete': 'Wybierz przepisy do usunięcia',
+        'fillRequiredFields': 'Wypełnij wszystkie wymagane pola i dodaj przynajmniej jeden składnik',
+        'noDescription': 'Brak opisu',
+        'noRecipesFound': 'Nie znaleziono przepisów',
+        'catalogEmpty': 'Katalog jest pusty',
+        'featureInDevelopment': 'Funkcja w trakcie rozwoju',
+        'ingredientsCount': 'Składników',
+        'totalWeight': 'Całkowita waga',
+        'date': 'Data',
+        'select': 'Wybierz',
+        'edit': 'Edytuj',
+        'delete': 'Usuń',
+        'export': 'Eksportuj',
         
         // Stopka
         'version': 'Wersja',
@@ -243,11 +255,23 @@ const translations = {
         'confirmYes': 'Так, виконати',
         
         // Сповіщення
-        'recipeSaved': 'Рецепт збережено',
+        'recipeSaved': 'Рецепт успішно збережено!',
         'recipeDeleted': 'Рецепт видалено',
-        'paintAdded': 'Фарбу додано',
-        'paintDeleted': 'Фарбу видалено',
+        'paintAdded': 'Фарбу додано до каталогу',
+        'paintDeleted': 'Фарбу видалено з каталогу',
         'selectForDelete': 'Оберіть рецепти для видалення',
+        'fillRequiredFields': 'Заповніть всі обов\'язкові поля та додайте хоча б один інгредієнт',
+        'noDescription': 'Опис відсутній',
+        'noRecipesFound': 'Рецептів не знайдено',
+        'catalogEmpty': 'Каталог порожній',
+        'featureInDevelopment': 'Функція в розробці',
+        'ingredientsCount': 'Інгредієнтів',
+        'totalWeight': 'Загальна вага',
+        'date': 'Дата',
+        'select': 'Обрати',
+        'edit': 'Редагувати',
+        'delete': 'Видалити',
+        'export': 'Експорт',
         
         // Підвал
         'version': 'Версія',
@@ -370,11 +394,23 @@ const translations = {
         'confirmYes': 'Yes, perform',
         
         // Notifications
-        'recipeSaved': 'Recipe saved',
+        'recipeSaved': 'Recipe saved successfully!',
         'recipeDeleted': 'Recipe deleted',
-        'paintAdded': 'Paint added',
-        'paintDeleted': 'Paint deleted',
+        'paintAdded': 'Paint added to catalog',
+        'paintDeleted': 'Paint deleted from catalog',
         'selectForDelete': 'Select recipes for deletion',
+        'fillRequiredFields': 'Please fill all required fields and add at least one ingredient',
+        'noDescription': 'No description',
+        'noRecipesFound': 'No recipes found',
+        'catalogEmpty': 'Catalog is empty',
+        'featureInDevelopment': 'Feature in development',
+        'ingredientsCount': 'Ingredients',
+        'totalWeight': 'Total weight',
+        'date': 'Date',
+        'select': 'Select',
+        'edit': 'Edit',
+        'delete': 'Delete',
+        'export': 'Export',
         
         // Footer
         'version': 'Version',
@@ -391,6 +427,16 @@ function setLanguage(lang) {
         localStorage.setItem('sicoMixLanguage', lang);
         applyTranslations();
         updatePlaceholders();
+        
+        // Update language selectors
+        document.querySelectorAll('.lang-select').forEach(select => {
+            select.value = lang;
+        });
+        
+        // Update data displays
+        updatePaintCount();
+        renderPaintCatalog();
+        renderRecipes();
     }
 }
 
@@ -399,25 +445,11 @@ function getTranslation(key) {
 }
 
 function applyTranslations() {
-    // Переклад тексту
+    // Update all elements with data-i18n attribute
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         if (key) {
             element.textContent = getTranslation(key);
-        }
-    });
-    
-    // Оновлення селектів мови
-    const languageSelectors = [
-        document.getElementById('mobileLanguageSelect'),
-        document.getElementById('sidebarLanguageSelect'),
-        document.getElementById('desktopLanguageSelect'),
-        document.getElementById('languageSelect')
-    ];
-    
-    languageSelectors.forEach(selector => {
-        if (selector) {
-            selector.value = currentLanguage;
         }
     });
 }
@@ -435,21 +467,13 @@ function initLanguage() {
     const savedLang = localStorage.getItem('sicoMixLanguage') || 'pl';
     setLanguage(savedLang);
     
-    // Додавання обробників подій для селекторів мови
-    const languageSelectors = [
-        document.getElementById('mobileLanguageSelect'),
-        document.getElementById('sidebarLanguageSelect'),
-        document.getElementById('desktopLanguageSelect'),
-        document.getElementById('languageSelect')
-    ];
-    
-    languageSelectors.forEach(selector => {
-        if (selector) {
-            selector.addEventListener('change', (e) => {
-                setLanguage(e.target.value);
-            });
-        }
+    // Add event listeners to language selectors
+    document.querySelectorAll('.lang-select').forEach(select => {
+        select.addEventListener('change', (e) => {
+            setLanguage(e.target.value);
+        });
     });
 }
 
+// Initialize language when DOM is loaded
 document.addEventListener('DOMContentLoaded', initLanguage);
