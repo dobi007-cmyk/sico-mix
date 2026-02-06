@@ -1,9 +1,5 @@
-# Заборона індексації для пошукових систем (якщо потрібно)
 User-agent: *
-Disallow:
-
-# Дозвіл на індексацію головної сторінки
 Allow: /
+Disallow: /admin/
 
-# Sitemap (можна додати пізніше)
-# Sitemap: https://ваш-сайт.com/sitemap.xml
+Sitemap: https://twoja-domena.com/sitemap.xml
