@@ -1,327 +1,236 @@
+// ========== СИСТЕМА ІНТЕРНАЦІОНАЛІЗАЦІЇ ==========
 const i18n = {
-  ua: {
-    paints: "Фарби",
-    recipes: "Рецепти",
-    newRecipe: "Новий рецепт",
-    settings: "Налаштування",
-    catalog: "Каталог фарб",
-    recipeName: "Назва рецепта",
-    recipeNote: "Нотатка",
-    addRecipe: "Зберегти рецепт",
-    clear: "Очистити",
-    draft: "Чернетка",
-    ready: "Готовий",
-    status: "Статус",
-    statusDraft: "Чернетка",
-    statusReady: "Готовий",
-    colors: "фарб",
-    addColors: "Додати фарби",
-    colorAlreadyAdded: "Фарба вже додана",
-    seriesSet: "Встановлено серію",
-    calculator: "Калькулятор",
-    totalWeight: "Загальна вага",
-    totalWeightGrams: "Загальна вага",
-    totalColors: "Фарб",
-    totalPercent: "Загальний %",
-    percentMode: "% режим",
-    gramMode: "г режим",
-    modeChanged: "Режим змінено",
-    search: "Пошук",
-    searchPlaceholder: "Пошук за кодом або назвою",
-    searchRecipes: "Пошук рецептів",
-    filterSeries: "Серія фарб",
-    allSeries: "Всі серії",
-    all: "Всі",
-    drafts: "Чернетки",
-    ready: "Готові",
-    addPhoto: "Додати фото змішаної фарби",
-    clickToUpload: "Натисніть для завантаження",
-    maxSize: "Макс. 5МБ",
-    photoAdded: "Фото додано",
-    photoRemoved: "Фото видалено",
-    fileTooLarge: "Файл занадто великий",
-    invalidImage: "Невірний формат зображення",
-    themeToggle: "Змінити тему",
-    themeChanged: "Тему змінено",
-    light: "Світла",
-    dark: "Темна",
-    auto: "Авто",
-    language: "Мова",
-    appearance: "Зовнішній вигляд",
-    dataManagement: "Управління даними",
-    exportAllData: "Експортувати всі дані",
-    backup: "Резервна копія",
-    backupNow: "Створити резервну копію",
-    resetAll: "Скинути все",
-    confirmReset: "Підтвердити скидання",
-    confirmResetMsg: "Ви дійсно хочете скинути всі дані? Цю дію неможливо скасувати.",
-    dataReset: "Дані скинуто",
-    backupCreated: "Резервна копія створена",
-    import: "Імпорт",
-    export: "Експорт",
-    exportAll: "Експортувати все",
-    exportText: "Експорт JSON",
-    exportPdf: "Експорт PDF",
-    exportSuccess: "Експорт успішний",
-    pdfExported: "PDF експортовано",
-    importSuccess: "Імпорт успішний",
-    importError: "Помилка імпорту",
-    exportError: "Помилка експорту",
-    savedSuccess: "Рецепт збережено",
-    saveError: "Помилка збереження",
-    draftCleared: "Чернетку очищено",
-    recipeLoaded: "Рецепт завантажено",
-    recipeDeleted: "Рецепт видалено",
-    error: "Помилка",
-    errorSeries: "Можна змішувати тільки в межах однієї серії",
-    errorEmptyRecipe: "Вкажіть назву та додайте хоча б один колір",
-    errorEmptyName: "Введіть назву рецепта",
-    sumWarning: "Сума повинна бути близько 100%",
-    warning: "Попередження",
-    noRecipes: "Немає рецептів",
-    noColorsAdded: "Ще не додано фарб",
-    createFirstRecipe: "Створіть свій перший рецепт змішування фарб!",
-    createRecipe: "Створити рецепт",
-    browseColors: "Переглянути фарби",
-    confirmDelete: "Видалити рецепт",
-    confirmDeleteMsg: "Видалити рецепт",
-    cancel: "Скасувати",
-    confirm: "Підтвердити",
-    about: "Про додаток",
-    appDescription: "Професійний калькулятор змішування фарб для трафаретного друку",
-    quickNew: "Новий",
-    quickCalc: "Розрахувати",
-    quickRecipes: "Рецепти",
-    loading: "Завантаження...",
-    delete: "Видалити"
-  },
-  
-  pl: {
-    paints: "Farby",
-    recipes: "Receptury",
-    newRecipe: "Nowa receptura",
-    settings: "Ustawienia",
-    catalog: "Katalog farb",
-    recipeName: "Nazwa receptury",
-    recipeNote: "Notatka",
-    addRecipe: "Zapisz recepturę",
-    clear: "Wyczyść",
-    draft: "Szkic",
-    ready: "Gotowy",
-    status: "Status",
-    statusDraft: "Szkic",
-    statusReady: "Gotowy",
-    colors: "farby",
-    addColors: "Dodaj farby",
-    colorAlreadyAdded: "Farba już dodana",
-    seriesSet: "Ustawiono serię",
-    calculator: "Kalkulator",
-    totalWeight: "Całkowita waga",
-    totalWeightGrams: "Całkowita waga",
-    totalColors: "Farby",
-    totalPercent: "Suma %",
-    percentMode: "Tryb %",
-    gramMode: "Tryb g",
-    modeChanged: "Zmieniono tryb",
-    search: "Szukaj",
-    searchPlaceholder: "Szukaj po kodzie lub nazwie",
-    searchRecipes: "Szukaj receptur",
-    filterSeries: "Seria farb",
-    allSeries: "Wszystkie serie",
-    all: "Wszystkie",
-    drafts: "Szkice",
-    ready: "Gotowe",
-    addPhoto: "Dodaj zdjęcie zmieszanej farby",
-    clickToUpload: "Kliknij, aby przesłać",
-    maxSize: "Maks. 5MB",
-    photoAdded: "Zdjęcie dodane",
-    photoRemoved: "Zdjęcie usunięte",
-    fileTooLarge: "Plik za duży",
-    invalidImage: "Nieprawidłowy format obrazu",
-    themeToggle: "Zmień motyw",
-    themeChanged: "Zmieniono motyw",
-    light: "Jasny",
-    dark: "Ciemny",
-    auto: "Auto",
-    language: "Język",
-    appearance: "Wygląd",
-    dataManagement: "Zarządzanie danymi",
-    exportAllData: "Eksportuj wszystkie dane",
-    backup: "Kopia zapasowa",
-    backupNow: "Utwórz kopię zapasową",
-    resetAll: "Resetuj wszystko",
-    confirmReset: "Potwierdź reset",
-    confirmResetMsg: "Czy na pewno chcesz zresetować wszystkie dane? Tej operacji nie można cofnąć.",
-    dataReset: "Dane zresetowane",
-    backupCreated: "Utworzono kopię zapasową",
-    import: "Import",
-    export: "Eksport",
-    exportAll: "Eksportuj wszystko",
-    exportText: "Eksport JSON",
-    exportPdf: "Eкспорт PDF",
-    exportSuccess: "Eksport udany",
-    pdfExported: "PDF wyeksportowany",
-    importSuccess: "Import udany",
-    importError: "Błąd importu",
-    exportError: "Błąd eksportu",
-    savedSuccess: "Receptura zapisana",
-    saveError: "Błąd zapisu",
-    draftCleared: "Szkic wyczyszczony",
-    recipeLoaded: "Receptura załadowana",
-    recipeDeleted: "Receptura usunięta",
-    error: "Błąd",
-    errorSeries: "Można mieszać tylko w jednej serii",
-    errorEmptyRecipe: "Podaj nazwę i dodaj kolor",
-    errorEmptyName: "Wprowadź nazwę receptury",
-    sumWarning: "Suma powinna być około 100%",
-    warning: "Ostrzeżenie",
-    noRecipes: "Brak receptur",
-    noColorsAdded: "Nie dodano farb",
-    createFirstRecipe: "Utwórz swoją pierwszą recepturę mieszania farb!",
-    createRecipe: "Utwórz recepturę",
-    browseColors: "Przeglądaj farby",
-    confirmDelete: "Usuń recepturę",
-    confirmDeleteMsg: "Usunąć recepturę",
-    cancel: "Anuluj",
-    confirm: "Potwierdź",
-    about: "O aplikacji",
-    appDescription: "Profesjonalny kalkulator mieszania farb do druku sitowego",
-    quickNew: "Nowy",
-    quickCalc: "Oblicz",
-    quickRecipes: "Receptury",
-    loading: "Ładowanie...",
-    delete: "Usuń"
-  },
-  
-  en: {
-    paints: "Paints",
-    recipes: "Recipes",
-    newRecipe: "New recipe",
-    settings: "Settings",
-    catalog: "Paint catalog",
-    recipeName: "Recipe name",
-    recipeNote: "Note",
-    addRecipe: "Save recipe",
-    clear: "Clear",
-    draft: "Draft",
-    ready: "Ready",
-    status: "Status",
-    statusDraft: "Draft",
-    statusReady: "Ready",
-    colors: "colors",
-    addColors: "Add colors",
-    colorAlreadyAdded: "Color already added",
-    seriesSet: "Series set to",
-    calculator: "Calculator",
-    totalWeight: "Total weight",
-    totalWeightGrams: "Total weight",
-    totalColors: "Colors",
-    totalPercent: "Total %",
-    percentMode: "% mode",
-    gramMode: "g mode",
-    modeChanged: "Mode changed",
-    search: "Search",
-    searchPlaceholder: "Search by code or name",
-    searchRecipes: "Search recipes",
-    filterSeries: "Paint series",
-    allSeries: "All series",
-    all: "All",
-    drafts: "Drafts",
-    ready: "Ready",
-    addPhoto: "Add photo of mixed paint",
-    clickToUpload: "Click to upload",
-    maxSize: "Max 5MB",
-    photoAdded: "Photo added",
-    photoRemoved: "Photo removed",
-    fileTooLarge: "File too large",
-    invalidImage: "Invalid image format",
-    themeToggle: "Toggle theme",
-    themeChanged: "Theme changed",
-    light: "Light",
-    dark: "Dark",
-    auto: "Auto",
-    language: "Language",
-    appearance: "Appearance",
-    dataManagement: "Data management",
-    exportAllData: "Export all data",
-    backup: "Backup",
-    backupNow: "Backup now",
-    resetAll: "Reset all",
-    confirmReset: "Confirm reset",
-    confirmResetMsg: "Are you sure you want to reset all data? This action cannot be undone.",
-    dataReset: "Data reset",
-    backupCreated: "Backup created",
-    import: "Import",
-    export: "Export",
-    exportAll: "Export all",
-    exportText: "Export JSON",
-    exportPdf: "Export PDF",
-    exportSuccess: "Export successful",
-    pdfExported: "PDF exported",
-    importSuccess: "Import successful",
-    importError: "Import error",
-    exportError: "Export error",
-    savedSuccess: "Recipe saved",
-    saveError: "Save error",
-    draftCleared: "Draft cleared",
-    recipeLoaded: "Recipe loaded",
-    recipeDeleted: "Recipe deleted",
-    error: "Error",
-    errorSeries: "You can mix only within one series",
-    errorEmptyRecipe: "Enter name and add color",
-    errorEmptyName: "Enter recipe name",
-    sumWarning: "Sum should be around 100%",
-    warning: "Warning",
-    noRecipes: "No recipes",
-    noColorsAdded: "No colors added",
-    createFirstRecipe: "Create your first paint mixing recipe!",
-    createRecipe: "Create recipe",
-    browseColors: "Browse colors",
-    confirmDelete: "Delete recipe",
-    confirmDeleteMsg: "Delete recipe",
-    cancel: "Cancel",
-    confirm: "Confirm",
-    about: "About",
-    appDescription: "Professional paint mixing calculator for screen printing",
-    quickNew: "New",
-    quickCalc: "Calculate",
-    quickRecipes: "Recipes",
-    loading: "Loading...",
-    delete: "Delete"
-  }
+    // Поточна мова
+    currentLanguage: 'uk',
+    
+    // Словники перекладів
+    translations: {
+        uk: {
+            // Загальні
+            appName: "SICO MIX",
+            appDescription: "Система управління рецептами фарб",
+            
+            // Навігація
+            home: "Головна",
+            newRecipe: "Новий рецепт",
+            recipes: "Рецепти",
+            catalog: "Каталог фарб",
+            import: "Імпорт",
+            export: "Експорт",
+            settings: "Налаштування",
+            
+            // Кнопки
+            save: "Зберегти",
+            cancel: "Скасувати",
+            delete: "Видалити",
+            edit: "Редагувати",
+            add: "Додати",
+            search: "Пошук",
+            print: "Друк",
+            
+            // Повідомлення
+            loading: "Завантаження...",
+            saved: "Збережено!",
+            deleted: "Видалено",
+            error: "Помилка",
+            success: "Успіх",
+            warning: "Увага",
+            
+            // Тексти сторінок
+            welcomeTitle: "Ласкаво просимо до SICO MIX",
+            welcomeSubtitle: "Професійна система управління рецептами фарб для створення, зберігання та аналізу ваших кольорових рішень",
+            
+            // Підписи полів
+            recipeName: "Назва рецепту",
+            recipeCategory: "Категорія",
+            recipeColor: "Колір",
+            recipeDescription: "Опис рецепту",
+            recipePhoto: "Фото рецепту",
+            
+            // Помилки
+            requiredField: "Це поле обов'язкове",
+            invalidEmail: "Невірний формат email",
+            invalidNumber: "Невірне число",
+            
+            // Підтвердження
+            confirmDelete: "Ви впевнені, що хочете видалити?",
+            confirmAction: "Ви впевнені, що хочете виконати цю дію?",
+            
+            // Статистика
+            paintsInCatalog: "фарб у каталозі",
+            totalRecipes: "всього рецептів",
+            lastUpdated: "останнє оновлення"
+        },
+        en: {
+            // General
+            appName: "SICO MIX",
+            appDescription: "Paint Recipe Management System",
+            
+            // Navigation
+            home: "Home",
+            newRecipe: "New Recipe",
+            recipes: "Recipes",
+            catalog: "Paint Catalog",
+            import: "Import",
+            export: "Export",
+            settings: "Settings",
+            
+            // Buttons
+            save: "Save",
+            cancel: "Cancel",
+            delete: "Delete",
+            edit: "Edit",
+            add: "Add",
+            search: "Search",
+            print: "Print",
+            
+            // Messages
+            loading: "Loading...",
+            saved: "Saved!",
+            deleted: "Deleted",
+            error: "Error",
+            success: "Success",
+            warning: "Warning",
+            
+            // Page texts
+            welcomeTitle: "Welcome to SICO MIX",
+            welcomeSubtitle: "Professional paint recipe management system for creating, storing and analyzing your color solutions",
+            
+            // Field labels
+            recipeName: "Recipe name",
+            recipeCategory: "Category",
+            recipeColor: "Color",
+            recipeDescription: "Recipe description",
+            recipePhoto: "Recipe photo",
+            
+            // Errors
+            requiredField: "This field is required",
+            invalidEmail: "Invalid email format",
+            invalidNumber: "Invalid number",
+            
+            // Confirmations
+            confirmDelete: "Are you sure you want to delete?",
+            confirmAction: "Are you sure you want to perform this action?",
+            
+            // Statistics
+            paintsInCatalog: "paints in catalog",
+            totalRecipes: "total recipes",
+            lastUpdated: "last updated"
+        },
+        pl: {
+            // Ogólne
+            appName: "SICO MIX",
+            appDescription: "System zarządzania recepturami farb",
+            
+            // Nawigacja
+            home: "Strona główna",
+            newRecipe: "Nowy przepis",
+            recipes: "Przepisy",
+            catalog: "Katalog farb",
+            import: "Import",
+            export: "Eksport",
+            settings: "Ustawienia",
+            
+            // Przyciski
+            save: "Zapisz",
+            cancel: "Anuluj",
+            delete: "Usuń",
+            edit: "Edytuj",
+            add: "Dodaj",
+            search: "Szukaj",
+            print: "Drukuj",
+            
+            // Komunikaty
+            loading: "Ładowanie...",
+            saved: "Zapisano!",
+            deleted: "Usunięto",
+            error: "Błąd",
+            success: "Sukces",
+            warning: "Ostrzeżenie",
+            
+            // Teksty stron
+            welcomeTitle: "Witamy w SICO MIX",
+            welcomeSubtitle: "Profesjonalny system zarządzania recepturami farb do tworzenia, przechowywania i analizowania rozwiązań kolorystycznych",
+            
+            // Etykiety pól
+            recipeName: "Nazwa przepisu",
+            recipeCategory: "Kategoria",
+            recipeColor: "Kolor",
+            recipeDescription: "Opis przepisu",
+            recipePhoto: "Zdjęcie przepisu",
+            
+            // Błędy
+            requiredField: "To pole jest wymagane",
+            invalidEmail: "Nieprawidłowy format email",
+            invalidNumber: "Nieprawidłowa liczba",
+            
+            // Potwierdzenia
+            confirmDelete: "Czy na pewno chcesz usunąć?",
+            confirmAction: "Czy na pewno chcesz wykonać tę akcję?",
+            
+            // Statystyki
+            paintsInCatalog: "farb w katalogu",
+            totalRecipes: "wszystkich przepisów",
+            lastUpdated: "ostatnia aktualizacja"
+        }
+    },
+    
+    // Змінити мову
+    setLanguage(lang) {
+        if (this.translations[lang]) {
+            this.currentLanguage = lang;
+            this.applyTranslations();
+            localStorage.setItem('sicoMixLanguage', lang);
+            return true;
+        }
+        return false;
+    },
+    
+    // Отримати переклад
+    t(key) {
+        return this.translations[this.currentLanguage][key] || key;
+    },
+    
+    // Застосувати переклади до всіх елементів
+    applyTranslations() {
+        // Оновлення тексту в елементах з атрибутом data-i18n
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            const key = element.getAttribute('data-i18n');
+            const translation = this.t(key);
+            
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                element.placeholder = translation;
+            } else {
+                element.textContent = translation;
+            }
+        });
+        
+        // Оновлення заголовка сторінки
+        document.title = `${this.t('appName')} • ${this.t('appDescription')}`;
+    },
+    
+    // Ініціалізація мови
+    initialize() {
+        const savedLanguage = localStorage.getItem('sicoMixLanguage') || 'uk';
+        this.setLanguage(savedLanguage);
+        
+        // Оновлення вибору мови в налаштуваннях
+        const languageSelect = document.getElementById('languageSelect');
+        if (languageSelect) {
+            languageSelect.value = savedLanguage;
+            languageSelect.addEventListener('change', (e) => {
+                this.setLanguage(e.target.value);
+            });
+        }
+    }
 };
 
-export let currentLang = localStorage.getItem("sico_lang") || "ua";
-
-export function t(key) {
-  return i18n[currentLang]?.[key] || key;
+// Ініціалізація i18n при завантаженні
+function initializeI18n() {
+    i18n.initialize();
 }
 
-export function setLang(lang) {
-  if (!i18n[lang]) return;
-  
-  currentLang = lang;
-  localStorage.setItem("sico_lang", lang);
-  
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.dataset.i18n;
-    const translation = t(key);
-    if (translation !== key) el.textContent = translation;
-  });
-  
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-    el.placeholder = t(el.dataset.i18nPlaceholder);
-  });
-  
-  document.querySelectorAll("option[data-i18n]").forEach(opt => {
-    opt.textContent = t(opt.dataset.i18n);
-  });
-  
-  document.documentElement.lang = lang;
-  
-  if (typeof window.renderAll === 'function') {
-    window.renderAll();
-  }
-  
-  console.log(`Мова змінена на: ${lang}`);
+// Експорт для використання в інших файлах
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = i18n;
 }
