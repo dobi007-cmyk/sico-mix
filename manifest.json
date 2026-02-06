@@ -1,117 +1,84 @@
 {
-  "id": "/",
-  "name": "SICO MIX - Paint Calculator",
+  "name": "SICO MIX - Калькулятор фарб",
   "short_name": "SICO MIX",
-  "description": "Professional paint mixing calculator for screen printing",
-
+  "description": "Професійний калькулятор змішування фарб для трафаретного друку",
   "start_url": "/",
-  "scope": "/",
-
   "display": "standalone",
-  "display_override": [
-    "window-controls-overlay",
-    "standalone"
-  ],
-
   "background_color": "#f8fafc",
   "theme_color": "#3b82f6",
-
   "orientation": "portrait",
+  "scope": "/",
   "lang": "uk",
-  "dir": "ltr",
-
-  "categories": ["productivity", "business", "utilities"],
-
+  
   "icons": [
-    { "src": "/icons/icon-72.png",  "sizes": "72x72",   "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-72.png",  "sizes": "72x72",   "type": "image/png", "purpose": "maskable" },
-
-    { "src": "/icons/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "maskable" },
-
-    { "src": "/icons/icon-128.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-128.png", "sizes": "128x128", "type": "image/png", "purpose": "maskable" },
-
-    { "src": "/icons/icon-144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-144.png", "sizes": "144x144", "type": "image/png", "purpose": "maskable" },
-
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-
-    { "src": "/icons/icon-256.png", "sizes": "256x256", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-256.png", "sizes": "256x256", "type": "image/png", "purpose": "maskable" },
-
-    { "src": "/icons/icon-384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-384.png", "sizes": "384x384", "type": "image/png", "purpose": "maskable" },
-
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ],
-
-  "screenshots": [
     {
-      "src": "/screenshots/desktop.png",
-      "sizes": "1280x720",
+      "src": "/icons/icon-72.png",
+      "sizes": "72x72",
       "type": "image/png",
-      "form_factor": "wide",
-      "label": "SICO MIX on desktop"
+      "purpose": "any maskable"
     },
     {
-      "src": "/screenshots/mobile.png",
-      "sizes": "414x896",
+      "src": "/icons/icon-96.png",
+      "sizes": "96x96",
       "type": "image/png",
-      "form_factor": "narrow",
-      "label": "SICO MIX on mobile"
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-
+  
   "shortcuts": [
     {
-      "name": "New Recipe",
-      "short_name": "New",
-      "description": "Create new paint mixing recipe",
-      "url": "/?tab=new",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+      "name": "Новий рецепт",
+      "short_name": "Новий",
+      "description": "Створити новий рецепт змішування фарб",
+      "url": "/?tab=new"
     },
     {
-      "name": "Color Catalog",
-      "short_name": "Catalog",
-      "description": "Browse all SICO paint colors",
-      "url": "/?tab=colors",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+      "name": "Каталог фарб",
+      "short_name": "Каталог",
+      "description": "Переглянути всі фарби SICO",
+      "url": "/?tab=colors"
     },
     {
-      "name": "Recipes",
-      "short_name": "Recipes",
-      "description": "View saved paint mixing recipes",
-      "url": "/?tab=recipes",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
-    }
-  ],
-
-  "share_target": {
-    "action": "/",
-    "method": "POST",
-    "enctype": "application/x-www-form-urlencoded",
-    "params": {
-      "title": "name",
-      "text": "description",
-      "url": "link"
-    }
-  },
-
-  "launch_handler": {
-    "client_mode": ["auto", "focus-existing", "navigate-existing"]
-  },
-
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-
-  "protocol_handlers": [
-    {
-      "protocol": "web+sico",
-      "url": "/?recipe=%s"
+      "name": "Мої рецепти",
+      "short_name": "Рецепти",
+      "description": "Переглянути збережені рецепти",
+      "url": "/?tab=recipes"
     }
   ]
 }
