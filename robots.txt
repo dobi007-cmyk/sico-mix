@@ -1,14 +1,9 @@
-# ============================================
-# SICO MIX Paint Calculator
-# Professional paint mixing application
-# ============================================
-
+# Заборона індексації для пошукових систем (якщо потрібно)
 User-agent: *
+Disallow:
+
+# Дозвіл на індексацію головної сторінки
 Allow: /
 
-# Restricted areas
-Disallow: /admin/
-Disallow: /private/
-
-# Sitemap
-Sitemap: https://example.com/sitemap.xml
+# Sitemap (можна додати пізніше)
+# Sitemap: https://ваш-сайт.com/sitemap.xml
