@@ -1,383 +1,683 @@
 <!DOCTYPE html>
-<html lang="uk" data-theme="auto">
+<html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <meta name="description" content="Професійний калькулятор змішування фарб SICO для трафаретного друку">
-  <meta name="theme-color" content="#3b82f6">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>SICO MIX | Професійний калькулятор фарб</title>
-  
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icons/icon-192.png" type="image/png">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  
-  <!-- Фонт Inter з оптимізованими вагами -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700;800&family=JetBrains+Mono:wght=400;500;600&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SICO MIX • Управління фарбами</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --success: #4cc9f0;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .logo-container h1 {
+            color: var(--primary);
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-container h1 i {
+            color: var(--accent);
+        }
+
+        .paint-count {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 25px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+        }
+
+        .nav-title {
+            font-size: 14px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .nav-item {
+            margin-bottom: 12px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: var(--border-radius);
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .export-btn {
+            width: 100%;
+            background: linear-gradient(to right, var(--secondary), var(--accent));
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Catalog Section */
+        .catalog {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--light);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .action-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            border: 2px solid transparent;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--dark);
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            color: white;
+            font-size: 24px;
+        }
+
+        .action-btn span {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Paint Series */
+        .paint-series {
+            margin-top: 30px;
+        }
+
+        .series-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .series-title i {
+            color: var(--accent);
+        }
+
+        .series-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .series-card {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--primary);
+        }
+
+        .series-card:hover {
+            background: #e8f4ff;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .series-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .series-count {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-icon {
+            font-size: 60px;
+            color: var(--light-gray);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .empty-state p {
+            max-width: 500px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        .add-first-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .add-first-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .search-container {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+            
+            .series-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
 </head>
-
 <body>
-  <div class="app-container">
-    
-    <header class="app-header" role="banner">
-      <div class="header-left">
-        <div class="logo" aria-label="SICO MIX Logo">
-          <div class="logo-icon" aria-hidden="true">🎨</div>
-          <h1>SICO <span class="gradient-text">MIX</span></h1>
-        </div>
-        <div class="header-info" aria-label="Інформація про поточну серію">
-          <span id="seriesBadge" class="series-badge" style="display:none;"></span>
-          <span id="recipeStats" class="stats-badge">0 фарб</span>
-        </div>
-      </div>
-      
-      <div class="header-controls">
-        <div class="lang-switcher" role="group" aria-label="Вибір мови">
-          <button class="lang-btn" onclick="setLang('ua')" title="Українська" aria-label="Українська мова">UA</button>
-          <button class="lang-btn" onclick="setLang('pl')" title="Polski" aria-label="Польська мова">PL</button>
-          <button class="lang-btn" onclick="setLang('en')" title="English" aria-label="Англійська мова">EN</button>
-        </div>
-        
-        <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Перемкнути тему">
-          <span class="theme-icon">🌙</span>
-        </button>
-      </div>
-    </header>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <h1><i class="fas fa-palette"></i> SICO MIX</h1>
+                <p>Система управління рецептами фарб</p>
+            </div>
+            <div class="paint-count">
+                <i class="fas fa-paint-brush"></i>
+                <span id="paintCount">0</span> фарб у каталозі
+            </div>
+        </header>
 
-    <nav class="app-nav" role="navigation" aria-label="Основна навігація">
-      <button class="nav-btn active" onclick="showTab('colors')" data-i18n="paints" aria-label="Каталог фарб">
-        <span class="nav-icon" aria-hidden="true">🎨</span>
-        <span class="nav-text">Фарби</span>
-      </button>
-      <button class="nav-btn" onclick="showTab('new')" data-i18n="newRecipe" aria-label="Створити новий рецепт">
-        <span class="nav-icon" aria-hidden="true">➕</span>
-        <span class="nav-text">Новий</span>
-      </button>
-      <button class="nav-btn" onclick="showTab('recipes')" data-i18n="recipes" aria-label="Мої рецепти">
-        <span class="nav-icon" aria-hidden="true">📋</span>
-        <span class="nav-text">Рецепти</span>
-      </button>
-      <button class="nav-btn" onclick="showTab('settings')" data-i18n="settings" aria-label="Налаштування">
-        <span class="nav-icon" aria-hidden="true">⚙️</span>
-        <span class="nav-text">Налаштування</span>
-      </button>
-    </nav>
+        <div class="main-content">
+            <!-- Sidebar Navigation -->
+            <aside class="sidebar">
+                <h3 class="nav-title">Навігація</h3>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fas fa-home"></i>
+                            <span>Головна</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" id="newBtn">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Новий рецепт</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-calculator"></i>
+                            <span>Розрахунки</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-book-open"></i>
+                            <span>Рецепти</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-sliders-h"></i>
+                            <span>Налаштування</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <button class="export-btn" id="exportBtn">
+                    <i class="fas fa-file-export"></i>
+                    Експорт каталогу
+                </button>
+            </aside>
 
-    <main class="app-main" role="main">
-      
-      <section id="colors" class="tab active" role="tabpanel" aria-label="Каталог фарб">
-        <div class="tab-header">
-          <h2><span class="tab-icon" aria-hidden="true">🎨</span> <span data-i18n="catalog">Каталог фарб</span></h2>
-          <div class="tab-actions">
-            <button class="btn-secondary" onclick="exportAllColors()" data-i18n="exportAll">Експорт</button>
-          </div>
-        </div>
-        
-        <div class="filter-section">
-          <div class="filter-group">
-            <label for="seriesFilter" data-i18n="filterSeries">Серія фарб</label>
-            <select id="seriesFilter" class="modern-select" aria-label="Фільтр за серією"></select>
-          </div>
-          
-          <div class="filter-group">
-            <label for="colorSearch" data-i18n="search">Пошук</label>
-            <div class="search-box">
-              <input type="text" id="colorSearch" data-i18n-placeholder="searchPlaceholder" 
-                     oninput="renderColors()" aria-label="Пошук фарби">
-              <span class="search-icon" aria-hidden="true">🔍</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="color-grid-container">
-          <div id="colorCount" class="color-count" aria-live="polite">0 фарб</div>
-          <div id="colorList" class="color-grid" role="list" aria-label="Список фарб"></div>
-        </div>
-      </section>
+            <!-- Main Catalog -->
+            <main class="catalog">
+                <div class="section-header">
+                    <h2 class="section-title">Каталог фарб</h2>
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Пошук фарб, рецептів, серій...">
+                    </div>
+                </div>
 
-      <section id="new" class="tab" role="tabpanel" aria-label="Створення рецепта" hidden>
-        <div class="tab-header">
-          <h2><span class="tab-icon" aria-hidden="true">➕</span> <span data-i18n="newRecipe">Новий рецепт</span></h2>
-          <div class="tab-actions">
-            <button class="btn-secondary" onclick="clearDraft()" data-i18n="clear">Очистити</button>
-            <button class="btn-primary" onclick="saveRecipe()" data-i18n="addRecipe">
-              <span class="btn-icon" aria-hidden="true">💾</span>
-              <span class="btn-text">Зберегти</span>
-            </button>
-          </div>
-        </div>
-        
-        <div class="recipe-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="recipeName" data-i18n="recipeName">Назва рецепта</label>
-              <input type="text" id="recipeName" data-i18n-placeholder="recipeName" 
-                     class="modern-input" aria-required="true">
-            </div>
-            
-            <div class="form-group">
-              <label for="recipeStatus" data-i18n="status">Статус</label>
-              <select id="recipeStatus" class="modern-select" aria-label="Статус рецепта">
-                <option value="draft" data-i18n="statusDraft">Чернетка</option>
-                <option value="ready" data-i18n="statusReady">Готовий</option>
-              </select>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="recipeNote" data-i18n="recipeNote">Нотатка</label>
-            <textarea id="recipeNote" data-i18n-placeholder="recipeNote" 
-                      class="modern-textarea" rows="2" aria-label="Нотатка до рецепта"></textarea>
-          </div>
-          
-          <div class="form-section">
-            <div class="section-header">
-              <h3><span class="section-icon" aria-hidden="true">🔍</span> <span data-i18n="addColors">Додати фарби</span></h3>
-              <div class="mode-toggle">
-                <span data-i18n="percentMode">% режим</span>
-                <label class="switch">
-                  <input type="checkbox" id="modeToggle" onchange="toggleMode(this)" aria-label="Перемкнути режим">
-                  <span class="slider">
-                    <span class="slider-label">%</span>
-                    <span class="slider-label">г</span>
-                  </span>
-                </label>
-              </div>
-            </div>
-            
-            <div class="search-box">
-              <input type="text" id="recipeSearch" data-i18n-placeholder="searchPlaceholder" 
-                     oninput="renderAddColors()" aria-label="Пошук фарб для додавання">
-              <span class="search-icon" aria-hidden="true">🔍</span>
-            </div>
-            
-            <div id="addColorList" class="color-grid compact" role="list" aria-label="Фарби для додавання"></div>
-          </div>
-          
-          <div class="form-section">
-            <div class="section-header">
-              <h3><span class="section-icon" aria-hidden="true">⚖️</span> <span data-i18n="calculator">Калькулятор</span></h3>
-              <div class="weight-selector">
-                <label for="totalWeight" data-i18n="totalWeight">Загальна вага</label>
-                <select id="totalWeight" class="modern-select" onchange="renderCurrentRecipe()" aria-label="Загальна вага">
-                  <option value="100">100 г</option>
-                  <option value="250">250 г</option>
-                  <option value="500">500 г</option>
-                  <option value="1000" selected>1 кг</option>
-                  <option value="5000">5 кг</option>
-                  <option value="custom">Своя</option>
-                </select>
-                <input type="number" id="customWeight" class="modern-input" 
-                       placeholder="Введіть вагу" style="display:none;" min="1" step="1">
-              </div>
-            </div>
-            
-            <div id="recipeItems" class="recipe-items" role="list" aria-label="Склад рецепта">
-              <div class="empty-state">
-                <div class="empty-icon" aria-hidden="true">🎨</div>
-                <p data-i18n="noColorsAdded">Ще не додано фарб</p>
-              </div>
-            </div>
-            
-            <div class="recipe-summary" aria-live="polite">
-              <div class="summary-item">
-                <span data-i18n="totalColors">Фарб</span>
-                <span id="totalColors">0</span>
-              </div>
-              <div class="summary-item">
-                <span data-i18n="totalPercent">Загальний %</span>
-                <span id="totalPercent">0%</span>
-              </div>
-              <div class="summary-item">
-                <span data-i18n="totalWeightGrams">Вага</span>
-                <span id="totalWeightGrams">0 г</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="form-section">
-            <h3><span class="section-icon" aria-hidden="true">📸</span> <span data-i18n="addPhoto">Додати фото</span></h3>
-            <div class="photo-upload">
-              <label for="recipePhoto" class="upload-area">
-                <div class="upload-icon" aria-hidden="true">📸</div>
-                <div class="upload-text" data-i18n="clickToUpload">Натисніть для завантаження</div>
-                <div class="upload-subtext" data-i18n="maxSize">Макс. 5МБ</div>
-              </label>
-              <input type="file" id="recipePhoto" accept="image/*" capture="environment" 
-                     style="display:none;" aria-label="Завантажити фото">
-              <div id="photoPreview" class="photo-preview">
-                <img src="" alt="Попередній перегляд фото" style="display:none;">
-                <button class="remove-photo" onclick="removePhoto()" aria-label="Видалити фото">✕</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="#" class="action-btn" id="newActionBtn">
+                        <div class="action-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <span>Новий рецепт</span>
+                    </a>
+                    <a href="#" class="action-btn">
+                        <div class="action-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <span>Розрахунки</span>
+                    </a>
+                    <a href="#" class="action-btn">
+                        <div class="action-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <span>Рецепти</span>
+                    </a>
+                </div>
 
-      <section id="recipes" class="tab" role="tabpanel" aria-label="Мої рецепти" hidden>
-        <div class="tab-header">
-          <h2><span class="tab-icon" aria-hidden="true">📋</span> <span data-i18n="recipes">Рецепти</span></h2>
-          <div class="tab-actions">
-            <div class="button-group">
-              <button class="btn-secondary" onclick="importRecipes()" data-i18n="import">
-                <span class="btn-icon" aria-hidden="true">📥</span>
-                <span class="btn-text">Імпорт</span>
-              </button>
-              <button class="btn-primary" onclick="exportAllRecipes()" data-i18n="exportAll">
-                <span class="btn-icon" aria-hidden="true">📤</span>
-                <span class="btn-text">Експорт</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="recipes-toolbar">
-          <div class="search-box">
-            <input type="text" id="recipeSearchList" data-i18n-placeholder="searchRecipes" 
-                   oninput="filterRecipes()" aria-label="Пошук рецептів">
-            <span class="search-icon" aria-hidden="true">🔍</span>
-          </div>
-          
-          <div class="filter-buttons" role="group" aria-label="Фільтр рецептів">
-            <button class="filter-btn active" data-filter="all" onclick="setRecipeFilter('all')" data-i18n="all">Всі</button>
-            <button class="filter-btn" data-filter="draft" onclick="setRecipeFilter('draft')" data-i18n="drafts">Чернетки</button>
-            <button class="filter-btn" data-filter="ready" onclick="setRecipeFilter('ready')" data-i18n="ready">Готові</button>
-          </div>
-        </div>
-        
-        <div id="recipeList" class="recipes-grid" role="list" aria-label="Список рецептів">
-          <div class="empty-state">
-            <div class="empty-icon" aria-hidden="true">📋</div>
-            <h3 data-i18n="noRecipes">Немає рецептів</h3>
-            <p data-i18n="createFirstRecipe">Створіть свій перший рецепт!</p>
-            <button class="btn-primary" onclick="showTab('new')" data-i18n="createRecipe">Створити</button>
-          </div>
-        </div>
-      </section>
+                <!-- Paint Series -->
+                <div class="paint-series">
+                    <h3 class="series-title">
+                        <i class="fas fa-layer-group"></i>
+                        Серії фарб
+                    </h3>
+                    
+                    <div class="series-grid" id="seriesGrid">
+                        <!-- Series will be added here dynamically -->
+                    </div>
+                </div>
 
-      <section id="settings" class="tab" role="tabpanel" aria-label="Налаштування" hidden>
-        <div class="tab-header">
-          <h2><span class="tab-icon" aria-hidden="true">⚙️</span> <span data-i18n="settings">Налаштування</span></h2>
+                <!-- Empty State (shown by default) -->
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <h3>Каталог фарб порожній</h3>
+                    <p>Додайте свою першу фарбу або рецепт, щоб почати роботу з системою SICO MIX.</p>
+                    <button class="add-first-btn" id="addFirstBtn">
+                        <i class="fas fa-plus"></i>
+                        Додати першу фарбу
+                    </button>
+                </div>
+            </main>
         </div>
-        
-        <div class="settings-container">
-          <div class="settings-card">
-            <h3><span class="settings-icon" aria-hidden="true">🌍</span> <span data-i18n="language">Мова</span></h3>
-            <div class="settings-options">
-              <button class="lang-option" onclick="setLang('ua')" aria-label="Українська мова">
-                <span class="flag" aria-hidden="true">🇺🇦</span>
-                <span>Українська</span>
-              </button>
-              <button class="lang-option" onclick="setLang('pl')" aria-label="Польська мова">
-                <span class="flag" aria-hidden="true">🇵🇱</span>
-                <span>Polski</span>
-              </button>
-              <button class="lang-option" onclick="setLang('en')" aria-label="Англійська мова">
-                <span class="flag" aria-hidden="true">🇬🇧</span>
-                <span>English</span>
-              </button>
-            </div>
-          </div>
-          
-          <div class="settings-card">
-            <h3><span class="settings-icon" aria-hidden="true">🎨</span> <span data-i18n="appearance">Тема</span></h3>
-            <div class="theme-options">
-              <button class="theme-option" onclick="setTheme('light')" aria-label="Світла тема">
-                <div class="theme-preview light"></div>
-                <span data-i18n="light">Світла</span>
-              </button>
-              <button class="theme-option" onclick="setTheme('dark')" aria-label="Темна тема">
-                <div class="theme-preview dark"></div>
-                <span data-i18n="dark">Темна</span>
-              </button>
-              <button class="theme-option" onclick="setTheme('auto')" aria-label="Автоматична тема">
-                <div class="theme-preview auto"></div>
-                <span data-i18n="auto">Авто</span>
-              </button>
-            </div>
-          </div>
-          
-          <div class="settings-card">
-            <h3><span class="settings-icon" aria-hidden="true">💾</span> <span data-i18n="dataManagement">Дані</span></h3>
-            <div class="settings-buttons">
-              <button class="btn-secondary" onclick="exportAllData()" data-i18n="exportAllData">Експорт даних</button>
-              <button class="btn-secondary" onclick="backupData()" data-i18n="backupNow">Резервна копія</button>
-              <button class="btn-danger" onclick="confirmReset()" data-i18n="resetAll">Скинути все</button>
-            </div>
-          </div>
-          
-          <div class="settings-card">
-            <h3><span class="settings-icon" aria-hidden="true">ℹ️</span> <span data-i18n="about">Про додаток</span></h3>
-            <div class="about-info">
-              <div class="app-version">SICO MIX v2.0.0</div>
-              <div class="app-description" data-i18n="appDescription">Професійний калькулятор змішування фарб</div>
-              <div class="copyright">© 2026 SICO MIX • Всі права захищені</div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
 
-    <div class="quick-actions" role="toolbar" aria-label="Швидкі дії">
-      <button class="quick-action" onclick="showTab('new')" aria-label="Новий рецепт">
-        <span class="action-icon" aria-hidden="true">➕</span>
-        <span class="action-text" data-i18n="quickNew">Новий</span>
-      </button>
-      <button class="quick-action" onclick="calculateWeights()" aria-label="Розрахувати ваги">
-        <span class="action-icon" aria-hidden="true">⚖️</span>
-        <span class="action-text" data-i18n="quickCalc">Розрахувати</span>
-      </button>
-      <button class="quick-action" onclick="showTab('recipes')" aria-label="Мої рецепти">
-        <span class="action-icon" aria-hidden="true">📋</span>
-        <span class="action-text" data-i18n="quickRecipes">Рецепти</span>
-      </button>
+        <footer class="footer">
+            <p>SICO MIX • Версія 2.1 • © 2023 Система управління рецептами фарб</p>
+        </footer>
     </div>
-  </div>
 
-  <div id="modalOverlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 id="modalTitle"></h3>
-        <button class="modal-close" onclick="closeModal()" aria-label="Закрити">✕</button>
-      </div>
-      <div class="modal-body" id="modalBody"></div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal()" data-i18n="cancel">Скасувати</button>
-        <button id="modalConfirm" class="btn-primary" data-i18n="confirm">Підтвердити</button>
-      </div>
-    </div>
-  </div>
+    <script>
+        // Sample data for paint series
+        const paintSeries = [
+            { name: "Металік", count: 0 },
+            { name: "Перламутр", count: 0 },
+            { name: "Матові", count: 0 },
+            { name: "Глянцеві", count: 0 },
+            { name: "Акрилові", count: 0 },
+            { name: "Епоксидні", count: 0 }
+        ];
 
-  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+        // DOM Elements
+        const paintCountElement = document.getElementById('paintCount');
+        const seriesGridElement = document.getElementById('seriesGrid');
+        const emptyStateElement = document.getElementById('emptyState');
+        const searchInputElement = document.getElementById('searchInput');
+        const newBtn = document.getElementById('newBtn');
+        const newActionBtn = document.getElementById('newActionBtn');
+        const addFirstBtn = document.getElementById('addFirstBtn');
+        const exportBtn = document.getElementById('exportBtn');
 
-  <div id="loadingOverlay" class="loading-overlay hidden" aria-busy="true" aria-label="Завантаження">
-    <div class="loading-spinner" aria-hidden="true"></div>
-    <div class="loading-text" data-i18n="loading">Завантаження...</div>
-  </div>
+        // Initialize the app
+        function initApp() {
+            renderPaintSeries();
+            updatePaintCount();
+        }
 
-  <input type="file" id="importFile" accept=".json" style="display:none;" aria-label="Імпорт файлу">
+        // Render paint series to the grid
+        function renderPaintSeries() {
+            seriesGridElement.innerHTML = '';
+            
+            paintSeries.forEach(series => {
+                const seriesCard = document.createElement('div');
+                seriesCard.className = 'series-card';
+                seriesCard.innerHTML = `
+                    <div class="series-name">${series.name}</div>
+                    <div class="series-count">${series.count} фарб</div>
+                `;
+                seriesGridElement.appendChild(seriesCard);
+            });
+        }
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-  
-  <script type="module" src="js/utils.js"></script>
-  <script type="module" src="js/data-colors.js"></script>
-  <script type="module" src="js/i18n.js"></script>
-  <script type="module" src="js/app.js"></script>
-  
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(reg => console.log('Service Worker зареєстровано'))
-          .catch(err => console.log('Помилка реєстрації Service Worker:', err));
-      });
-    }
-  </script>
+        // Update paint count
+        function updatePaintCount() {
+            const totalPaints = paintSeries.reduce((sum, series) => sum + series.count, 0);
+            paintCountElement.textContent = totalPaints;
+            
+            // Show/hide empty state
+            if (totalPaints > 0) {
+                emptyStateElement.style.display = 'none';
+            } else {
+                emptyStateElement.style.display = 'block';
+            }
+        }
+
+        // Add new paint function
+        function addNewPaint() {
+            // In a real app, this would open a modal/form
+            // For demo, we'll just add a random paint to a random series
+            const randomSeriesIndex = Math.floor(Math.random() * paintSeries.length);
+            paintSeries[randomSeriesIndex].count++;
+            
+            updatePaintCount();
+            renderPaintSeries();
+            
+            // Show notification
+            showNotification(`Фарбу додано до серії "${paintSeries[randomSeriesIndex].name}"`);
+        }
+
+        // Search functionality
+        searchInputElement.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            if (searchTerm.length > 0) {
+                // In a real app, this would filter actual paints
+                // For demo, we'll just show a message
+                console.log(`Пошук: ${searchTerm}`);
+                // You would filter and re-render paint series here
+            }
+        });
+
+        // Show notification
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--primary);
+                color: white;
+                padding: 15px 25px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-hover);
+                z-index: 1000;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            notification.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Event Listeners
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            addNewPaint();
+        });
+
+        newActionBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            addNewPaint();
+        });
+
+        addFirstBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            addNewPaint();
+        });
+
+        exportBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            showNotification("Каталог експортовано у форматі CSV");
+        });
+
+        // Initialize the app
+        initApp();
+        
+        // Demo: Add some paints after 2 seconds to show functionality
+        setTimeout(() => {
+            // Add a few demo paints
+            paintSeries[0].count = 3;
+            paintSeries[1].count = 2;
+            paintSeries[3].count = 5;
+            updatePaintCount();
+            renderPaintSeries();
+        }, 2000);
+    </script>
 </body>
 </html>
