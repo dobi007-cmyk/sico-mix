@@ -1,45 +1,38 @@
 {
-  "name": "SICO MIX",
-  "short_name": "SICO MIX",
-  "description": "Система управління рецептами фарб",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4361ee",
-  "orientation": "portrait",
-  "scope": "/",
-  "lang": "uk",
-  "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "categories": ["business", "productivity", "utilities"],
-  "shortcuts": [
-    {
-      "name": "Новий рецепт",
-      "short_name": "Новий",
-      "description": "Створити новий рецепт фарби",
-      "url": "/?page=new-recipe",
-      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Мої рецепти",
-      "short_name": "Рецепти",
-      "description": "Переглянути всі рецепти",
-      "url": "/?page=recipes",
-      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
-    }
-  ],
-  "related_applications": [],
-  "prefer_related_applications": false
+    "name": "SICO MIX",
+    "short_name": "SICO MIX",
+    "description": "System zarządzania przepisami farb",
+    "lang": "pl",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#4361ee",
+    "theme_color": "#4361ee",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "https://via.placeholder.com/192x192/4361ee/ffffff?text=SICO",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://via.placeholder.com/512x512/4361ee/ffffff?text=SICO",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "categories": ["business", "productivity", "utilities"],
+    "shortcuts": [
+        {
+            "name": "Nowy przepis",
+            "short_name": "Nowy przepis",
+            "description": "Utwórz nowy przepis farby",
+            "url": "./index.html?page=new-recipe"
+        },
+        {
+            "name": "Moje przepisy",
+            "short_name": "Przepisy",
+            "description": "Przejrzyj zapisane przepisy",
+            "url": "./index.html?page=recipes"
+        }
+    ]
 }
