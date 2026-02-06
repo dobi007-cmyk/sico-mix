@@ -1,9 +1,4 @@
-/* ============================================
-   SICO MIX 2026 - Modern Professional Design (Improved)
-   ============================================ */
-
 :root {
-  /* Light Theme */
   --color-bg: #f8fafc;
   --color-surface: #ffffff;
   --color-surface-secondary: #f1f5f9;
@@ -28,9 +23,9 @@
   --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
 
-  --glass-bg: rgba(255,255,255,0.75);
+  --glass-bg: rgba(255,255,255,0.78);
   --glass-border: rgba(255,255,255,0.18);
-  --glass-shadow: 0 8px 32px rgba(31,38,135,0.15);
+  --glass-shadow: 0 8px 32px rgba(31,38,135,0.12);
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -77,9 +72,9 @@
   --color-warning: #fbbf24;
   --color-error: #f87171;
 
-  --glass-bg: rgba(30,41,59,0.75);
-  --glass-border: rgba(255,255,255,0.08);
-  --glass-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  --glass-bg: rgba(30,41,59,0.78);
+  --glass-border: rgba(255,255,255,0.09);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.38);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -98,9 +93,9 @@
     --color-warning: #fbbf24;
     --color-error: #f87171;
 
-    --glass-bg: rgba(30,41,59,0.75);
-    --glass-border: rgba(255,255,255,0.08);
-    --glass-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    --glass-bg: rgba(30,41,59,0.78);
+    --glass-border: rgba(255,255,255,0.09);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.38);
   }
 }
 
@@ -126,40 +121,136 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ... решта коду без змін, але з виправленими та доповненими стилями ... */
-
-/* Додано/покращено для кращої адаптивності */
-@media (max-width: 640px) {
-  .app-nav {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-sm);
-  }
-
-  .quick-actions {
-    flex-wrap: wrap;
-    gap: var(--space-md);
-  }
-
-  .recipe-item {
-    grid-template-columns: 48px 1fr;
-    grid-template-rows: auto auto;
-    gap: var(--space-sm);
-  }
-
-  .item-input {
-    grid-column: 1 / -1;
-  }
-
-  .item-remove {
-    grid-row: 1;
-    grid-column: 2;
-    justify-self: end;
-  }
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
-/* Print styles покращено */
-@media print {
-  body { background: white; color: black; }
-  .glass-bg, .backdrop-filter { background: white !important; backdrop-filter: none !important; }
-  .gradient-text { background: none !important; -webkit-background-clip: initial; color: #000 !important; }
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+
+.app-nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-xs);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.nav-btn:hover {
+  background: var(--color-surface-secondary);
+  color: var(--color-text);
+  transform: translateY(-1px);
+}
+
+.nav-btn.active {
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.app-main {
+  padding: var(--space-lg);
+  flex: 1;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-lg);
+}
+
+.color-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+
+.color-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.color-swatch {
+  height: 120px;
+}
+
+.color-info {
+  padding: var(--space-md);
+}
+
+.recipe-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.recipe-item {
+  display: grid;
+  grid-template-columns: 60px 2fr 1fr 80px 48px;
+  gap: var(--space-md);
+  align-items: center;
+  background: var(--color-surface-secondary);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+}
+
+.item-input {
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  text-align: right;
+}
+
+.quick-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--z-sticky);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--glass-border);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xl);
+}
+
+.modal-overlay {
+  position: fixed
