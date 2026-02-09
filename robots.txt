@@ -1,6 +1,10 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
-Disallow: /private/
+Disallow: /api/
 
-Sitemap: https://twoja-domena.com/sitemap.xml
+Sitemap: https://ваш-домен.укр/sitemap.xml
+
+# SICO MIX - Система управління рецептами фарб
+# Версія 2.2
+# © 2023
