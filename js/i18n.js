@@ -152,7 +152,34 @@ SICOMIX.i18n = (function() {
             invalid_file_format: "Невірний формат файлу",
             file_read_error: "Помилка читання файлу",
             feature_in_development: "Функція в розробці"
+                
+            // Нові ключі для меню
+            main_menu: "Головне меню",
+            import_export_menu: "Імпорт/Експорт",
+            settings_menu: "Налаштування",
+    
+            // Одиниці вимірювання
+            grams_unit: "г",
+            kg_unit: "кг",
+            ml_unit: "мл",
+            l_unit: "л",
+    
+            // Категорії фарб
+            metallic_category: "Металік",
+            pearl_category: "Перламутр",
+            matte_category: "Матові",
+            glossy_category: "Глянцеві",
+            acrylic_category: "Акрилові",
+            epoxy_category: "Епоксидні",
+    
+            // Версія
+            version_text: "Версія",
+            system_description: "Система управління рецептами фарб",
+    
+            // Фільтри
+            filter_all_categories: "Всі категорії"
         },
+                
         en: {
             // General
             home: "Home",
@@ -301,7 +328,35 @@ SICOMIX.i18n = (function() {
             invalid_file_format: "Invalid file format",
             file_read_error: "File read error",
             feature_in_development: "Feature in development"
+
+            // New keys for the menu
+            main_menu: "Main Menu",
+            import_export_menu: "Import/Export",
+            settings_menu: "Settings",
+    
+            // Units of measurement
+            grams_unit: "g",
+            kg_unit: "kg",
+            ml_unit: "ml",
+            l_unit: "l",
+    
+            // Paint categories
+            metallic_category: "Metallic",
+            pearl_category: "Pearl",
+            matte_category: "Matte",
+            glossy_category: "Glossy",
+            acrylic_category: "Acrylic",
+            epoxy_category: "Epoxy",
+    
+            // Version
+            version_text: "Version",
+            system_description: "Paint recipe management system",
+    
+            // Filters
+            filter_all_categories: "All categories"
+    }
         },
+
         pl: {
             // Ogólne
             home: "Strona główna",
@@ -450,6 +505,32 @@ SICOMIX.i18n = (function() {
             invalid_file_format: "Nieprawidłowy format pliku",
             file_read_error: "Błąd odczytu pliku",
             feature_in_development: "Funkcja w rozwoju"
+
+            // Novi klyuchi dlya menyu
+            main_menu: "Główne menu",
+            import_export_menu: "Import/Eksport",
+            settings_menu: "Ustawienia",
+    
+            // Jednostki miary
+            grams_unit: "g",
+            kg_unit: "kg",
+            ml_unit: "ml",
+            l_unit: "l",
+    
+            // Kategorie farb
+            metallic_category: "Metalik",
+            pearl_category: "Perłowy",
+            matte_category: "Matowy",
+            glossy_category: "Glossy",
+            acrylic_category: "Akrylowy",
+            epoxy_category: "Epoksydowy",
+    
+            // Wersja
+            version_text: "Wersja",
+            system_description: "System zarządzania przepisami farb",
+    
+            // Filtry
+            filter_all_categories: "Wszystkie kategorie"
         }
     };
 
