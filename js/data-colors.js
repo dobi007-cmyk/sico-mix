@@ -1,198 +1,195 @@
-// data-colors.js
-// Зберігаємо дані про фарби та рецепти, а також функції для роботи з ними
+// ========== ДАНІ ПРО ФАРБИ ТА ПОЧАТКОВІ РЕЦЕПТИ ==========
 
-let recipes = [];
-let paintCatalog = [];
+const SICOMIX = window.SICOMIX || {};
 
-const initialData = {
-    paints: [
-        { id: 1, name: "Червоний металік", category: "Металік", color: "#FF0000", manufacturer: "SICO", article: "MET-RED-001" },
-        { id: 2, name: "Синій перламутр", category: "Перламутр", color: "#0000FF", manufacturer: "SICO", article: "PER-BLU-002" },
-        { id: 3, name: "Чорний мат", category: "Матові", color: "#000000", manufacturer: "SICO", article: "MAT-BLK-003" },
-        { id: 4, name: "Білий глянець", category: "Глянцеві", color: "#FFFFFF", manufacturer: "SICO", article: "GLOSS-WHT-004" },
-        { id: 5, name: "Зелений акрил", category: "Акрилові", color: "#00FF00", manufacturer: "SICO", article: "ACR-GRN-005" },
-        { id: 6, name: "Жовтий епоксид", category: "Епоксидні", color: "#FFFF00", manufacturer: "SICO", article: "EPO-YLW-006" }
-    ],
-    recipes: [
-        { 
-            id: 1, 
-            name: "Автомобільний червоний", 
-            category: "Металік", 
-            color: "#FF0000",
-            description: "Яскраво-червоний металік для автомобілів",
-            ingredients: [
-                { paintId: 1, amount: 500, unit: "г", percentage: 50 },
-                { paintId: 3, amount: 300, unit: "г", percentage: 30 },
-                { paintId: 4, amount: 200, unit: "г", percentage: 20 }
-            ],
-            date: "15.03.2023",
-            photo: null
-        },
-        { 
-            id: 2, 
-            name: "Ніжний перламутровий", 
-            category: "Перламутр", 
-            color: "#FFC0CB",
-            description: "Ніжний рожевий перламутр з ефектом перламутру",
-            ingredients: [
-                { paintId: 2, amount: 400, unit: "г", percentage: 40 },
-                { paintId: 4, amount: 600, unit: "г", percentage: 60 }
-            ],
-            date: "10.03.2023",
-            photo: null
-        }
-    ]
-};
+SICOMIX.data = (function() {
+    const initialData = {
+        paints: [
+            { id: 1, name: "Червоний металік", category: "Металік", color: "#FF0000", manufacturer: "SICO", article: "MET-RED-001" },
+            { id: 2, name: "Синій перламутр", category: "Перламутр", color: "#0000FF", manufacturer: "SICO", article: "PER-BLU-002" },
+            { id: 3, name: "Чорний мат", category: "Матові", color: "#000000", manufacturer: "SICO", article: "MAT-BLK-003" },
+            { id: 4, name: "Білий глянець", category: "Глянцеві", color: "#FFFFFF", manufacturer: "SICO", article: "GLOSS-WHT-004" },
+            { id: 5, name: "Зелений акрил", category: "Акрилові", color: "#00FF00", manufacturer: "SICO", article: "ACR-GRN-005" },
+            { id: 6, name: "Жовтий епоксид", category: "Епоксидні", color: "#FFFF00", manufacturer: "SICO", article: "EPO-YLW-006" },
+            { id: 7, name: "Сріблястий металік", category: "Металік", color: "#C0C0C0", manufacturer: "SICO", article: "MET-SIL-007" },
+            { id: 8, name: "Золотий перламутр", category: "Перламутр", color: "#FFD700", manufacturer: "SICO", article: "PER-GLD-008" },
+            { id: 9, name: "Сірий мат", category: "Матові", color: "#808080", manufacturer: "SICO", article: "MAT-GRY-009" },
+            { id: 10, name: "Червоний глянець", category: "Глянцеві", color: "#DC143C", manufacturer: "SICO", article: "GLOSS-RED-010" }
+        ],
+        recipes: [
+            { 
+                id: 1, 
+                name: "Автомобільний червоний", 
+                category: "Металік", 
+                color: "#FF0000",
+                description: "Яскраво-червоний металік для автомобілів",
+                ingredients: [
+                    { paintId: 1, amount: 500, unit: "г", percentage: 50 },
+                    { paintId: 3, amount: 300, unit: "г", percentage: 30 },
+                    { paintId: 4, amount: 200, unit: "г", percentage: 20 }
+                ],
+                date: "15.03.2023",
+                photo: null
+            },
+            { 
+                id: 2, 
+                name: "Ніжний перламутровий", 
+                category: "Перламутр", 
+                color: "#FFC0CB",
+                description: "Ніжний рожевий перламутр з ефектом перламутру",
+                ingredients: [
+                    { paintId: 2, amount: 400, unit: "г", percentage: 40 },
+                    { paintId: 4, amount: 600, unit: "г", percentage: 60 }
+                ],
+                date: "10.03.2023",
+                photo: null
+            },
+            { 
+                id: 3, 
+                name: "Елегантний сірий металік", 
+                category: "Металік", 
+                color: "#808080",
+                description: "Сучасний сірий металік для преміум авто",
+                ingredients: [
+                    { paintId: 7, amount: 700, unit: "г", percentage: 70 },
+                    { paintId: 3, amount: 200, unit: "г", percentage: 20 },
+                    { paintId: 10, amount: 100, unit: "г", percentage: 10 }
+                ],
+                date: "20.03.2023",
+                photo: null
+            }
+        ]
+    };
 
-// Завантаження даних з localStorage
-function loadData() {
-    const savedRecipes = localStorage.getItem('sicoMixRecipes');
-    const savedPaints = localStorage.getItem('sicoMixPaints');
-    
-    recipes = savedRecipes ? JSON.parse(savedRecipes) : initialData.recipes;
-    paintCatalog = savedPaints ? JSON.parse(savedPaints) : initialData.paints;
-}
+    // Категорії фарб
+    const categories = [
+        "Металік",
+        "Перламутр", 
+        "Матові",
+        "Глянцеві",
+        "Акрилові",
+        "Епоксидні",
+        "Грунтовка",
+        "Лак",
+        "Розчинник"
+    ];
 
-// Збереження даних в localStorage
-function saveData() {
-    localStorage.setItem('sicoMixRecipes', JSON.stringify(recipes));
-    localStorage.setItem('sicoMixPaints', JSON.stringify(paintCatalog));
-}
+    // Одиниці вимірювання
+    const units = [
+        { value: "г", label: "Грами" },
+        { value: "кг", label: "Кілограми" },
+        { value: "мл", label: "Мілілітри" },
+        { value: "л", label: "Літри" },
+        { value: "шт", label: "Штуки" },
+        { value: "%", label: "Відсотки" }
+    ];
 
-// Отримати фарбу за ID
-function getPaintById(id) {
-    return paintCatalog.find(paint => paint.id === id);
-}
+    // Формати файлів для імпорту/експорту
+    const fileFormats = [
+        { value: "json", label: "JSON", extension: ".json" },
+        { value: "csv", label: "CSV", extension: ".csv" },
+        { value: "excel", label: "Excel", extension: ".xlsx" },
+        { value: "pdf", label: "PDF", extension: ".pdf" }
+    ];
 
-// Отримати рецепт за ID
-function getRecipeById(id) {
-    return recipes.find(recipe => recipe.id === id);
-}
+    // Мови інтерфейсу
+    const languages = [
+        { code: "uk", name: "Українська", flag: "🇺🇦" },
+        { code: "en", name: "English", flag: "🇬🇧" },
+        { code: "pl", name: "Polski", flag: "🇵🇱" }
+    ];
 
-// Додати нову фарбу
-function addPaint(paint) {
-    paint.id = Date.now();
-    paintCatalog.push(paint);
-    saveData();
-    return paint;
-}
+    // Налаштування за замовчуванням
+    const defaultSettings = {
+        language: "uk",
+        units: "grams",
+        autoSave: true,
+        backup: false,
+        theme: "light",
+        notifications: true,
+        defaultCategory: "Металік",
+        defaultUnit: "г",
+        calculationsPrecision: 2
+    };
 
-// Додати новий рецепт
-function addRecipe(recipe) {
-    recipe.id = Date.now();
-    recipe.date = new Date().toLocaleDateString('uk-UA');
-    recipes.push(recipe);
-    saveData();
-    return recipe;
-}
+    // Кольори за замовчуванням для палітри
+    const defaultColors = [
+        "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF",
+        "#FFA500", "#800080", "#008000", "#800000", "#008080", "#000080",
+        "#FF4500", "#DA70D6", "#EEE8AA", "#98FB98", "#AFEEEE", "#DDA0DD"
+    ];
 
-// Видалити фарбу за ID
-function deletePaintById(id) {
-    paintCatalog = paintCatalog.filter(paint => paint.id !== id);
-    saveData();
-}
-
-// Видалити рецепт за ID
-function deleteRecipeById(id) {
-    recipes = recipes.filter(recipe => recipe.id !== id);
-    saveData();
-}
-
-// Оновити фарбу
-function updatePaint(updatedPaint) {
-    const index = paintCatalog.findIndex(paint => paint.id === updatedPaint.id);
-    if (index !== -1) {
-        paintCatalog[index] = updatedPaint;
-        saveData();
-    }
-}
-
-// Оновити рецепт
-function updateRecipe(updatedRecipe) {
-    const index = recipes.findIndex(recipe => recipe.id === updatedRecipe.id);
-    if (index !== -1) {
-        recipes[index] = updatedRecipe;
-        saveData();
-    }
-}
-
-// Пошук фарб
-function searchPaints(searchTerm, category) {
-    let filtered = paintCatalog;
-    if (searchTerm) {
-        const term = searchTerm.toLowerCase();
-        filtered = filtered.filter(paint => 
-            paint.name.toLowerCase().includes(term) ||
-            paint.category.toLowerCase().includes(term) ||
-            (paint.manufacturer && paint.manufacturer.toLowerCase().includes(term)) ||
-            (paint.article && paint.article.toLowerCase().includes(term))
-        );
-    }
-    if (category) {
-        filtered = filtered.filter(paint => paint.category === category);
-    }
-    return filtered;
-}
-
-// Пошук рецептів
-function searchRecipes(searchTerm, category) {
-    let filtered = recipes;
-    if (searchTerm) {
-        const term = searchTerm.toLowerCase();
-        filtered = filtered.filter(recipe => 
-            recipe.name.toLowerCase().includes(term) ||
-            (recipe.description && recipe.description.toLowerCase().includes(term))
-        );
-    }
-    if (category) {
-        filtered = filtered.filter(recipe => recipe.category === category);
-    }
-    return filtered;
-}
-
-// Отримати всі категорії фарб
-function getPaintCategories() {
-    const categories = new Set();
-    paintCatalog.forEach(paint => categories.add(paint.category));
-    return Array.from(categories);
-}
-
-// Отримати всі категорії рецептів
-function getRecipeCategories() {
-    const categories = new Set();
-    recipes.forEach(recipe => categories.add(recipe.category));
-    return Array.from(categories);
-}
-
-// Експорт даних у форматі JSON
-function exportData(includeRecipes = true, includePaints = true) {
-    const data = {};
-    if (includeRecipes) data.recipes = recipes;
-    if (includePaints) data.paints = paintCatalog;
-    return JSON.stringify(data, null, 2);
-}
-
-// Імпорт даних з JSON
-function importData(jsonString) {
-    try {
-        const data = JSON.parse(jsonString);
-        if (data.recipes && Array.isArray(data.recipes)) {
-            data.recipes.forEach(recipe => {
-                // Генеруємо нові ID, щоб уникнути конфліктів
-                recipe.id = Date.now() + Math.random();
-                recipes.push(recipe);
+    // Генерація випадкових даних для тестування
+    function generateMockData(count) {
+        const mockPaints = [];
+        const mockRecipes = [];
+        
+        for (let i = 1; i <= count; i++) {
+            // Генеруємо фарби
+            const category = categories[Math.floor(Math.random() * categories.length)];
+            const color = defaultColors[Math.floor(Math.random() * defaultColors.length)];
+            
+            mockPaints.push({
+                id: i,
+                name: `Фарба ${i} ${category}`,
+                category: category,
+                color: color,
+                manufacturer: ["SICO", "DUPONT", "PPG", "BASF", "AKZO"][Math.floor(Math.random() * 5)],
+                article: `ART-${category.substring(0, 3).toUpperCase()}-${String(i).padStart(3, '0')}`,
+                description: `Високоякісна ${category.toLowerCase()} фарба для професійного використання`
             });
+
+            // Генеруємо рецепти (кожен 3-й)
+            if (i % 3 === 0) {
+                const numIngredients = Math.floor(Math.random() * 5) + 2;
+                const ingredients = [];
+                let totalAmount = 0;
+                
+                for (let j = 0; j < numIngredients; j++) {
+                    const amount = Math.floor(Math.random() * 500) + 100;
+                    totalAmount += amount;
+                    ingredients.push({
+                        paintId: Math.floor(Math.random() * count) + 1,
+                        amount: amount,
+                        unit: "г",
+                        percentage: 0
+                    });
+                }
+                
+                // Розраховуємо відсотки
+                ingredients.forEach(ing => {
+                    ing.percentage = parseFloat(((ing.amount / totalAmount) * 100).toFixed(1));
+                });
+                
+                mockRecipes.push({
+                    id: i,
+                    name: `Рецепт ${i} ${category}`,
+                    category: category,
+                    color: color,
+                    description: `Унікальний рецепт ${category.toLowerCase()} фарби з ${numIngredients} інгредієнтами`,
+                    ingredients: ingredients,
+                    date: new Date().toLocaleDateString('uk-UA'),
+                    photo: null
+                });
+            }
         }
-        if (data.paints && Array.isArray(data.paints)) {
-            data.paints.forEach(paint => {
-                paint.id = Date.now() + Math.random();
-                paintCatalog.push(paint);
-            });
-        }
-        saveData();
-        return true;
-    } catch (error) {
-        console.error('Помилка імпорту даних:', error);
-        return false;
+        
+        return {
+            paints: mockPaints,
+            recipes: mockRecipes
+        };
     }
-}
+
+    return {
+        initialData,
+        categories,
+        units,
+        fileFormats,
+        languages,
+        defaultSettings,
+        defaultColors,
+        generateMockData
+    };
+})();
+
+window.SICOMIX = SICOMIX;
