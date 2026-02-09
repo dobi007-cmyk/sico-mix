@@ -5,17 +5,39 @@ if (!window.SICOMIX) window.SICOMIX = {};
 SICOMIX.data = (function() {
     const initialData = {
         paints: [
-            { id: 1, name: "Червоний металік", category: "Металік", color: "#FF0000", manufacturer: "SICO", article: "MET-RED-001" },
-            { id: 2, name: "Синій перламутр", category: "Перламутр", color: "#0000FF", manufacturer: "SICO", article: "PER-BLU-002" },
-            { id: 3, name: "Чорний мат", category: "Матові", color: "#000000", manufacturer: "SICO", article: "MAT-BLK-003" },
-            { id: 4, name: "Білий глянець", category: "Глянцеві", color: "#FFFFFF", manufacturer: "SICO", article: "GLOSS-WHT-004" },
-            { id: 5, name: "Зелений акрил", category: "Акрилові", color: "#00FF00", manufacturer: "SICO", article: "ACR-GRN-005" },
-            { id: 6, name: "Жовтий епоксид", category: "Епоксидні", color: "#FFFF00", manufacturer: "SICO", article: "EPO-YLW-006" },
-            { id: 7, name: "Сріблястий металік", category: "Металік", color: "#C0C0C0", manufacturer: "SICO", article: "MET-SIL-007" },
-            { id: 8, name: "Золотий перламутр", category: "Перламутр", color: "#FFD700", manufacturer: "SICO", article: "PER-GLD-008" },
-            { id: 9, name: "Сірий мат", category: "Матові", color: "#808080", manufacturer: "SICO", article: "MAT-GRY-009" },
-            { id: 10, name: "Червоний глянець", category: "Глянцеві", color: "#DC143C", manufacturer: "SICO", article: "GLOSS-RED-010" }
-        ],
+    // ===== STANDARD COLOUR INKS =====
+    { id: 1, name: "SICO White 90", category: "Standard", color: "#FFFFFF", manufacturer: "SICO", article: "STD-90" },
+    { id: 2, name: "SICO Black 100", category: "Standard", color: "#000000", manufacturer: "SICO", article: "STD-100" },
+    { id: 3, name: "SICO Red 60", category: "Standard", color: "#B11226", manufacturer: "SICO", article: "STD-60" },
+    { id: 4, name: "SICO Blue 23", category: "Standard", color: "#0033A0", manufacturer: "SICO", article: "STD-23" },
+    { id: 5, name: "SICO Green 35", category: "Standard", color: "#007A3D", manufacturer: "SICO", article: "STD-35" },
+    { id: 6, name: "SICO Yellow 40", category: "Standard", color: "#FFD100", manufacturer: "SICO", article: "STD-40" },
+    { id: 7, name: "SICO Orange 55", category: "Standard", color: "#F05A28", manufacturer: "SICO", article: "STD-55" },
+
+    // ===== PANTONE / P SERIES =====
+    { id: 8, name: "Pantone Red P60/38", category: "Pantone", color: "#C8102E", manufacturer: "SICO", article: "P60/38" },
+    { id: 9, name: "Pantone Magenta P61/15", category: "Pantone", color: "#9C2A70", manufacturer: "SICO", article: "P61/15" },
+    { id: 10, name: "Pantone Blue P26/2", category: "Pantone", color: "#005EB8", manufacturer: "SICO", article: "P26/2" },
+    { id: 11, name: "Pantone Yellow P20/5", category: "Pantone", color: "#FEDD00", manufacturer: "SICO", article: "P20/5" },
+
+    // ===== CMYK INKS =====
+    { id: 12, name: "CMYK Cyan 141", category: "CMYK", color: "#009DDC", manufacturer: "SICO", article: "CMYK-141" },
+    { id: 13, name: "CMYK Magenta 142", category: "CMYK", color: "#D5006D", manufacturer: "SICO", article: "CMYK-142" },
+    { id: 14, name: "CMYK Yellow 140", category: "CMYK", color: "#FFDD00", manufacturer: "SICO", article: "CMYK-140" },
+    { id: 15, name: "CMYK Black 143", category: "CMYK", color: "#1A1A1A", manufacturer: "SICO", article: "CMYK-143" },
+
+    // ===== METALIZED INKS =====
+    { id: 16, name: "Metal Silver 110", category: "Metalized", color: "#BFC1C2", manufacturer: "SICO", article: "MET-110" },
+    { id: 17, name: "Metal Gold 120", category: "Metalized", color: "#8B6F2D", manufacturer: "SICO", article: "MET-120" },
+
+    // ===== FLUORESCENT INKS =====
+    { id: 18, name: "Fluo Yellow 130", category: "Fluorescent", color: "#E6FF00", manufacturer: "SICO", article: "FLUO-130" },
+    { id: 19, name: "Fluo Orange 131", category: "Fluorescent", color: "#FF7A00", manufacturer: "SICO", article: "FLUO-131" },
+    { id: 20, name: "Fluo Red 133", category: "Fluorescent", color: "#FF0038", manufacturer: "SICO", article: "FLUO-133" },
+    { id: 21, name: "Fluo Pink 134", category: "Fluorescent", color: "#FF1493", manufacturer: "SICO", article: "FLUO-134" },
+    { id: 22, name: "Fluo Green 135", category: "Fluorescent", color: "#00E676", manufacturer: "SICO", article: "FLUO-135" },
+    { id: 23, name: "Fluo Blue 136", category: "Fluorescent", color: "#2979FF", manufacturer: "SICO", article: "FLUO-136" }
+],
         recipes: [
             { 
                 id: 1, 
