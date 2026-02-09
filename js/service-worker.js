@@ -2,14 +2,18 @@
 
 const CACHE_NAME = 'sico-mix-v2.2';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/css/style.css',
-    '/js/data-colors.js',
-    '/js/i18n.js',
-    '/js/utils.js',
-    '/js/app.js',
-    '/manifest.json',
+    './',
+    './index.html',
+    './css/style.css',
+    './js/data-colors.js',
+    './js/i18n.js',
+    './js/utils.js',
+    './js/app.js',
+    './js/service-worker.js',
+    './manifest.json',
+    './icons/icon-72x72.png',
+    './icons/icon-192x192.png',
+    './icons/favicon.ico',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
@@ -43,6 +47,9 @@ self.addEventListener('activate', event => {
 
 // Обробка запитів
 self.addEventListener('fetch', event => {
+    // Пропускаємо запити для Chrome extensions та інших спеціальних схем
+    if (!event.request.url.startsWith('http')) return;
+    
     event.respondWith(
         caches.match(event.request)
             .then(response => {
@@ -106,8 +113,8 @@ function syncData() {
 self.addEventListener('push', event => {
     const options = {
         body: event.data ? event.data.text() : 'Нове повідомлення від SICO MIX',
-        icon: '/icons/icon-192.png',
-        badge: '/icons/icon-72.png',
+        icon: './icons/icon-192.png',
+        badge: './icons/icon-72.png',
         vibrate: [100, 50, 100],
         data: {
             dateOfArrival: Date.now(),
@@ -117,12 +124,12 @@ self.addEventListener('push', event => {
             {
                 action: 'explore',
                 title: 'Переглянути',
-                icon: '/icons/icon-72.png'
+                icon: './icons/icon-72.png'
             },
             {
                 action: 'close',
                 title: 'Закрити',
-                icon: '/icons/icon-72.png'
+                icon: './icons/icon-72.png'
             }
         ]
     };
@@ -138,13 +145,13 @@ self.addEventListener('notificationclick', event => {
     
     if (event.action === 'explore') {
         event.waitUntil(
-            clients.openWindow('/')
+            clients.openWindow('./')
         );
     } else if (event.action === 'close') {
         console.log('Повідомлення закрито');
     } else {
         event.waitUntil(
-            clients.openWindow('/')
+            clients.openWindow('./')
         );
     }
 });
