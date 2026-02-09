@@ -55,14 +55,14 @@
         <div class="sidebar-header">
             <div class="logo-container">
                 <h1><i class="fas fa-palette"></i> SICO MIX</h1>
-                <p data-i18n="system_description">Система управління рецептами фарб</p>
+                <p>Система управління рецептами фарб</p>
             </div>
             <button class="close-sidebar" id="closeSidebar">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
-        <h3 class="nav-title" data-i18n="main_menu">ГОЛОВНЕ МЕНЮ</h3>
+        <h3 class="nav-title">Головне меню</h3>
         <ul class="nav-menu">
             <li class="nav-item">
                 <a class="nav-link active" href="#" data-page="home">
@@ -90,7 +90,7 @@
             </li>
         </ul>
 
-        <h3 class="nav-title" data-i18n="import_export_menu">ІМПОРТ/ЕКСПОРТ</h3>
+        <h3 class="nav-title">Імпорт/Експорт</h3>
         <ul class="nav-menu">
             <li class="nav-item">
                 <a class="nav-link" href="#" data-page="import">
@@ -106,7 +106,7 @@
             </li>
         </ul>
 
-        <h3 class="nav-title" data-i18n="settings_menu">НАЛАШТУВАННЯ</h3>
+        <h3 class="nav-title">Налаштування</h3>
         <ul class="nav-menu">
             <li class="nav-item">
                 <a class="nav-link" href="#" data-page="settings">
@@ -200,7 +200,7 @@
                     
                     <div class="form-group">
                         <label class="form-label required" data-i18n="recipe_name">Назва рецепту</label>
-                        <input type="text" class="form-input" id="recipeName" placeholder="recipe_name_placeholder" required data-i18n="recipe_name_placeholder">
+                        <input type="text" class="form-input" id="recipeName" placeholder="Введіть назву рецепту" required>
                     </div>
 
                     <div class="form-row">
@@ -208,12 +208,12 @@
                             <label class="form-label required" data-i18n="category">Категорія</label>
                             <select class="form-select" id="recipeCategory" required>
                                 <option value="" data-i18n="select_category">Оберіть категорію</option>
-                                <option value="Металік" data-i18n="metallic_category">Металік</option>
-                                <option value="Перламутр" data-i18n="pearl_category">Перламутр</option>
-                                <option value="Матові" data-i18n="matte_category">Матові</option>
-                                <option value="Глянцеві" data-i18n="glossy_category">Глянцеві</option>
-                                <option value="Акрилові" data-i18n="acrylic_category">Акрилові</option>
-                                <option value="Епоксидні" data-i18n="epoxy_category">Епоксидні</option>
+                                <option value="Металік">Металік</option>
+                                <option value="Перламутр">Перламутр</option>
+                                <option value="Матові">Матові</option>
+                                <option value="Глянцеві">Глянцеві</option>
+                                <option value="Акрилові">Акрилові</option>
+                                <option value="Епоксидні">Епоксидні</option>
                             </select>
                         </div>
 
@@ -228,7 +228,7 @@
 
                     <div class="form-group">
                         <label class="form-label" data-i18n="recipe_description">Опис рецепту</label>
-                        <textarea class="form-textarea" id="recipeDescription" placeholder="recipe_description_placeholder" data-i18n="recipe_description_placeholder"></textarea>
+                        <textarea class="form-textarea" id="recipeDescription" placeholder="Додайте опис рецепту (необов'язково)"></textarea>
                     </div>
 
                     <div class="form-group">
@@ -252,17 +252,14 @@
 
                     <div class="search-filter-container">
                         <div class="search-box">
-                            <input type="text" class="search-input" id="paintSearch" placeholder="search_paints" data-i18n="search_paints">
+                            <input type="text" class="search-input" id="paintSearch" placeholder="Пошук фарб...">
                             <i class="fas fa-search search-icon"></i>
                         </div>
                         <select class="filter-select" id="categoryFilter">
                             <option value="" data-i18n="all_categories">Всі категорії</option>
-                            <option value="Металік" data-i18n="metallic_category">Металік</option>
-                            <option value="Перламутр" data-i18n="pearl_category">Перламутр</option>
-                            <option value="Матові" data-i18n="matte_category">Матові</option>
-                            <option value="Глянцеві" data-i18n="glossy_category">Глянцеві</option>
-                            <option value="Акрилові" data-i18n="acrylic_category">Акрилові</option>
-                            <option value="Епоксидні" data-i18n="epoxy_category">Епоксидні</option>
+                            <option value="Металік">Металік</option>
+                            <option value="Перламутр">Перламутр</option>
+                            <option value="Матові">Матові</option>
                         </select>
                     </div>
 
@@ -311,17 +308,14 @@
 
                 <div class="search-filter-container">
                     <div class="search-box">
-                        <input type="text" class="search-input" id="recipeSearch" placeholder="search_recipes" data-i18n="search_recipes">
+                        <input type="text" class="search-input" id="recipeSearch" placeholder="Пошук рецептів...">
                         <i class="fas fa-search search-icon"></i>
                     </div>
                     <select class="filter-select" id="recipeCategoryFilter">
                         <option value="" data-i18n="all_categories">Всі категорії</option>
-                        <option value="Металік" data-i18n="metallic_category">Металік</option>
-                        <option value="Перламутр" data-i18n="pearl_category">Перламутр</option>
-                        <option value="Матові" data-i18n="matte_category">Матові</option>
-                        <option value="Глянцеві" data-i18n="glossy_category">Глянцеві</option>
-                        <option value="Акрилові" data-i18n="acrylic_category">Акрилові</option>
-                        <option value="Епоксидні" data-i18n="epoxy_category">Епоксидні</option>
+                        <option value="Металік">Металік</option>
+                        <option value="Перламутр">Перламутр</option>
+                        <option value="Матові">Матові</option>
                     </select>
                 </div>
 
@@ -356,7 +350,7 @@
 
                 <div class="search-filter-container">
                     <div class="search-box">
-                        <input type="text" class="search-input" id="catalogSearch" placeholder="search_catalog" data-i18n="search_catalog">
+                        <input type="text" class="search-input" id="catalogSearch" placeholder="Пошук фарб у каталозі...">
                         <i class="fas fa-search search-icon"></i>
                     </div>
                     <button class="btn btn-primary" id="addNewPaintBtn">
@@ -503,9 +497,9 @@
                         <div class="form-group">
                             <label class="form-label" data-i18n="measurement_units">Одиниці вимірювання</label>
                             <select class="form-select" id="unitsSelect">
-                                <option value="grams" selected data-i18n="grams_unit">Грами (г)</option>
-                                <option value="percent" data-i18n="percentage">Відсотки (%)</option>
-                                <option value="ml" data-i18n="milliliters_unit">Мілілітри (мл)</option>
+                                <option value="grams" selected>Грами (г)</option>
+                                <option value="percent">Відсотки (%)</option>
+                                <option value="ml">Мілілітри (мл)</option>
                             </select>
                         </div>
                     </div>
@@ -541,7 +535,7 @@
         </main>
 
         <footer class="footer">
-            <p>SICO MIX • <span data-i18n="version_text">Версія</span> 2.2 • © 2023 <span data-i18n="system_description">Система управління рецептами фарб</span></p>
+            <p>SICO MIX • Версія 2.2 • © 2023 Система управління рецептами фарб</p>
         </footer>
     </div>
 
@@ -555,7 +549,7 @@
             <div id="addPaintForm">
                 <div class="form-group">
                     <label class="form-label required" data-i18n="paint_name">Назва фарби</label>
-                    <input type="text" class="form-input" id="paintName" placeholder="paint_name_placeholder" required data-i18n="paint_name_placeholder">
+                    <input type="text" class="form-input" id="paintName" placeholder="Введіть назву фарби" required>
                 </div>
 
                 <div class="form-row">
@@ -563,35 +557,35 @@
                         <label class="form-label required" data-i18n="category">Категорія</label>
                         <select class="form-select" id="paintCategory" required>
                             <option value="" data-i18n="select_category">Оберіть категорію</option>
-                            <option value="Металік" data-i18n="metallic_category">Металік</option>
-                            <option value="Перламутр" data-i18n="pearl_category">Перламутр</option>
-                            <option value="Матові" data-i18n="matte_category">Матові</option>
-                            <option value="Глянцеві" data-i18n="glossy_category">Глянцеві</option>
-                            <option value="Акрилові" data-i18n="acrylic_category">Акрилові</option>
-                            <option value="Епоксидні" data-i18n="epoxy_category">Епоксидні</option>
+                            <option value="Металік">Металік</option>
+                            <option value="Перламутр">Перламутр</option>
+                            <option value="Матові">Матові</option>
+                            <option value="Глянцеві">Глянцеві</option>
+                            <option value="Акрилові">Акрилові</option>
+                            <option value="Епоксидні">Епоксидні</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" data-i18n="color_code">Код кольору</label>
-                        <input type="text" class="form-input" id="paintColorCode" placeholder="color_code_placeholder" data-i18n="color_code_placeholder">
+                        <input type="text" class="form-input" id="paintColorCode" placeholder="#000000 або RGB">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" data-i18n="paint_description">Опис фарби</label>
-                    <textarea class="form-textarea" id="paintDescription" placeholder="paint_description_placeholder" data-i18n="paint_description_placeholder"></textarea>
+                    <textarea class="form-textarea" id="paintDescription" placeholder="Опишіть характеристики фарби"></textarea>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" data-i18n="manufacturer">Виробник</label>
-                        <input type="text" class="form-input" id="paintManufacturer" placeholder="manufacturer_placeholder" data-i18n="manufacturer_placeholder">
+                        <input type="text" class="form-input" id="paintManufacturer" placeholder="Назва виробника">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" data-i18n="article">Артикул</label>
-                        <input type="text" class="form-input" id="paintArticle" placeholder="article_placeholder" data-i18n="article_placeholder">
+                        <input type="text" class="form-input" id="paintArticle" placeholder="Артикул продукту">
                     </div>
                 </div>
 
@@ -625,7 +619,7 @@
         // Глобальний об'єкт для додатку
         window.SICOMIX = {};
     </script>
-    <script src="js/data-colors.js"></script>
+    <script src="js/data-colors(1).js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/app.js"></script>
