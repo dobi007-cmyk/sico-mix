@@ -14,7 +14,6 @@
     <link rel="icon" href="icons/favicon.ico">
     
     <style>
-        /* Additional inline styles for notifications */
         .notification {
             position: fixed;
             top: 20px;
@@ -29,6 +28,14 @@
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
         }
     </style>
 </head>
@@ -58,25 +65,25 @@
         <h3 class="nav-title">Головне меню</h3>
         <ul class="nav-menu">
             <li class="nav-item">
-                <a class="nav-link active" data-page="home">
+                <a class="nav-link active" href="#" data-page="home">
                     <i class="fas fa-home"></i>
                     <span data-i18n="home">Головна</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-page="new-recipe">
+                <a class="nav-link" href="#" data-page="new-recipe">
                     <i class="fas fa-plus-circle"></i>
                     <span data-i18n="new_recipe">Новий рецепт</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-page="recipes">
+                <a class="nav-link" href="#" data-page="recipes">
                     <i class="fas fa-book-open"></i>
                     <span data-i18n="recipes">Рецепти</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-page="catalog">
+                <a class="nav-link" href="#" data-page="catalog">
                     <i class="fas fa-layer-group"></i>
                     <span data-i18n="catalog">Каталог фарб</span>
                 </a>
@@ -86,13 +93,13 @@
         <h3 class="nav-title">Імпорт/Експорт</h3>
         <ul class="nav-menu">
             <li class="nav-item">
-                <a class="nav-link" data-page="import">
+                <a class="nav-link" href="#" data-page="import">
                     <i class="fas fa-file-import"></i>
                     <span data-i18n="import">Імпорт</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-page="export">
+                <a class="nav-link" href="#" data-page="export">
                     <i class="fas fa-file-export"></i>
                     <span data-i18n="export">Експорт</span>
                 </a>
@@ -102,7 +109,7 @@
         <h3 class="nav-title">Налаштування</h3>
         <ul class="nav-menu">
             <li class="nav-item">
-                <a class="nav-link" data-page="settings">
+                <a class="nav-link" href="#" data-page="settings">
                     <i class="fas fa-sliders-h"></i>
                     <span data-i18n="settings">Налаштування</span>
                 </a>
@@ -145,7 +152,7 @@
                 </div>
 
                 <div class="quick-actions-grid">
-                    <a class="action-card" data-page="new-recipe">
+                    <a class="action-card" href="#" data-page="new-recipe">
                         <div class="action-icon">
                             <i class="fas fa-plus"></i>
                         </div>
@@ -153,7 +160,7 @@
                         <p class="action-description" data-i18n="new_recipe_desc">Створіть новий рецепт фарби з детальними пропорціями та характеристиками</p>
                     </a>
 
-                    <a class="action-card" data-page="recipes">
+                    <a class="action-card" href="#" data-page="recipes">
                         <div class="action-icon">
                             <i class="fas fa-book"></i>
                         </div>
@@ -161,7 +168,7 @@
                         <p class="action-description" data-i18n="my_recipes_desc">Переглядайте, редагуйте та керуйте всіма вашими збереженими рецептами</p>
                     </a>
 
-                    <a class="action-card" data-page="catalog">
+                    <a class="action-card" href="#" data-page="catalog">
                         <div class="action-icon">
                             <i class="fas fa-layer-group"></i>
                         </div>
@@ -169,7 +176,7 @@
                         <p class="action-description" data-i18n="catalog_desc">База всіх доступних фарб з можливістю пошуку та фільтрації</p>
                     </a>
 
-                    <a class="action-card" data-page="export">
+                    <a class="action-card" href="#" data-page="export">
                         <div class="action-icon">
                             <i class="fas fa-file-export"></i>
                         </div>
@@ -193,7 +200,7 @@
                     
                     <div class="form-group">
                         <label class="form-label required" data-i18n="recipe_name">Назва рецепту</label>
-                        <input type="text" class="form-input" id="recipeName" placeholder="recipe_name_placeholder" required>
+                        <input type="text" class="form-input" id="recipeName" placeholder="Введіть назву рецепту" required>
                     </div>
 
                     <div class="form-row">
@@ -221,7 +228,7 @@
 
                     <div class="form-group">
                         <label class="form-label" data-i18n="recipe_description">Опис рецепту</label>
-                        <textarea class="form-textarea" id="recipeDescription" placeholder="recipe_description_placeholder"></textarea>
+                        <textarea class="form-textarea" id="recipeDescription" placeholder="Додайте опис рецепту (необов'язково)"></textarea>
                     </div>
 
                     <div class="form-group">
@@ -245,7 +252,7 @@
 
                     <div class="search-filter-container">
                         <div class="search-box">
-                            <input type="text" class="search-input" id="paintSearch" placeholder="search_paints">
+                            <input type="text" class="search-input" id="paintSearch" placeholder="Пошук фарб...">
                             <i class="fas fa-search search-icon"></i>
                         </div>
                         <select class="filter-select" id="categoryFilter">
@@ -301,7 +308,7 @@
 
                 <div class="search-filter-container">
                     <div class="search-box">
-                        <input type="text" class="search-input" id="recipeSearch" placeholder="search_recipes">
+                        <input type="text" class="search-input" id="recipeSearch" placeholder="Пошук рецептів...">
                         <i class="fas fa-search search-icon"></i>
                     </div>
                     <select class="filter-select" id="recipeCategoryFilter">
@@ -343,7 +350,7 @@
 
                 <div class="search-filter-container">
                     <div class="search-box">
-                        <input type="text" class="search-input" id="catalogSearch" placeholder="search_catalog">
+                        <input type="text" class="search-input" id="catalogSearch" placeholder="Пошук фарб у каталозі...">
                         <i class="fas fa-search search-icon"></i>
                     </div>
                     <button class="btn btn-primary" id="addNewPaintBtn">
@@ -542,7 +549,7 @@
             <div id="addPaintForm">
                 <div class="form-group">
                     <label class="form-label required" data-i18n="paint_name">Назва фарби</label>
-                    <input type="text" class="form-input" id="paintName" placeholder="paint_name_placeholder" required>
+                    <input type="text" class="form-input" id="paintName" placeholder="Введіть назву фарби" required>
                 </div>
 
                 <div class="form-row">
@@ -561,24 +568,24 @@
 
                     <div class="form-group">
                         <label class="form-label" data-i18n="color_code">Код кольору</label>
-                        <input type="text" class="form-input" id="paintColorCode" placeholder="color_code_placeholder">
+                        <input type="text" class="form-input" id="paintColorCode" placeholder="#000000 або RGB">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" data-i18n="paint_description">Опис фарби</label>
-                    <textarea class="form-textarea" id="paintDescription" placeholder="paint_description_placeholder"></textarea>
+                    <textarea class="form-textarea" id="paintDescription" placeholder="Опишіть характеристики фарби"></textarea>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" data-i18n="manufacturer">Виробник</label>
-                        <input type="text" class="form-input" id="paintManufacturer" placeholder="manufacturer_placeholder">
+                        <input type="text" class="form-input" id="paintManufacturer" placeholder="Назва виробника">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" data-i18n="article">Артикул</label>
-                        <input type="text" class="form-input" id="paintArticle" placeholder="article_placeholder">
+                        <input type="text" class="form-input" id="paintArticle" placeholder="Артикул продукту">
                     </div>
                 </div>
 
@@ -607,15 +614,31 @@
         </div>
     </div>
 
+    <!-- Підключення JS файлів в правильному порядку -->
+    <script>
+        // Глобальний об'єкт для додатку
+        window.SICOMIX = {};
+    </script>
     <script src="js/data-colors.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/app.js"></script>
     
     <script>
-        // Реєстрація Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
+        // Ініціалізація додатку при завантаженні сторінки
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ініціалізація i18n
+            if (SICOMIX.i18n && SICOMIX.i18n.init) {
+                SICOMIX.i18n.init();
+            }
+            
+            // Ініціалізація додатку
+            if (SICOMIX.app && SICOMIX.app.init) {
+                SICOMIX.app.init();
+            }
+            
+            // Реєстрація Service Worker
+            if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('js/service-worker.js')
                     .then(registration => {
                         console.log('Service Worker зареєстрований:', registration.scope);
@@ -623,8 +646,8 @@
                     .catch(error => {
                         console.log('Помилка реєстрації Service Worker:', error);
                     });
-            });
-        }
+            }
+        });
     </script>
 </body>
 </html>
