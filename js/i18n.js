@@ -1,6 +1,6 @@
 // ========== ІНТЕРНАЦІОНАЛІЗАЦІЯ (i18n) ==========
 
-const SICOMIX = window.SICOMIX || {};
+if (!window.SICOMIX) window.SICOMIX = {};
 
 SICOMIX.i18n = (function() {
     const translations = {
