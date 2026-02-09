@@ -1,6 +1,6 @@
 // ========== УТІЛІТИ ==========
 
-const SICOMIX = window.SICOMIX || {};
+if (!window.SICOMIX) window.SICOMIX = {};
 
 SICOMIX.utils = (function() {
     // Показ сповіщень
