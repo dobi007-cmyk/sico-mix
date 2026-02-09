@@ -1,6 +1,6 @@
 // ========== ДАНІ ПРО ФАРБИ ТА ПОЧАТКОВІ РЕЦЕПТИ ==========
 
-const SICOMIX = window.SICOMIX || {};
+if (!window.SICOMIX) window.SICOMIX = {};
 
 SICOMIX.data = (function() {
     const initialData = {
