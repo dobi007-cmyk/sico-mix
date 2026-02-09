@@ -11,6 +11,18 @@ const urlsToCache = [
     './js/app.js',
     './js/service-worker.js',
     './manifest.json',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+];
+const urlsToCache = [
+    './',
+    './index.html',
+    './css/style.css',
+    './js/data-colors.js',
+    './js/i18n.js',
+    './js/utils.js',
+    './js/app.js',
+    './js/service-worker.js',
+    './manifest.json',
     './icons/icon-72x72.png',
     './icons/icon-192x192.png',
     './icons/favicon.ico',
