@@ -1,6 +1,6 @@
 // ========== ОСНОВНА ЛОГІКА ДОДАТКУ ==========
 
-const SICOMIX = window.SICOMIX || {};
+if (!window.SICOMIX) window.SICOMIX = {};
 
 SICOMIX.app = (function() {
     // ========== ГЛОБАЛЬНІ ЗМІННІ ==========
@@ -1124,24 +1124,18 @@ SICOMIX.app = (function() {
     }
 
     // ========== ПУБЛІЧНІ МЕТОДИ ==========
-    return {
-        // Ініціалізація
+     return {
         init: initApp,
-        
-        // Рецепти
-        deleteRecipe,
-        exportRecipe,
-        editRecipe,
-        
-        // Фарби
-        deletePaint,
-        editPaint,
-        
-        // Утіліти
-        showNotification,
-        showConfirmation
+        deleteRecipe: deleteRecipe,
+        exportRecipe: exportRecipe,
+        editRecipe: editRecipe,
+        deletePaint: deletePaint,
+        editPaint: editPaint,
+        showNotification: showNotification,
+        showConfirmation: showConfirmation
     };
 })();
+
 
 // Ініціалізація додатку при завантаженні сторінки
 document.addEventListener('DOMContentLoaded', function() {
@@ -1152,8 +1146,6 @@ document.addEventListener('DOMContentLoaded', function() {
     SICOMIX.app.init();
     
     // Додаємо глобальні функції
-    window.editRecipe = SICOMIX.app.editRecipe;
-    window.deleteRecipe = SICOMIX.app.deleteRecipe;
     window.exportRecipe = SICOMIX.app.exportRecipe;
     window.editPaint = SICOMIX.app.editPaint;
     window.deletePaint = SICOMIX.app.deletePaint;
