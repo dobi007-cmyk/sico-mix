@@ -110,12 +110,33 @@ SICOMIX.app = (function() {
             languageSelect.value = savedLang;
         }
         SICOMIX.i18n.setLanguage(savedLang);
+        updateCategoryOptions();
     }
 
     function initSettings() {
         if (unitsSelect) unitsSelect.value = currentSettings.units || 'grams';
         if (autoSaveCheckbox) autoSaveCheckbox.checked = currentSettings.autoSave !== false;
         if (backupCheckbox) backupCheckbox.checked = currentSettings.backup === true;
+    }
+
+    // ========== ОНОВЛЕННЯ КАТЕГОРІЙ ==========
+    function updateCategoryOptions() {
+        // Оновити опції категорій у всіх випадаючих списках
+        document.querySelectorAll('option[value="Металік"], option[value="Перламутр"], option[value="Матові"], option[value="Глянцеві"], option[value="Акрилові"], option[value="Епоксидні"]').forEach(option => {
+            if (option.value === "Металік") {
+                option.textContent = SICOMIX.i18n.t('metallic_category');
+            } else if (option.value === "Перламутр") {
+                option.textContent = SICOMIX.i18n.t('pearl_category');
+            } else if (option.value === "Матові") {
+                option.textContent = SICOMIX.i18n.t('matte_category');
+            } else if (option.value === "Глянцеві") {
+                option.textContent = SICOMIX.i18n.t('glossy_category');
+            } else if (option.value === "Акрилові") {
+                option.textContent = SICOMIX.i18n.t('acrylic_category');
+            } else if (option.value === "Епоксидні") {
+                option.textContent = SICOMIX.i18n.t('epoxy_category');
+            }
+        });
     }
 
     // ========== НАВІГАЦІЯ ==========
@@ -257,10 +278,10 @@ SICOMIX.app = (function() {
                 </td>
                 <td>
                     <select class="unit-select" data-index="${index}" data-field="unit">
-                        <option value="г" ${ingredient.unit === 'г' ? 'selected' : ''}>г</option>
-                        <option value="кг" ${ingredient.unit === 'кг' ? 'selected' : ''}>кг</option>
-                        <option value="мл" ${ingredient.unit === 'мл' ? 'selected' : ''}>мл</option>
-                        <option value="л" ${ingredient.unit === 'л' ? 'selected' : ''}>л</option>
+                        <option value="г" ${ingredient.unit === 'г' ? 'selected' : ''} data-i18n="grams_unit">г</option>
+                        <option value="кг" ${ingredient.unit === 'кг' ? 'selected' : ''} data-i18n="kilograms_unit">кг</option>
+                        <option value="мл" ${ingredient.unit === 'мл' ? 'selected' : ''} data-i18n="milliliters_unit">мл</option>
+                        <option value="л" ${ingredient.unit === 'л' ? 'selected' : ''} data-i18n="liters_unit">л</option>
                     </select>
                 </td>
                 <td>
@@ -277,6 +298,9 @@ SICOMIX.app = (function() {
             ingredientsList.appendChild(row);
         });
 
+        // Застосувати переклади для нових елементів
+        SICOMIX.i18n.applyTranslations();
+        
         // Add event listeners
         ingredientsList.querySelectorAll('input, select').forEach(input => {
             input.addEventListener('change', handleIngredientChange);
@@ -925,7 +949,8 @@ SICOMIX.app = (function() {
         // Apply language change if needed
         if (languageSelect && SICOMIX.i18n.getLanguage() !== languageSelect.value) {
             SICOMIX.i18n.setLanguage(languageSelect.value);
-            location.reload();
+            updateCategoryOptions();
+            showNotification(SICOMIX.i18n.t('language_changed'), 'success');
         }
     }
 
@@ -1072,7 +1097,10 @@ SICOMIX.app = (function() {
             languageSelect.addEventListener('change', function() {
                 const lang = this.value;
                 currentSettings.language = lang;
+                SICOMIX.i18n.setLanguage(lang);
+                updateCategoryOptions();
                 saveData();
+                showNotification(SICOMIX.i18n.t('language_changed'), 'success');
             });
         }
         
@@ -1124,13 +1152,20 @@ SICOMIX.app = (function() {
     }
 
     // ========== ПУБЛІЧНІ МЕТОДИ ==========
-     return {
+    return {
+        // Ініціалізація
         init: initApp,
+        
+        // Рецепти
         deleteRecipe: deleteRecipe,
         exportRecipe: exportRecipe,
         editRecipe: editRecipe,
+        
+        // Фарби
         deletePaint: deletePaint,
         editPaint: editPaint,
+        
+        // Утіліти
         showNotification: showNotification,
         showConfirmation: showConfirmation
     };
@@ -1146,6 +1181,8 @@ document.addEventListener('DOMContentLoaded', function() {
     SICOMIX.app.init();
     
     // Додаємо глобальні функції
+    window.editRecipe = SICOMIX.app.editRecipe;
+    window.deleteRecipe = SICOMIX.app.deleteRecipe;
     window.exportRecipe = SICOMIX.app.exportRecipe;
     window.editPaint = SICOMIX.app.editPaint;
     window.deletePaint = SICOMIX.app.deletePaint;
