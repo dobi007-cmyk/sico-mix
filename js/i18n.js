@@ -50,6 +50,7 @@ SICOMIX.i18n = (function() {
             save_recipe: "Зберегти рецепт",
             calculate_percentages: "Розрахувати відсотки",
             clear_form: "Очистити форму",
+            update_recipe: "Оновити рецепт",
             
             // Рецепти
             my_recipes_desc_long: "Переглядайте, редагуйте та керуйте всіма вашими рецептами фарб",
@@ -81,6 +82,7 @@ SICOMIX.i18n = (function() {
             print_date: "Дата друку",
             creation_date: "Дата створення",
             unknown: "Невідомо",
+            deleted: "Видалено",
             
             // Каталог
             catalog_desc_long: "База всіх доступних фарб з детальною інформацією та характеристиками",
@@ -197,6 +199,7 @@ SICOMIX.i18n = (function() {
             save_recipe: "Save Recipe",
             calculate_percentages: "Calculate Percentages",
             clear_form: "Clear Form",
+            update_recipe: "Update Recipe",
             
             // Recipes
             my_recipes_desc_long: "View, edit and manage all your paint recipes",
@@ -228,6 +231,7 @@ SICOMIX.i18n = (function() {
             print_date: "Print Date",
             creation_date: "Creation Date",
             unknown: "Unknown",
+            deleted: "Deleted",
             
             // Catalog
             catalog_desc_long: "Database of all available paints with detailed information and characteristics",
@@ -344,6 +348,7 @@ SICOMIX.i18n = (function() {
             save_recipe: "Zapisz przepis",
             calculate_percentages: "Oblicz procenty",
             clear_form: "Wyczyść formularz",
+            update_recipe: "Aktualizuj przepis",
             
             // Przepisy
             my_recipes_desc_long: "Przeglądaj, edytuj i zarządzaj wszystkimi przepisami farb",
@@ -375,6 +380,7 @@ SICOMIX.i18n = (function() {
             print_date: "Data druku",
             creation_date: "Data utworzenia",
             unknown: "Nieznany",
+            deleted: "Usunięto",
             
             // Katalog
             catalog_desc_long: "Baza wszystkich dostępnych farb ze szczegółowymi informacjami i charakterystyką",
@@ -480,11 +486,18 @@ SICOMIX.i18n = (function() {
             if (element.hasAttribute('placeholder')) {
                 element.setAttribute('placeholder', translation);
             } else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                element.value = translation;
+                if (element.type !== 'submit' && element.type !== 'button') {
+                    if (element.value === element.getAttribute('data-placeholder') || !element.value) {
+                        element.value = translation;
+                    }
+                }
             } else {
                 element.textContent = translation;
             }
         });
+        
+        // Оновити заголовок сторінки
+        document.title = `SICO MIX • ${t('paint_catalog')}`;
     }
 
     function getAvailableLanguages() {
