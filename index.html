@@ -8,18 +8,46 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icons/favicon.ico">
+    <style>
+        /* Додаткові стилі для виправлення проблем */
+        @media (max-width: 992px) {
+            .desktop-nav .menu-toggle {
+                display: block !important;
+            }
+            
+            .mobile-nav {
+                display: none;
+            }
+            
+            .sidebar {
+                padding-top: 20px;
+            }
+        }
+        
+        @media (min-width: 993px) {
+            .sidebar {
+                transform: translateX(0) !important;
+            }
+            
+            .container {
+                margin-left: 280px !important;
+            }
+            
+            .desktop-nav .menu-toggle {
+                display: none !important;
+            }
+        }
+        
+        .page-content {
+            display: none;
+        }
+        
+        .page-content.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    <!-- Mobile Navigation -->
-    <div class="mobile-nav">
-        <button class="menu-toggle" id="menuToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="mobile-nav-title">
-            <i class="fas fa-palette"></i> SICO MIX
-        </div>
-    </div>
-
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -99,7 +127,7 @@
         <!-- Header -->
         <header class="header">
             <div class="desktop-nav">
-                <button class="menu-toggle" id="desktopMenuToggle">
+                <button class="menu-toggle" id="menuToggle">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo-container">
@@ -587,6 +615,122 @@
     <script src="js/data-colors.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/utils.js"></script>
+    <script>
+        // Простий скрипт для навігації та бокової панелі
+        document.addEventListener('DOMContentLoaded', function() {
+            // Елементи DOM
+            const menuToggle = document.getElementById('menuToggle');
+            const closeSidebar = document.getElementById('closeSidebar');
+            const sidebar = document.getElementById('sidebar');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const actionCards = document.querySelectorAll('.action-card');
+            const pageContents = document.querySelectorAll('.page-content');
+            const mainContainer = document.getElementById('mainContainer');
+            
+            // Перемикач бокової панелі
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.add('active');
+                    if (window.innerWidth < 993) {
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+            }
+            
+            // Закриття бокової панелі
+            if (closeSidebar) {
+                closeSidebar.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            }
+            
+            // Перемикання сторінок
+            function switchPage(pageId) {
+                // Приховати всі сторінки
+                pageContents.forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                // Показати обрану сторінку
+                const selectedPage = document.getElementById(`${pageId}-page`);
+                if (selectedPage) {
+                    selectedPage.classList.add('active');
+                }
+                
+                // Оновити активне посилання в навігації
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('data-page') === pageId) {
+                        link.classList.add('active');
+                    }
+                });
+                
+                // Закрити бокову панель на мобільних пристроях
+                if (window.innerWidth < 993) {
+                    sidebar.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            }
+            
+            // Обробники для навігаційних посилань
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('data-page');
+                    switchPage(pageId);
+                });
+            });
+            
+            // Обробники для карток дій на головній сторінці
+            actionCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('data-page');
+                    switchPage(pageId);
+                });
+            });
+            
+            // Закриття бокової панелі при кліку поза нею (для мобільних)
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 993 && 
+                    sidebar.classList.contains('active') &&
+                    !sidebar.contains(e.target) && 
+                    e.target !== menuToggle) {
+                    sidebar.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Заборонити прокрутку тіла при відкритій боковій панелі на мобільних
+            sidebar.addEventListener('touchmove', function(e) {
+                if (window.innerWidth < 993) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            // Оновлення кількості фарб
+            function updatePaintCount() {
+                const count = 10; // Приклад значення
+                document.getElementById('totalPaints').textContent = count;
+                document.getElementById('headerPaintCount').textContent = count;
+            }
+            
+            // Ініціалізація
+            updatePaintCount();
+            
+            // Адаптація бокової панелі при зміні розміру вікна
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 993) {
+                    sidebar.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Показуємо головну сторінку при завантаженні
+            switchPage('home');
+        });
+    </script>
     <script src="js/app.js"></script>
     
     <script>
