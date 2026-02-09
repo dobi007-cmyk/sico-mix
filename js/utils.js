@@ -16,7 +16,7 @@ SICOMIX.utils = (function() {
                        type === 'error' ? 'var(--danger)' : 
                        type === 'warning' ? 'var(--warning)' : 'var(--gray)';
         
-        notification.className = 'notification';
+        notification.className = `notification ${type}`;
         notification.style.cssText = `
             position: fixed;
             top: 20px;
@@ -48,10 +48,12 @@ SICOMIX.utils = (function() {
             notification.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => {
                 if (notification.parentNode) {
-                    document.body.removeChild(notification);
+                    notification.remove();
                 }
             }, 300);
         }, duration);
+        
+        return notification;
     }
 
     // Показ підтвердження
@@ -64,11 +66,11 @@ SICOMIX.utils = (function() {
         const closeConfirmationModal = document.getElementById('closeConfirmationModal');
         
         confirmationTitle.textContent = title;
-        confirmationMessage.textContent = message;
+        confirmationMessage.innerHTML = `<span>${message}</span>`;
         confirmationModal.classList.add('active');
         
         const handleConfirm = () => {
-            onConfirm();
+            if (onConfirm) onConfirm();
             confirmationModal.classList.remove('active');
             cleanup();
         };
@@ -88,6 +90,16 @@ SICOMIX.utils = (function() {
         confirmActionBtn.onclick = handleConfirm;
         cancelActionBtn.onclick = handleCancel;
         closeConfirmationModal.onclick = handleCancel;
+        
+        // Додати обробник для клавіші Escape
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                handleCancel();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        
+        document.addEventListener('keydown', handleEscape);
     }
 
     // Розрахунок відсотків інгредієнтів
@@ -293,6 +305,35 @@ SICOMIX.utils = (function() {
         }
     }
 
+    // Очищення даних з localStorage
+    function clearLocalStorage() {
+        try {
+            localStorage.clear();
+            return true;
+        } catch (error) {
+            console.error('Помилка очищення localStorage:', error);
+            return false;
+        }
+    }
+
+    // Відкриття модального вікна
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    // Закриття модального вікна
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    }
+
     return {
         showNotification,
         showConfirmation,
@@ -314,7 +355,10 @@ SICOMIX.utils = (function() {
         groupBy,
         loadImage,
         saveToLocalStorage,
-        loadFromLocalStorage
+        loadFromLocalStorage,
+        clearLocalStorage,
+        openModal,
+        closeModal
     };
 })();
 
