@@ -1,70 +1,231 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SICO MIX</title>
-
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="css/main.css" />
-
-  <meta name="theme-color" content="#4361ee" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SICOMIX - Каталог фарб</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
-
 <body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo">
+                <h1>🎨 SICOMIX</h1>
+                <p>Каталог фарб та рецептур</p>
+            </div>
+            <div class="language-selector">
+                <select id="languageSelect">
+                    <option value="uk">🇺🇦 Українська</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="pl">🇵🇱 Polski</option>
+                </select>
+            </div>
+        </header>
 
-<header class="topbar">
-  <h1>SICO MIX</h1>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="#home" class="nav-active">🏠 Головна</a></li>
+                <li><a href="#series">📁 Серії фарб</a></li>
+                <li><a href="#colors">🎨 Кольори</a></li>
+                <li><a href="#recipes">📋 Рецепти</a></li>
+                <li><a href="#calculator">🧮 Калькулятор</a></li>
+                <li><a href="#settings">⚙️ Налаштування</a></li>
+            </ul>
+        </nav>
 
-  <input
-    id="searchInput"
-    type="text"
-    placeholder="Пошук рецепту..."
-  />
+        <main class="main-content">
+            <section id="home" class="content-section active">
+                <h2>Ласкаво просимо до каталогу фарб SICOMIX!</h2>
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <h3>Серії фарб</h3>
+                        <p class="stat-number" id="seriesCount">10</p>
+                        <p>доступних серій</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Кольори</h3>
+                        <p class="stat-number" id="colorsCount">44</p>
+                        <p>базових кольорів</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Фарби</h3>
+                        <p class="stat-number" id="paintsCount">440</p>
+                        <p>доступних фарб</p>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <h3>Швидкі дії</h3>
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="app.showSection('series')">
+                            📁 Переглянути серії
+                        </button>
+                        <button class="btn-secondary" onclick="app.showSection('colors')">
+                            🎨 Знайти колір
+                        </button>
+                        <button class="btn-success" onclick="app.createNewRecipe()">
+                            📝 Створити рецепт
+                        </button>
+                    </div>
+                </div>
+            </section>
 
-  <select id="categoryFilter">
-    <option value="">Всі категорії</option>
-  </select>
+            <section id="series" class="content-section">
+                <h2>Серії фарб</h2>
+                <div class="series-filter">
+                    <input type="text" id="seriesSearch" placeholder="Пошук серій..." class="search-input">
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="">Всі категорії</option>
+                    </select>
+                </div>
+                <div class="series-grid" id="seriesGrid">
+                    <!-- Серії будуть додані через JavaScript -->
+                </div>
+            </section>
 
-  <button id="newRecipeBtn">Новий рецепт</button>
-</header>
+            <section id="colors" class="content-section">
+                <h2>Каталог кольорів</h2>
+                <div class="color-filters">
+                    <input type="text" id="colorSearch" placeholder="Пошук за кодом або назвою..." class="search-input">
+                    <select id="seriesFilter" class="filter-select">
+                        <option value="">Всі серії</option>
+                    </select>
+                    <select id="colorCategoryFilter" class="filter-select">
+                        <option value="">Всі типи</option>
+                    </select>
+                </div>
+                <div class="colors-grid" id="colorsGrid">
+                    <!-- Кольори будуть додані через JavaScript -->
+                </div>
+            </section>
 
+            <section id="recipes" class="content-section">
+                <h2>Мої рецепти</h2>
+                <button class="btn-primary" onclick="app.createNewRecipe()">➕ Створити новий рецепт</button>
+                <div class="recipes-list" id="recipesList">
+                    <p class="empty-state">Рецептів ще немає. Створіть перший!</p>
+                </div>
+            </section>
 
-<main>
+            <section id="calculator" class="content-section">
+                <h2>Калькулятор фарби</h2>
+                <div class="calculator-container">
+                    <div class="calculator-inputs">
+                        <div class="input-group">
+                            <label>Площа друку (м²):</label>
+                            <input type="number" id="printArea" value="1" min="0.1" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>Витрата фарби (м²/л):</label>
+                            <input type="number" id="paintConsumption" value="40" min="1">
+                        </div>
+                        <div class="input-group">
+                            <label>Кількість кольорів:</label>
+                            <input type="number" id="colorCount" value="1" min="1" max="10">
+                        </div>
+                        <button class="btn-primary" onclick="app.calculatePaint()">🧮 Розрахувати</button>
+                    </div>
+                    <div class="calculator-results">
+                        <h3>Результати розрахунку:</h3>
+                        <div class="result-item">
+                            <span>Загальна кількість фарби:</span>
+                            <span id="totalPaint">0.00 л</span>
+                        </div>
+                        <div class="result-item">
+                            <span>На один колір:</span>
+                            <span id="paintPerColor">0.00 л</span>
+                        </div>
+                        <div class="result-item">
+                            <span>У грамах (приблизно):</span>
+                            <span id="paintInGrams">0.00 г</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-  <!-- Створення рецепту -->
-  <section id="editor" class="card hidden">
+            <section id="settings" class="content-section">
+                <h2>Налаштування</h2>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label>Мова інтерфейсу:</label>
+                        <select id="languageSetting">
+                            <option value="uk">Українська</option>
+                            <option value="en">English</option>
+                            <option value="pl">Polski</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Одиниці вимірювання:</label>
+                        <select id="unitsSetting">
+                            <option value="grams">Грами</option>
+                            <option value="kg">Кілограми</option>
+                            <option value="ml">Мілілітри</option>
+                            <option value="l">Літри</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Тема інтерфейсу:</label>
+                        <select id="themeSetting">
+                            <option value="light">Світла</option>
+                            <option value="dark">Темна</option>
+                            <option value="auto">Авто</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Автозбереження:</label>
+                        <input type="checkbox" id="autoSaveSetting" checked>
+                    </div>
+                    <div class="setting-item">
+                        <label>Точність розрахунків:</label>
+                        <input type="number" id="precisionSetting" min="0" max="4" value="2">
+                        <span> знаків після коми</span>
+                    </div>
+                </div>
+                <div class="settings-actions">
+                    <button class="btn-primary" onclick="app.saveSettings()">💾 Зберегти налаштування</button>
+                    <button class="btn-secondary" onclick="app.resetSettings()">🔄 Скинути до стандартних</button>
+                    <button class="btn-warning" onclick="app.exportData()">📤 Експортувати дані</button>
+                    <button class="btn-danger" onclick="app.clearData()">🗑️ Очистити всі дані</button>
+                </div>
+            </section>
+        </main>
 
-    <h2>Редактор рецепту</h2>
+        <footer class="app-footer">
+            <p>© 2024 SICOMIX Каталог фарб. Всі права захищені.</p>
+            <p>Версія: 1.0.0 | <a href="#" onclick="app.showAbout()">Про програму</a></p>
+        </footer>
+    </div>
 
-    <input id="recipeName" placeholder="Назва рецепту"/>
+    <!-- Модальні вікна -->
+    <div id="colorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="app.closeModal()">&times;</span>
+            <h3 id="modalTitle">Деталі кольору</h3>
+            <div id="modalBody"></div>
+        </div>
+    </div>
 
-    <input id="recipeCategory" placeholder="Категорія"/>
+    <div id="recipeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="app.closeModal()">&times;</span>
+            <h3 id="recipeModalTitle">Рецепт</h3>
+            <div id="recipeModalBody"></div>
+        </div>
+    </div>
 
-    <textarea id="components"
-      placeholder="Компоненти (формат: Назва=кількість)"
-    ></textarea>
-
-    <button id="calcBtn">Розрахувати пропорції</button>
-
-    <button id="saveRecipeBtn">Зберегти</button>
-    <button id="cancelBtn">Скасувати</button>
-
-  </section>
-
-
-  <!-- Список -->
-  <section id="recipesList" class="grid"></section>
-
-</main>
-
-
-<footer class="footer">
-  SICO MIX PWA
-</footer>
-
-
-<script type="module" src="js/app.js"></script>
-
+    <!-- Скрипти -->
+    <script src="js/data-colors.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/service-worker.js"></script>
+    <script>
+        // Ініціалізація додатку
+        document.addEventListener('DOMContentLoaded', function() {
+            app.init();
+        });
+    </script>
 </body>
 </html>
