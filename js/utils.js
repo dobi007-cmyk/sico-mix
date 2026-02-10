@@ -1,163 +1,170 @@
-/* ==========================================
-   SICO MIX — PRO Utils Module
-========================================== */
+// Утилітні функції
+const utils = {
+    // Форматування числа
+    formatNumber: function(num, decimals = 2) {
+        return parseFloat(num).toFixed(decimals);
+    },
 
-window.SICOMIX = window.SICOMIX || {};
+    // Генерація унікального ID
+    generateId: function() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    },
 
-SICOMIX.utils = (() => {
-
-    /* ================= STORAGE ================= */
-
-    const storage = {
-
-        save(key, data) {
-            try {
-                localStorage.setItem(key, JSON.stringify(data));
-                return true;
-            } catch (e) {
-                console.error('Storage save error:', e);
-                return false;
-            }
-        },
-
-        load(key, fallback = null) {
-            try {
-                const data = localStorage.getItem(key);
-                return data ? JSON.parse(data) : fallback;
-            } catch (e) {
-                console.error('Storage load error:', e);
-                return fallback;
-            }
-        },
-
-        remove(key) {
-            localStorage.removeItem(key);
-        },
-
-        clear() {
-            localStorage.clear();
+    // Конвертація одиниць вимірювання
+    convertUnits: function(value, fromUnit, toUnit) {
+        const conversions = {
+            'г': { 'кг': 0.001, 'мл': 1, 'л': 0.001 },
+            'кг': { 'г': 1000, 'мл': 1000, 'л': 1 },
+            'мл': { 'г': 1, 'кг': 0.001, 'л': 0.001 },
+            'л': { 'г': 1000, 'кг': 1, 'мл': 1000 }
+        };
+        
+        if (fromUnit === toUnit) return value;
+        if (!conversions[fromUnit] || !conversions[fromUnit][toUnit]) {
+            console.error('Неможлива конвертація:', fromUnit, '->', toUnit);
+            return value;
         }
-    };
+        
+        return value * conversions[fromUnit][toUnit];
+    },
 
-    /* ================= ID ================= */
+    // Обчислення відсотків
+    calculatePercentages: function(ingredients) {
+        const total = ingredients.reduce((sum, ing) => sum + ing.amount, 0);
+        return ingredients.map(ing => ({
+            ...ing,
+            percentage: total > 0 ? (ing.amount / total * 100).toFixed(1) : 0
+        }));
+    },
 
-    const uid = () =>
-        Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
+    // Перевірка HEX кольору
+    isValidHexColor: function(hex) {
+        return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(hex);
+    },
 
+    // Темний/світлий текст для кольору
+    getContrastColor: function(hexColor) {
+        // Конвертація HEX в RGB
+        const r = parseInt(hexColor.substr(1, 2), 16);
+        const g = parseInt(hexColor.substr(3, 2), 16);
+        const b = parseInt(hexColor.substr(5, 2), 16);
+        
+        // Формула яскравості
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        
+        return brightness > 128 ? '#000000' : '#FFFFFF';
+    },
 
-    /* ================= DEBOUNCE ================= */
+    // Збереження в localStorage з обробкою помилок
+    saveToStorage: function(key, data) {
+        try {
+            localStorage.setItem(key, JSON.stringify(data));
+            return true;
+        } catch (e) {
+            console.error('Помилка збереження в localStorage:', e);
+            return false;
+        }
+    },
 
-    const debounce = (fn, delay = 300) => {
-        let timer;
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => fn(...args), delay);
-        };
-    };
+    // Завантаження з localStorage
+    loadFromStorage: function(key) {
+        try {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : null;
+        } catch (e) {
+            console.error('Помилка завантаження з localStorage:', e);
+            return null;
+        }
+    },
 
-
-    /* ================= COLOR ================= */
-
-    const hexToRgb = hex => {
-        hex = hex.replace('#', '');
-        const bigint = parseInt(hex, 16);
-        return {
-            r: (bigint >> 16) & 255,
-            g: (bigint >> 8) & 255,
-            b: bigint & 255
-        };
-    };
-
-    const rgbToHex = (r, g, b) =>
-        "#" +
-        [r, g, b]
-            .map(x => {
-                const hex = x.toString(16);
-                return hex.length === 1 ? '0' + hex : hex;
-            })
-            .join('');
-
-    const brightness = hex => {
-        const { r, g, b } = hexToRgb(hex);
-        return (r * 299 + g * 587 + b * 114) / 1000;
-    };
-
-
-    /* ================= CSV EXPORT ================= */
-
-    const toCSV = array => {
-        if (!array.length) return '';
-
-        const headers = Object.keys(array[0]);
-        const rows = array.map(obj =>
-            headers.map(h => JSON.stringify(obj[h] ?? '')).join(',')
-        );
-
-        return [headers.join(','), ...rows].join('\n');
-    };
-
-    const downloadFile = (data, filename, type) => {
+    // Експорт даних у файл
+    exportToFile: function(data, filename, type = 'application/json') {
         const blob = new Blob([data], { type });
         const url = URL.createObjectURL(blob);
-
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.click();
-
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
         URL.revokeObjectURL(url);
-    };
+    },
 
+    // Імпорт даних з файлу
+    importFromFile: function(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    resolve(data);
+                } catch (error) {
+                    reject(new Error('Невірний формат файлу'));
+                }
+            };
+            reader.onerror = () => reject(new Error('Помилка читання файлу'));
+            reader.readAsText(file);
+        });
+    },
 
-    /* ================= NOTIFICATIONS ================= */
+    // Фільтрація масиву
+    filterArray: function(array, filters) {
+        return array.filter(item => {
+            return Object.keys(filters).every(key => {
+                if (!filters[key]) return true;
+                if (typeof item[key] === 'string') {
+                    return item[key].toLowerCase().includes(filters[key].toLowerCase());
+                }
+                return item[key] == filters[key];
+            });
+        });
+    },
 
-    const notify = (message, duration = 2500) => {
-        const el = document.createElement('div');
-        el.className = 'notification';
-        el.textContent = message;
+    // Сортування масиву
+    sortArray: function(array, key, direction = 'asc') {
+        return [...array].sort((a, b) => {
+            if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
+            if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    },
 
-        document.body.appendChild(el);
+    // Форматування дати
+    formatDate: function(date, format = 'uk-UA') {
+        const d = new Date(date);
+        return d.toLocaleDateString(format, {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+    },
 
-        el.style.animation = 'slideIn 0.3s ease';
+    // Копіювання в буфер обміну
+    copyToClipboard: function(text) {
+        return navigator.clipboard.writeText(text)
+            .then(() => true)
+            .catch(() => {
+                // Fallback для старих браузерів
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                return true;
+            });
+    },
 
-        setTimeout(() => {
-            el.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => el.remove(), 300);
-        }, duration);
-    };
-
-
-    /* ================= FORMAT ================= */
-
-    const formatDate = ts => {
-        const d = new Date(ts);
-        return d.toLocaleDateString();
-    };
-
-    const round = (num, decimals = 2) =>
-        Number(Math.round(num + 'e' + decimals) + 'e-' + decimals);
-
-
-    /* ================= NETWORK ================= */
-
-    const isOnline = () => navigator.onLine;
-
-
-    /* ================= RETURN PUBLIC API ================= */
-
-    return {
-        storage,
-        uid,
-        debounce,
-        hexToRgb,
-        rgbToHex,
-        brightness,
-        toCSV,
-        downloadFile,
-        notify,
-        formatDate,
-        round,
-        isOnline
-    };
-
-})();
+    // Обмеження частоти викликів (debounce)
+    debounce: function(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+};
