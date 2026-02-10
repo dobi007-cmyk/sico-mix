@@ -1,748 +1,607 @@
 <!DOCTYPE html>
-<html lang="uk" dir="ltr">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <!-- Виправлено: maximum-scale видалено для доступності -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta name="format-detection" content="telephone=no">
-    
-    <!-- Основні мета-теги -->
-    <title>SICO MIX • Професійна система управління рецептами фарб</title>
-    <meta name="description" content="Професійна система управління рецептами фарб для створення, зберігання та аналізу кольорових рішень">
-    <meta name="keywords" content="фарби, рецепти, колір, палітра, SICO, управління, каталог">
-    <meta name="author" content="SICO MIX Team">
-    <meta name="robots" content="index, follow">
-    
-    <!-- PWA мета-теги -->
-    <meta name="theme-color" content="#4361ee">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="SICO MIX">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="SICO MIX">
-    
-    <!-- Open Graph / Social медіа -->
-    <meta property="og:title" content="SICO MIX • Управління рецептами фарб">
-    <meta property="og:description" content="Професійна система управління рецептами фарб">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://sico-mix.example.com">
-    <meta property="og:image" content="https://sico-mix.example.com/icons/icon-512x512.png">
-    <meta property="og:locale" content="uk_UA">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="SICO MIX • Управління рецептами фарб">
-    <meta name="twitter:description" content="Професійна система управління рецептами фарб">
-    <meta name="twitter:image" content="https://sico-mix.example.com/icons/icon-512x512.png">
-    
-    <!-- Preconnect для швидшого завантаження -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    
-    <!-- Іконки та маніфест -->
-    <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="icons/icon-192x192.png" type="image/png" sizes="192x192">
-    <link rel="icon" href="icons/icon-512x512.png" type="image/png" sizes="512x512">
-    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-    <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
-    
-    <!-- Стилі -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
-          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" 
-          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SICO MIX • Управління рецептами фарб</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="preload" href="css/style.css" as="style">
-    
-    <!-- Стилі для сповіщень (інлайн для швидкого завантаження) -->
-    <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
-            --success: #2ecc71;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-            --light: #f8f9fa;
-            --gray: #6c757d;
-            --light-gray: #e9ecef;
-            --border-radius: 8px;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--primary);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-            z-index: 1001;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            max-width: min(400px, calc(100vw - 40px));
-            word-break: break-word;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* Стилі для офлайн режиму */
-        .offline-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: var(--warning);
-            color: white;
-            text-align: center;
-            padding: 10px;
-            z-index: 1002;
-            font-weight: 500;
-            animation: slideIn 0.3s ease;
-        }
-        /* Стилі для завантаження */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            flex-direction: column;
-            gap: 20px;
-            transition: opacity 0.3s ease;
-        }
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid var(--light-gray);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        /* Покращення доступності */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-        /* Стилі для drag & drop */
-        .drag-over {
-            border-color: var(--success) !important;
-            background: rgba(40, 167, 69, 0.1) !important;
-        }
-        
-        /* Виправлені стилі для покращення UX */
-        .hidden {
-            display: none !important;
-        }
-        
-        .skip-link {
-            position: absolute;
-            top: -40px;
-            left: 0;
-            background: var(--primary);
-            color: white;
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: var(--border-radius);
-            z-index: 10000;
-        }
-        
-        .skip-link:focus {
-            top: 0;
-        }
-    </style>
-    
-    <!-- Безпека та політики -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/favicon.ico">
 </head>
 <body>
-    <!-- Skip link для доступності -->
-    <a href="#mainContainer" class="skip-link sr-only-focusable">Перейти до основного контенту</a>
-    
-    <!-- Банер офлайн режиму -->
-    <div class="offline-banner hidden" id="offlineBanner" role="status" aria-live="polite">
-        <i class="fas fa-wifi-slash"></i>
-        <span data-i18n="offline_mode">Офлайн режим. Деякі функції можуть бути недоступні.</span>
-    </div>
-
-    <!-- Overlay для завантаження -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-        <p data-i18n="loading">Завантаження SICO MIX...</p>
-    </div>
-
     <!-- Mobile Navigation -->
-    <nav class="mobile-nav" aria-label="Мобільна навігація">
-        <button class="menu-toggle" id="menuToggle" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar">
+    <div class="mobile-nav">
+        <button class="menu-toggle" id="menuToggle">
             <i class="fas fa-bars"></i>
         </button>
         <div class="mobile-nav-title">
-            <i class="fas fa-palette" aria-hidden="true"></i> 
-            <span>SICO MIX</span>
+            <i class="fas fa-palette"></i> SICO MIX
         </div>
-    </nav>
+    </div>
 
     <!-- Sidebar Navigation -->
-    <aside class="sidebar hidden" id="sidebar" aria-label="Бічна панель навігації">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-container">
-                <h1><i class="fas fa-palette" aria-hidden="true"></i> SICO MIX</h1>
+                <h1><i class="fas fa-palette"></i> SICO MIX</h1>
                 <p>Система управління рецептами фарб</p>
             </div>
-            <button class="close-sidebar" id="closeSidebar" aria-label="Закрити бічну панель">
+            <button class="close-sidebar" id="closeSidebar">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
         <h3 class="nav-title">Головне меню</h3>
-        <nav aria-label="Головне меню">
-            <ul class="nav-menu" role="menubar">
-                <li class="nav-item" role="none">
-                    <a class="nav-link active" href="#home" data-page="home" role="menuitem" aria-current="page">
-                        <i class="fas fa-home" aria-hidden="true"></i>
-                        <span data-i18n="home">Головна</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="none">
-                    <a class="nav-link" href="#new-recipe" data-page="new-recipe" role="menuitem">
-                        <i class="fas fa-plus-circle" aria-hidden="true"></i>
-                        <span data-i18n="new_recipe">Новий рецепт</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="none">
-                    <a class="nav-link" href="#recipes" data-page="recipes" role="menuitem">
-                        <i class="fas fa-book-open" aria-hidden="true"></i>
-                        <span data-i18n="recipes">Рецепти</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="none">
-                    <a class="nav-link" href="#catalog" data-page="catalog" role="menuitem">
-                        <i class="fas fa-layer-group" aria-hidden="true"></i>
-                        <span data-i18n="catalog">Каталог фарб</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a class="nav-link active" data-page="home">
+                    <i class="fas fa-home"></i>
+                    <span data-i18n="home">Головна</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-page="new-recipe">
+                    <i class="fas fa-plus-circle"></i>
+                    <span data-i18n="new_recipe">Новий рецепт</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-page="recipes">
+                    <i class="fas fa-book-open"></i>
+                    <span data-i18n="recipes">Рецепти</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-page="catalog">
+                    <i class="fas fa-layer-group"></i>
+                    <span data-i18n="catalog">Каталог фарб</span>
+                </a>
+            </li>
+        </ul>
 
         <h3 class="nav-title">Імпорт/Експорт</h3>
-        <nav aria-label="Імпорт та експорт">
-            <ul class="nav-menu" role="menubar">
-                <li class="nav-item" role="none">
-                    <a class="nav-link" href="#import" data-page="import" role="menuitem">
-                        <i class="fas fa-file-import" aria-hidden="true"></i>
-                        <span data-i18n="import">Імпорт</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="none">
-                    <a class="nav-link" href="#export" data-page="export" role="menuitem">
-                        <i class="fas fa-file-export" aria-hidden="true"></i>
-                        <span data-i18n="export">Експорт</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a class="nav-link" data-page="import">
+                    <i class="fas fa-file-import"></i>
+                    <span data-i18n="import">Імпорт</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-page="export">
+                    <i class="fas fa-file-export"></i>
+                    <span data-i18n="export">Експорт</span>
+                </a>
+            </li>
+        </ul>
 
         <h3 class="nav-title">Налаштування</h3>
-        <nav aria-label="Налаштування">
-            <ul class="nav-menu" role="menubar">
-                <li class="nav-item" role="none">
-                    <a class="nav-link" href="#settings" data-page="settings" role="menuitem">
-                        <i class="fas fa-sliders-h" aria-hidden="true"></i>
-                        <span data-i18n="settings">Налаштування</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="none">
-                    <a class="nav-link" href="#about" data-page="about" role="menuitem">
-                        <i class="fas fa-info-circle" aria-hidden="true"></i>
-                        <span data-i18n="about">Про додаток</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a class="nav-link" data-page="settings">
+                    <i class="fas fa-sliders-h"></i>
+                    <span data-i18n="settings">Налаштування</span>
+                </a>
+            </li>
+        </ul>
 
-        <div class="sidebar-footer">
-            <div class="paint-count" aria-live="polite">
-                <i class="fas fa-paint-brush" aria-hidden="true"></i>
-                <span id="totalPaints">0</span> 
-                <span data-i18n="paints_in_catalog">фарб у каталозі</span>
-            </div>
-            <div class="app-version">
-                <i class="fas fa-code-branch" aria-hidden="true"></i>
-                <span>Версія 2.2.0</span>
+        <div style="margin-top: 30px; padding: 20px; background: var(--light); border-radius: var(--border-radius);">
+            <div class="paint-count">
+                <i class="fas fa-paint-brush"></i>
+                <span id="totalPaints">0</span> <span data-i18n="paints_in_catalog">фарб у каталозі</span>
             </div>
         </div>
     </aside>
 
     <!-- Main Content -->
-    <div class="container" id="mainContainer" tabindex="-1">
+    <div class="container" id="mainContainer">
         <!-- Header -->
-        <header class="header" role="banner">
+        <header class="header">
             <div class="desktop-nav">
-                <button class="menu-toggle" id="desktopMenuToggle" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar">
+                <button class="menu-toggle" id="desktopMenuToggle">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo-container">
-                    <h1><i class="fas fa-palette" aria-hidden="true"></i> SICO MIX</h1>
+                    <h1><i class="fas fa-palette"></i> SICO MIX</h1>
                 </div>
             </div>
-            <div class="header-actions">
-                <div class="paint-count" aria-live="polite">
-                    <i class="fas fa-paint-brush" aria-hidden="true"></i>
-                    <span id="headerPaintCount">0</span> 
-                    <span data-i18n="paints_in_catalog">фарб у каталозі</span>
-                </div>
-                <button class="btn btn-outline btn-icon" id="themeToggle" aria-label="Змінити тему">
-                    <i class="fas fa-moon"></i>
-                </button>
+            <div class="paint-count">
+                <i class="fas fa-paint-brush"></i>
+                <span id="headerPaintCount">0</span> <span data-i18n="paints_in_catalog">фарб у каталозі</span>
             </div>
         </header>
 
         <!-- Page Content -->
-        <main id="page-content" role="main">
+        <main id="page-content">
             <!-- Home Page -->
-            <div class="page-content active" id="home-page" role="region" aria-label="Головна сторінка">
+            <div class="page-content active" id="home-page">
                 <div class="welcome-section">
                     <h2 class="welcome-title" data-i18n="welcome_title">Ласкаво просимо до SICO MIX</h2>
                     <p class="welcome-subtitle" data-i18n="welcome_subtitle">Професійна система управління рецептами фарб для створення, зберігання та аналізу ваших кольорових рішень</p>
-                    <div class="welcome-actions">
-                        <button class="btn btn-primary" id="quickStartBtn">
-                            <i class="fas fa-rocket"></i>
-                            <span data-i18n="quick_start">Швидкий старт</span>
-                        </button>
-                        <button class="btn btn-outline" id="showTutorialBtn">
-                            <i class="fas fa-graduation-cap"></i>
-                            <span data-i18n="show_tutorial">Показати навчання</span>
-                        </button>
-                    </div>
                 </div>
 
                 <div class="quick-actions-grid">
-                    <button class="action-card" type="button" data-page="new-recipe" role="link">
+                    <a class="action-card" data-page="new-recipe">
                         <div class="action-icon">
-                            <i class="fas fa-plus" aria-hidden="true"></i>
+                            <i class="fas fa-plus"></i>
                         </div>
                         <h3 class="action-title" data-i18n="new_recipe">Новий рецепт</h3>
                         <p class="action-description" data-i18n="new_recipe_desc">Створіть новий рецепт фарби з детальними пропорціями та характеристиками</p>
-                    </button>
+                    </a>
 
-                    <button class="action-card" type="button" data-page="recipes" role="link">
+                    <a class="action-card" data-page="recipes">
                         <div class="action-icon">
-                            <i class="fas fa-book" aria-hidden="true"></i>
+                            <i class="fas fa-book"></i>
                         </div>
                         <h3 class="action-title" data-i18n="my_recipes">Мої рецепти</h3>
                         <p class="action-description" data-i18n="my_recipes_desc">Переглядайте, редагуйте та керуйте всіма вашими збереженими рецептами</p>
-                    </button>
+                    </a>
 
-                    <button class="action-card" type="button" data-page="catalog" role="link">
+                    <a class="action-card" data-page="catalog">
                         <div class="action-icon">
-                            <i class="fas fa-layer-group" aria-hidden="true"></i>
+                            <i class="fas fa-layer-group"></i>
                         </div>
                         <h3 class="action-title" data-i18n="paint_catalog">Каталог фарб</h3>
                         <p class="action-description" data-i18n="catalog_desc">База всіх доступних фарб з можливістю пошуку та фільтрації</p>
-                    </button>
+                    </a>
 
-                    <button class="action-card" type="button" data-page="export" role="link">
+                    <a class="action-card" data-page="export">
                         <div class="action-icon">
-                            <i class="fas fa-file-export" aria-hidden="true"></i>
+                            <i class="fas fa-file-export"></i>
                         </div>
                         <h3 class="action-title" data-i18n="export_data">Експорт даних</h3>
                         <p class="action-description" data-i18n="export_desc">Експортуйте ваші рецепти у різних форматах для подальшого використання</p>
-                    </button>
-                </div>
-
-                <!-- Статистика -->
-                <div class="stats-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-chart-line"></i>
-                        <span data-i18n="your_statistics">Ваша статистика</span>
-                    </h3>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalRecipes">0</div>
-                            <div class="stat-label" data-i18n="total_recipes">Всього рецептів</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalPaintsCatalog">0</div>
-                            <div class="stat-label" data-i18n="total_paints">Фарб у каталозі</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalCalculations">0</div>
-                            <div class="stat-label" data-i18n="total_calculations">Розрахунків виконано</div>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
 
             <!-- New Recipe Page -->
-            <div class="page-content hidden" id="new-recipe-page" role="region" aria-label="Створення нового рецепту">
-                <!-- Залишено без змін, але додано hidden клас -->
-                <!-- ... (content unchanged) ... -->
+            <div class="page-content" id="new-recipe-page">
+                <h2 class="page-title" data-i18n="new_recipe">Новий рецепт</h2>
+                <p class="page-description" data-i18n="new_recipe_desc_long">Створіть новий рецепт фарби, додаючи інгредієнти та вказуючи пропорції</p>
+
+                <!-- Basic Information -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        <span data-i18n="basic_info">Основна інформація</span>
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label required" data-i18n="recipe_name">Назва рецепту</label>
+                        <input type="text" class="form-input" id="recipeName" placeholder="recipe_name_placeholder" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required" data-i18n="category">Категорія</label>
+                            <select class="form-select" id="recipeCategory" required>
+                                <option value="" data-i18n="select_category">Оберіть категорію</option>
+                                <option value="Металік">Металік</option>
+                                <option value="Перламутр">Перламутр</option>
+                                <option value="Матові">Матові</option>
+                                <option value="Глянцеві">Глянцеві</option>
+                                <option value="Акрилові">Акрилові</option>
+                                <option value="Епоксидні">Епоксидні</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="color">Колір</label>
+                            <div class="color-picker-container">
+                                <div class="color-preview" id="colorPreview" style="background: #4361ee;"></div>
+                                <input type="color" class="color-input" id="recipeColor" value="#4361ee">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="recipe_description">Опис рецепту</label>
+                        <textarea class="form-textarea" id="recipeDescription" placeholder="recipe_description_placeholder"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="recipe_photo">Фото рецепту</label>
+                        <div class="file-upload">
+                            <input type="file" class="file-input" id="recipePhoto" accept="image/*">
+                            <label class="file-label" for="recipePhoto">
+                                <i class="fas fa-camera"></i>
+                                <span id="fileName" data-i18n="upload_photo">Завантажити фото</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ingredients Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-flask"></i>
+                        <span data-i18n="recipe_ingredients">Інгредієнти рецепту</span>
+                    </h3>
+
+                    <div class="search-filter-container">
+                        <div class="search-box">
+                            <input type="text" class="search-input" id="paintSearch" placeholder="search_paints">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                        <select class="filter-select" id="categoryFilter">
+                            <option value="" data-i18n="all_categories">Всі категорії</option>
+                            <option value="Металік">Металік</option>
+                            <option value="Перламутр">Перламутр</option>
+                            <option value="Матові">Матові</option>
+                        </select>
+                    </div>
+
+                    <table class="ingredients-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="paint">Фарба</th>
+                                <th data-i18n="quantity">Кількість</th>
+                                <th data-i18n="units">Одиниці</th>
+                                <th data-i18n="percentage">Відсоток</th>
+                                <th data-i18n="actions">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ingredientsList">
+                            <!-- Ingredients will be added here -->
+                        </tbody>
+                    </table>
+
+                    <button class="btn-add" id="addIngredientBtn">
+                        <i class="fas fa-plus"></i>
+                        <span data-i18n="add_ingredient">Додати інгредієнт</span>
+                    </button>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="saveRecipeBtn">
+                        <i class="fas fa-save"></i>
+                        <span data-i18n="save_recipe">Зберегти рецепт</span>
+                    </button>
+                    <button class="btn btn-secondary" id="calculatePercentagesBtn">
+                        <i class="fas fa-calculator"></i>
+                        <span data-i18n="calculate_percentages">Розрахувати відсотки</span>
+                    </button>
+                    <button class="btn btn-warning" id="clearRecipeBtn">
+                        <i class="fas fa-trash"></i>
+                        <span data-i18n="clear_form">Очистити форму</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Recipes Page -->
-            <div class="page-content hidden" id="recipes-page" role="region" aria-label="Мої рецепти">
-                <!-- Залишено без змін, але додано hidden клас -->
-                <!-- ... (content unchanged) ... -->
+            <div class="page-content" id="recipes-page">
+                <h2 class="page-title" data-i18n="my_recipes">Мої рецепти</h2>
+                <p class="page-description" data-i18n="my_recipes_desc_long">Переглядайте, редагуйте та керуйте всіма вашими рецептами фарб</p>
+
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="recipeSearch" placeholder="search_recipes">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                    <select class="filter-select" id="recipeCategoryFilter">
+                        <option value="" data-i18n="all_categories">Всі категорії</option>
+                        <option value="Металік">Металік</option>
+                        <option value="Перламутр">Перламутр</option>
+                        <option value="Матові">Матові</option>
+                    </select>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-success" id="importRecipesBtn">
+                        <i class="fas fa-file-import"></i>
+                        <span data-i18n="import">Імпортувати</span>
+                    </button>
+                    <button class="btn btn-primary" id="exportRecipesBtn">
+                        <i class="fas fa-file-export"></i>
+                        <span data-i18n="export">Експорт</span>
+                    </button>
+                    <button class="btn btn-warning" id="printRecipesBtn">
+                        <i class="fas fa-print"></i>
+                        <span data-i18n="print">Друк</span>
+                    </button>
+                    <button class="btn btn-danger" id="deleteSelectedRecipesBtn">
+                        <i class="fas fa-trash"></i>
+                        <span data-i18n="delete_selected">Видалити обрані</span>
+                    </button>
+                </div>
+
+                <div class="recipe-cards" id="recipesContainer">
+                    <!-- Recipe cards will be loaded here -->
+                </div>
             </div>
 
             <!-- Catalog Page -->
-            <div class="page-content hidden" id="catalog-page" role="region" aria-label="Каталог фарб">
-                <!-- Залишено без змін, але додано hidden клас -->
-                <!-- ... (content unchanged) ... -->
+            <div class="page-content" id="catalog-page">
+                <h2 class="page-title" data-i18n="paint_catalog">Каталог фарб</h2>
+                <p class="page-description" data-i18n="catalog_desc_long">База всіх доступних фарб з детальною інформацією та характеристиками</p>
+
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="catalogSearch" placeholder="search_catalog">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                    <button class="btn btn-primary" id="addNewPaintBtn">
+                        <i class="fas fa-plus"></i>
+                        <span data-i18n="add_new_paint">Додати нову фарбу</span>
+                    </button>
+                </div>
+
+                <div class="recipe-cards" id="paintCatalog">
+                    <!-- Paint cards will be loaded here -->
+                </div>
             </div>
 
             <!-- Import Page -->
-            <div class="page-content hidden" id="import-page" role="region" aria-label="Імпорт даних">
-                <!-- Залишено без змін, але додано hidden клас -->
-                <!-- ... (content unchanged) ... -->
+            <div class="page-content" id="import-page">
+                <h2 class="page-title" data-i18n="import">Імпорт даних</h2>
+                <p class="page-description" data-i18n="import_desc">Імпортуйте рецепти та каталог фарб з файлів різних форматів</p>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-file-import"></i>
+                        <span data-i18n="select_import_file">Виберіть файл для імпорту</span>
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="file_format">Формат файлу</label>
+                        <select class="form-select" id="importFormat">
+                            <option value="json">JSON (.json)</option>
+                            <option value="csv">CSV (.csv)</option>
+                            <option value="excel">Excel (.xlsx)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="select_file">Оберіть файл</label>
+                        <div class="file-upload">
+                            <input type="file" class="file-input" id="importFile" accept=".json,.csv,.xlsx">
+                            <label class="file-label" for="importFile">
+                                <i class="fas fa-folder-open"></i>
+                                <span id="importFileName" data-i18n="select_import_file">Оберіть файл для імпорту</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="import_data_type">Тип даних для імпорту</label>
+                        <div>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox" id="importRecipesCheckbox" checked> <span data-i18n="recipes">Рецепти</span>
+                            </label>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox" id="importPaintsCheckbox"> <span data-i18n="paints">Фарби з каталогу</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-success" id="startImportBtn">
+                            <i class="fas fa-play"></i>
+                            <span data-i18n="start_import">Почати імпорт</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Export Page -->
-            <div class="page-content hidden" id="export-page" role="region" aria-label="Експорт даних">
-                <!-- Залишено без змін, але додано hidden клас -->
-                <!-- ... (content unchanged) ... -->
+            <div class="page-content" id="export-page">
+                <h2 class="page-title" data-i18n="export">Експорт даних</h2>
+                <p class="page-description" data-i18n="export_desc_long">Експортуйте ваші дані у різних форматах для зберігання та подальшого використання</p>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-file-export"></i>
+                        <span data-i18n="export_settings">Налаштування експорту</span>
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="export_format">Формат експорту</label>
+                        <select class="form-select" id="exportFormat">
+                            <option value="json">JSON (.json)</option>
+                            <option value="csv">CSV (.csv)</option>
+                            <option value="excel">Excel (.xlsx)</option>
+                            <option value="pdf">PDF (.pdf)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="data_to_export">Дані для експорту</label>
+                        <div>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox" id="exportRecipesCheckbox" checked> <span data-i18n="recipes">Рецепти</span>
+                            </label>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox" id="exportPaintsCheckbox"> <span data-i18n="paint_catalog">Каталог фарб</span>
+                            </label>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox" id="exportCalculationsCheckbox"> <span data-i18n="calculations">Розрахунки</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="additional_options">Додаткові опції</label>
+                        <div>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox" id="includePhotosCheckbox"> <span data-i18n="include_photos">Включати фотографії</span>
+                            </label>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox" id="compressDataCheckbox"> <span data-i18n="compress_data">Стиснути дані (ZIP)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="startExportBtn">
+                            <i class="fas fa-download"></i>
+                            <span data-i18n="start_export">Почати експорт</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Settings Page -->
-            <div class="page-content hidden" id="settings-page" role="region" aria-label="Налаштування">
-                <!-- Залишено без змін, але додано hidden клас -->
-                <!-- ... (content unchanged) ... -->
+            <div class="page-content" id="settings-page">
+                <h2 class="page-title" data-i18n="settings">Налаштування</h2>
+                <p class="page-description" data-i18n="settings_desc">Налаштуйте систему SICO MIX за вашими потребами</p>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-cog"></i>
+                        <span data-i18n="general_settings">Загальні налаштування</span>
+                    </h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="interface_language">Мова інтерфейсу</label>
+                            <select class="form-select" id="languageSelect">
+                                <option value="uk" selected>Українська</option>
+                                <option value="en">English</option>
+                                <option value="pl">Polski</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="measurement_units">Одиниці вимірювання</label>
+                            <select class="form-select" id="unitsSelect">
+                                <option value="grams" selected>Грами (г)</option>
+                                <option value="percent">Відсотки (%)</option>
+                                <option value="ml">Мілілітри (мл)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="auto_save">Автоматичне збереження</label>
+                        <div>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox" id="autoSaveCheckbox" checked> <span data-i18n="auto_save_changes">Автоматично зберігати зміни</span>
+                            </label>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox" id="backupCheckbox"> <span data-i18n="create_backups">Створювати резервні копії</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="saveSettingsBtn">
+                            <i class="fas fa-save"></i>
+                            <span data-i18n="save_settings">Зберегти налаштування</span>
+                        </button>
+                        <button class="btn btn-warning" id="resetSettingsBtn">
+                            <i class="fas fa-undo"></i>
+                            <span data-i18n="reset_defaults">Скинути до стандартних</span>
+                        </button>
+                        <button class="btn btn-danger" id="clearAllDataBtn">
+                            <i class="fas fa-trash"></i>
+                            <span data-i18n="clear_all_data">Очистити всі дані</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </main>
 
-        <footer class="footer" role="contentinfo">
-            <p>SICO MIX • Версія 2.2.0 • © 2023-2024 Система управління рецептами фарб</p>
-            <p class="footer-links">
-                <a href="#" data-i18n="privacy_policy">Політика конфіденційності</a> • 
-                <a href="#" data-i18n="terms_of_service">Умови використання</a> • 
-                <a href="#" data-i18n="contact_support">Зв'язатися з підтримкою</a>
-            </p>
+        <footer class="footer">
+            <p>SICO MIX • Версія 2.2 • © 2023 Система управління рецептами фарб</p>
         </footer>
     </div>
 
     <!-- Modals -->
-    <div class="modal hidden" id="addPaintModal" role="dialog" aria-labelledby="addPaintModalTitle" aria-hidden="true">
-        <!-- Залишено без змін, але додано hidden клас -->
-        <!-- ... (content unchanged) ... -->
+    <div class="modal" id="addPaintModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" data-i18n="add_new_paint">Додати нову фарбу</h3>
+                <button class="modal-close" id="closePaintModal">&times;</button>
+            </div>
+            <div id="addPaintForm">
+                <div class="form-group">
+                    <label class="form-label required" data-i18n="paint_name">Назва фарби</label>
+                    <input type="text" class="form-input" id="paintName" placeholder="paint_name_placeholder" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label required" data-i18n="category">Категорія</label>
+                        <select class="form-select" id="paintCategory" required>
+                            <option value="" data-i18n="select_category">Оберіть категорію</option>
+                            <option value="Металік">Металік</option>
+                            <option value="Перламутр">Перламутр</option>
+                            <option value="Матові">Матові</option>
+                            <option value="Глянцеві">Глянцеві</option>
+                            <option value="Акрилові">Акрилові</option>
+                            <option value="Епоксидні">Епоксидні</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="color_code">Код кольору</label>
+                        <input type="text" class="form-input" id="paintColorCode" placeholder="color_code_placeholder">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" data-i18n="paint_description">Опис фарби</label>
+                    <textarea class="form-textarea" id="paintDescription" placeholder="paint_description_placeholder"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="manufacturer">Виробник</label>
+                        <input type="text" class="form-input" id="paintManufacturer" placeholder="manufacturer_placeholder">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="article">Артикул</label>
+                        <input type="text" class="form-input" id="paintArticle" placeholder="article_placeholder">
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="savePaintBtn" data-i18n="save_paint">Зберегти фарбу</button>
+                    <button class="btn btn-warning" id="cancelPaintBtn" data-i18n="cancel">Скасувати</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Confirmation Modal -->
-    <div class="modal hidden" id="confirmationModal" role="dialog" aria-labelledby="confirmationTitle" aria-hidden="true">
-        <!-- Залишено без змін, але додано hidden клас -->
-        <!-- ... (content unchanged) ... -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="confirmationTitle" data-i18n="confirmation">Підтвердження дії</h3>
+                <button class="modal-close" id="closeConfirmationModal">&times;</button>
+            </div>
+            <div id="confirmationMessage">
+                <span data-i18n="confirmation_message">Ви впевнені, що хочете виконати цю дію?</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-danger" id="confirmActionBtn" data-i18n="confirm_action">Так, виконати</button>
+                <button class="btn btn-secondary" id="cancelActionBtn" data-i18n="cancel">Скасувати</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Підключення JS файлів в правильному порядку -->
-    <script>
-        // Глобальний об'єкт для додатку
-        window.SICOMIX = {
-            version: '2.2.0',
-            buildDate: '2024-01-15',
-            isOnline: navigator.onLine,
-            isPWA: window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone,
-            config: {},
-            data: {
-                recipes: [],
-                paints: [],
-                settings: {}
-            }
-        };
-
-        // Приховати overlay завантаження після повного завантаження сторінки
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                const loadingOverlay = document.getElementById('loadingOverlay');
-                if (loadingOverlay) {
-                    loadingOverlay.style.opacity = '0';
-                    setTimeout(() => {
-                        loadingOverlay.style.display = 'none';
-                    }, 300);
-                }
-            }, 500);
-        });
-
-        // Базові функції до завантаження JS файлів
-        window.SICOMIX.utils = {
-            showNotification: function(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.className = 'notification';
-                notification.setAttribute('role', 'alert');
-                notification.setAttribute('aria-live', 'assertive');
-                
-                let icon = 'info-circle';
-                if (type === 'success') icon = 'check-circle';
-                if (type === 'warning') icon = 'exclamation-triangle';
-                if (type === 'danger') icon = 'times-circle';
-                
-                notification.innerHTML = `
-                    <i class="fas fa-${icon}"></i>
-                    <span>${message}</span>
-                `;
-                
-                document.body.appendChild(notification);
-                notification.style.animation = 'slideIn 0.3s ease';
-                
-                setTimeout(() => {
-                    notification.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.parentNode.removeChild(notification);
-                        }
-                    }, 300);
-                }, 3000);
-            },
-            
-            navigateToPage: function(pageId) {
-                // Приховати всі сторінки
-                document.querySelectorAll('.page-content').forEach(page => {
-                    page.classList.add('hidden');
-                    page.classList.remove('active');
-                });
-                
-                // Показати обрану сторінку
-                const targetPage = document.getElementById(pageId);
-                if (targetPage) {
-                    targetPage.classList.remove('hidden');
-                    targetPage.classList.add('active');
-                    targetPage.focus();
-                    
-                    // Оновити URL без перезавантаження сторінки
-                    history.pushState({ page: pageId }, '', `#${pageId}`);
-                }
-            },
-            
-            toggleSidebar: function() {
-                const sidebar = document.getElementById('sidebar');
-                const menuToggle = document.getElementById('menuToggle');
-                const desktopMenuToggle = document.getElementById('desktopMenuToggle');
-                
-                if (sidebar) {
-                    const isVisible = !sidebar.classList.contains('hidden');
-                    sidebar.classList.toggle('hidden');
-                    
-                    // Оновити aria-атрибути
-                    if (menuToggle) {
-                        menuToggle.setAttribute('aria-expanded', !isVisible);
-                    }
-                    if (desktopMenuToggle) {
-                        desktopMenuToggle.setAttribute('aria-expanded', !isVisible);
-                    }
-                    
-                    // Заблокувати прокручування тіла, коли сайдбар відкрито
-                    document.body.style.overflow = isVisible ? '' : 'hidden';
-                }
-            }
-        };
-    </script>
-    
-    <!-- Підключення JS файлів -->
-    <script src="js/data-colors.js" defer></script>
-    <script src="js/i18n.js" defer></script>
-    <script src="js/utils.js" defer></script>
-    <script src="js/app.js" defer></script>
+    <script src="js/data-colors.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
     
     <script>
-        // Ініціалізація додатку при завантаженні сторінки
-        document.addEventListener('DOMContentLoaded', function() {
-            // Відстеження онлайн/офлайн статусу
-            function updateOnlineStatus() {
-                const offlineBanner = document.getElementById('offlineBanner');
-                SICOMIX.isOnline = navigator.onLine;
-                
-                if (!SICOMIX.isOnline) {
-                    if (offlineBanner) offlineBanner.classList.remove('hidden');
-                    SICOMIX.utils.showNotification('Перехід в офлайн режим', 'warning');
-                } else {
-                    if (offlineBanner) offlineBanner.classList.add('hidden');
-                    SICOMIX.utils.showNotification('З\'єднання відновлено', 'success');
-                }
-            }
-            
-            // Обробка навігації
-            function handleNavigation() {
-                document.querySelectorAll('[data-page]').forEach(element => {
-                    element.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const pageId = this.getAttribute('data-page');
-                        SICOMIX.utils.navigateToPage(`${pageId}-page`);
-                        SICOMIX.utils.toggleSidebar();
-                    });
-                });
-            }
-            
-            // Ініціалізація модальних вікон
-            function initModals() {
-                // Закриття модальних вікон
-                document.querySelectorAll('.modal-close, .modal .btn-secondary, .modal .btn-warning').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        this.closest('.modal').classList.add('hidden');
-                    });
-                });
-                
-                // Закриття при кліку на підложку
-                document.querySelectorAll('.modal').forEach(modal => {
-                    modal.addEventListener('click', function(e) {
-                        if (e.target === this) {
-                            this.classList.add('hidden');
-                        }
-                    });
-                });
-            }
-            
-            // Ініціалізація сайдбару
-            function initSidebar() {
-                const menuToggle = document.getElementById('menuToggle');
-                const desktopMenuToggle = document.getElementById('desktopMenuToggle');
-                const closeSidebar = document.getElementById('closeSidebar');
-                
-                if (menuToggle) {
-                    menuToggle.addEventListener('click', SICOMIX.utils.toggleSidebar);
-                }
-                
-                if (desktopMenuToggle) {
-                    desktopMenuToggle.addEventListener('click', SICOMIX.utils.toggleSidebar);
-                }
-                
-                if (closeSidebar) {
-                    closeSidebar.addEventListener('click', SICOMIX.utils.toggleSidebar);
-                }
-            }
-            
-            // Ініціалізація теми
-            function initTheme() {
-                const themeToggle = document.getElementById('themeToggle');
-                const savedTheme = localStorage.getItem('theme') || 'light';
-                
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                
-                if (themeToggle) {
-                    themeToggle.addEventListener('click', function() {
-                        const currentTheme = document.documentElement.getAttribute('data-theme');
-                        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                        
-                        document.documentElement.setAttribute('data-theme', newTheme);
-                        localStorage.setItem('theme', newTheme);
-                        
-                        this.innerHTML = newTheme === 'dark' 
-                            ? '<i class="fas fa-sun"></i>' 
-                            : '<i class="fas fa-moon"></i>';
-                        
-                        this.setAttribute('aria-label', 
-                            newTheme === 'dark' ? 'Увімкнути світлу тему' : 'Увімкнути темну тему');
-                    });
-                    
-                    // Встановити правильну іконку
-                    themeToggle.innerHTML = savedTheme === 'dark' 
-                        ? '<i class="fas fa-sun"></i>' 
-                        : '<i class="fas fa-moon"></i>';
-                }
-            }
-            
-            // Обробка хешу URL
-            function handleHashNavigation() {
-                const hash = window.location.hash.substring(1);
-                if (hash) {
-                    const targetPage = document.getElementById(`${hash}-page`);
-                    if (targetPage) {
-                        SICOMIX.utils.navigateToPage(`${hash}-page`);
-                    }
-                }
-            }
-            
-            window.addEventListener('online', updateOnlineStatus);
-            window.addEventListener('offline', updateOnlineStatus);
-            window.addEventListener('hashchange', handleHashNavigation);
-            
-            // Ініціалізація
-            updateOnlineStatus();
-            handleNavigation();
-            initModals();
-            initSidebar();
-            initTheme();
-            handleHashNavigation();
-            
-            // Реєстрація Service Worker для PWA
-            if ('serviceWorker' in navigator) {
+        // Реєстрація Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
                 navigator.serviceWorker.register('js/service-worker.js')
                     .then(registration => {
                         console.log('Service Worker зареєстрований:', registration.scope);
-                        
-                        registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    SICOMIX.utils.showNotification(
-                                        'Доступна нова версія! Оновіть сторінку.',
-                                        'info'
-                                    );
-                                }
-                            });
-                        });
                     })
                     .catch(error => {
-                        console.error('Помилка реєстрації Service Worker:', error);
+                        console.log('Помилка реєстрації Service Worker:', error);
                     });
-            }
-            
-            // PWA Install Prompt
-            let deferredPrompt;
-            const installButton = document.getElementById('installPwaBtn');
-            
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                
-                if (installButton) {
-                    installButton.style.display = 'inline-flex';
-                    installButton.addEventListener('click', () => {
-                        deferredPrompt.prompt();
-                        deferredPrompt.userChoice.then((choiceResult) => {
-                            if (choiceResult.outcome === 'accepted') {
-                                console.log('Користувач погодився на встановлення PWA');
-                            }
-                            deferredPrompt = null;
-                            installButton.style.display = 'none';
-                        });
-                    });
-                }
             });
-            
-            // Ініціалізація i18n (якщо доступно)
-            if (SICOMIX.i18n && SICOMIX.i18n.init) {
-                SICOMIX.i18n.init();
-            }
-            
-            // Ініціалізація додатку (якщо доступно)
-            if (SICOMIX.app && SICOMIX.app.init) {
-                SICOMIX.app.init();
-            }
-        });
+        }
     </script>
 </body>
 </html>
