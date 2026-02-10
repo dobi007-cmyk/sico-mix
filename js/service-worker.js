@@ -1,143 +1,128 @@
-/* ================================
-   SICO MIX — PRO Service Worker
-   Versioned caching + runtime strategies
-================================ */
-
-const CACHE_VERSION = 'v2.0.0';
-const STATIC_CACHE = `sicomix-static-${CACHE_VERSION}`;
-const RUNTIME_CACHE = `sicomix-runtime-${CACHE_VERSION}`;
-const IMAGE_CACHE = `sicomix-images-${CACHE_VERSION}`;
-
-// Файли ядра додатку
-const APP_SHELL = [
+// Service Worker для офлайн-роботи
+const CACHE_NAME = 'sicomix-v1.0.0';
+const urlsToCache = [
     '/',
     '/index.html',
     '/css/style.css',
+    '/js/data-colors.js',
     '/js/app.js',
     '/js/utils.js',
     '/js/i18n.js',
-    '/js/data-colors(1).js',
     '/manifest.json'
 ];
 
-// ================= INSTALL =================
+// Встановлення Service Worker
 self.addEventListener('install', event => {
-    self.skipWaiting();
-
     event.waitUntil(
-        caches.open(STATIC_CACHE)
-            .then(cache => cache.addAll(APP_SHELL))
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                console.log('Відкрито кеш');
+                return cache.addAll(urlsToCache);
+            })
     );
 });
 
-// ================= ACTIVATE =================
+// Активація Service Worker
 self.addEventListener('activate', event => {
     event.waitUntil(
-        caches.keys().then(keys =>
-            Promise.all(
-                keys.map(key => {
-                    if (
-                        key !== STATIC_CACHE &&
-                        key !== RUNTIME_CACHE &&
-                        key !== IMAGE_CACHE
-                    ) {
-                        return caches.delete(key);
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheName !== CACHE_NAME) {
+                        console.log('Видалення старого кешу:', cacheName);
+                        return caches.delete(cacheName);
                     }
                 })
-            )
-        )
+            );
+        })
     );
-
-    self.clients.claim();
 });
 
-// ================= FETCH =================
+// Обробка запитів
 self.addEventListener('fetch', event => {
-    const request = event.request;
-
-    if (request.method !== 'GET') return;
-
-    const url = new URL(request.url);
-
-    // ----- IMAGE STRATEGY -----
-    if (request.destination === 'image') {
-        event.respondWith(cacheFirst(request, IMAGE_CACHE));
-        return;
-    }
-
-    // ----- CSS / JS / Fonts -----
-    if (
-        request.destination === 'style' ||
-        request.destination === 'script' ||
-        request.destination === 'font'
-    ) {
-        event.respondWith(staleWhileRevalidate(request, STATIC_CACHE));
-        return;
-    }
-
-    // ----- HTML -----
-    if (request.mode === 'navigate') {
-        event.respondWith(networkFirst(request));
-        return;
-    }
-
-    // ----- DEFAULT -----
-    event.respondWith(networkFallbackCache(request));
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                // Повертаємо кешовану версію, якщо вона є
+                if (response) {
+                    return response;
+                }
+                
+                // Інакше робимо мережевий запит
+                return fetch(event.request)
+                    .then(response => {
+                        // Перевірка чи отримали ми дійсну відповідь
+                        if (!response || response.status !== 200 || response.type !== 'basic') {
+                            return response;
+                        }
+                        
+                        // Клонуємо відповідь
+                        const responseToCache = response.clone();
+                        
+                        // Додаємо до кешу
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+                                cache.put(event.request, responseToCache);
+                            });
+                        
+                        return response;
+                    })
+                    .catch(() => {
+                        // Якщо мережа недоступна, показуємо офлайн-сторінку
+                        if (event.request.headers.get('accept').includes('text/html')) {
+                            return caches.match('/index.html');
+                        }
+                    });
+            })
+    );
 });
 
-// ================= STRATEGIES =================
-
-async function cacheFirst(request, cacheName) {
-    const cache = await caches.open(cacheName);
-    const cached = await cache.match(request);
-
-    if (cached) return cached;
-
-    const response = await fetch(request);
-    cache.put(request, response.clone());
-    return response;
-}
-
-async function staleWhileRevalidate(request, cacheName) {
-    const cache = await caches.open(cacheName);
-    const cached = await cache.match(request);
-
-    const networkFetch = fetch(request).then(response => {
-        cache.put(request, response.clone());
-        return response;
-    });
-
-    return cached || networkFetch;
-}
-
-async function networkFirst(request) {
-    try {
-        const response = await fetch(request);
-        const cache = await caches.open(RUNTIME_CACHE);
-        cache.put(request, response.clone());
-        return response;
-    } catch {
-        const cache = await caches.open(RUNTIME_CACHE);
-        const cached = await cache.match(request);
-        return cached || caches.match('/index.html');
+// Фонове оновлення
+self.addEventListener('sync', event => {
+    if (event.tag === 'sync-data') {
+        event.waitUntil(syncData());
     }
+});
+
+// Синхронізація даних
+function syncData() {
+    // Тут буде логіка синхронізації даних з сервером
+    return Promise.resolve();
 }
 
-async function networkFallbackCache(request) {
-    try {
-        const response = await fetch(request);
-        const cache = await caches.open(RUNTIME_CACHE);
-        cache.put(request, response.clone());
-        return response;
-    } catch {
-        return caches.match(request);
-    }
-}
+// Отримання повідомлень
+self.addEventListener('push', event => {
+    const options = {
+        body: event.data ? event.data.text() : 'Оновлення каталогу фарб',
+        icon: '/icon-192.png',
+        badge: '/icon-72.png',
+        vibrate: [100, 50, 100],
+        data: {
+            dateOfArrival: Date.now(),
+            primaryKey: '1'
+        }
+    };
+    
+    event.waitUntil(
+        self.registration.showNotification('SICOMIX', options)
+    );
+});
 
-// ================= MESSAGE =================
-// Дозволяє вручну оновлювати SW
-self.addEventListener('message', event => {
-    if (event.data === 'SKIP_WAITING') {
-        self.skipWaiting();
-    }
+// Клік по повідомленню
+self.addEventListener('notificationclick', event => {
+    event.notification.close();
+    
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true })
+            .then(clientList => {
+                for (const client of clientList) {
+                    if (client.url === '/' && 'focus' in client) {
+                        return client.focus();
+                    }
+                }
+                if (clients.openWindow) {
+                    return clients.openWindow('/');
+                }
+            })
+    );
 });
