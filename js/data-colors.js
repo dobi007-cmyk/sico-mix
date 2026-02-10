@@ -159,49 +159,49 @@ SICOMIX.data = (function() {
 
     // Базові кольори
     const baseColors = [
-        { code: "10", name: { ua: "Фіолетовий", pl: "Fioletowy", en: "Violet" } },
-        { code: "20", name: { ua: "Синій", pl: "Niebieski", en: "Blue" } },
-        { code: "20/B", name: { ua: "Синій Flex", pl: "Niebieski Flex", en: "Blue Flex" } },
-        { code: "P20/5", name: { ua: "Pantone Blue", pl: "Pantone Blue", en: "Pantone Blue" } },
-        { code: "22", name: { ua: "Ультрамарин", pl: "Ultramaryna", en: "Ultramarine" } },
-        { code: "24", name: { ua: "Блакитний", pl: "Niebieski jasny", en: "Light Blue" } },
-        { code: "26", name: { ua: "Світло-блакитний", pl: "Jasnoniebieski", en: "Light Blue 2" } },
-        { code: "P26/2", name: { ua: "Pantone Blue 2", pl: "Pantone Blue 2", en: "Pantone Blue 2" } },
-        { code: "27", name: { ua: "Бірюзовий", pl: "Turkusowy", en: "Turquoise" } },
-        { code: "30", name: { ua: "Темно-зелений", pl: "Ciemnozielony", en: "Dark Green" } },
-        { code: "31", name: { ua: "Зелений", pl: "Zielony", en: "Green" } },
-        { code: "32", name: { ua: "Яскраво-зелений", pl: "Jasnozielony", en: "Bright Green" } },
-        { code: "33", name: { ua: "Зелений трава", pl: "Zielony trawa", en: "Grass Green" } },
-        { code: "40", name: { ua: "Жовтий", pl: "Żółty", en: "Yellow" } },
-        { code: "41", name: { ua: "Цитриновий", pl: "Cytrynowy", en: "Lemon Yellow" } },
-        { code: "42", name: { ua: "Медовий", pl: "Miodowy", en: "Honey Yellow" } },
-        { code: "50", name: { ua: "Помаранчевий", pl: "Pomarańczowy", en: "Orange" } },
-        { code: "51", name: { ua: "Світло-помаранчевий", pl: "Jasnopomarańczowy", en: "Light Orange" } },
-        { code: "56", name: { ua: "Червоний", pl: "Czerwony", en: "Red" } },
-        { code: "60", name: { ua: "Темно-червоний", pl: "Ciemnoczerwony", en: "Dark Red" } },
-        { code: "P60/38", name: { ua: "Pantone Red", pl: "Pantone Red", en: "Pantone Red" } },
-        { code: "61", name: { ua: "Малиновий", pl: "Karminowy", en: "Carmine" } },
-        { code: "P61/15", name: { ua: "Pantone Magenta", pl: "Pantone Magenta", en: "Pantone Magenta" } },
-        { code: "70", name: { ua: "Магента", pl: "Magenta", en: "Magenta" } },
-        { code: "80", name: { ua: "Коричневий", pl: "Brązowy", en: "Brown" } },
-        { code: "81", name: { ua: "Темно-коричневий", pl: "Ciemnobrązowy", en: "Dark Brown" } },
-        { code: "82", name: { ua: "Бежевий", pl: "Beżowy", en: "Beige" } },
-        { code: "90", name: { ua: "Білий", pl: "Biały", en: "White" } },
-        { code: "91", name: { ua: "Криючий білий", pl: "Biały kryjący", en: "Opaque White" } },
-        { code: "100", name: { ua: "Чорний", pl: "Czarny", en: "Black" } },
-        { code: "110", name: { ua: "Срібло", pl: "Srebro", en: "Silver" } },
-        { code: "120", name: { ua: "Золото", pl: "Złoto", en: "Gold" } },
-        { code: "130", name: { ua: "Флуо жовтий", pl: "Fluo żółty", en: "Fluo Yellow" } },
-        { code: "131", name: { ua: "Флуо оранж", pl: "Fluo pomarańcz", en: "Fluo Orange" } },
-        { code: "132", name: { ua: "Флуо червоний", pl: "Fluo czerwony", en: "Fluo Red" } },
-        { code: "133", name: { ua: "Флуо рожевий", pl: "Fluo różowy", en: "Fluo Pink" } },
-        { code: "134", name: { ua: "Флуо зелений", pl: "Fluo zielony", en: "Fluo Green" } },
-        { code: "135", name: { ua: "Флуо синій", pl: "Fluo niebieski", en: "Fluo Blue" } },
-        { code: "136", name: { ua: "Флуо блакитний", pl: "Fluo jasnoniebieski", en: "Fluo Light Blue" } },
-        { code: "140", name: { ua: "CMYK Yellow", pl: "CMYK Yellow", en: "CMYK Yellow" } },
-        { code: "141", name: { ua: "CMYK Cyan", pl: "CMYK Cyan", en: "CMYK Cyan" } },
-        { code: "142", name: { ua: "CMYK Magenta", pl: "CMYK Magenta", en: "CMYK Magenta" } },
-        { code: "143", name: { ua: "CMYK Black", pl: "CMYK Black", en: "CMYK Black" } }
+        { code: "10", name: { ua: "Фіолетовий", pl: "Fioletowy", en: "Violet" }, color: "#800080" },
+        { code: "20", name: { ua: "Синій", pl: "Niebieski", en: "Blue" }, color: "#0000FF" },
+        { code: "20/B", name: { ua: "Синій Flex", pl: "Niebieski Flex", en: "Blue Flex" }, color: "#1E90FF" },
+        { code: "P20/5", name: { ua: "Pantone Blue", pl: "Pantone Blue", en: "Pantone Blue" }, color: "#0066CC" },
+        { code: "22", name: { ua: "Ультрамарин", pl: "Ultramaryna", en: "Ultramarine" }, color: "#4169E1" },
+        { code: "24", name: { ua: "Блакитний", pl: "Niebieski jasny", en: "Light Blue" }, color: "#87CEEB" },
+        { code: "26", name: { ua: "Світло-блакитний", pl: "Jasnoniebieski", en: "Light Blue 2" }, color: "#ADD8E6" },
+        { code: "P26/2", name: { ua: "Pantone Blue 2", pl: "Pantone Blue 2", en: "Pantone Blue 2" }, color: "#6495ED" },
+        { code: "27", name: { ua: "Бірюзовий", pl: "Turkusowy", en: "Turquoise" }, color: "#40E0D0" },
+        { code: "30", name: { ua: "Темно-зелений", pl: "Ciemnozielony", en: "Dark Green" }, color: "#006400" },
+        { code: "31", name: { ua: "Зелений", pl: "Zielony", en: "Green" }, color: "#008000" },
+        { code: "32", name: { ua: "Яскраво-зелений", pl: "Jasnozielony", en: "Bright Green" }, color: "#00FF00" },
+        { code: "33", name: { ua: "Зелений трава", pl: "Zielony trawa", en: "Grass Green" }, color: "#7CFC00" },
+        { code: "40", name: { ua: "Жовтий", pl: "Żółty", en: "Yellow" }, color: "#FFFF00" },
+        { code: "41", name: { ua: "Цитриновий", pl: "Cytrynowy", en: "Lemon Yellow" }, color: "#FFFACD" },
+        { code: "42", name: { ua: "Медовий", pl: "Miodowy", en: "Honey Yellow" }, color: "#F0E68C" },
+        { code: "50", name: { ua: "Помаранчевий", pl: "Pomarańczowy", en: "Orange" }, color: "#FFA500" },
+        { code: "51", name: { ua: "Світло-помаранчевий", pl: "Jasnopomarańczowy", en: "Light Orange" }, color: "#FFB347" },
+        { code: "56", name: { ua: "Червоний", pl: "Czerwony", en: "Red" }, color: "#FF0000" },
+        { code: "60", name: { ua: "Темно-червоний", pl: "Ciemnoczerwony", en: "Dark Red" }, color: "#8B0000" },
+        { code: "P60/38", name: { ua: "Pantone Red", pl: "Pantone Red", en: "Pantone Red" }, color: "#DC143C" },
+        { code: "61", name: { ua: "Малиновий", pl: "Karminowy", en: "Carmine" }, color: "#DC143C" },
+        { code: "P61/15", name: { ua: "Pantone Magenta", pl: "Pantone Magenta", en: "Pantone Magenta" }, color: "#FF00FF" },
+        { code: "70", name: { ua: "Магента", pl: "Magenta", en: "Magenta" }, color: "#FF00FF" },
+        { code: "80", name: { ua: "Коричневий", pl: "Brązowy", en: "Brown" }, color: "#A52A2A" },
+        { code: "81", name: { ua: "Темно-коричневий", pl: "Ciemnobrązowy", en: "Dark Brown" }, color: "#8B4513" },
+        { code: "82", name: { ua: "Бежевий", pl: "Beżowy", en: "Beige" }, color: "#F5F5DC" },
+        { code: "90", name: { ua: "Білий", pl: "Biały", en: "White" }, color: "#FFFFFF" },
+        { code: "91", name: { ua: "Криючий білий", pl: "Biały kryjący", en: "Opaque White" }, color: "#F8F8FF" },
+        { code: "100", name: { ua: "Чорний", pl: "Czarny", en: "Black" }, color: "#000000" },
+        { code: "110", name: { ua: "Срібло", pl: "Srebro", en: "Silver" }, color: "#C0C0C0" },
+        { code: "120", name: { ua: "Золото", pl: "Złoto", en: "Gold" }, color: "#FFD700" },
+        { code: "130", name: { ua: "Флуо жовтий", pl: "Fluo żółty", en: "Fluo Yellow" }, color: "#FFFF00" },
+        { code: "131", name: { ua: "Флуо оранж", pl: "Fluo pomarańcz", en: "Fluo Orange" }, color: "#FFA500" },
+        { code: "132", name: { ua: "Флуо червоний", pl: "Fluo czerwony", en: "Fluo Red" }, color: "#FF0000" },
+        { code: "133", name: { ua: "Флуо рожевий", pl: "Fluo różowy", en: "Fluo Pink" }, color: "#FF69B4" },
+        { code: "134", name: { ua: "Флуо зелений", pl: "Fluo zielony", en: "Fluo Green" }, color: "#00FF00" },
+        { code: "135", name: { ua: "Флуо синій", pl: "Fluo niebieski", en: "Fluo Blue" }, color: "#0000FF" },
+        { code: "136", name: { ua: "Флуо блакитний", pl: "Fluo jasnoniebieski", en: "Fluo Light Blue" }, color: "#87CEEB" },
+        { code: "140", name: { ua: "CMYK Yellow", pl: "CMYK Yellow", en: "CMYK Yellow" }, color: "#FFFF00" },
+        { code: "141", name: { ua: "CMYK Cyan", pl: "CMYK Cyan", en: "CMYK Cyan" }, color: "#00FFFF" },
+        { code: "142", name: { ua: "CMYK Magenta", pl: "CMYK Magenta", en: "CMYK Magenta" }, color: "#FF00FF" },
+        { code: "143", name: { ua: "CMYK Black", pl: "CMYK Black", en: "CMYK Black" }, color: "#000000" }
     ];
 
     // Генерація фарб з урахуванням серій та базових кольорів
@@ -209,36 +209,24 @@ SICOMIX.data = (function() {
         const paints = [];
         let id = 1;
         
-        baseColors.forEach(baseColor => {
-            series.forEach(serie => {
-                // Визначаємо колір на основі коду
-                const colorMap = {
-                    "10": "#800080", "20": "#0000FF", "20/B": "#1E90FF", "P20/5": "#0066CC",
-                    "22": "#4169E1", "24": "#87CEEB", "26": "#ADD8E6", "P26/2": "#6495ED",
-                    "27": "#40E0D0", "30": "#006400", "31": "#008000", "32": "#00FF00", "33": "#7CFC00",
-                    "40": "#FFFF00", "41": "#FFFACD", "42": "#F0E68C", "50": "#FFA500", "51": "#FFB347",
-                    "56": "#FF0000", "60": "#8B0000", "P60/38": "#DC143C", "61": "#DC143C", "P61/15": "#FF00FF",
-                    "70": "#FF00FF", "80": "#A52A2A", "81": "#8B4513", "82": "#F5F5DC", "90": "#FFFFFF",
-                    "91": "#F8F8FF", "100": "#000000", "110": "#C0C0C0", "120": "#FFD700",
-                    "130": "#FFFF00", "131": "#FFA500", "132": "#FF0000", "133": "#FF69B4", "134": "#00FF00",
-                    "135": "#0000FF", "136": "#87CEEB", "140": "#FFFF00", "141": "#00FFFF", "142": "#FF00FF",
-                    "143": "#000000"
-                };
-                
-                const hexColor = colorMap[baseColor.code] || "#CCCCCC";
-                
+        series.forEach(serie => {
+            baseColors.forEach(baseColor => {
                 paints.push({
                     id: id++,
-                    name: `${serie.name} ${baseColor.code}`,
-                    fullName: `${serie.name} ${baseColor.code} - ${baseColor.name.ua}`,
+                    name: `${serie.id}${baseColor.code}`, // EC91, CF100, тощо
+                    displayName: `${serie.name} ${baseColor.name.ua}`,
+                    searchName: `${serie.id}${baseColor.code}`, // Для пошуку: EC91
                     series: serie.id,
                     baseColorCode: baseColor.code,
                     category: serie.category,
-                    color: hexColor,
+                    color: baseColor.color,
                     manufacturer: "SICO",
                     article: `${serie.id}-${baseColor.code}`,
+                    description: `${serie.description}. Колір: ${baseColor.name.ua}`,
                     properties: serie.properties,
-                    names: baseColor.name
+                    colorName: baseColor.name.ua,
+                    colorCode: baseColor.code,
+                    fullInfo: `Серія: ${serie.name}, Колір: ${baseColor.code} - ${baseColor.name.ua}, Категорія: ${serie.category}`
                 });
             });
         });
@@ -254,18 +242,8 @@ SICOMIX.data = (function() {
         recipes: []
     };
 
-    // Категорії
-    const categories = [
-        "Універсальні",
-        "Текстиль", 
-        "Папір/картон",
-        "Пластики",
-        "UV фарби",
-        "Металік",
-        "Перламутр",
-        "Флуоресцентні",
-        "CMYK"
-    ];
+    // Категорії для фільтрації
+    const categories = Array.from(new Set(series.map(s => s.category))).sort();
 
     // Одиниці вимірювання
     const units = [
@@ -306,38 +284,6 @@ SICOMIX.data = (function() {
         defaultSeries: "EC"
     };
 
-    // Кольори за замовчуванням
-    const defaultColors = [
-        "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF",
-        "#FFA500", "#800080", "#008000", "#800000", "#008080", "#000080",
-        "#FF4500", "#DA70D6", "#EEE8AA", "#98FB98", "#AFEEEE", "#DDA0DD"
-    ];
-
-    // Додаткові продукти для кожної серії
-    const additionalProducts = {
-        "EC": [
-            "EC 160 - паста криюча для растрових відбитків",
-            "EC 150 - прозора база для яскравіших кольорів",
-            "EC 1501 HG - захисний лак високого блиску",
-            "AS 1000 - антистатик (до 5%)",
-            "EC 170 - гелевий сповільнювач"
-        ],
-        "CF": [
-            "CF 150 - прозора база",
-            "CF 1501 HG - завершальний лак",
-            "CF 160 - високо тиксотропна добавка для деталей",
-            "CF 1702 - сильний гелевий сповільнювач",
-            "HCF - повільний отверджувач (до 5%)"
-        ],
-        "SPTN": [
-            "SPTN9l - Flash white (швидкосохнучий)",
-            "SPTN 91/l - Opaque white (криючий)",
-            "Nyloncoat - отверджувач для нейлону (до 5%)",
-            "SPT №2 - трансферний клей",
-            "SPTNCR - розріджувач"
-        ]
-    };
-
     return {
         initialData,
         series,
@@ -347,35 +293,7 @@ SICOMIX.data = (function() {
         fileFormats,
         languages,
         defaultSettings,
-        defaultColors,
-        additionalProducts,
-        generateMockData: function(count) {
-            const mockPaints = [];
-            const mockRecipes = [];
-            
-            for (let i = 1; i <= count; i++) {
-                const randomBase = baseColors[Math.floor(Math.random() * baseColors.length)];
-                const randomSerie = series[Math.floor(Math.random() * series.length)];
-                
-                mockPaints.push({
-                    id: i,
-                    name: `${randomSerie.name} ${randomBase.code}`,
-                    series: randomSerie.id,
-                    baseColorCode: randomBase.code,
-                    category: randomSerie.category,
-                    color: defaultColors[Math.floor(Math.random() * defaultColors.length)],
-                    manufacturer: "SICO",
-                    article: `${randomSerie.id}-${randomBase.code}-MOCK-${i}`,
-                    names: randomBase.name,
-                    properties: randomSerie.properties
-                });
-            }
-            
-            return {
-                paints: mockPaints,
-                recipes: mockRecipes
-            };
-        }
+        generatePaintsFromBaseColors
     };
 })();
 
