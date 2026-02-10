@@ -2,44 +2,43 @@
   "$schema": "https://json.schemastore.org/web-manifest-combined.json",
   "name": "SICO MIX",
   "short_name": "SICO MIX",
-  "description": "Професійна система управління рецептами фарб для створення, зберігання та аналізу кольорових рішень",
+  "description": "Професійна система управління рецептами фарб",
   "start_url": "./",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "browser"],
+  "display_override": ["window-controls-overlay", "minimal-ui"],
   "background_color": "#f8f9fa",
   "theme_color": "#4361ee",
   "orientation": "any",
   "lang": "uk",
   "dir": "ltr",
-  "id": "/?source=pwa",
-  "categories": ["business", "productivity", "utilities"],
   "scope": "./",
-  "iarc_rating_id": "e84b072d-719b-453e-b4b5-8c6945b3375a",
+  "categories": ["business", "productivity", "utilities"],
+  "id": "/",
   
   "icons": [
     {
       "src": "icons/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/icon-152x152.png",
@@ -57,13 +56,13 @@
       "src": "icons/icon-256x256.png",
       "sizes": "256x256",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/icon-512x512.png",
@@ -76,43 +75,23 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
-    },
-    {
-      "src": "icons/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
     }
   ],
   
   "screenshots": [
     {
-      "src": "screenshots/screenshot-desktop-1.png",
+      "src": "screenshots/desktop-1280x720.png",
       "sizes": "1280x720",
       "type": "image/png",
       "platform": "wide",
       "label": "Головна сторінка SICO MIX"
     },
     {
-      "src": "screenshots/screenshot-desktop-2.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide",
-      "label": "Створення нового рецепту"
-    },
-    {
-      "src": "screenshots/screenshot-mobile-1.png",
+      "src": "screenshots/mobile-360x640.png",
       "sizes": "360x640",
       "type": "image/png",
       "platform": "narrow",
-      "label": "Мобільний вигляд головної сторінки"
-    },
-    {
-      "src": "screenshots/screenshot-mobile-2.png",
-      "sizes": "360x640",
-      "type": "image/png",
-      "platform": "narrow",
-      "label": "Каталог фарб на мобільному"
+      "label": "Мобільний вигляд"
     }
   ],
   
@@ -121,10 +100,10 @@
       "name": "Новий рецепт",
       "short_name": "Новий",
       "description": "Створити новий рецепт фарби",
-      "url": "./#new-recipe",
+      "url": "/#new-recipe",
       "icons": [
         {
-          "src": "icons/shortcut-new.png",
+          "src": "icons/shortcut-new-96x96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -134,10 +113,10 @@
       "name": "Мої рецепти",
       "short_name": "Рецепти",
       "description": "Переглянути всі мої рецепти",
-      "url": "./#recipes",
+      "url": "/#recipes",
       "icons": [
         {
-          "src": "icons/shortcut-recipes.png",
+          "src": "icons/shortcut-recipes-96x96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -146,30 +125,57 @@
     {
       "name": "Каталог фарб",
       "short_name": "Каталог",
-      "description": "Переглянути каталог доступних фарб",
-      "url": "./#catalog",
+      "description": "Переглянути каталог фарб",
+      "url": "/#catalog",
       "icons": [
         {
-          "src": "icons/shortcut-catalog.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Імпорт даних",
-      "short_name": "Імпорт",
-      "description": "Імпортувати рецепти з файлу",
-      "url": "./#import",
-      "icons": [
-        {
-          "src": "icons/shortcut-import.png",
+          "src": "icons/shortcut-catalog-96x96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
       ]
     }
   ],
+  
+  "share_target": {
+    "action": "/?share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  
+  "file_handlers": [
+    {
+      "action": "/?import",
+      "accept": {
+        "application/json": [".json"],
+        "text/csv": [".csv"]
+      },
+      "name": "Файли даних SICO MIX"
+    }
+  ],
+  
+  "protocol_handlers": [
+    {
+      "protocol": "web+sico",
+      "url": "/?protocol=%s"
+    }
+  ],
+  
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  
+  "handle_links": "preferred",
+  
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  
+  "prefer_related_applications": false,
   
   "related_applications": [
     {
@@ -178,135 +184,8 @@
       "id": "com.sico.mix"
     },
     {
-      "platform": "itunes",
-      "url": "https://apps.apple.com/app/sico-mix/id1234567890"
-    },
-    {
-      "platform": "windows",
-      "url": "ms-windows-store://pdp/?productid=9NBLGGH12345"
-    }
-  ],
-  
-  "prefer_related_applications": false,
-  
-  "protocol_handlers": [
-    {
-      "protocol": "web+sico",
-      "url": "./?protocol=%s"
-    }
-  ],
-  
-  "handle_links": "preferred",
-  
-  "launch_handler": {
-    "client_mode": ["navigate-existing", "auto"]
-  },
-  
-  "edge_side_panel": {
-    "preferred_width": 360
-  },
-  
-  "file_handlers": [
-    {
-      "action": "./?import=file",
-      "accept": {
-        "application/json": [".json"],
-        "text/csv": [".csv"],
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"]
-      },
-      "name": "Файли даних SICO MIX"
-    }
-  ],
-  
-  "share_target": {
-    "action": "./?share",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "title": "name",
-      "text": "description",
-      "url": "link",
-      "files": [
-        {
-          "name": "recipe",
-          "accept": ["application/json", "text/csv", "image/*"]
-        }
-      ]
-    }
-  },
-  
-  "capture_links": "existing-client-navigate",
-  
-  "permissions": [
-    "clipboard-write",
-    "clipboard-read",
-    "notifications",
-    "storage",
-    "geolocation"
-  ],
-  
-  "serviceworker": {
-    "src": "./js/service-worker.js",
-    "scope": "./",
-    "use_cache": true
-  },
-  
-  "features": [
-    "cross-origin-isolated",
-    "geolocation",
-    "hid",
-    "idle-detection",
-    "payment",
-    "storage-access",
-    "sync-filesystem",
-    "top-navigation"
-  ],
-  
-  "version": "2.2.0",
-  "author": "SICO MIX Team",
-  "homepage_url": "https://sico-mix.example.com",
-  
-  "developer": {
-    "name": "SICO Україна",
-    "url": "https://sico.com.ua"
-  },
-  
-  "platforms": ["web", "android", "ios", "windows"],
-  
-  "output": "standalone",
-  
-  "generated": true,
-  
-  "splash_pages": null,
-  
-  "related_apps": [
-    {
       "platform": "webapp",
       "url": "https://sico-mix.example.com/manifest.json"
     }
-  ],
-  
-  "monetization": {
-    "payment_pointer": "$ilp.uphold.com/XXXXXX",
-    "supported_protocols": ["interledger"]
-  },
-  
-  "background": {
-    "scripts": ["./js/background.js"]
-  },
-  
-  "content_security_policy": "script-src 'self' https://cdnjs.cloudflare.com; object-src 'self'",
-  
-  "update_url": "https://sico-mix.example.com/updates.xml",
-  
-  "external": {
-    "connectors": [
-      {
-        "platform": "github",
-        "url": "https://github.com/sico-mix/app"
-      }
-    ]
-  },
-  
-  "format_detection": ["telephone=no", "date=no", "address=no", "email=no"]
+  ]
 }
