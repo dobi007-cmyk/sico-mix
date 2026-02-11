@@ -3,8 +3,8 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://ваш-домен.укр/sitemap.xml
+Sitemap: https://sico-spectrum.ua/sitemap.xml
 
-# SICO MIX - Система управління рецептами фарб
-# Версія 2.2
-# © 2023
+# SICO Spectrum - Система управління рецептами фарб
+# Версія 3.0
+# © 2026
