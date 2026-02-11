@@ -35,7 +35,6 @@ body {
     backdrop-filter: blur(2px);
 }
 
-/* ===== Стилізація скролбара ===== */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -52,7 +51,6 @@ body {
     background: var(--secondary);
 }
 
-/* ===== Мобільна навігація ===== */
 .mobile-nav {
     display: none;
     position: fixed;
@@ -90,7 +88,6 @@ body {
     letter-spacing: -0.5px;
 }
 
-/* ===== Сайдбар ===== */
 .sidebar {
     position: fixed;
     left: 0;
@@ -211,7 +208,6 @@ body {
     border: none;
 }
 
-/* ===== Основний контейнер ===== */
 .container {
     margin-left: 0;
     padding: 30px;
@@ -221,7 +217,6 @@ body {
     margin-left: 300px;
 }
 
-/* ===== Хедер ===== */
 .header {
     display: flex;
     justify-content: space-between;
@@ -258,7 +253,6 @@ body {
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
 }
 
-/* ===== Сторінки ===== */
 .page-content {
     display: none;
     background: var(--glass-bg);
@@ -279,7 +273,6 @@ body {
     to { opacity: 1; transform: scale(1); }
 }
 
-/* ===== Головна ===== */
 .welcome-section {
     text-align: center;
     padding: 40px 20px;
@@ -358,7 +351,6 @@ body {
     line-height: 1.6;
 }
 
-/* ===== Заголовки сторінок ===== */
 .page-title {
     font-size: 34px;
     font-weight: 800;
@@ -375,7 +367,6 @@ body {
     line-height: 1.7;
 }
 
-/* ===== Секції форми ===== */
 .form-section {
     background: var(--surface);
     border-radius: var(--border-radius);
@@ -397,7 +388,6 @@ body {
     color: var(--primary);
 }
 
-/* ===== Елементи форми ===== */
 .form-group {
     margin-bottom: 24px;
 }
@@ -438,7 +428,6 @@ body {
     resize: vertical;
 }
 
-/* ===== Завантаження файлів ===== */
 .file-upload {
     position: relative;
     overflow: hidden;
@@ -471,7 +460,6 @@ body {
     color: white;
 }
 
-/* ===== Таблиця інгредієнтів ===== */
 .ingredients-table {
     width: 100%;
     border-collapse: collapse;
@@ -528,7 +516,6 @@ body {
     color: #ef4444;
 }
 
-/* ===== Кнопки ===== */
 .btn, .btn-add, .recipe-btn {
     padding: 14px 28px;
     border-radius: 40px;
@@ -580,7 +567,6 @@ body {
     box-shadow: var(--shadow-md);
 }
 
-/* ===== Картки рецептів ===== */
 .recipe-cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -648,7 +634,6 @@ body {
     justify-content: flex-end;
 }
 
-/* ===== Модальні вікна ===== */
 .modal {
     display: none;
     position: fixed;
@@ -712,7 +697,6 @@ body {
     color: white;
 }
 
-/* ===== Сповіщення ===== */
 .notification {
     position: fixed;
     top: 24px;
@@ -740,7 +724,6 @@ body {
     to { transform: translateX(100%); opacity: 0; }
 }
 
-/* ===== Адаптація ===== */
 @media (max-width: 992px) {
     .mobile-nav {
         display: flex;
@@ -788,7 +771,6 @@ body {
     }
 }
 
-/* ===== Футер ===== */
 .footer {
     text-align: center;
     margin-top: 50px;
