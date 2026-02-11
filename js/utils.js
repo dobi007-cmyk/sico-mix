@@ -1,147 +1,139 @@
-// utils.js – безпечні утиліти, IndexedDB, експорт, генерація ID
+// ========== УТІЛІТИ ==========
+if (!window.SICOMIX) window.SICOMIX = {};
 
-// ------------------- Санітайзинг -------------------
-export function escapeHTML(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+SICOMIX.utils = (function() {
+    function showNotification(message, type = 'success', duration = 3000) {
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => notification.remove());
 
-export function sanitizeRecipe(recipe) {
-  return {
-    ...recipe,
-    name: escapeHTML(recipe.name),
-    description: escapeHTML(recipe.description),
-    category: escapeHTML(recipe.category)
-  };
-}
-
-// ------------------- IndexedDB -------------------
-const DB_NAME = 'SICOMIX_DB';
-const DB_VERSION = 2;
-const STORE_RECIPES = 'recipes';
-const STORE_PAINTS = 'paints';
-const STORE_SETTINGS = 'settings';
-
-let dbPromise = null;
-
-function getDB() {
-  if (!dbPromise) {
-    dbPromise = new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
-      request.onupgradeneeded = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains(STORE_RECIPES)) {
-          db.createObjectStore(STORE_RECIPES, { keyPath: 'id' });
-        }
-        if (!db.objectStoreNames.contains(STORE_PAINTS)) {
-          db.createObjectStore(STORE_PAINTS, { keyPath: 'id' });
-        }
-        if (!db.objectStoreNames.contains(STORE_SETTINGS)) {
-          db.createObjectStore(STORE_SETTINGS, { keyPath: 'key' });
-        }
-      };
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
-  return dbPromise;
-}
-
-export async function saveToIndexedDB(storeName, data) {
-  const db = await getDB();
-  const tx = db.transaction(storeName, 'readwrite');
-  const store = tx.objectStore(storeName);
-  if (Array.isArray(data)) {
-    data.forEach(item => store.put(item));
-  } else {
-    store.put(data);
-  }
-  return tx.done;
-}
-
-export async function loadFromIndexedDB(storeName, key = null) {
-  const db = await getDB();
-  const tx = db.transaction(storeName, 'readonly');
-  const store = tx.objectStore(storeName);
-  if (key) return store.get(key);
-  return store.getAll();
-}
-
-export async function deleteFromIndexedDB(storeName, key) {
-  const db = await getDB();
-  const tx = db.transaction(storeName, 'readwrite');
-  const store = tx.objectStore(storeName);
-  store.delete(key);
-  return tx.done;
-}
-
-export async function clearStore(storeName) {
-  const db = await getDB();
-  const tx = db.transaction(storeName, 'readwrite');
-  const store = tx.objectStore(storeName);
-  store.clear();
-  return tx.done;
-}
-
-// ------------------- Інші утиліти -------------------
-export function generateId() {
-  return `${Date.now()}-${crypto.randomUUID().slice(0,8)}`;
-}
-
-export function debounce(fn, delay) {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), delay);
-  };
-}
-
-export function throttle(fn, limit) {
-  let inThrottle;
-  return (...args) => {
-    if (!inThrottle) {
-      fn(...args);
-      inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+        const notification = document.createElement('div');
+        const bgColor = type === 'success' ? 'var(--primary)' : 
+                       type === 'error' ? 'var(--danger)' : 
+                       type === 'warning' ? 'var(--warning)' : 'var(--gray)';
+        notification.className = `notification ${type}`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${bgColor};
+            color: white;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-hover);
+            z-index: 1001;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        `;
+        const icon = type === 'success' ? 'fa-check-circle' :
+                    type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+        notification.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, duration);
+        return notification;
     }
-  };
-}
 
-export function downloadFile(content, fileName, mimeType = 'application/json') {
-  const blob = new Blob([content], { type: mimeType });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+    function showConfirmation(title, message, onConfirm, onCancel = null) {
+        const confirmationModal = document.getElementById('confirmationModal');
+        const confirmationTitle = document.getElementById('confirmationTitle');
+        const confirmationMessage = document.getElementById('confirmationMessage');
+        const confirmActionBtn = document.getElementById('confirmActionBtn');
+        const cancelActionBtn = document.getElementById('cancelActionBtn');
+        const closeConfirmationModal = document.getElementById('closeConfirmationModal');
+        
+        confirmationTitle.textContent = title;
+        confirmationMessage.innerHTML = `<span>${message}</span>`;
+        confirmationModal.classList.add('active');
+        
+        const handleConfirm = () => { if (onConfirm) onConfirm(); confirmationModal.classList.remove('active'); cleanup(); };
+        const handleCancel = () => { if (onCancel) onCancel(); confirmationModal.classList.remove('active'); cleanup(); };
+        function cleanup() { confirmActionBtn.onclick = null; cancelActionBtn.onclick = null; closeConfirmationModal.onclick = null; }
+        
+        confirmActionBtn.onclick = handleConfirm;
+        cancelActionBtn.onclick = handleCancel;
+        closeConfirmationModal.onclick = handleCancel;
+        
+        const handleEscape = (e) => { if (e.key === 'Escape') { handleCancel(); document.removeEventListener('keydown', handleEscape); } };
+        document.addEventListener('keydown', handleEscape);
+    }
 
-export function formatDate(date, locale = 'uk-UA') {
-  return new Intl.DateTimeFormat(locale, {
-    year: 'numeric', month: 'long', day: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-  }).format(new Date(date));
-}
+    function calculateIngredientPercentages(ingredients) {
+        const totalAmount = ingredients.reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0);
+        if (totalAmount === 0) return ingredients;
+        return ingredients.map(ing => ({ ...ing, percentage: parseFloat(((ing.amount / totalAmount) * 100).toFixed(1)) }));
+    }
 
-export function validateEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+    function generateId() { return Date.now() + Math.random().toString(36).substr(2, 9); }
 
-export function calculateIngredientPercentages(ingredients) {
-  const total = ingredients.reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0);
-  if (total === 0) return ingredients;
-  return ingredients.map(ing => ({
-    ...ing,
-    percentage: parseFloat(((ing.amount / total) * 100).toFixed(1))
-  }));
-}
+    function exportToFile(data, filename, type = 'application/json') {
+        const dataStr = type === 'application/json' ? JSON.stringify(data, null, 2) : convertToCSV(data);
+        const dataUri = `data:${type};charset=utf-8,${encodeURIComponent(dataStr)}`;
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', filename);
+        linkElement.click();
+        return true;
+    }
 
-export function formatNumber(num, decimals = 2) {
-  return parseFloat(num).toFixed(decimals);
-}
+    function convertToCSV(data) {
+        if (!Array.isArray(data)) return '';
+        const headers = Object.keys(data[0] || {});
+        const rows = data.map(item => headers.map(h => {
+            const v = item[h]; return typeof v === 'object' ? JSON.stringify(v) : v;
+        }).join(','));
+        return [headers.join(','), ...rows].join('\n');
+    }
+
+    function formatDate(date, locale = 'uk-UA') {
+        const d = new Date(date);
+        return d.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+    function debounce(func, wait) { let timeout; return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func(...args), wait); }; }
+    function throttle(func, limit) { let inThrottle; return function() { if (!inThrottle) { func.apply(this, arguments); inThrottle = true; setTimeout(() => inThrottle = false, limit); } }; }
+    function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
+    function getRandomColor() { return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'); }
+    function formatNumber(num, decimals = 2) { return parseFloat(num).toFixed(decimals); }
+    function calculateTotal(ingredients) { return ingredients.reduce((total, ing) => total + (parseFloat(ing.amount) || 0), 0); }
+    function isEmpty(obj) { if (!obj) return true; if (Array.isArray(obj)) return obj.length === 0; return Object.keys(obj).length === 0; }
+    function filterArray(array, filters) {
+        return array.filter(item => Object.entries(filters).every(([key, value]) => {
+            if (!value) return true;
+            if (typeof value === 'string') return String(item[key]).toLowerCase().includes(value.toLowerCase());
+            if (typeof value === 'function') return value(item[key]);
+            return item[key] === value;
+        }));
+    }
+    function sortArray(array, key, direction = 'asc') {
+        return [...array].sort((a, b) => {
+            const aVal = a[key], bVal = b[key];
+            if (typeof aVal === 'string' && typeof bVal === 'string')
+                return direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            return direction === 'asc' ? aVal - bVal : bVal - aVal;
+        });
+    }
+    function groupBy(array, key) {
+        return array.reduce((groups, item) => { const gKey = item[key]; if (!groups[gKey]) groups[gKey] = []; groups[gKey].push(item); return groups; }, {});
+    }
+    function loadImage(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = e => resolve(e.target.result); reader.onerror = reject; reader.readAsDataURL(file); }); }
+    function saveToLocalStorage(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); return true; } catch (e) { console.error('Помилка збереження в localStorage:', e); showNotification('Помилка збереження даних', 'error'); return false; } }
+    function loadFromLocalStorage(key, defaultValue = null) { try { const data = localStorage.getItem(key); return data ? JSON.parse(data) : defaultValue; } catch (e) { console.error('Помилка завантаження з localStorage:', e); return defaultValue; } }
+    function clearLocalStorage() { try { localStorage.clear(); return true; } catch (e) { console.error('Помилка очищення localStorage:', e); return false; } }
+    function openModal(modalId) { const modal = document.getElementById(modalId); if (modal) { modal.classList.add('active'); document.body.style.overflow = 'hidden'; } }
+    function closeModal(modalId) { const modal = document.getElementById(modalId); if (modal) { modal.classList.remove('active'); document.body.style.overflow = 'auto'; } }
+
+    return {
+        showNotification, showConfirmation, calculateIngredientPercentages, generateId, exportToFile, convertToCSV,
+        formatDate, validateEmail, debounce, throttle, deepClone, getRandomColor, formatNumber, calculateTotal,
+        isEmpty, filterArray, sortArray, groupBy, loadImage, saveToLocalStorage, loadFromLocalStorage, clearLocalStorage,
+        openModal, closeModal
+    };
+})();
+
+window.SICOMIX = SICOMIX;
