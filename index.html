@@ -1,311 +1,51 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>SICO MIX 2026</title>
-  <meta name="description" content="Професійне керування рецептами фарб – преміум дизайн, офлайн">
-  <meta name="theme-color" content="#4361ee" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0b0f1a" media="(prefers-color-scheme: dark)">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="color-scheme" content="light dark">
-  
-  <!-- Content-Security-Policy (приклад; на продакшені nonce генерується динамічно) -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-EDNnf03nceIOfn39fn3e9h3sdfa' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self'; img-src 'self' data:; manifest-src 'self';">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SICO</title>
 
-  <!-- Preconnect -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
-        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" 
-        crossorigin="anonymous" referrerpolicy="no-referrer">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icons/favicon.ico" sizes="any">
-  <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <!-- Mobile Navigation -->
-  <div class="mobile-nav">
-    <button class="menu-toggle" id="menuToggle">
-      <i class="fas fa-bars"></i>
-    </button>
-    <div class="mobile-nav-title">
-      <i class="fas fa-palette"></i> SICO MIX
-    </div>
-  </div>
 
-  <!-- Sidebar -->
-  <aside class="sidebar glass-card" id="sidebar">
-    <div class="sidebar-header">
-      <div class="logo-container">
-        <h1><i class="fas fa-palette"></i> SICO MIX</h1>
-        <p>Система управління рецептами фарб</p>
-      </div>
-      <button class="close-sidebar" id="closeSidebar">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <h3 class="nav-title" data-i18n="home">Головне меню</h3>
-    <ul class="nav-menu">
-      <li class="nav-item"><a class="nav-link active" href="#" data-page="home"><i class="fas fa-home"></i><span data-i18n="home">Головна</span></a></li>
-      <li class="nav-item"><a class="nav-link" href="#" data-page="new-recipe"><i class="fas fa-plus-circle"></i><span data-i18n="new_recipe">Новий рецепт</span></a></li>
-      <li class="nav-item"><a class="nav-link" href="#" data-page="recipes"><i class="fas fa-book-open"></i><span data-i18n="recipes">Рецепти</span></a></li>
-      <li class="nav-item"><a class="nav-link" href="#" data-page="catalog"><i class="fas fa-layer-group"></i><span data-i18n="catalog">Каталог фарб</span></a></li>
-    </ul>
-    <h3 class="nav-title" data-i18n="import">Імпорт/Експорт</h3>
-    <ul class="nav-menu">
-      <li class="nav-item"><a class="nav-link" href="#" data-page="import"><i class="fas fa-file-import"></i><span data-i18n="import">Імпорт</span></a></li>
-      <li class="nav-item"><a class="nav-link" href="#" data-page="export"><i class="fas fa-file-export"></i><span data-i18n="export">Експорт</span></a></li>
-    </ul>
-    <h3 class="nav-title" data-i18n="settings">Налаштування</h3>
-    <ul class="nav-menu">
-      <li class="nav-item"><a class="nav-link" href="#" data-page="settings"><i class="fas fa-sliders-h"></i><span data-i18n="settings">Налаштування</span></a></li>
-    </ul>
-    <div class="paint-count glass-card">
-      <i class="fas fa-paint-brush"></i>
-      <span id="totalPaints">0</span> <span data-i18n="paints_in_catalog">фарб у каталозі</span>
-    </div>
-  </aside>
+<div id="app">
+    <aside class="sidebar">
+        <div class="logo">SICO</div>
 
-  <!-- Main Content -->
-  <div class="container" id="mainContainer">
-    <header class="header glass-card">
-      <div class="desktop-nav">
-        <button class="menu-toggle" id="desktopMenuToggle">
-          <i class="fas fa-bars"></i>
-        </button>
-        <div class="logo-container">
-          <h1><i class="fas fa-palette"></i> SICO MIX</h1>
-        </div>
-      </div>
-      <div class="paint-count">
-        <i class="fas fa-paint-brush"></i>
-        <span id="headerPaintCount">0</span> <span data-i18n="paints_in_catalog">фарб у каталозі</span>
-      </div>
-    </header>
+        <nav>
+            <button data-view="paints" class="nav-btn active" data-i18n="paints"></button>
+            <button data-view="recipes" class="nav-btn" data-i18n="recipes"></button>
+            <button data-view="settings" class="nav-btn" data-i18n="settings"></button>
+        </nav>
 
-    <main id="page-content">
-      <!-- Home Page -->
-      <div class="page-content active" id="home-page">
-        <div class="welcome-section">
-          <h2 class="welcome-title" data-i18n="welcome_title">Ласкаво просимо до SICO MIX</h2>
-          <p class="welcome-subtitle" data-i18n="welcome_subtitle">Професійна система управління рецептами фарб</p>
+        <div class="bottom">
+            <button id="themeToggle">🌗</button>
+            <select id="languageSelect"></select>
         </div>
-        <div class="quick-actions-grid">
-          <a class="action-card glass-card" href="#" data-page="new-recipe">
-            <div class="action-icon"><i class="fas fa-plus"></i></div>
-            <h3 class="action-title" data-i18n="new_recipe">Новий рецепт</h3>
-            <p class="action-description" data-i18n="new_recipe_desc">Створіть новий рецепт фарби</p>
-          </a>
-          <a class="action-card glass-card" href="#" data-page="recipes">
-            <div class="action-icon"><i class="fas fa-book"></i></div>
-            <h3 class="action-title" data-i18n="my_recipes">Мої рецепти</h3>
-            <p class="action-description" data-i18n="my_recipes_desc">Керуйте вашими рецептами</p>
-          </a>
-          <a class="action-card glass-card" href="#" data-page="catalog">
-            <div class="action-icon"><i class="fas fa-layer-group"></i></div>
-            <h3 class="action-title" data-i18n="paint_catalog">Каталог фарб</h3>
-            <p class="action-description" data-i18n="catalog_desc">База всіх доступних фарб</p>
-          </a>
-          <a class="action-card glass-card" href="#" data-page="export">
-            <div class="action-icon"><i class="fas fa-file-export"></i></div>
-            <h3 class="action-title" data-i18n="export_data">Експорт даних</h3>
-            <p class="action-description" data-i18n="export_desc">Експортуйте рецепти</p>
-          </a>
-        </div>
-      </div>
+    </aside>
 
-      <!-- New Recipe Page (без прев'ю кольору) -->
-      <div class="page-content" id="new-recipe-page">
-        <h2 class="page-title" data-i18n="new_recipe">Новий рецепт</h2>
-        <p class="page-description" data-i18n="new_recipe_desc_long">Створіть новий рецепт, додаючи інгредієнти та пропорції</p>
-        <div class="form-section glass-card">
-          <h3 class="section-title"><i class="fas fa-info-circle"></i><span data-i18n="basic_info">Основна інформація</span></h3>
-          <div class="form-group">
-            <label class="form-label required" data-i18n="recipe_name">Назва рецепту</label>
-            <input type="text" class="form-input" id="recipeName" placeholder="Введіть назву рецепту" required>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label required" data-i18n="category">Категорія</label>
-              <select class="form-select" id="recipeCategory" required>
-                <option value="" data-i18n="select_category">Оберіть категорію</option>
-                <option value="Металік">Металік</option>
-                <option value="Перламутр">Перламутр</option>
-                <option value="Матові">Матові</option>
-                <option value="Глянцеві">Глянцеві</option>
-                <option value="Акрилові">Акрилові</option>
-                <option value="Епоксидні">Епоксидні</option>
-                <option value="Текстиль">Текстиль</option>
-                <option value="УФ друк">УФ друк</option>
-                <option value="Пластик">Пластик</option>
-                <option value="Папір/картон">Папір/картон</option>
-                <option value="Універсальна">Універсальна</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label" data-i18n="recipe_description">Опис рецепту</label>
-            <textarea class="form-textarea" id="recipeDescription" placeholder="Додайте опис (необов'язково)"></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label" data-i18n="recipe_photo">Фото рецепту</label>
-            <div class="file-upload">
-              <input type="file" class="file-input" id="recipePhoto" accept="image/*">
-              <label class="file-label" for="recipePhoto"><i class="fas fa-camera"></i><span id="fileName" data-i18n="upload_photo">Завантажити фото</span></label>
-            </div>
-          </div>
-        </div>
+    <main class="content">
+        <header>
+            <h1 id="viewTitle"></h1>
+            <button id="addBtn" class="primary">+</button>
+        </header>
 
-        <div class="form-section glass-card">
-          <h3 class="section-title"><i class="fas fa-flask"></i><span data-i18n="recipe_ingredients">Інгредієнти</span></h3>
-          <div class="search-filter-container">
-            <div class="search-box">
-              <input type="text" class="search-input" id="paintSearch" placeholder="Пошук фарб...">
-              <i class="fas fa-search search-icon"></i>
-            </div>
-            <select class="filter-select" id="categoryFilter">
-              <option value="" data-i18n="all_categories">Всі категорії</option>
-              <option value="Металік">Металік</option>
-              <option value="Перламутр">Перламутр</option>
-              <option value="Матові">Матові</option>
-              <option value="Глянцеві">Глянцеві</option>
-              <option value="Акрилові">Акрилові</option>
-              <option value="Епоксидні">Епоксидні</option>
-              <option value="Текстиль">Текстиль</option>
-              <option value="УФ друк">УФ друк</option>
-              <option value="Пластик">Пластик</option>
-              <option value="Папір/картон">Папір/картон</option>
-              <option value="Універсальна">Універсальна</option>
-            </select>
-          </div>
-          <table class="ingredients-table">
-            <thead><tr><th data-i18n="paint">Фарба</th><th data-i18n="quantity">Кількість</th><th data-i18n="units">Одиниці</th><th data-i18n="percentage">Відсоток</th><th data-i18n="actions">Дії</th></tr></thead>
-            <tbody id="ingredientsList"></tbody>
-          </table>
-          <button class="btn-add" id="addIngredientBtn"><i class="fas fa-plus"></i><span data-i18n="add_ingredient">Додати інгредієнт</span></button>
-        </div>
-
-        <div class="action-buttons">
-          <button class="btn btn-primary" id="saveRecipeBtn"><i class="fas fa-save"></i><span data-i18n="save_recipe">Зберегти рецепт</span></button>
-          <button class="btn btn-secondary" id="calculatePercentagesBtn"><i class="fas fa-calculator"></i><span data-i18n="calculate_percentages">Розрахувати відсотки</span></button>
-          <button class="btn btn-warning" id="clearRecipeBtn"><i class="fas fa-trash"></i><span data-i18n="clear_form">Очистити форму</span></button>
-        </div>
-      </div>
-
-      <!-- Recipes Page (аналогічно оригіналу, адаптовано) -->
-      <div class="page-content" id="recipes-page">
-        <h2 class="page-title" data-i18n="my_recipes">Мої рецепти</h2>
-        <p class="page-description" data-i18n="my_recipes_desc_long">Управління всіма рецептами</p>
-        <div class="search-filter-container">
-          <div class="search-box">
-            <input type="text" class="search-input" id="recipeSearch" placeholder="Пошук рецептів...">
-            <i class="fas fa-search search-icon"></i>
-          </div>
-          <select class="filter-select" id="recipeCategoryFilter">
-            <option value="" data-i18n="all_categories">Всі категорії</option>
-            <option value="Металік">Металік</option>
-            <option value="Перламутр">Перламутр</option>
-            <!-- ... інші категорії ... -->
-          </select>
-        </div>
-        <div class="action-buttons">
-          <button class="btn btn-success" id="importRecipesBtn"><i class="fas fa-file-import"></i><span data-i18n="import">Імпортувати</span></button>
-          <button class="btn btn-primary" id="exportRecipesBtn"><i class="fas fa-file-export"></i><span data-i18n="export">Експорт</span></button>
-          <button class="btn btn-warning" id="printRecipesBtn"><i class="fas fa-print"></i><span data-i18n="print">Друк</span></button>
-          <button class="btn btn-danger" id="deleteSelectedRecipesBtn"><i class="fas fa-trash"></i><span data-i18n="delete_selected">Видалити обрані</span></button>
-        </div>
-        <div class="recipe-grid" id="recipesContainer"></div>
-      </div>
-
-      <!-- Catalog Page -->
-      <div class="page-content" id="catalog-page">
-        <h2 class="page-title" data-i18n="paint_catalog">Каталог фарб</h2>
-        <p class="page-description" data-i18n="catalog_desc_long">Детальна база фарб</p>
-        <div class="search-filter-container">
-          <div class="search-box">
-            <input type="text" class="search-input" id="catalogSearch" placeholder="Пошук фарб...">
-            <i class="fas fa-search search-icon"></i>
-          </div>
-          <button class="btn btn-primary" id="addNewPaintBtn"><i class="fas fa-plus"></i><span data-i18n="add_new_paint">Додати нову фарбу</span></button>
-        </div>
-        <div class="recipe-grid" id="paintCatalog"></div>
-      </div>
-
-      <!-- Import/Export/Settings – скорочено для економії місця, в реальному проєкті вони присутні -->
-      <div class="page-content" id="import-page">...</div>
-      <div class="page-content" id="export-page">...</div>
-      <div class="page-content" id="settings-page">...</div>
+        <section id="viewContainer"></section>
     </main>
+</div>
 
-    <footer class="footer">
-      <p>SICO MIX • Версія 2026 • © 2026</p>
-    </footer>
-  </div>
+<script src="js/data-colors.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/app.js"></script>
 
-  <!-- DIALOG: Додати фарбу -->
-  <dialog id="addPaintDialog" class="glass-card">
-    <form method="dialog">
-      <div class="modal-header">
-        <h3 data-i18n="add_new_paint">Додати нову фарбу</h3>
-        <button type="button" class="modal-close" onclick="this.closest('dialog').close()">&times;</button>
-      </div>
-      <div class="form-group">
-        <label class="form-label required" data-i18n="paint_name">Назва фарби</label>
-        <input type="text" class="form-input" id="paintName" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label required" data-i18n="category">Категорія</label>
-        <select class="form-select" id="paintCategory" required>
-          <option value="" data-i18n="select_category">Оберіть категорію</option>
-          <option value="Металік">Металік</option>
-          <option value="Перламутр">Перламутр</option>
-          <!-- ... -->
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-i18n="paint_description">Опис</label>
-        <textarea class="form-textarea" id="paintDescription"></textarea>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" data-i18n="manufacturer">Виробник</label>
-          <input type="text" class="form-input" id="paintManufacturer" value="SICO">
-        </div>
-        <div class="form-group">
-          <label class="form-label" data-i18n="article">Артикул</label>
-          <input type="text" class="form-input" id="paintArticle">
-        </div>
-      </div>
-      <div class="action-buttons">
-        <button type="button" class="btn btn-primary" id="savePaintBtn" data-i18n="save_paint">Зберегти</button>
-        <button type="button" class="btn btn-warning" id="cancelPaintBtn" data-i18n="cancel">Скасувати</button>
-      </div>
-    </form>
-  </dialog>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('js/service-worker.js');
+}
+</script>
 
-  <!-- DIALOG: Підтвердження -->
-  <dialog id="confirmationDialog" class="glass-card">
-    <div class="modal-header">
-      <h3 id="confirmationTitle" data-i18n="confirmation">Підтвердження</h3>
-      <button type="button" class="modal-close" onclick="this.closest('dialog').close()">&times;</button>
-    </div>
-    <div id="confirmationMessage" style="padding:20px;"></div>
-    <div class="action-buttons">
-      <button class="btn btn-danger" id="confirmActionBtn" data-i18n="confirm_action">Так</button>
-      <button class="btn btn-secondary" id="cancelActionBtn" data-i18n="cancel">Скасувати</button>
-    </div>
-  </dialog>
-
-  <!-- Скрипти як модулі -->
-  <script type="module" nonce="EDNnf03nceIOfn39fn3e9h3sdfa">
-    import { initApp } from './js/app.js';
-    window.addEventListener('DOMContentLoaded', initApp);
-  </script>
-  <script nomodule src="js/legacy.js"></script>
 </body>
 </html>
