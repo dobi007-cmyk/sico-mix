@@ -1,44 +1,36 @@
 {
-  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
   "name": "SICO MIX",
   "short_name": "SICO MIX",
-  "description": "Професійна система управління рецептами фарб",
-  "start_url": "./",
+  "description": "Система управління рецептами фарб",
+  "start_url": ".",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "minimal-ui"],
-  "background_color": "#f8f9fa",
+  "background_color": "#ffffff",
   "theme_color": "#4361ee",
-  "orientation": "any",
-  "lang": "uk",
-  "dir": "ltr",
-  "scope": "./",
-  "categories": ["business", "productivity", "utilities"],
-  "id": "/",
-  
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "icons/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "icons/icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "icons/icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "icons/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "icons/icon-152x152.png",
@@ -53,139 +45,47 @@
       "purpose": "any maskable"
     },
     {
-      "src": "icons/icon-256x256.png",
-      "sizes": "256x256",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
       "src": "icons/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    },
-    {
-      "src": "icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
     }
   ],
-  
+  "categories": ["productivity", "utilities"],
+  "lang": "uk",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "scope": "/",
   "screenshots": [
     {
-      "src": "screenshots/desktop-1280x720.png",
+      "src": "icons/screenshot-1.png",
       "sizes": "1280x720",
       "type": "image/png",
       "platform": "wide",
       "label": "Головна сторінка SICO MIX"
-    },
-    {
-      "src": "screenshots/mobile-360x640.png",
-      "sizes": "360x640",
-      "type": "image/png",
-      "platform": "narrow",
-      "label": "Мобільний вигляд"
     }
   ],
-  
   "shortcuts": [
     {
       "name": "Новий рецепт",
       "short_name": "Новий",
       "description": "Створити новий рецепт фарби",
       "url": "/#new-recipe",
-      "icons": [
-        {
-          "src": "icons/shortcut-new-96x96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "icons": [{ "src": "icons/shortcut-new.png", "sizes": "96x96" }]
     },
     {
       "name": "Мої рецепти",
       "short_name": "Рецепти",
-      "description": "Переглянути всі мої рецепти",
+      "description": "Переглянути мої рецепти",
       "url": "/#recipes",
-      "icons": [
-        {
-          "src": "icons/shortcut-recipes-96x96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Каталог фарб",
-      "short_name": "Каталог",
-      "description": "Переглянути каталог фарб",
-      "url": "/#catalog",
-      "icons": [
-        {
-          "src": "icons/shortcut-catalog-96x96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    }
-  ],
-  
-  "share_target": {
-    "action": "/?share",
-    "method": "GET",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  },
-  
-  "file_handlers": [
-    {
-      "action": "/?import",
-      "accept": {
-        "application/json": [".json"],
-        "text/csv": [".csv"]
-      },
-      "name": "Файли даних SICO MIX"
-    }
-  ],
-  
-  "protocol_handlers": [
-    {
-      "protocol": "web+sico",
-      "url": "/?protocol=%s"
-    }
-  ],
-  
-  "launch_handler": {
-    "client_mode": ["navigate-existing", "auto"]
-  },
-  
-  "handle_links": "preferred",
-  
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-  
-  "prefer_related_applications": false,
-  
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=com.sico.mix",
-      "id": "com.sico.mix"
-    },
-    {
-      "platform": "webapp",
-      "url": "https://sico-mix.example.com/manifest.json"
+      "icons": [{ "src": "icons/shortcut-recipes.png", "sizes": "96x96" }]
     }
   ]
 }
