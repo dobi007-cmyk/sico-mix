@@ -1,169 +1,77 @@
-// Service Worker для PWA функціоналу
+const CACHE_NAME = 'sico-mix-v3';
+const RUNTIME_CACHE = 'runtime-v3';
 
-const CACHE_NAME = 'sico-mix-v2.2';
-const urlsToCache = [
-    './',
-    './index.html',
-    './css/style.css',
-    './js/data-colors.js',
-    './js/i18n.js',
-    './js/utils.js',
-    './js/app.js',
-    './js/service-worker.js',
-    './manifest.json',
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
-];
-const urlsToCache = [
-    './',
-    './index.html',
-    './css/style.css',
-    './js/data-colors.js',
-    './js/i18n.js',
-    './js/utils.js',
-    './js/app.js',
-    './js/service-worker.js',
-    './manifest.json',
-    './icons/icon-72x72.png',
-    './icons/icon-192x192.png',
-    './icons/favicon.ico',
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+const PRECACHE_URLS = [
+  '/',
+  '/index.html',
+  '/css/style.css',
+  '/js/main.js',
+  '/js/data-colors.js',
+  '/js/i18n.js',
+  '/js/utils.js',
+  '/js/app.js',
+  '/manifest.json',
+  '/offline.html',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png'
 ];
 
-// Інсталяція Service Worker
 self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                console.log('Кеш відкрито');
-                return cache.addAll(urlsToCache);
-            })
-            .then(() => self.skipWaiting())
-    );
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting())
+  );
 });
 
-// Активація Service Worker
 self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('Видаляємо старий кеш:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        }).then(() => self.clients.claim())
-    );
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys
+          .filter(key => key !== CACHE_NAME && key !== RUNTIME_CACHE)
+          .map(key => caches.delete(key))
+      )
+    ).then(() => self.clients.claim())
+  );
 });
 
-// Обробка запитів
 self.addEventListener('fetch', event => {
-    // Пропускаємо запити для Chrome extensions та інших спеціальних схем
-    if (!event.request.url.startsWith('http')) return;
-    
+  const { request } = event;
+  const url = new URL(request.url);
+  if (!url.protocol.startsWith('http')) return;
+
+  if (request.mode === 'navigate') {
     event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                // Повертаємо кешовану версію, якщо вона є
-                if (response) {
-                    return response;
-                }
-                
-                // Інакше завантажуємо з мережі
-                return fetch(event.request)
-                    .then(response => {
-                        // Перевіряємо, чи отримали валідну відповідь
-                        if (!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
-                        
-                        // Клонуємо відповідь
-                        const responseToCache = response.clone();
-                        
-                        // Додаємо в кеш
-                        caches.open(CACHE_NAME)
-                            .then(cache => {
-                                cache.put(event.request, responseToCache);
-                            });
-                        
-                        return response;
-                    })
-                    .catch(error => {
-                        console.error('Помилка завантаження:', error);
-                        // Можна повернути резервну сторінку або повідомлення
-                        return new Response('Офлайн режим. Перевірте з\'єднання з інтернетом.', {
-                            headers: { 'Content-Type': 'text/plain' }
-                        });
-                    });
-            })
+      fetch(request)
+        .then(response => {
+          const copy = response.clone();
+          caches.open(RUNTIME_CACHE).then(cache => cache.put(request, copy));
+          return response;
+        })
+        .catch(() => caches.match(request).then(cached => cached || caches.match('/offline.html')))
     );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(request).then(cached => {
+      const fetchPromise = fetch(request)
+        .then(networkResponse => {
+          caches.open(RUNTIME_CACHE).then(cache => cache.put(request, networkResponse.clone()));
+          return networkResponse;
+        })
+        .catch(() => cached);
+      return cached || fetchPromise;
+    })
+  );
 });
 
-// Обробка повідомлень
-self.addEventListener('message', event => {
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
-    }
-});
-
-// Синхронізація в фоновому режимі
 self.addEventListener('sync', event => {
-    if (event.tag === 'sync-data') {
-        event.waitUntil(syncData());
-    }
-});
-
-// Фонова синхронізація даних
-function syncData() {
-    // Тут можна реалізувати синхронізацію з сервером
-    console.log('Фонова синхронізація даних');
-    return Promise.resolve();
-}
-
-// Push-повідомлення
-self.addEventListener('push', event => {
-    const options = {
-        body: event.data ? event.data.text() : 'Нове повідомлення від SICO MIX',
-        icon: './icons/icon-192.png',
-        badge: './icons/icon-72.png',
-        vibrate: [100, 50, 100],
-        data: {
-            dateOfArrival: Date.now(),
-            primaryKey: '1'
-        },
-        actions: [
-            {
-                action: 'explore',
-                title: 'Переглянути',
-                icon: './icons/icon-72.png'
-            },
-            {
-                action: 'close',
-                title: 'Закрити',
-                icon: './icons/icon-72.png'
-            }
-        ]
-    };
-    
+  if (event.tag === 'sync-data') {
     event.waitUntil(
-        self.registration.showNotification('SICO MIX', options)
+      // Фонова синхронізація (можна розширити)
+      Promise.resolve(console.log('Фонова синхронізація виконана'))
     );
-});
-
-// Клік по push-повідомленню
-self.addEventListener('notificationclick', event => {
-    event.notification.close();
-    
-    if (event.action === 'explore') {
-        event.waitUntil(
-            clients.openWindow('./')
-        );
-    } else if (event.action === 'close') {
-        console.log('Повідомлення закрито');
-    } else {
-        event.waitUntil(
-            clients.openWindow('./')
-        );
-    }
+  }
 });
