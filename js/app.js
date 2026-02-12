@@ -151,29 +151,30 @@ SICOMIX.app = (function() {
             }
         });
         
-      // ========== ЗАКРИТТЯ САЙДБАРУ КЛІКОМ ПОЗА НИМ ==========
-document.addEventListener('click', function(e) {
-    const isSidebarActive = sidebar.classList.contains('active');
-    if (!isSidebarActive) return;
+        // ========== ЗАКРИТТЯ САЙДБАРУ КЛІКОМ ПОЗА НИМ ==========
+        document.addEventListener('click', function(e) {
+            if (!sidebar) return; // додаткова перевірка
+            const isSidebarActive = sidebar.classList.contains('active');
+            if (!isSidebarActive) return;
 
-    // На десктопі не закриваємо сайдбар кліком поза ним
-    if (window.innerWidth > 992) return;
+            // На десктопі не закриваємо сайдбар кліком поза ним
+            if (window.innerWidth > 992) return;
 
-    // Елементи, клік на які НЕ закриває сайдбар
-    const isClickOnSidebar = sidebar.contains(e.target);
-    const isClickOnMenuToggle = menuToggle?.contains(e.target) || desktopMenuToggle?.contains(e.target);
-    const isClickOnCloseBtn = closeSidebar?.contains(e.target);
+            // Елементи, клік на які НЕ закриває сайдбар (приведення до булевого значення)
+            const isClickOnSidebar = sidebar.contains(e.target);
+            const isClickOnMenuToggle = !!(menuToggle?.contains(e.target) || desktopMenuToggle?.contains(e.target));
+            const isClickOnCloseBtn = !!(closeSidebar?.contains(e.target));
 
-    if (!isClickOnSidebar && !isClickOnMenuToggle && !isClickOnCloseBtn) {
-        // Закриваємо сайдбар
-        sidebar.classList.remove('active');
-        mainContainer?.classList.remove('sidebar-open');
-        document.body.style.overflow = 'auto';
-        
-        // Невелика затримка, щоб уникнути конфліктів з іншими обробниками
-        e.stopPropagation();
-    }
-});
+            if (!isClickOnSidebar && !isClickOnMenuToggle && !isClickOnCloseBtn) {
+                // Закриваємо сайдбар
+                sidebar.classList.remove('active');
+                if (mainContainer) mainContainer.classList.remove('sidebar-open');
+                document.body.style.overflow = 'auto';
+                
+                // Невелика затримка, щоб уникнути конфліктів з іншими обробниками
+                e.stopPropagation();
+            }
+        });
     }
 
     // ========== НАВІГАЦІЯ ==========
