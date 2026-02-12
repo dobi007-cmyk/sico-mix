@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sico-spectrum-v2026.1';
+const CACHE_NAME = 'sico-spectrum-v1.0';
 const urlsToCache = [
     './',
     './index.html',
