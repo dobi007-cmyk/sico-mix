@@ -1,12 +1,3 @@
-// =====================================================
-// SICO PRINT SOLUTIONS – KOMPLETNY KATALOG PRODUKTÓW
-// =====================================================
-// Źródła: 
-//   - photo_2026-02-09_15-03-41.jpg (tabele ogólne, podłoża)
-//   - photo_2026-02-09_15-03-37.jpg (farby standardowe – lista CMYK)
-//   - Karty techniczne: EC, OTF, PLUV, SPTN, SX, TPP, UV, AS, CF, NST
-// =====================================================
-
 if (!window.SICOMIX) window.SICOMIX = {};
 
 SICOMIX.data = (function() {
