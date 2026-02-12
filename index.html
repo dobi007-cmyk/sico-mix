@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <base href="/sico-mix/">  <!-- Важливо для GitHub Pages -->
+    <base href="/sico-mix/">  <!-- Якщо проєкт НЕ в підпапці /sico-mix/, видаліть цей рядок -->
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -529,21 +529,39 @@
     </div>
 
     <script>
-        window.SICOMIX = {};
+        // ========== ВИПРАВЛЕННЯ: гарантована ініціалізація ==========
+        window.SICOMIX = window.SICOMIX || {};
+        window.SICOMIX.data = window.SICOMIX.data || {};
+        window.SICOMIX.data.paints = window.SICOMIX.data.paints || [];
+        window.SICOMIX.data.colors = window.SICOMIX.data.colors || [];
+
+        // Глобальний перехоплювач помилок (запобігає перезавантаженню)
+        window.addEventListener('error', function(e) {
+            console.error('❌ Перехоплено помилку:', e.error || e.message);
+            e.preventDefault(); // Заборонити стандартне виконання (наприклад, reload)
+        });
     </script>
-    <!-- ВАЖЛИВО: правильні шляхи з ./ та назва data-colors.js -->
+
+    <!-- Підключення скриптів (шляхи відносні, переконайтесь у їх наявності) -->
     <script src="./js/data-colors.js"></script>
     <script src="./js/i18n.js"></script>
     <script src="./js/utils.js"></script>
     <script src="./js/app.js"></script>
+    
+    <!-- Сервіс-воркер – ТИМЧАСОВО ВИМКНЕНО для діагностики. Розкоментуйте після виправлення помилок -->
+    <!--
     <script src="./js/service-worker.js"></script>
     <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./js/service-worker.js').catch(console.error);
+        }
+    </script>
+    -->
+
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
-            SICOMIX.i18n.init();
-            SICOMIX.app.init();
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./js/service-worker.js').catch(console.error);
-            }
+            if (typeof SICOMIX.i18n?.init === 'function') SICOMIX.i18n.init();
+            if (typeof SICOMIX.app?.init === 'function') SICOMIX.app.init();
         });
     </script>
 </body>
