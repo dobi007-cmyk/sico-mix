@@ -63,11 +63,6 @@ SICOMIX.app = (function() {
     function loadData() {
         recipes = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumRecipes', SICOMIX.data.recipes);
         paintCatalog = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumPaints', SICOMIX.data.paints);
-        // ВИПРАВЛЕНО: перевірка, що paintCatalog — масив
-        if (!Array.isArray(paintCatalog)) {
-            paintCatalog = SICOMIX.data.paints;
-            SICOMIX.utils.saveToLocalStorage('sicoSpectrumPaints', paintCatalog);
-        }
         currentSettings = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumSettings', SICOMIX.data.defaultSettings);
     }
 
@@ -249,12 +244,9 @@ document.addEventListener('click', function(e) {
         }
     }
 
-    // ВИПРАВЛЕНО: безпечний доступ до paintSearch та categoryFilter
     function addIngredient() {
-        const searchInput = document.getElementById('paintSearch');
-        const term = searchInput ? searchInput.value.toLowerCase() : '';
-        const catSelect = document.getElementById('categoryFilter');
-        const cat = catSelect ? catSelect.value : '';
+        const term = paintSearch?.value.toLowerCase() || '';
+        const cat = categoryFilter?.value || '';
         let filtered = paintCatalog;
         if (term) filtered = filtered.filter(p => p.name.toLowerCase().includes(term));
         if (cat) filtered = filtered.filter(p => p.category === cat);
@@ -363,13 +355,10 @@ document.addEventListener('click', function(e) {
     }
 
     // ========== РЕЦЕПТИ ==========
-    // ВИПРАВЛЕНО: безпечний доступ до пошуку
     function renderRecipes() {
         if (!recipesContainer) return;
-        const searchInput = document.getElementById('recipeSearch');
-        const search = searchInput ? searchInput.value.toLowerCase() : '';
-        const catSelect = document.getElementById('recipeCategoryFilter');
-        const cat = catSelect ? catSelect.value : '';
+        const search = document.getElementById('recipeSearch')?.value.toLowerCase() || '';
+        const cat = document.getElementById('recipeCategoryFilter')?.value || '';
         let filtered = recipes;
         if (search) filtered = filtered.filter(r => r.name.toLowerCase().includes(search) || (r.description && r.description.toLowerCase().includes(search)));
         if (cat) filtered = filtered.filter(r => r.category === cat);
@@ -516,20 +505,9 @@ document.addEventListener('click', function(e) {
     }
 
     // ========== КАТАЛОГ ==========
-    // ВИПРАВЛЕНО: повністю — безпечний доступ, перевірка масиву, id без parseInt
     function renderPaintCatalog() {
         if (!paintCatalogEl) return;
-        
-        // Перевірка, що paintCatalog — масив
-        if (!Array.isArray(paintCatalog)) {
-            console.error('paintCatalog is not an array', paintCatalog);
-            paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('catalog_empty')}</p>`;
-            return;
-        }
-        
-        const searchInput = document.getElementById('catalogSearch');
-        const search = searchInput ? searchInput.value.toLowerCase() : '';
-        
+        const search = document.getElementById('catalogSearch')?.value.toLowerCase() || '';
         let filtered = paintCatalog;
         if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || (p.category && p.category.toLowerCase().includes(search)));
 
@@ -559,11 +537,9 @@ document.addEventListener('click', function(e) {
             </div>
         `).join('');
 
-        paintCatalogEl.querySelectorAll('.delete-paint').forEach(btn => {
-            btn.addEventListener('click', () => {
-                deletePaint(btn.dataset.id);
-            });
-        });
+        paintCatalogEl.querySelectorAll('.delete-paint').forEach(btn => btn.addEventListener('click', () => {
+            deletePaint(parseInt(btn.dataset.id));
+        }));
         updatePaintCount();
     }
 
@@ -603,13 +579,12 @@ document.addEventListener('click', function(e) {
         showNotification(`${SICOMIX.i18n.t('paint_added')} "${name}"`, 'success');
     }
 
-    // ВИПРАВЛЕНО: id — рядок, несуворе порівняння
     function deletePaint(id) {
         SICOMIX.utils.showConfirmation(
             SICOMIX.i18n.t('delete_paint'),
             SICOMIX.i18n.t('delete_paint_confirmation'),
             () => {
-                paintCatalog = paintCatalog.filter(p => String(p.id) !== String(id));
+                paintCatalog = paintCatalog.filter(p => p.id !== id);
                 saveData();
                 renderPaintCatalog();
                 showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
