@@ -1,11 +1,10 @@
-// ========== ІНТЕРНАЦІОНАЛІЗАЦІЯ (ВИПРАВЛЕНО) ==========
-// Безпечно додаємо модуль i18n до вже існуючого SICOMIX, нічого не перезаписуючи
+// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (ВИПРАВЛЕНО) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
-    var SICOMIX = global.SICOMIX; // посилання на існуючий об'єкт
+    const SICOMIX = global.SICOMIX;
 
-    SICOMIX.i18n = (function() {
+    SICOMIX.app = (function() {
         const translations = {
             uk: {
                 // Глобальні
