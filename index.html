@@ -9,7 +9,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <base href="/sico-mix/">  <!-- Якщо проєкт НЕ в підпапці /sico-mix/, видаліть цей рядок -->
+    <!-- ТИМЧАСОВО ВИДАЛЕНО base href – якщо шлях правильний, можна повернути пізніше -->
+    <!-- <base href="/sico-mix/"> -->
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +20,63 @@
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" href="./icons/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="./icons/icon-192.png">
+
+    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ ========== -->
+    <script>
+        // Виконується негайно, до завантаження всього іншого
+        (function() {
+            console.log('🛡️ Антикризовий захист активовано');
+
+            // 1. Глобальний перехоплювач помилок (включно з синтаксичними)
+            window.addEventListener('error', function(e) {
+                console.error('❌ Помилка:', e.error || e.message);
+                console.error('   Стек:', e.error?.stack);
+                e.preventDefault();   // Забороняє стандартну поведінку (перезавантаження)
+                return false;
+            });
+
+            // 2. Перехоплення необроблених Promise rejection
+            window.addEventListener('unhandledrejection', function(e) {
+                console.error('❌ Unhandled Promise Rejection:', e.reason);
+                e.preventDefault();
+            });
+
+            // 3. Примусове видалення ВСІХ сервіс-воркерів (якщо вони залишились)
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for (let registration of registrations) {
+                        registration.unregister();
+                        console.log('🗑️ Сервіс-воркер видалено');
+                    }
+                }).catch(console.error);
+            }
+
+            // 4. Гарантована ініціалізація глобального об'єкта
+            window.SICOMIX = window.SICOMIX || {};
+            window.SICOMIX.data = window.SICOMIX.data || {};
+            window.SICOMIX.data.paints = window.SICOMIX.data.paints || [];
+            window.SICOMIX.data.colors = window.SICOMIX.data.colors || [];
+
+            // 5. Захист від випадкового location.reload() у коді
+            const originalReload = window.location.reload;
+            window.location.reload = function() {
+                console.warn('⚠️ Спроба викликати location.reload() – ЗАБЛОКОВАНО');
+                // Нічого не робимо
+            };
+
+            // 6. Захист від присвоєння location.href
+            Object.defineProperty(window.location, 'href', {
+                set: function(value) {
+                    console.warn('⚠️ Спроба змінити location.href на', value, '– ЗАБЛОКОВАНО');
+                },
+                get: function() {
+                    return originalReload.call(window.location); // це не зовсім правильно, але для діагностики
+                }
+            });
+
+            console.log('🛡️ Захист завершено');
+        })();
+    </script>
 </head>
 <body>
     <!-- Preloader -->
@@ -528,40 +586,32 @@
         </div>
     </div>
 
-    <script>
-        // ========== ВИПРАВЛЕННЯ: гарантована ініціалізація ==========
-        window.SICOMIX = window.SICOMIX || {};
-        window.SICOMIX.data = window.SICOMIX.data || {};
-        window.SICOMIX.data.paints = window.SICOMIX.data.paints || [];
-        window.SICOMIX.data.colors = window.SICOMIX.data.colors || [];
-
-        // Глобальний перехоплювач помилок (запобігає перезавантаженню)
-        window.addEventListener('error', function(e) {
-            console.error('❌ Перехоплено помилку:', e.error || e.message);
-            e.preventDefault(); // Заборонити стандартне виконання (наприклад, reload)
-        });
-    </script>
-
-    <!-- Підключення скриптів (шляхи відносні, переконайтесь у їх наявності) -->
+    <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ ========== -->
     <script src="./js/data-colors.js"></script>
     <script src="./js/i18n.js"></script>
     <script src="./js/utils.js"></script>
     <script src="./js/app.js"></script>
-    
-    <!-- Сервіс-воркер – ТИМЧАСОВО ВИМКНЕНО для діагностики. Розкоментуйте після виправлення помилок -->
-    <!--
-    <script src="./js/service-worker.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./js/service-worker.js').catch(console.error);
-        }
-    </script>
-    -->
+
+    <!-- Сервіс-воркер – ПОВНІСТЮ ВИМКНЕНО -->
+    <!-- <script src="./js/service-worker.js"></script> -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            if (typeof SICOMIX.i18n?.init === 'function') SICOMIX.i18n.init();
-            if (typeof SICOMIX.app?.init === 'function') SICOMIX.app.init();
+            console.log('🚀 DOM готовий, ініціалізація...');
+            
+            // Безпечний виклик i18n
+            if (window.SICOMIX?.i18n?.init && typeof window.SICOMIX.i18n.init === 'function') {
+                window.SICOMIX.i18n.init();
+            } else {
+                console.warn('⚠️ i18n.init не знайдено');
+            }
+
+            // Безпечний виклик app
+            if (window.SICOMIX?.app?.init && typeof window.SICOMIX.app.init === 'function') {
+                window.SICOMIX.app.init();
+            } else {
+                console.warn('⚠️ app.init не знайдено');
+            }
         });
     </script>
 </body>
