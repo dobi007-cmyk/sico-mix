@@ -150,31 +150,30 @@ SICOMIX.app = (function() {
                 document.body.style.overflow = 'auto';
             }
         });
-        
-        // ========== ЗАКРИТТЯ САЙДБАРУ КЛІКОМ ПОЗА НИМ ==========
-        document.addEventListener('click', function(e) {
-            if (!sidebar) return; // додаткова перевірка
-            const isSidebarActive = sidebar.classList.contains('active');
-            if (!isSidebarActive) return;
+       // ========== ЗАКРИТТЯ САЙДБАРУ КЛІКОМ ПОЗА НИМ ==========
+document.addEventListener('click', function(e) {
+    if (!sidebar) return;
 
-            // На десктопі не закриваємо сайдбар кліком поза ним
-            if (window.innerWidth > 992) return;
+    const isSidebarActive = sidebar.classList.contains('active');
+    if (!isSidebarActive) return;
 
-            // Елементи, клік на які НЕ закриває сайдбар (приведення до булевого значення)
-            const isClickOnSidebar = sidebar.contains(e.target);
-            const isClickOnMenuToggle = !!(menuToggle?.contains(e.target) || desktopMenuToggle?.contains(e.target));
-            const isClickOnCloseBtn = !!(closeSidebar?.contains(e.target));
+    // На десктопі не закриваємо (використовуємо matchMedia – точно як у CSS)
+    const isDesktop = window.matchMedia('(min-width: 993px)').matches;
+    if (isDesktop) return;
 
-            if (!isClickOnSidebar && !isClickOnMenuToggle && !isClickOnCloseBtn) {
-                // Закриваємо сайдбар
-                sidebar.classList.remove('active');
-                if (mainContainer) mainContainer.classList.remove('sidebar-open');
-                document.body.style.overflow = 'auto';
-                
-                // Невелика затримка, щоб уникнути конфліктів з іншими обробниками
-                e.stopPropagation();
-            }
-        });
+    // Елементи, клік на які НЕ закриває сайдбар
+    const isClickOnSidebar = sidebar.contains(e.target);
+    const isClickOnMenuToggle = !!(menuToggle?.contains(e.target) || desktopMenuToggle?.contains(e.target));
+    const isClickOnCloseBtn = !!(closeSidebar?.contains(e.target));
+
+    if (!isClickOnSidebar && !isClickOnMenuToggle && !isClickOnCloseBtn) {
+        // Закриваємо сайдбар
+        sidebar.classList.remove('active');
+        if (mainContainer) mainContainer.classList.remove('sidebar-open');
+        document.body.style.overflow = 'auto';
+        // stopPropagation прибрано – воно не потрібне і могло заважати
+    }
+});
     }
 
     // ========== НАВІГАЦІЯ ==========
