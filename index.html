@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <base href="/sico-mix/">  <!-- Важливо для GitHub Pages -->
+    <base href="/sico-mix/">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -181,7 +181,7 @@
                     </h3>
                     <div class="form-group">
                         <label class="form-label required" data-i18n="recipe_name">Назва рецепту</label>
-                        <input type="text" class="form-input" id="recipeName" placeholder="" required>
+                        <input type="text" class="form-input" id="recipeName" placeholder="" data-i18n-placeholder="recipe_name_placeholder">
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -200,7 +200,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-i18n="recipe_description">Опис рецепту</label>
-                        <textarea class="form-textarea" id="recipeDescription" placeholder=""></textarea>
+                        <textarea class="form-textarea" id="recipeDescription" placeholder="" data-i18n-placeholder="recipe_description_placeholder"></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-i18n="recipe_photo">Фото рецепту</label>
@@ -336,10 +336,12 @@
                         <label class="form-label" data-i18n="import_data_type">Тип даних для імпорту</label>
                         <div>
                             <label style="display: block; margin-bottom: 10px;">
-                                <input type="checkbox" id="importRecipesCheckbox" checked> <span data-i18n="recipes">Рецепти</span>
+                                <input type="checkbox" id="importRecipesCheckbox" checked>
+                                <span data-i18n="recipes">Рецепти</span>
                             </label>
                             <label style="display: block;">
-                                <input type="checkbox" id="importPaintsCheckbox"> <span data-i18n="paints">Фарби з каталогу</span>
+                                <input type="checkbox" id="importPaintsCheckbox">
+                                <span data-i18n="paints">Фарби з каталогу</span>
                             </label>
                         </div>
                     </div>
@@ -370,13 +372,16 @@
                         <label class="form-label" data-i18n="data_to_export">Дані для експорту</label>
                         <div>
                             <label style="display: block; margin-bottom: 10px;">
-                                <input type="checkbox" id="exportRecipesCheckbox" checked> <span data-i18n="recipes">Рецепти</span>
+                                <input type="checkbox" id="exportRecipesCheckbox" checked>
+                                <span data-i18n="recipes">Рецепти</span>
                             </label>
                             <label style="display: block; margin-bottom: 10px;">
-                                <input type="checkbox" id="exportPaintsCheckbox"> <span data-i18n="paint_catalog">Каталог фарб</span>
+                                <input type="checkbox" id="exportPaintsCheckbox">
+                                <span data-i18n="paint_catalog">Каталог фарб</span>
                             </label>
                             <label style="display: block;">
-                                <input type="checkbox" id="exportCalculationsCheckbox"> <span data-i18n="calculations">Розрахунки</span>
+                                <input type="checkbox" id="exportCalculationsCheckbox">
+                                <span data-i18n="calculations">Розрахунки</span>
                             </label>
                         </div>
                     </div>
@@ -384,10 +389,12 @@
                         <label class="form-label" data-i18n="additional_options">Додаткові опції</label>
                         <div>
                             <label style="display: block; margin-bottom: 10px;">
-                                <input type="checkbox" id="includePhotosCheckbox"> <span data-i18n="include_photos">Включати фотографії</span>
+                                <input type="checkbox" id="includePhotosCheckbox">
+                                <span data-i18n="include_photos">Включати фотографії</span>
                             </label>
                             <label style="display: block;">
-                                <input type="checkbox" id="compressDataCheckbox"> <span data-i18n="compress_data">Стиснути дані (ZIP)</span>
+                                <input type="checkbox" id="compressDataCheckbox">
+                                <span data-i18n="compress_data">Стиснути дані (ZIP)</span>
                             </label>
                         </div>
                     </div>
@@ -427,10 +434,12 @@
                         <label class="form-label" data-i18n="auto_save">Автоматичне збереження</label>
                         <div>
                             <label style="display: block; margin-bottom: 10px;">
-                                <input type="checkbox" id="autoSaveCheckbox" checked> <span data-i18n="auto_save_changes">Автоматично зберігати зміни</span>
+                                <input type="checkbox" id="autoSaveCheckbox" checked>
+                                <span data-i18n="auto_save_changes">Автоматично зберігати зміни</span>
                             </label>
                             <label style="display: block;">
-                                <input type="checkbox" id="backupCheckbox"> <span data-i18n="create_backups">Створювати резервні копії</span>
+                                <input type="checkbox" id="backupCheckbox">
+                                <span data-i18n="create_backups">Створювати резервні копії</span>
                             </label>
                         </div>
                     </div>
@@ -464,7 +473,7 @@
             <div id="addPaintForm">
                 <div class="form-group">
                     <label class="form-label required" data-i18n="paint_name">Назва фарби</label>
-                    <input type="text" class="form-input" id="paintName" placeholder="" required>
+                    <input type="text" class="form-input" id="paintName" placeholder="" data-i18n-placeholder="paint_name_placeholder" required>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -480,21 +489,26 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label" data-i18n="paint_description">Опис фарби</label>
-                    <textarea class="form-textarea" id="paintDescription" placeholder=""></textarea>
+                    <textarea class="form-textarea" id="paintDescription" placeholder="" data-i18n-placeholder="paint_description_placeholder"></textarea>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" data-i18n="manufacturer">Виробник</label>
-                        <input type="text" class="form-input" id="paintManufacturer" placeholder="SICO">
+                        <input type="text" class="form-input" id="paintManufacturer" placeholder="SICO" data-i18n-placeholder="manufacturer_placeholder">
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-i18n="article">Артикул</label>
-                        <input type="text" class="form-input" id="paintArticle" placeholder="">
+                        <input type="text" class="form-input" id="paintArticle" placeholder="" data-i18n-placeholder="article_placeholder">
                     </div>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn btn-primary" id="savePaintBtn"><span data-i18n="save_paint">Зберегти фарбу</span></button>
-                    <button class="btn btn-warning" id="cancelPaintBtn"><span data-i18n="cancel">Скасувати</span></button>
+                    <button class="btn btn-primary" id="savePaintBtn">
+                        <i class="fas fa-save"></i>
+                        <span data-i18n="save_paint">Зберегти фарбу</span>
+                    </button>
+                    <button class="btn btn-warning" id="cancelPaintBtn">
+                        <span data-i18n="cancel">Скасувати</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -531,7 +545,6 @@
     <script>
         window.SICOMIX = {};
     </script>
-    <!-- ВАЖЛИВО: правильні шляхи з ./ та назва data-colors.js -->
     <script src="./js/data-colors.js"></script>
     <script src="./js/i18n.js"></script>
     <script src="./js/utils.js"></script>
