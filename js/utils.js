@@ -135,17 +135,6 @@ SICOMIX.utils = (function() {
         }
     }
 
-    // ========== НОВА ФУНКЦІЯ: захист від XSS ==========
-    function escapeHTML(str) {
-        if (str === null || str === undefined) return '';
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
-
     return {
         showNotification,
         showConfirmation,
@@ -155,8 +144,7 @@ SICOMIX.utils = (function() {
         convertToCSV,
         debounce,
         saveToLocalStorage,
-        loadFromLocalStorage,
-        escapeHTML   // <-- експорт
+        loadFromLocalStorage
     };
 })();
 
