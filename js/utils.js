@@ -30,10 +30,7 @@ SICOMIX.utils = (function() {
         const icon = type === 'success' ? 'fa-check-circle' :
                      type === 'error' ? 'fa-exclamation-circle' :
                      type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
-        
-        // FIX: XSS protection – escape message
-        const safeMessage = SICOMIX.utils.escapeHTML(message);
-        notification.innerHTML = `<i class="fas ${icon}"></i><span>${safeMessage}</span>`;
+        notification.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
         document.body.appendChild(notification);
 
         setTimeout(() => {
@@ -103,18 +100,10 @@ SICOMIX.utils = (function() {
         URL.revokeObjectURL(url);
     }
 
-    // FIX: CSV escaping – commas, quotes, newlines
     function convertToCSV(data) {
         if (!Array.isArray(data) || data.length === 0) return '';
         const headers = Object.keys(data[0]);
-        const escapeCSV = (cell) => {
-            const str = cell?.toString() ?? '';
-            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-                return `"${str.replace(/"/g, '""')}"`;
-            }
-            return str;
-        };
-        const rows = data.map(item => headers.map(h => escapeCSV(item[h])).join(','));
+        const rows = data.map(item => headers.map(h => item[h] ?? '').join(','));
         return [headers.join(','), ...rows].join('\n');
     }
 
@@ -146,7 +135,7 @@ SICOMIX.utils = (function() {
         }
     }
 
-    // ========== XSS PROTECTION ==========
+    // ========== НОВА ФУНКЦІЯ: захист від XSS ==========
     function escapeHTML(str) {
         if (str === null || str === undefined) return '';
         return String(str)
@@ -155,26 +144,6 @@ SICOMIX.utils = (function() {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
-    }
-
-    // ========== STORAGE OPTIMIZATION ==========
-    function sanitizePaintForStorage(paint) {
-        return {
-            id: paint.id,
-            name: paint.name,
-            displayName: paint.displayName,
-            searchName: paint.searchName,
-            series: paint.series,
-            baseColorCode: paint.baseColorCode,
-            category: paint.category,
-            color: paint.color,
-            manufacturer: paint.manufacturer,
-            article: paint.article,
-            description: paint.description,
-            colorName: paint.colorName,
-            colorCode: paint.colorCode
-            // properties, fullInfo – intentionally omitted
-        };
     }
 
     return {
@@ -187,8 +156,7 @@ SICOMIX.utils = (function() {
         debounce,
         saveToLocalStorage,
         loadFromLocalStorage,
-        escapeHTML,
-        sanitizePaintForStorage   // <-- nowa funkcja
+        escapeHTML   // <-- експорт
     };
 })();
 
