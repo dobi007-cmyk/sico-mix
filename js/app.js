@@ -1,5 +1,15 @@
 if (!window.SICOMIX) window.SICOMIX = {};
 
+// FIX: Fallback, jeśli SICOMIX.data nie istnieje (np. błąd ładowania data-colors.js)
+if (!SICOMIX.data || !Array.isArray(SICOMIX.data.paints)) {
+    console.error('SICOMIX.data.paints is missing or invalid. Creating empty catalog.');
+    SICOMIX.data = SICOMIX.data || {};
+    SICOMIX.data.paints = [];
+    SICOMIX.data.categories = [];
+    SICOMIX.data.defaultSettings = SICOMIX.data.defaultSettings || {
+        language: 'uk', units: 'grams', autoSave: true, backup: false, theme: 'dark'
+    };
+}
 SICOMIX.app = (function() {
     // Stan
     let recipes = [];
