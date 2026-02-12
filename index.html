@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <base href="/sico-mix/">
+    <base href="/sico-mix/">  <!-- Важливо для GitHub Pages -->
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,10 +21,12 @@
     <link rel="apple-touch-icon" href="./icons/icon-192.png">
 </head>
 <body>
+    <!-- Preloader -->
     <div id="preloader">
         <div class="spectrum-spinner"></div>
     </div>
 
+    <!-- Mobile Navigation -->
     <div class="mobile-nav">
         <button class="menu-toggle" id="menuToggle" aria-label="Menu">
             <i class="fas fa-bars"></i>
@@ -34,6 +36,7 @@
         </div>
     </div>
 
+    <!-- Sidebar (Glass) -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-container">
@@ -107,7 +110,9 @@
         </div>
     </aside>
 
+    <!-- Main Content -->
     <div class="container" id="mainContainer">
+        <!-- Header -->
         <header class="header">
             <div class="desktop-nav">
                 <button class="menu-toggle" id="desktopMenuToggle" aria-label="Menu">
@@ -123,7 +128,9 @@
             </div>
         </header>
 
+        <!-- Page Content -->
         <main id="page-content">
+            <!-- HOME PAGE -->
             <div class="page-content active" id="home-page">
                 <div class="welcome-section">
                     <span class="spectrum-badge">2026 EDITION</span>
@@ -162,6 +169,7 @@
                 </div>
             </div>
 
+            <!-- NEW RECIPE PAGE -->
             <div class="page-content" id="new-recipe-page">
                 <h2 class="page-title" data-i18n="new_recipe">Новий рецепт</h2>
                 <p class="page-description" data-i18n="new_recipe_desc_long">Створіть новий рецепт фарби, додаючи інгредієнти</p>
@@ -254,6 +262,7 @@
                 </div>
             </div>
 
+            <!-- RECIPES PAGE -->
             <div class="page-content" id="recipes-page">
                 <h2 class="page-title" data-i18n="my_recipes">Мої рецепти</h2>
                 <p class="page-description" data-i18n="my_recipes_desc_long">Переглядайте, редагуйте та керуйте рецептами</p>
@@ -283,6 +292,7 @@
                 <div class="recipe-cards" id="recipesContainer"></div>
             </div>
 
+            <!-- CATALOG PAGE -->
             <div class="page-content" id="catalog-page">
                 <h2 class="page-title" data-i18n="paint_catalog">Каталог фарб</h2>
                 <p class="page-description" data-i18n="catalog_desc_long">База всіх доступних фарб</p>
@@ -298,6 +308,7 @@
                 <div class="recipe-cards" id="paintCatalog"></div>
             </div>
 
+            <!-- IMPORT PAGE -->
             <div class="page-content" id="import-page">
                 <h2 class="page-title" data-i18n="import">Імпорт даних</h2>
                 <p class="page-description" data-i18n="import_desc">Імпортуйте рецепти та каталог з файлів</p>
@@ -340,6 +351,7 @@
                 </div>
             </div>
 
+            <!-- EXPORT PAGE -->
             <div class="page-content" id="export-page">
                 <h2 class="page-title" data-i18n="export">Експорт даних</h2>
                 <p class="page-description" data-i18n="export_desc_long">Експортуйте ваші дані у різних форматах</p>
@@ -387,6 +399,7 @@
                 </div>
             </div>
 
+            <!-- SETTINGS PAGE -->
             <div class="page-content" id="settings-page">
                 <h2 class="page-title" data-i18n="settings">Налаштування</h2>
                 <p class="page-description" data-i18n="settings_desc">Налаштуйте систему за вашими потребами</p>
@@ -441,6 +454,7 @@
         </footer>
     </div>
 
+    <!-- MODAL: Add Paint -->
     <div class="modal" id="addPaintModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -486,6 +500,7 @@
         </div>
     </div>
 
+    <!-- MODAL: Confirmation -->
     <div class="modal" id="confirmationModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -502,6 +517,7 @@
         </div>
     </div>
 
+    <!-- MODAL: Paint Selection -->
     <div class="modal" id="paintSelectionModal">
         <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
@@ -515,17 +531,18 @@
     <script>
         window.SICOMIX = {};
     </script>
-    <!-- ВИПРАВЛЕНО: шляхи до скриптів без ./js/ -->
+    <!-- ВАЖЛИВО: правильні шляхи з ./ та назва data-colors.js -->
     <script src="./js/data-colors.js"></script>
-<script src="./js/i18n.js"></script>
-<script src="./js/utils.js"></script>
-<script src="./js/app.js"></script>
-<script src="./js/service-worker.js"></script>
+    <script src="./js/i18n.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/app.js"></script>
+    <script src="./js/service-worker.js"></script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             SICOMIX.i18n.init();
             SICOMIX.app.init();
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('service-worker.js').catch(console.error);
+                navigator.serviceWorker.register('./js/service-worker.js').catch(console.error);
             }
         });
     </script>
