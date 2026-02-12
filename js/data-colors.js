@@ -25,7 +25,7 @@ SICOMIX.data = (function() {
                 { paintId: 3, amount: 300, unit: "г", percentage: 30 },
                 { paintId: 4, amount: 200, unit: "г", percentage: 20 }
             ],
-            date: "12.02.2026",
+            date: new Date().toLocaleDateString('uk-UA'),
             photo: null
         },
         {
@@ -39,7 +39,7 @@ SICOMIX.data = (function() {
                 { paintId: 2, amount: 200, unit: "г", percentage: 20 },
                 { paintId: 6, amount: 100, unit: "г", percentage: 10 }
             ],
-            date: "10.02.2026",
+            date: new Date().toLocaleDateString('uk-UA'),
             photo: null
         }
     ];
