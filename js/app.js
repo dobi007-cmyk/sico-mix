@@ -150,10 +150,13 @@ SICOMIX.app = (function() {
                 document.body.style.overflow = 'auto';
             }
         });
-        // ========== ЗАКРИТТЯ САЙДБАРУ КЛІКОМ ПОЗА НИМ ==========
+// ========== ЗАКРИТТЯ САЙДБАРУ КЛІКОМ ПОЗА НИМ ==========
 document.addEventListener('click', function(e) {
     const isSidebarActive = sidebar.classList.contains('active');
     if (!isSidebarActive) return;
+
+    // На десктопі не закриваємо сайдбар кліком поза ним
+    if (window.innerWidth > 992) return;
 
     // Елементи, клік на які НЕ закриває сайдбар
     const isClickOnSidebar = sidebar.contains(e.target);
