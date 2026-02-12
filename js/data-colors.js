@@ -418,5 +418,3 @@ SICOMIX.data = (function() {
         defaultSettings
     };
 })();
-
-window.SICOMIX = SICOMIX;
