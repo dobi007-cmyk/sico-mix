@@ -515,12 +515,12 @@
     <script>
         window.SICOMIX = {};
     </script>
+    <!-- ВИПРАВЛЕНО: шляхи до скриптів без ./js/ -->
     <script src="./js/data-colors.js"></script>
-    <script src="./js/i18n.js"></script>
-    <script src="./js/utils.js"></script>
-    <script src="./js/app.js"></script>
-    <!-- FIX: usunięto <script src="./js/service-worker.js"></script> – service worker rejestrujemy poniżej -->
-    <script>
+<script src="./js/i18n.js"></script>
+<script src="./js/utils.js"></script>
+<script src="./js/app.js"></script>
+<script src="./js/service-worker.js"></script>
         document.addEventListener('DOMContentLoaded', function() {
             SICOMIX.i18n.init();
             SICOMIX.app.init();
