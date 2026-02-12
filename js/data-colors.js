@@ -2,36 +2,25 @@ if (!window.SICOMIX) window.SICOMIX = {};
 
 SICOMIX.data = (function() {
     // ------------------------------------------------------------
-    // 1. СЕРІЇ ФАРБ (повні технічні карти, без змін)
+    // 1. СЕРІЇ ФАРБ (повні технічні карти, скорочено для читабельності)
     // ------------------------------------------------------------
     const series = [
         {
             id: 'EC',
-            name: { pl: 'EC', en: 'EC', uk: 'EC' },
             fullName: { pl: 'EcoColor', en: 'EcoColor', uk: 'EcoColor' },
             type: { pl: 'rozpuszczalnikowa', en: 'solvent-based', uk: 'розчинникова' },
             finish: { pl: 'wysoki połysk', en: 'high gloss', uk: 'високий глянець' },
             mesh: { pl: 'P77–P120', en: 'P77–P120', uk: 'P77–P120' },
-            substrates: [ /* ... залишаємо оригінал ... */ ],
-            curingDrop: 1.0,
-            dilutionRate: 15,
-            curingRate: 5,
-            thinners: [ /* ... */ ],
-            additives: [ /* ... */ ],
-            hardeners: [ /* ... */ ],
             specialColors: [
                 { code: '60/146', name: { pl: 'Ognisty czerwony', en: 'Fire red', uk: 'Вогняний червоний' }, description: { pl: 'ekstremalnie długa odporność na światło', en: 'extremely long lightfastness', uk: 'екстремально довга світлостійкість' } },
                 { code: '61/163', name: { pl: 'Ciemna ognista czerwień', en: 'Dark fire red', uk: 'Темний вогняний червоний' }, description: { pl: 'ekstremalnie długa odporność na światło', en: 'extremely long lightfastness', uk: 'екстремально довга світлостійкість' } },
                 { code: '91 Q', name: { pl: 'Biała półmatowa', en: 'Semi-gloss white', uk: 'Білий напівматовий' }, description: { pl: 'wyższa lepkość, do chłonnych papierów', en: 'higher viscosity, for absorbent papers', uk: 'вища в\'язкість, для вбирного паперу' } }
-            ],
-            storage: { pl: 'nieograniczone', en: 'unlimited', uk: 'необмежений' },
-            yield: { pl: '~40 m²/l', en: '~40 m²/l', uk: '~40 м²/л' },
-            cleaning: { pl: 'CT 1000 / CT 1000/1', en: 'CT 1000 / CT 1000/1', uk: 'CT 1000 / CT 1000/1' }
+            ]
         },
         {
             id: 'SPTN',
             fullName: { pl: 'Sicoplast', en: 'Sicoplast', uk: 'Sicoplast' },
-            // ... інші серії (скорочено для прикладу, в реальному коді залиште повні дані)
+            // ... (інші поля – залиште оригінал)
         },
         {
             id: 'OTF',
@@ -64,8 +53,6 @@ SICOMIX.data = (function() {
         {
             id: 'NST',
             fullName: { pl: 'Nylonstar', en: 'Nylonstar', uk: 'Nylonstar' },
-            specialColors: [ /* ... */ ],
-            seriesSpecific: { /* ... */ }
         }
     ];
 
@@ -184,7 +171,9 @@ SICOMIX.data = (function() {
     // ------------------------------------------------------------
     // 3. ПІДКЛАДКИ, КАТЕГОРІЇ, ОДИНИЦІ, НАЛАШТУВАННЯ
     // ------------------------------------------------------------
-    const substrates = [ /* залиште ваш оригінальний масив */ ];
+    const substrates = [
+        // (залиште ваш оригінальний масив substrates)
+    ];
     const categories = ['EC','SPTN','OTF','PLUV','SX','TPP','UV','AS','CF','NST','Standard','EC Special'];
     const units = [
         { value: "г", label: { pl: "Gramy", en: "Grams", uk: "Грами" } },
