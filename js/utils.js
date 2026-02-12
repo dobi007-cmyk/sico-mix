@@ -146,6 +146,26 @@ SICOMIX.utils = (function() {
             .replace(/'/g, '&#039;');
     }
 
+    // ========== ОЧИЩЕННЯ ФАРБ ДЛЯ LOCALSTORAGE ==========
+function sanitizePaintForStorage(paint) {
+    return {
+        id: paint.id,
+        name: paint.name,
+        displayName: paint.displayName,
+        searchName: paint.searchName,
+        series: paint.series,
+        baseColorCode: paint.baseColorCode,
+        category: paint.category,
+        color: paint.color,
+        manufacturer: paint.manufacturer,
+        article: paint.article,
+        description: paint.description,
+        colorName: paint.colorName,
+        colorCode: paint.colorCode
+        // properties, fullInfo – ВИДАЛЕНО
+    };
+}
+    
     return {
         showNotification,
         showConfirmation,
