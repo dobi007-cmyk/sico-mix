@@ -73,24 +73,23 @@ SICOMIX.app = (function() {
     }
 
     // FIX: odczyt z localStorage z przywracaniem pełnych danych
-    function loadData() {
-        recipes = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumRecipes', SICOMIX.data.recipes);
+  function loadData() {
+    recipes = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumRecipes', SICOMIX.data.recipes || []);
 
-        const storedPaints = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumPaints', null);
-        if (storedPaints && Array.isArray(storedPaints)) {
-            const fullPaintsMap = new Map(SICOMIX.data.paints.map(p => [p.id, p]));
-            paintCatalog = storedPaints.map(sp => {
-                const full = fullPaintsMap.get(sp.id);
-                return full ? { ...full, ...sp } : sp;
-            });
-        } else {
-            paintCatalog = [...SICOMIX.data.paints];
-        }
-
-        currentSettings = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumSettings', SICOMIX.data.defaultSettings);
+    const storedPaints = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumPaints', null);
+    if (storedPaints && Array.isArray(storedPaints)) {
+        const fullPaintsMap = new Map(SICOMIX.data.paints.map(p => [p.id, p]));
+        paintCatalog = storedPaints.map(sp => {
+            const full = fullPaintsMap.get(sp.id);
+            return full ? { ...full, ...sp } : sp;
+        });
+    } else {
+        // FIX: upewniamy się, że SICOMIX.data.paints jest tablicą
+        paintCatalog = Array.isArray(SICOMIX.data.paints) ? [...SICOMIX.data.paints] : [];
     }
 
-    // FIX: zapis – okrojone farby
+    currentSettings = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumSettings', SICOMIX.data.defaultSettings || {});
+}
     function saveData() {
         SICOMIX.utils.saveToLocalStorage('sicoSpectrumRecipes', recipes);
 
