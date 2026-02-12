@@ -150,9 +150,12 @@ SICOMIX.app = (function() {
                 document.body.style.overflow = 'auto';
             }
         });
-        // ========== ЗАКРИТТЯ САЙДБАРУ КЛІКОМ ПОЗА НИМ ==========
-document.addEventListener('click', function(e) {
-    const isSidebarActive = sidebar.classList.contains('active');
+      // ========== ЗАКРИТТЯ САЙДБАРУ ТІЛЬКИ НА МОБІЛЬНОМУ ==========
+window.addEventListener('click', function(e) {
+    // Працює тільки коли ширина екрана <= 992px (мобільні/планшети)
+    if (window.innerWidth > 992) return;
+    
+    const isSidebarActive = sidebar?.classList.contains('active');
     if (!isSidebarActive) return;
 
     // Елементи, клік на які НЕ закриває сайдбар
@@ -161,13 +164,9 @@ document.addEventListener('click', function(e) {
     const isClickOnCloseBtn = closeSidebar?.contains(e.target);
 
     if (!isClickOnSidebar && !isClickOnMenuToggle && !isClickOnCloseBtn) {
-        // Закриваємо сайдбар
         sidebar.classList.remove('active');
         mainContainer?.classList.remove('sidebar-open');
         document.body.style.overflow = 'auto';
-        
-        // Невелика затримка, щоб уникнути конфліктів з іншими обробниками
-        e.stopPropagation();
     }
 });
     }
