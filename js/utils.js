@@ -30,7 +30,10 @@ SICOMIX.utils = (function() {
         const icon = type === 'success' ? 'fa-check-circle' :
                      type === 'error' ? 'fa-exclamation-circle' :
                      type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
-        notification.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+        
+        // FIX: XSS protection – escape message
+        const safeMessage = SICOMIX.utils.escapeHTML(message);
+        notification.innerHTML = `<i class="fas ${icon}"></i><span>${safeMessage}</span>`;
         document.body.appendChild(notification);
 
         setTimeout(() => {
@@ -100,10 +103,18 @@ SICOMIX.utils = (function() {
         URL.revokeObjectURL(url);
     }
 
+    // FIX: CSV escaping – commas, quotes, newlines
     function convertToCSV(data) {
         if (!Array.isArray(data) || data.length === 0) return '';
         const headers = Object.keys(data[0]);
-        const rows = data.map(item => headers.map(h => item[h] ?? '').join(','));
+        const escapeCSV = (cell) => {
+            const str = cell?.toString() ?? '';
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                return `"${str.replace(/"/g, '""')}"`;
+            }
+            return str;
+        };
+        const rows = data.map(item => headers.map(h => escapeCSV(item[h])).join(','));
         return [headers.join(','), ...rows].join('\n');
     }
 
@@ -135,7 +146,7 @@ SICOMIX.utils = (function() {
         }
     }
 
-    // ========== НОВА ФУНКЦІЯ: захист від XSS ==========
+    // ========== XSS PROTECTION ==========
     function escapeHTML(str) {
         if (str === null || str === undefined) return '';
         return String(str)
@@ -146,26 +157,26 @@ SICOMIX.utils = (function() {
             .replace(/'/g, '&#039;');
     }
 
-    // ========== ОЧИЩЕННЯ ФАРБ ДЛЯ LOCALSTORAGE ==========
-function sanitizePaintForStorage(paint) {
-    return {
-        id: paint.id,
-        name: paint.name,
-        displayName: paint.displayName,
-        searchName: paint.searchName,
-        series: paint.series,
-        baseColorCode: paint.baseColorCode,
-        category: paint.category,
-        color: paint.color,
-        manufacturer: paint.manufacturer,
-        article: paint.article,
-        description: paint.description,
-        colorName: paint.colorName,
-        colorCode: paint.colorCode
-        // properties, fullInfo – ВИДАЛЕНО
-    };
-}
-    
+    // ========== STORAGE OPTIMIZATION ==========
+    function sanitizePaintForStorage(paint) {
+        return {
+            id: paint.id,
+            name: paint.name,
+            displayName: paint.displayName,
+            searchName: paint.searchName,
+            series: paint.series,
+            baseColorCode: paint.baseColorCode,
+            category: paint.category,
+            color: paint.color,
+            manufacturer: paint.manufacturer,
+            article: paint.article,
+            description: paint.description,
+            colorName: paint.colorName,
+            colorCode: paint.colorCode
+            // properties, fullInfo – intentionally omitted
+        };
+    }
+
     return {
         showNotification,
         showConfirmation,
@@ -176,7 +187,8 @@ function sanitizePaintForStorage(paint) {
         debounce,
         saveToLocalStorage,
         loadFromLocalStorage,
-        escapeHTML   // <-- експорт
+        escapeHTML,
+        sanitizePaintForStorage   // <-- nowa funkcja
     };
 })();
 
