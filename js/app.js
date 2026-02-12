@@ -150,6 +150,7 @@ SICOMIX.app = (function() {
                 document.body.style.overflow = 'auto';
             }
         });
+        
         // ========== ЗАКРИТТЯ САЙДБАРУ ТІЛЬКИ НА МОБІЛЬНОМУ ==========
 window.addEventListener('click', function(e) {
     // Працює тільки коли ширина екрана <= 992px (мобільні/планшети)
