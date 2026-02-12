@@ -241,10 +241,12 @@ SICOMIX.data = (function() {
         { code: "75", name: { ua: "Прозорий рожевий", pl: "Transparent różowy", en: "Transparent Pink" }, color: "#FFC0CB" }
     ];
 
+    // ---------- ГЕНЕРАЦІЯ ФАРБ (СЕРІЯ + КОЛІР) ----------
     function generatePaintsFromBaseColors() {
         const paints = [];
         let id = 1;
         
+        // Стандартні комбінації
         series.forEach(serie => {
             baseColors.forEach(baseColor => {
                 paints.push({
@@ -267,7 +269,8 @@ SICOMIX.data = (function() {
             });
         });
 
-        // Specjalne farby EC
+        // ---------- ДОДАТКОВІ СПЕЦІАЛЬНІ ФАРБИ (EC) ----------
+        // EC 60/146 – вогненно-червоний з екстремальною світлостійкістю
         paints.push({
             id: id++,
             name: "EC60/146",
@@ -276,7 +279,7 @@ SICOMIX.data = (function() {
             series: "EC",
             baseColorCode: "60/146",
             category: "Універсальні",
-            color: "#E34234",
+            color: "#E34234", // Vermilion
             manufacturer: "SICO",
             article: "EC-60/146",
             description: "Вогненно-червоний колір з екстремально довгою світлостійкістю. Відтінок як №60.",
@@ -285,6 +288,8 @@ SICOMIX.data = (function() {
             colorCode: "60/146",
             fullInfo: "Серія: EC, Спеціальний колір: EC 60/146 - Вогненно-червоний"
         });
+
+        // EC 61/163 – темно-вогненно-червоний з екстремальною світлостійкістю
         paints.push({
             id: id++,
             name: "EC61/163",
@@ -293,7 +298,7 @@ SICOMIX.data = (function() {
             series: "EC",
             baseColorCode: "61/163",
             category: "Універсальні",
-            color: "#C41E3A",
+            color: "#C41E3A", // Cardinal
             manufacturer: "SICO",
             article: "EC-61/163",
             description: "Темно-вогненно-червоний колір з екстремально довгою світлостійкістю. Відтінок як №61.",
@@ -302,6 +307,8 @@ SICOMIX.data = (function() {
             colorCode: "61/163",
             fullInfo: "Серія: EC, Спеціальний колір: EC 61/163 - Темно-вогненно-червоний"
         });
+
+        // EC 91 Q – напівматова біла з вищою в'язкістю
         paints.push({
             id: id++,
             name: "EC91Q",
@@ -322,6 +329,8 @@ SICOMIX.data = (function() {
             colorCode: "91Q",
             fullInfo: "Серія: EC, Спеціальний колір: EC 91 Q - Напівматова біла"
         });
+
+        // ECRG 120 – золота фарба готового використання
         paints.push({
             id: id++,
             name: "ECRG120",
@@ -343,10 +352,10 @@ SICOMIX.data = (function() {
         return paints;
     }
 
-    // ---------- ПОЧАТКОВІ РЕЦЕПТИ (ПОРОЖНІ) ----------
+    // ---------- ПОЧАТКОВІ РЕЦЕПТИ (ПОРОЖНІ, КОРИСТУВАЧ СТВОРИТЬ САМ) ----------
     const recipes = [];
 
-    // ---------- КАТЕГОРІЇ ----------
+    // ---------- КАТЕГОРІЇ (УНІКАЛЬНІ) ----------
     const categories = Array.from(new Set(series.map(s => s.category))).sort();
 
     // ---------- ОДИНИЦІ ВИМІРЮВАННЯ ----------
