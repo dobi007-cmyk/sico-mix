@@ -1,7 +1,10 @@
 // ========== ДАНІ ПРО ФАРБИ SICO (ПОВНА БАЗА + PDF-ІНФОРМАЦІЯ) ==========
-if (!window.SICOMIX) window.SICOMIX = {};
+// ========== ДАНІ ПРО ФАРБИ SICO (ПОВНА БАЗА + PDF-ІНФОРМАЦІЯ) ==========
+window.SICOMIX = window.SICOMIX || {};
+const SICOMIX = window.SICOMIX;
 
 SICOMIX.data = (function() {
+    
     // ---------- СЕРІЇ ФАРБ (оновлені з PDF) ----------
     const series = [
         { 
