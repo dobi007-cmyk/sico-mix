@@ -1,10 +1,5 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
-Disallow: /api/
 
-Sitemap: https://sico-spectrum.ua/sitemap.xml
-
-# SICO Spectrum - Система управління рецептами фарб
-# Версія 3.0
-# © 2026
+Sitemap: https://sico-spectrum.укр/sitemap.xml
