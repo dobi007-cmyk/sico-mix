@@ -1,40 +1,24 @@
-// ========== ОСНОВНА ЛОГІКА ДОДАТКУ SICO Spectrum ==========
 if (!window.SICOMIX) window.SICOMIX = {};
 
 SICOMIX.app = (function() {
-    let recipes = [], paintCatalog = [], selectedIngredients = [], selectedRecipes = [], currentSettings = {};
-    let isEditingRecipe = false, editingRecipeId = null;
+    // Стан
+    let recipes = [];
+    let paintCatalog = [];
+    let selectedIngredients = [];
+    let selectedRecipes = [];
+    let currentSettings = {};
+    let isEditingRecipe = false;
+    let editingRecipeId = null;
 
+    // DOM елементи
     let sidebar, menuToggle, desktopMenuToggle, closeSidebar, mainContainer;
-    let navLinks, pageContents, totalPaintsElement, headerPaintCount;
+    let navLinks, pageContents, totalPaintsEl, headerPaintCount;
     let colorPreview, recipeColor, ingredientsList, paintSearch, categoryFilter;
     let addIngredientBtn, saveRecipeBtn, clearRecipeBtn, calculatePercentagesBtn;
-    let recipesContainer, exportRecipesBtn, importRecipesBtn, printRecipesBtn;
-    let deleteSelectedRecipesBtn, paintCatalogElement, addNewPaintBtn;
-    let addPaintModal, closePaintModal, savePaintBtn, cancelPaintBtn;
-    let confirmationModal, confirmationTitle, confirmationMessage;
-    let confirmActionBtn, cancelActionBtn, closeConfirmationModal, actionCards;
-    let languageSelect, unitsSelect, autoSaveCheckbox, backupCheckbox;
-    let saveSettingsBtn, resetSettingsBtn, clearAllDataBtn;
-
-    function initApp() {
-        cacheDOMElements();
-        loadData();
-        initLanguage();
-        setupEventListeners();
-        initSettings();
-        updatePaintCount();
-        renderPaintCatalog();
-        loadRecipes();
-        renderIngredientsList();
-        
-        if (window.innerWidth > 992) {
-            sidebar.classList.add('active');
-            mainContainer.classList.add('sidebar-open');
-        }
-        
-        showNotification('SICO Spectrum завантажено! Готовий до роботи.', 'success', 2000);
-    }
+    let recipesContainer, exportRecipesBtn, importRecipesBtn, printRecipesBtn, deleteSelectedRecipesBtn;
+    let paintCatalogEl, addNewPaintBtn, addPaintModal, closePaintModal, savePaintBtn, cancelPaintBtn;
+    let languageSelect, unitsSelect, autoSaveCheckbox, backupCheckbox, saveSettingsBtn, resetSettingsBtn, clearAllDataBtn;
+    let actionCards;
 
     function cacheDOMElements() {
         sidebar = document.getElementById('sidebar');
@@ -44,7 +28,7 @@ SICOMIX.app = (function() {
         mainContainer = document.getElementById('mainContainer');
         navLinks = document.querySelectorAll('.nav-link');
         pageContents = document.querySelectorAll('.page-content');
-        totalPaintsElement = document.getElementById('totalPaints');
+        totalPaintsEl = document.getElementById('totalPaints');
         headerPaintCount = document.getElementById('headerPaintCount');
         colorPreview = document.getElementById('colorPreview');
         recipeColor = document.getElementById('recipeColor');
@@ -60,18 +44,12 @@ SICOMIX.app = (function() {
         importRecipesBtn = document.getElementById('importRecipesBtn');
         printRecipesBtn = document.getElementById('printRecipesBtn');
         deleteSelectedRecipesBtn = document.getElementById('deleteSelectedRecipesBtn');
-        paintCatalogElement = document.getElementById('paintCatalog');
+        paintCatalogEl = document.getElementById('paintCatalog');
         addNewPaintBtn = document.getElementById('addNewPaintBtn');
         addPaintModal = document.getElementById('addPaintModal');
         closePaintModal = document.getElementById('closePaintModal');
         savePaintBtn = document.getElementById('savePaintBtn');
         cancelPaintBtn = document.getElementById('cancelPaintBtn');
-        confirmationModal = document.getElementById('confirmationModal');
-        confirmationTitle = document.getElementById('confirmationTitle');
-        confirmationMessage = document.getElementById('confirmationMessage');
-        confirmActionBtn = document.getElementById('confirmActionBtn');
-        cancelActionBtn = document.getElementById('cancelActionBtn');
-        closeConfirmationModal = document.getElementById('closeConfirmationModal');
         actionCards = document.querySelectorAll('.action-card');
         languageSelect = document.getElementById('languageSelect');
         unitsSelect = document.getElementById('unitsSelect');
@@ -83,201 +61,265 @@ SICOMIX.app = (function() {
     }
 
     function loadData() {
-        recipes = SICOMIX.utils.loadFromLocalStorage('sicoMixRecipes', SICOMIX.data.initialData.recipes);
-        paintCatalog = SICOMIX.utils.loadFromLocalStorage('sicoMixPaints', SICOMIX.data.initialData.paints);
-        currentSettings = SICOMIX.utils.loadFromLocalStorage('sicoMixSettings', SICOMIX.data.defaultSettings);
+        recipes = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumRecipes', SICOMIX.data.recipes);
+        paintCatalog = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumPaints', SICOMIX.data.paints);
+        currentSettings = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumSettings', SICOMIX.data.defaultSettings);
     }
 
     function saveData() {
-        SICOMIX.utils.saveToLocalStorage('sicoMixRecipes', recipes);
-        SICOMIX.utils.saveToLocalStorage('sicoMixPaints', paintCatalog);
-        SICOMIX.utils.saveToLocalStorage('sicoMixSettings', currentSettings);
-    }
-
-    function initLanguage() {
-        const savedLang = localStorage.getItem('sicoMixLanguage') || 'uk';
-        if (languageSelect) languageSelect.value = savedLang;
-        SICOMIX.i18n.setLanguage(savedLang);
+        SICOMIX.utils.saveToLocalStorage('sicoSpectrumRecipes', recipes);
+        SICOMIX.utils.saveToLocalStorage('sicoSpectrumPaints', paintCatalog);
+        SICOMIX.utils.saveToLocalStorage('sicoSpectrumSettings', currentSettings);
     }
 
     function initSettings() {
         if (unitsSelect) unitsSelect.value = currentSettings.units || 'grams';
         if (autoSaveCheckbox) autoSaveCheckbox.checked = currentSettings.autoSave !== false;
         if (backupCheckbox) backupCheckbox.checked = currentSettings.backup === true;
+        if (languageSelect) languageSelect.value = SICOMIX.i18n.getLanguage();
     }
 
-    function setupNavigation() {
+    function setupEventListeners() {
+        // Навігація
         if (menuToggle) menuToggle.addEventListener('click', () => { sidebar.classList.add('active'); document.body.style.overflow = 'hidden'; });
         if (desktopMenuToggle) desktopMenuToggle.addEventListener('click', () => {
             if (window.innerWidth <= 992) { sidebar.classList.add('active'); document.body.style.overflow = 'hidden'; }
             else { sidebar.classList.add('active'); mainContainer.classList.add('sidebar-open'); }
         });
         if (closeSidebar) closeSidebar.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-            mainContainer.classList.remove('sidebar-open');
-            document.body.style.overflow = 'auto';
+            sidebar.classList.remove('active'); mainContainer.classList.remove('sidebar-open'); document.body.style.overflow = 'auto';
         });
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 992 && sidebar.classList.contains('active') && 
-                !sidebar.contains(e.target) && e.target !== menuToggle && !menuToggle?.contains(e.target)) {
-                sidebar.classList.remove('active');
+        navLinks.forEach(link => link.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchPage(link.getAttribute('data-page'));
+            if (window.innerWidth <= 992) { sidebar.classList.remove('active'); document.body.style.overflow = 'auto'; }
+        }));
+        actionCards.forEach(card => card.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchPage(card.getAttribute('data-page'));
+        }));
+
+        // Колір пікер
+        if (recipeColor && colorPreview) {
+            recipeColor.addEventListener('input', () => colorPreview.style.background = recipeColor.value);
+        }
+
+        // Фото
+        const recipePhoto = document.getElementById('recipePhoto');
+        if (recipePhoto) {
+            recipePhoto.addEventListener('change', function() {
+                const fileName = this.files[0]?.name || SICOMIX.i18n.t('upload_photo');
+                document.getElementById('fileName').textContent = fileName;
+            });
+        }
+
+        // Новий рецепт
+        if (addIngredientBtn) addIngredientBtn.addEventListener('click', addIngredient);
+        if (saveRecipeBtn) saveRecipeBtn.addEventListener('click', saveRecipe);
+        if (clearRecipeBtn) clearRecipeBtn.addEventListener('click', clearRecipeForm);
+        if (calculatePercentagesBtn) calculatePercentagesBtn.addEventListener('click', calculatePercentages);
+
+        // Рецепти
+        if (exportRecipesBtn) exportRecipesBtn.addEventListener('click', exportAllRecipes);
+        if (importRecipesBtn) importRecipesBtn.addEventListener('click', importRecipes);
+        if (printRecipesBtn) printRecipesBtn.addEventListener('click', printRecipes);
+        if (deleteSelectedRecipesBtn) deleteSelectedRecipesBtn.addEventListener('click', deleteSelectedRecipes);
+
+        // Каталог
+        if (addNewPaintBtn) addNewPaintBtn.addEventListener('click', addNewPaint);
+        if (closePaintModal) closePaintModal.addEventListener('click', () => { addPaintModal.classList.remove('active'); document.body.style.overflow = 'auto'; });
+        if (cancelPaintBtn) cancelPaintBtn.addEventListener('click', () => { addPaintModal.classList.remove('active'); document.body.style.overflow = 'auto'; });
+        if (savePaintBtn) savePaintBtn.addEventListener('click', saveNewPaint);
+
+        // Пошук (debounce)
+        if (paintSearch) paintSearch.addEventListener('input', SICOMIX.utils.debounce(renderIngredientsList, 300));
+        if (categoryFilter) categoryFilter.addEventListener('change', renderIngredientsList);
+
+        // Налаштування
+        if (languageSelect) languageSelect.addEventListener('change', function() { currentSettings.language = this.value; saveData(); });
+        if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSettings);
+        if (resetSettingsBtn) resetSettingsBtn.addEventListener('click', resetSettings);
+        if (clearAllDataBtn) clearAllDataBtn.addEventListener('click', clearAllData);
+
+        // Клавіатура
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveRecipeBtn?.click(); }
+            if (e.key === 'Escape') {
+                if (sidebar.classList.contains('active') && window.innerWidth <= 992) sidebar.classList.remove('active');
+                if (addPaintModal?.classList.contains('active')) addPaintModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
             }
         });
-        navLinks.forEach(link => link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const pageId = this.getAttribute('data-page');
-            switchPage(pageId);
-            if (window.innerWidth <= 992) { sidebar.classList.remove('active'); document.body.style.overflow = 'auto'; }
-        }));
-        actionCards.forEach(card => card.addEventListener('click', function(e) {
-            e.preventDefault();
-            const pageId = this.getAttribute('data-page');
-            switchPage(pageId);
-        }));
     }
 
+    // ========== НАВІГАЦІЯ ==========
     function switchPage(pageId) {
         if (isEditingRecipe && pageId !== 'new-recipe') resetEditMode();
-        pageContents.forEach(page => page.classList.remove('active'));
-        const selectedPage = document.getElementById(`${pageId}-page`);
-        if (selectedPage) {
-            selectedPage.classList.add('active');
+        pageContents.forEach(p => p.classList.remove('active'));
+        const target = document.getElementById(`${pageId}-page`);
+        if (target) {
+            target.classList.add('active');
             if (pageId === 'recipes') renderRecipes();
-            else if (pageId === 'catalog') renderPaintCatalog();
-            else if (pageId === 'new-recipe' && !isEditingRecipe) clearRecipeForm();
+            if (pageId === 'catalog') renderPaintCatalog();
+            if (pageId === 'new-recipe' && !isEditingRecipe) clearRecipeForm();
         }
-        navLinks.forEach(link => { link.classList.remove('active'); if (link.getAttribute('data-page') === pageId) link.classList.add('active'); });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('data-page') === pageId) link.classList.add('active');
+        });
     }
 
+    // ========== НОВИЙ РЕЦЕПТ ==========
     function renderIngredientsList() {
         if (!ingredientsList) return;
-        ingredientsList.innerHTML = '';
         if (selectedIngredients.length === 0) {
-            const emptyRow = document.createElement('tr');
-            emptyRow.innerHTML = `<td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                <i class="fas fa-paint-brush" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
-                <span>${SICOMIX.i18n.t('paints_not_found')}</span></td>`;
-            ingredientsList.appendChild(emptyRow);
+            ingredientsList.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px;">
+                <i class="fas fa-palette" style="font-size:32px; opacity:0.5;"></i><br>
+                <span>${SICOMIX.i18n.t('paints_not_found')}</span>
+            </td></tr>`;
             return;
         }
-        selectedIngredients.forEach((ingredient, index) => {
-            const paint = paintCatalog.find(p => p.id === ingredient.paintId);
+
+        let html = '';
+        selectedIngredients.forEach((ing, idx) => {
+            const paint = paintCatalog.find(p => p.id === ing.paintId);
             if (!paint) return;
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 20px; height: 20px; background: ${paint.color}; border-radius: 4px; border: 1px solid var(--border);"></div>
-                    <div><div style="font-weight: 600;">${paint.name}</div><div style="font-size: 12px; color: var(--text-secondary);">${paint.category}</div></div>
-                </div></td>
-                <td><input type="number" class="input-small" value="${ingredient.amount}" data-index="${index}" data-field="amount" min="0" step="0.1"></td>
-                <td><select class="unit-select" data-index="${index}" data-field="unit">
-                    <option value="г" ${ingredient.unit === 'г' ? 'selected' : ''}>г</option>
-                    <option value="кг" ${ingredient.unit === 'кг' ? 'selected' : ''}>кг</option>
-                    <option value="мл" ${ingredient.unit === 'мл' ? 'selected' : ''}>мл</option>
-                    <option value="л" ${ingredient.unit === 'л' ? 'selected' : ''}>л</option>
-                </select></td>
-                <td><input type="number" class="input-small" value="${ingredient.percentage || 0}" data-index="${index}" data-field="percentage" min="0" max="100" step="0.1" readonly> <span style="margin-left: 5px;">%</span></td>
-                <td><button class="btn-icon delete-ingredient" data-index="${index}" title="${SICOMIX.i18n.t('delete')}"><i class="fas fa-trash"></i></button></td>
-            `;
-            ingredientsList.appendChild(row);
+            html += `<tr>
+                <td>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:24px; height:24px; background:${paint.color}; border-radius:6px; border:1px solid rgba(255,255,255,0.2);"></div>
+                        <div>
+                            <div style="font-weight:600;">${paint.name}</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">${paint.category}</div>
+                        </div>
+                    </div>
+                </td>
+                <td><input type="number" class="input-small" value="${ing.amount}" data-index="${idx}" data-field="amount" min="0" step="0.1"></td>
+                <td>
+                    <select class="unit-select" data-index="${idx}" data-field="unit">
+                        <option value="г" ${ing.unit === 'г' ? 'selected' : ''}>г</option>
+                        <option value="кг" ${ing.unit === 'кг' ? 'selected' : ''}>кг</option>
+                        <option value="мл" ${ing.unit === 'мл' ? 'selected' : ''}>мл</option>
+                        <option value="л" ${ing.unit === 'л' ? 'selected' : ''}>л</option>
+                    </select>
+                </td>
+                <td><input type="number" class="input-small" value="${ing.percentage || 0}" readonly> %</td>
+                <td><button class="btn-icon delete-ingredient" data-index="${idx}"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
         });
-        ingredientsList.querySelectorAll('input, select').forEach(input => input.addEventListener('change', handleIngredientChange));
-        ingredientsList.querySelectorAll('.delete-ingredient').forEach(btn => btn.addEventListener('click', function() { deleteIngredient(parseInt(this.getAttribute('data-index'))); }));
+        ingredientsList.innerHTML = html;
+
+        ingredientsList.querySelectorAll('input, select').forEach(el => el.addEventListener('change', handleIngredientChange));
+        ingredientsList.querySelectorAll('.delete-ingredient').forEach(btn => btn.addEventListener('click', function() {
+            deleteIngredient(parseInt(this.dataset.index));
+        }));
     }
 
     function handleIngredientChange(e) {
-        const index = parseInt(e.target.getAttribute('data-index'));
-        const field = e.target.getAttribute('data-field');
-        const value = e.target.value;
-        if (index >= 0 && index < selectedIngredients.length) {
-            selectedIngredients[index][field] = field === 'amount' ? parseFloat(value) || 0 : value;
+        const idx = parseInt(e.target.dataset.index);
+        const field = e.target.dataset.field;
+        if (idx >= 0 && idx < selectedIngredients.length) {
+            selectedIngredients[idx][field] = field === 'amount' ? parseFloat(e.target.value) || 0 : e.target.value;
             if (field === 'amount') calculatePercentages();
         }
     }
 
     function addIngredient() {
-        const searchTerm = paintSearch.value.toLowerCase();
-        const category = categoryFilter.value;
-        let filteredPaints = paintCatalog;
-        if (searchTerm) filteredPaints = filteredPaints.filter(paint => paint.name.toLowerCase().includes(searchTerm) || (paint.category?.toLowerCase().includes(searchTerm)));
-        if (category) filteredPaints = filteredPaints.filter(paint => paint.category === category);
-        if (filteredPaints.length === 0) { showNotification(SICOMIX.i18n.t('paints_not_found'), 'error'); return; }
-        showPaintSelection(filteredPaints);
+        const term = paintSearch?.value.toLowerCase() || '';
+        const cat = categoryFilter?.value || '';
+        let filtered = paintCatalog;
+        if (term) filtered = filtered.filter(p => p.name.toLowerCase().includes(term));
+        if (cat) filtered = filtered.filter(p => p.category === cat);
+        if (filtered.length === 0) {
+            showNotification(SICOMIX.i18n.t('paints_not_found'), 'error');
+            return;
+        }
+        showPaintSelectionModal(filtered);
     }
 
-    function showPaintSelection(paints) {
-        const modal = document.createElement('div');
-        modal.className = 'modal active';
-        modal.innerHTML = `
-            <div class="modal-content" style="max-width: 600px;">
-                <div class="modal-header">
-                    <h3 class="modal-title">${SICOMIX.i18n.t('select_paint')}</h3>
-                    <button class="modal-close close-paint-selection">&times;</button>
+    function showPaintSelectionModal(paints) {
+        const modal = document.getElementById('paintSelectionModal');
+        const list = document.getElementById('paintSelectionList');
+        list.innerHTML = paints.map(p => `
+            <div class="paint-selection-card" data-id="${p.id}">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:32px; height:32px; background:${p.color}; border-radius:8px;"></div>
+                    <div><strong>${p.name}</strong><br><span style="font-size:12px;">${p.category}</span></div>
                 </div>
-                <div style="max-height: 400px; overflow-y: auto;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; padding: 10px;">
-                        ${paints.map(paint => `
-                            <div class="paint-selection-card" data-id="${paint.id}" style="padding: 15px; border: 2px solid var(--border); border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s ease;">
-                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                    <div style="width: 30px; height: 30px; background: ${paint.color}; border-radius: 6px; border: 1px solid var(--border);"></div>
-                                    <div style="font-weight: 600;">${paint.name}</div>
-                                </div>
-                                <div style="font-size: 12px; color: var(--text-secondary);">${paint.category} • ${paint.manufacturer || 'SICO'}</div>
-                            </div>`).join('')}
-                    </div>
-                </div>
-            </div>`;
-        document.body.appendChild(modal);
-        modal.querySelector('.close-paint-selection').addEventListener('click', () => document.body.removeChild(modal));
-        modal.querySelectorAll('.paint-selection-card').forEach(card => card.addEventListener('click', function() {
-            const paintId = parseInt(this.getAttribute('data-id'));
-            if (selectedIngredients.some(ing => ing.paintId === paintId)) {
-                showNotification(SICOMIX.i18n.t('paint_already_added'), 'warning');
-                return;
-            }
-            selectedIngredients.push({ paintId, amount: 100, unit: 'г', percentage: 0 });
+            </div>
+        `).join('');
+        modal.classList.add('active');
+        list.querySelectorAll('.paint-selection-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const pid = parseInt(this.dataset.id);
+                if (selectedIngredients.some(ing => ing.paintId === pid)) {
+                    showNotification(SICOMIX.i18n.t('paint_already_added'), 'warning');
+                } else {
+                    selectedIngredients.push({ paintId: pid, amount: 100, unit: 'г', percentage: 0 });
+                    calculatePercentages();
+                    renderIngredientsList();
+                    showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
+                }
+                modal.classList.remove('active');
+            });
+        });
+        modal.querySelector('.close-paint-selection')?.addEventListener('click', () => modal.classList.remove('active'));
+    }
+
+    function deleteIngredient(index) {
+        if (index >= 0) {
+            selectedIngredients.splice(index, 1);
             calculatePercentages();
             renderIngredientsList();
-            document.body.removeChild(modal);
-            showNotification(SICOMIX.i18n.t('paint_added_to_recipe'));
-        }));
-        const handleEscape = (e) => { if (e.key === 'Escape') { document.body.removeChild(modal); document.removeEventListener('keydown', handleEscape); } };
-        document.addEventListener('keydown', handleEscape);
+        }
     }
 
-    function deleteIngredient(index) { if (index >= 0 && index < selectedIngredients.length) { selectedIngredients.splice(index, 1); calculatePercentages(); renderIngredientsList(); } }
-    function calculatePercentages() { selectedIngredients = SICOMIX.utils.calculateIngredientPercentages(selectedIngredients); renderIngredientsList(); }
+    function calculatePercentages() {
+        selectedIngredients = SICOMIX.utils.calculateIngredientPercentages(selectedIngredients);
+        renderIngredientsList();
+    }
 
     function saveRecipe() {
-        const name = document.getElementById('recipeName').value.trim();
-        const category = document.getElementById('recipeCategory').value;
-        const color = document.getElementById('recipeColor').value;
-        const description = document.getElementById('recipeDescription').value.trim();
-        if (!name || !category || selectedIngredients.length === 0) { showNotification(SICOMIX.i18n.t('fill_required_fields'), 'error'); return; }
+        const name = document.getElementById('recipeName')?.value.trim();
+        const cat = document.getElementById('recipeCategory')?.value;
+        const color = document.getElementById('recipeColor')?.value;
+        const desc = document.getElementById('recipeDescription')?.value.trim();
+
+        if (!name || !cat || selectedIngredients.length === 0) {
+            showNotification(SICOMIX.i18n.t('fill_required_fields'), 'error');
+            return;
+        }
+
         if (isEditingRecipe && editingRecipeId) {
-            const index = recipes.findIndex(r => r.id === editingRecipeId);
-            if (index !== -1) {
-                recipes[index] = { ...recipes[index], name, category, color, description, ingredients: [...selectedIngredients], date: new Date().toLocaleDateString('uk-UA') };
+            const idx = recipes.findIndex(r => r.id === editingRecipeId);
+            if (idx !== -1) {
+                recipes[idx] = { ...recipes[idx], name, category: cat, color, description: desc, ingredients: [...selectedIngredients], date: new Date().toLocaleDateString('uk-UA') };
                 saveData();
-                showNotification(`${SICOMIX.i18n.t('recipe_saved')} "${name}"`);
+                showNotification(`${SICOMIX.i18n.t('recipe_saved')} "${name}"`, 'success');
                 resetEditMode();
             }
         } else {
-            const newRecipe = { id: SICOMIX.utils.generateId(), name, category, color, description, ingredients: [...selectedIngredients], date: new Date().toLocaleDateString('uk-UA'), photo: null };
+            const newRecipe = {
+                id: SICOMIX.utils.generateId(),
+                name, category: cat, color, description: desc,
+                ingredients: [...selectedIngredients],
+                date: new Date().toLocaleDateString('uk-UA'),
+                photo: null
+            };
             recipes.push(newRecipe);
             saveData();
-            showNotification(`${SICOMIX.i18n.t('recipe_saved')} "${name}"`);
+            showNotification(`${SICOMIX.i18n.t('recipe_saved')} "${name}"`, 'success');
         }
         clearRecipeForm();
         switchPage('recipes');
     }
 
     function clearRecipeForm() {
-        if (document.getElementById('recipeName')) document.getElementById('recipeName').value = '';
-        if (document.getElementById('recipeCategory')) document.getElementById('recipeCategory').value = '';
-        if (recipeColor && colorPreview) { recipeColor.value = '#8b5cf6'; colorPreview.style.background = '#8b5cf6'; }
-        if (document.getElementById('recipeDescription')) document.getElementById('recipeDescription').value = '';
+        document.getElementById('recipeName').value = '';
+        document.getElementById('recipeCategory').value = '';
+        if (recipeColor) recipeColor.value = '#3a86ff';
+        if (colorPreview) colorPreview.style.background = '#3a86ff';
+        document.getElementById('recipeDescription').value = '';
         selectedIngredients = [];
         renderIngredientsList();
         resetEditMode();
@@ -287,337 +329,372 @@ SICOMIX.app = (function() {
         isEditingRecipe = false;
         editingRecipeId = null;
         if (saveRecipeBtn) {
-            saveRecipeBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="save_recipe">Зберегти рецепт</span>`;
+            saveRecipeBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="save_recipe"></span>`;
             SICOMIX.i18n.applyTranslations();
         }
     }
 
+    // ========== РЕЦЕПТИ ==========
     function renderRecipes() {
         if (!recipesContainer) return;
-        const searchTerm = document.getElementById('recipeSearch')?.value.toLowerCase() || '';
-        const category = document.getElementById('recipeCategoryFilter')?.value || '';
-        let filteredRecipes = recipes;
-        if (searchTerm) filteredRecipes = filteredRecipes.filter(recipe => recipe.name.toLowerCase().includes(searchTerm) || (recipe.description?.toLowerCase().includes(searchTerm)));
-        if (category) filteredRecipes = filteredRecipes.filter(recipe => recipe.category === category);
-        recipesContainer.innerHTML = filteredRecipes.length > 0 ? filteredRecipes.map(recipe => {
-            const totalAmount = recipe.ingredients.reduce((sum, ing) => sum + (ing.amount || 0), 0);
-            return `<div class="recipe-card" data-id="${recipe.id}">
-                ${recipe.photo ? `<img src="${recipe.photo}" class="recipe-image" alt="${recipe.name}">` :
-                    `<div class="recipe-image" style="background: linear-gradient(135deg, ${recipe.color}30, ${recipe.color}60); display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-palette" style="font-size: 60px; color: ${recipe.color};"></i>
-                    </div>`}
+        const search = document.getElementById('recipeSearch')?.value.toLowerCase() || '';
+        const cat = document.getElementById('recipeCategoryFilter')?.value || '';
+        let filtered = recipes;
+        if (search) filtered = filtered.filter(r => r.name.toLowerCase().includes(search) || (r.description && r.description.toLowerCase().includes(search)));
+        if (cat) filtered = filtered.filter(r => r.category === cat);
+
+        if (filtered.length === 0) {
+            recipesContainer.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_recipes')}</p>`;
+            return;
+        }
+
+        recipesContainer.innerHTML = filtered.map(r => {
+            const total = r.ingredients.reduce((s, i) => s + (i.amount || 0), 0);
+            return `<div class="recipe-card" data-id="${r.id}">
+                <div class="recipe-image" style="background: linear-gradient(145deg, ${r.color}80, ${r.color});">
+                    <i class="fas fa-palette"></i>
+                </div>
                 <div class="recipe-content">
                     <div class="recipe-header">
-                        <div><h3 class="recipe-title">${recipe.name}</h3><span class="recipe-category">${recipe.category}</span></div>
+                        <div><h3 class="recipe-title">${r.name}</h3><span class="recipe-category">${r.category}</span></div>
                         <div class="recipe-select-container">
-                            <input type="checkbox" class="recipe-select" value="${recipe.id}" ${selectedRecipes.includes(recipe.id) ? 'checked' : ''}>
+                            <input type="checkbox" class="recipe-select" value="${r.id}" ${selectedRecipes.includes(r.id) ? 'checked' : ''}>
                             <span>${SICOMIX.i18n.t('select')}</span>
                         </div>
                     </div>
-                    <p class="recipe-description">${recipe.description || SICOMIX.i18n.t('no_description')}</p>
+                    <p class="recipe-description">${r.description || SICOMIX.i18n.t('no_description')}</p>
                     <div class="recipe-meta">
-                        <div><div style="font-size: 12px; color: var(--text-secondary);">${SICOMIX.i18n.t('ingredients_count')}</div><div style="font-weight: 600;">${recipe.ingredients.length}</div></div>
-                        <div><div style="font-size: 12px; color: var(--text-secondary);">${SICOMIX.i18n.t('total_weight')}</div><div style="font-weight: 600;">${totalAmount} г</div></div>
-                        <div><div style="font-size: 12px; color: var(--text-secondary);">${SICOMIX.i18n.t('date')}</div><div style="font-weight: 600;">${recipe.date}</div></div>
+                        <div><span style="font-size:12px;">${SICOMIX.i18n.t('ingredients_count')}</span><br><strong>${r.ingredients.length}</strong></div>
+                        <div><span style="font-size:12px;">${SICOMIX.i18n.t('total_weight')}</span><br><strong>${total} г</strong></div>
+                        <div><span style="font-size:12px;">${SICOMIX.i18n.t('date')}</span><br><strong>${r.date}</strong></div>
                     </div>
                     <div class="recipe-actions">
-                        <button class="recipe-btn" style="background: var(--primary); color: white;" onclick="SICOMIX.app.editRecipe(${recipe.id})"><i class="fas fa-edit"></i> ${SICOMIX.i18n.t('edit')}</button>
-                        <button class="recipe-btn" style="background: var(--danger); color: white;" onclick="SICOMIX.app.deleteRecipe(${recipe.id})"><i class="fas fa-trash"></i> ${SICOMIX.i18n.t('delete')}</button>
-                        <button class="recipe-btn" style="background: var(--success); color: white;" onclick="SICOMIX.app.exportRecipe(${recipe.id})"><i class="fas fa-download"></i> ${SICOMIX.i18n.t('export')}</button>
+                        <button class="recipe-btn edit-recipe"><i class="fas fa-edit"></i> ${SICOMIX.i18n.t('edit')}</button>
+                        <button class="recipe-btn delete-recipe"><i class="fas fa-trash"></i> ${SICOMIX.i18n.t('delete')}</button>
+                        <button class="recipe-btn export-recipe"><i class="fas fa-download"></i> ${SICOMIX.i18n.t('export')}</button>
                     </div>
                 </div>
             </div>`;
-        }).join('') : `<p style="text-align: center; color: var(--text-secondary); padding: 40px;">${SICOMIX.i18n.t('no_recipes')}</p>`;
-        updateRecipeSelection();
-        const recipeSearchInput = document.getElementById('recipeSearch');
-        const recipeCategoryFilter = document.getElementById('recipeCategoryFilter');
-        if (recipeSearchInput) recipeSearchInput.addEventListener('input', SICOMIX.utils.debounce(renderRecipes, 300));
-        if (recipeCategoryFilter) recipeCategoryFilter.addEventListener('change', renderRecipes);
-    }
+        }).join('');
 
-    function updateRecipeSelection() {
-        const checkboxes = recipesContainer.querySelectorAll('.recipe-select');
-        checkboxes.forEach(checkbox => checkbox.addEventListener('change', function() {
-            const recipeId = parseInt(this.value);
-            if (this.checked) { if (!selectedRecipes.includes(recipeId)) selectedRecipes.push(recipeId); }
-            else selectedRecipes = selectedRecipes.filter(id => id !== recipeId);
+        // Event listeners
+        recipesContainer.querySelectorAll('.edit-recipe').forEach(btn => btn.addEventListener('click', (e) => {
+            const id = parseInt(e.target.closest('.recipe-card').dataset.id);
+            editRecipe(id);
+        }));
+        recipesContainer.querySelectorAll('.delete-recipe').forEach(btn => btn.addEventListener('click', (e) => {
+            const id = parseInt(e.target.closest('.recipe-card').dataset.id);
+            deleteRecipe(id);
+        }));
+        recipesContainer.querySelectorAll('.export-recipe').forEach(btn => btn.addEventListener('click', (e) => {
+            const id = parseInt(e.target.closest('.recipe-card').dataset.id);
+            exportRecipe(id);
+        }));
+        recipesContainer.querySelectorAll('.recipe-select').forEach(cb => cb.addEventListener('change', function() {
+            const id = parseInt(this.value);
+            if (this.checked) { if (!selectedRecipes.includes(id)) selectedRecipes.push(id); }
+            else { selectedRecipes = selectedRecipes.filter(v => v !== id); }
         }));
     }
 
     function deleteRecipe(id) {
-        showConfirmation(SICOMIX.i18n.t('delete_recipe'), SICOMIX.i18n.t('delete_recipe_confirmation'), () => {
-            recipes = recipes.filter(recipe => recipe.id !== id);
-            selectedRecipes = selectedRecipes.filter(recipeId => recipeId !== id);
-            saveData();
-            renderRecipes();
-            showNotification(SICOMIX.i18n.t('recipe_deleted'));
-        });
+        SICOMIX.utils.showConfirmation(
+            SICOMIX.i18n.t('delete_recipe'),
+            SICOMIX.i18n.t('delete_recipe_confirmation'),
+            () => {
+                recipes = recipes.filter(r => r.id !== id);
+                selectedRecipes = selectedRecipes.filter(rid => rid !== id);
+                saveData();
+                renderRecipes();
+                showNotification(SICOMIX.i18n.t('recipe_deleted'), 'success');
+            }
+        );
     }
 
     function deleteSelectedRecipes() {
-        if (selectedRecipes.length === 0) { showNotification(SICOMIX.i18n.t('select_recipes_to_delete'), 'warning'); return; }
-        showConfirmation(SICOMIX.i18n.t('delete_recipes'), `${SICOMIX.i18n.t('delete_recipes_confirmation')} ${selectedRecipes.length} ${SICOMIX.i18n.t('recipes')}?`, () => {
-            recipes = recipes.filter(recipe => !selectedRecipes.includes(recipe.id));
-            selectedRecipes = [];
-            saveData();
-            renderRecipes();
-            showNotification(`${SICOMIX.i18n.t('deleted')} ${selectedRecipes.length} ${SICOMIX.i18n.t('recipes')}`);
-        });
+        if (selectedRecipes.length === 0) {
+            showNotification(SICOMIX.i18n.t('select_recipes_to_delete'), 'warning');
+            return;
+        }
+        SICOMIX.utils.showConfirmation(
+            SICOMIX.i18n.t('delete_recipes'),
+            `${SICOMIX.i18n.t('delete_recipes_confirmation')} ${selectedRecipes.length} ${SICOMIX.i18n.t('recipes')}?`,
+            () => {
+                recipes = recipes.filter(r => !selectedRecipes.includes(r.id));
+                selectedRecipes = [];
+                saveData();
+                renderRecipes();
+                showNotification(`${SICOMIX.i18n.t('deleted')} ${selectedRecipes.length}`, 'success');
+            }
+        );
     }
 
     function exportRecipe(id) {
         const recipe = recipes.find(r => r.id === id);
-        if (!recipe) return;
-        SICOMIX.utils.exportToFile(recipe, `${recipe.name.replace(/\s+/g, '_')}.json`);
-        showNotification(`${SICOMIX.i18n.t('recipe_exported')} "${recipe.name}"`);
+        if (recipe) {
+            SICOMIX.utils.exportToFile(recipe, `${recipe.name.replace(/\s+/g, '_')}.json`);
+            showNotification(`${SICOMIX.i18n.t('recipe_exported')}`, 'success');
+        }
     }
 
     function exportAllRecipes() {
-        if (recipes.length === 0) { showNotification(SICOMIX.i18n.t('no_recipes_to_export'), 'warning'); return; }
+        if (recipes.length === 0) {
+            showNotification(SICOMIX.i18n.t('no_recipes_to_export'), 'warning');
+            return;
+        }
         SICOMIX.utils.exportToFile(recipes, `sico_spectrum_recipes_${new Date().toISOString().split('T')[0]}.json`);
-        showNotification(`${SICOMIX.i18n.t('exported')} ${recipes.length} ${SICOMIX.i18n.t('recipes')}`);
+        showNotification(`${SICOMIX.i18n.t('exported')} ${recipes.length} ${SICOMIX.i18n.t('recipes')}`, 'success');
     }
 
     function importRecipes() {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.json,.csv';
-        fileInput.onchange = e => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = e => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = event => {
+            reader.onload = ev => {
                 try {
-                    let importedRecipes;
-                    if (file.name.endsWith('.csv')) {
-                        const csvText = event.target.result;
-                        const lines = csvText.split('\n');
-                        const headers = lines[0].split(',');
-                        importedRecipes = lines.slice(1).map(line => {
-                            const values = line.split(',');
-                            const recipe = {};
-                            headers.forEach((header, index) => recipe[header.trim()] = values[index]?.trim() || '');
-                            return recipe;
-                        }).filter(recipe => recipe.name);
-                    } else importedRecipes = JSON.parse(event.target.result);
-                    if (!Array.isArray(importedRecipes)) { showNotification(SICOMIX.i18n.t('invalid_file_format'), 'error'); return; }
-                    showConfirmation(SICOMIX.i18n.t('import_recipes'), `${SICOMIX.i18n.t('found_recipes')} ${importedRecipes.length}. ${SICOMIX.i18n.t('import_confirm')}`, () => {
-                        importedRecipes.forEach(recipe => { recipe.id = SICOMIX.utils.generateId(); recipes.push(recipe); });
-                        saveData();
-                        renderRecipes();
-                        showNotification(`${SICOMIX.i18n.t('imported')} ${importedRecipes.length} ${SICOMIX.i18n.t('recipes')}`);
-                    });
-                } catch (error) { console.error('Import error:', error); showNotification(SICOMIX.i18n.t('file_read_error'), 'error'); }
+                    const imported = JSON.parse(ev.target.result);
+                    const arr = Array.isArray(imported) ? imported : [imported];
+                    SICOMIX.utils.showConfirmation(
+                        SICOMIX.i18n.t('import_recipes'),
+                        `${SICOMIX.i18n.t('found_recipes')} ${arr.length}. ${SICOMIX.i18n.t('import_confirm')}`,
+                        () => {
+                            arr.forEach(r => { r.id = SICOMIX.utils.generateId(); recipes.push(r); });
+                            saveData();
+                            renderRecipes();
+                            showNotification(`${SICOMIX.i18n.t('imported')} ${arr.length}`, 'success');
+                        }
+                    );
+                } catch (err) {
+                    showNotification(SICOMIX.i18n.t('invalid_file_format'), 'error');
+                }
             };
             reader.readAsText(file);
         };
-        fileInput.click();
+        input.click();
     }
 
     function printRecipes() {
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html><head><title>${SICOMIX.i18n.t('print_recipes')} SICO Spectrum</title>
-            <style>body{font-family:Inter,sans-serif;background:#0f172a;color:#f1f5f9;padding:20px;}h1{color:#8b5cf6;}.recipe{margin-bottom:30px;padding:20px;border:1px solid #334155;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #475569;padding:8px;text-align:left;}th{background:#1e293b;}</style></head>
-            <body><h1>${SICOMIX.i18n.t('recipes')} SICO Spectrum</h1>
-            <p>${SICOMIX.i18n.t('print_date')}: ${new Date().toLocaleDateString('uk-UA')}</p><hr>
-            ${recipes.map(recipe => {
-                const ingredientsHTML = recipe.ingredients.map(ing => {
-                    const paint = paintCatalog.find(p => p.id === ing.paintId);
-                    return `<tr><td>${paint?.name || SICOMIX.i18n.t('unknown')}</td><td>${ing.amount} ${ing.unit}</td><td>${ing.percentage || 0}%</td></tr>`;
-                }).join('');
-                return `<div class="recipe"><h2>${recipe.name}</h2>
-                    <p><strong>${SICOMIX.i18n.t('category')}:</strong> ${recipe.category}</p>
-                    <p><strong>${SICOMIX.i18n.t('creation_date')}:</strong> ${recipe.date}</p>
-                    <p><strong>${SICOMIX.i18n.t('description')}:</strong> ${recipe.description || '—'}</p>
-                    <table><thead><tr><th>${SICOMIX.i18n.t('paint')}</th><th>${SICOMIX.i18n.t('quantity')}</th><th>${SICOMIX.i18n.t('percentage')}</th></tr></thead><tbody>${ingredientsHTML}</tbody></table></div>`;
-            }).join('')}
-            </body></html>`);
-        printWindow.document.close();
-        printWindow.print();
+        const win = window.open('', '_blank');
+        win.document.write(`<html><head><title>${SICOMIX.i18n.t('print_recipes')}</title><style>body{font-family:Inter,sans-serif;padding:20px;background:#0a0c0f;color:#f0f4f8;}</style></head><body><h1>SICO Spectrum</h1><p>${SICOMIX.i18n.t('print_date')}: ${new Date().toLocaleDateString()}</p>${recipes.map(r => `<div style="margin-bottom:30px;"><h2>${r.name}</h2><p>${r.description || ''}</p></div>`).join('')}</body></html>`);
+        win.document.close();
+        win.print();
     }
 
+    // ========== КАТАЛОГ ==========
     function renderPaintCatalog() {
-        if (!paintCatalogElement) return;
-        paintCatalogElement.innerHTML = paintCatalog.length > 0 ? paintCatalog.map(paint => `
+        if (!paintCatalogEl) return;
+        const search = document.getElementById('catalogSearch')?.value.toLowerCase() || '';
+        let filtered = paintCatalog;
+        if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || (p.category && p.category.toLowerCase().includes(search)));
+
+        if (filtered.length === 0) {
+            paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('catalog_empty')}</p>`;
+            return;
+        }
+
+        paintCatalogEl.innerHTML = filtered.map(p => `
             <div class="recipe-card">
-                <div class="recipe-image" style="background: ${paint.color};"></div>
+                <div class="recipe-image" style="background:${p.color};"></div>
                 <div class="recipe-content">
-                    <div class="recipe-header"><div><h3 class="recipe-title">${paint.name}</h3><span class="recipe-category">${paint.category}</span></div></div>
-                    <div style="margin-bottom: 15px;">
-                        <div style="display: flex; gap: 15px; margin-bottom: 10px;">
-                            <div><div style="font-size: 12px; color: var(--text-secondary);">${SICOMIX.i18n.t('manufacturer')}</div><div style="font-weight: 600;">${paint.manufacturer || 'SICO'}</div></div>
-                            <div><div style="font-size: 12px; color: var(--text-secondary);">${SICOMIX.i18n.t('article')}</div><div style="font-weight: 600;">${paint.article || '—'}</div></div>
+                    <div class="recipe-header">
+                        <div><h3 class="recipe-title">${p.name}</h3><span class="recipe-category">${p.category}</span></div>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <div style="display:flex; gap:15px;">
+                            <div><span style="font-size:12px;">${SICOMIX.i18n.t('manufacturer')}</span><br><strong>${p.manufacturer || 'SICO'}</strong></div>
+                            <div><span style="font-size:12px;">${SICOMIX.i18n.t('article')}</span><br><strong>${p.article || '—'}</strong></div>
                         </div>
-                        <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.5;">${paint.description || SICOMIX.i18n.t('no_description')}</div>
+                        <p style="color:var(--text-secondary);">${p.description || SICOMIX.i18n.t('no_description')}</p>
                     </div>
                     <div class="recipe-actions">
-                        <button class="recipe-btn" style="background: var(--primary); color: white;" onclick="SICOMIX.app.editPaint(${paint.id})"><i class="fas fa-edit"></i> ${SICOMIX.i18n.t('edit')}</button>
-                        <button class="recipe-btn" style="background: var(--danger); color: white;" onclick="SICOMIX.app.deletePaint(${paint.id})"><i class="fas fa-trash"></i> ${SICOMIX.i18n.t('delete')}</button>
+                        <button class="recipe-btn delete-paint" data-id="${p.id}"><i class="fas fa-trash"></i> ${SICOMIX.i18n.t('delete')}</button>
                     </div>
                 </div>
-            </div>`).join('') : `<p style="text-align: center; color: var(--text-secondary); padding: 40px;">${SICOMIX.i18n.t('catalog_empty')}</p>`;
+            </div>
+        `).join('');
+
+        paintCatalogEl.querySelectorAll('.delete-paint').forEach(btn => btn.addEventListener('click', () => {
+            deletePaint(parseInt(btn.dataset.id));
+        }));
         updatePaintCount();
-        const catalogSearchInput = document.getElementById('catalogSearch');
-        if (catalogSearchInput) catalogSearchInput.addEventListener('input', SICOMIX.utils.debounce(renderPaintCatalog, 300));
     }
 
     function addNewPaint() {
-        if (document.getElementById('paintName')) document.getElementById('paintName').value = '';
-        if (document.getElementById('paintCategory')) document.getElementById('paintCategory').value = '';
-        if (document.getElementById('paintColorCode')) document.getElementById('paintColorCode').value = '#8b5cf6';
-        if (document.getElementById('paintDescription')) document.getElementById('paintDescription').value = '';
-        if (document.getElementById('paintManufacturer')) document.getElementById('paintManufacturer').value = 'SICO';
-        if (document.getElementById('paintArticle')) document.getElementById('paintArticle').value = '';
-        if (addPaintModal) { addPaintModal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+        document.getElementById('paintName').value = '';
+        document.getElementById('paintCategory').value = '';
+        document.getElementById('paintColorCode').value = '#3a86ff';
+        document.getElementById('paintDescription').value = '';
+        document.getElementById('paintManufacturer').value = 'SICO';
+        document.getElementById('paintArticle').value = '';
+        addPaintModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
 
     function saveNewPaint() {
         const name = document.getElementById('paintName').value.trim();
-        const category = document.getElementById('paintCategory').value;
-        const color = document.getElementById('paintColorCode').value || '#8b5cf6';
-        const description = document.getElementById('paintDescription').value.trim();
-        const manufacturer = document.getElementById('paintManufacturer').value.trim() || 'SICO';
-        const article = document.getElementById('paintArticle').value.trim();
-        if (!name || !category) { showNotification('Будь ласка, заповніть обов\'язкові поля', 'error'); return; }
-        const newPaint = { id: SICOMIX.utils.generateId(), name, category, color, description, manufacturer, article: article || '' };
+        const cat = document.getElementById('paintCategory').value;
+        const color = document.getElementById('paintColorCode').value || '#3a86ff';
+        const desc = document.getElementById('paintDescription').value.trim();
+        const mfr = document.getElementById('paintManufacturer').value.trim() || 'SICO';
+        const art = document.getElementById('paintArticle').value.trim();
+
+        if (!name || !cat) {
+            showNotification('Будь ласка, заповніть обов\'язкові поля', 'error');
+            return;
+        }
+
+        const newPaint = {
+            id: SICOMIX.utils.generateId(),
+            name, category: cat, color, description: desc, manufacturer: mfr, article: art
+        };
         paintCatalog.push(newPaint);
         saveData();
-        if (addPaintModal) { addPaintModal.classList.remove('active'); document.body.style.overflow = 'auto'; }
+        addPaintModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
         renderPaintCatalog();
-        showNotification(`${SICOMIX.i18n.t('paint_added')} "${name}"`);
+        showNotification(`${SICOMIX.i18n.t('paint_added')} "${name}"`, 'success');
     }
 
     function deletePaint(id) {
-        showConfirmation(SICOMIX.i18n.t('delete_paint'), SICOMIX.i18n.t('delete_paint_confirmation'), () => {
-            paintCatalog = paintCatalog.filter(paint => paint.id !== id);
-            saveData();
-            renderPaintCatalog();
-            showNotification(SICOMIX.i18n.t('paint_deleted'));
-        });
+        SICOMIX.utils.showConfirmation(
+            SICOMIX.i18n.t('delete_paint'),
+            SICOMIX.i18n.t('delete_paint_confirmation'),
+            () => {
+                paintCatalog = paintCatalog.filter(p => p.id !== id);
+                saveData();
+                renderPaintCatalog();
+                showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
+            }
+        );
     }
 
     function updatePaintCount() {
         const count = paintCatalog.length;
-        if (totalPaintsElement) totalPaintsElement.textContent = count;
+        if (totalPaintsEl) totalPaintsEl.textContent = count;
         if (headerPaintCount) headerPaintCount.textContent = count;
     }
 
-    function saveSettings() {
-        currentSettings = {
-            language: languageSelect ? languageSelect.value : 'uk',
-            units: unitsSelect ? unitsSelect.value : 'grams',
-            autoSave: autoSaveCheckbox ? autoSaveCheckbox.checked : true,
-            backup: backupCheckbox ? backupCheckbox.checked : false,
-            theme: currentSettings.theme || 'light',
-            notifications: currentSettings.notifications !== false,
-            defaultCategory: currentSettings.defaultCategory || 'Металік',
-            defaultUnit: currentSettings.defaultUnit || 'г',
-            calculationsPrecision: currentSettings.calculationsPrecision || 2
-        };
-        saveData();
-        showNotification('Налаштування збережено', 'success');
-        if (languageSelect && SICOMIX.i18n.getLanguage() !== languageSelect.value) {
-            SICOMIX.i18n.setLanguage(languageSelect.value);
-            location.reload();
-        }
-    }
-
-    function resetSettings() {
-        showConfirmation('Скидання налаштувань', 'Ви впевнені, що хочете скинути всі налаштування до стандартних?', () => {
-            currentSettings = SICOMIX.data.defaultSettings;
-            saveData();
-            initSettings();
-            showNotification('Налаштування скинуті до стандартних', 'success');
-        });
-    }
-
-    function clearAllData() {
-        showConfirmation('Очищення всіх даних', 'УВАГА! Ця дія видалить всі рецепти та фарби. Дія незворотна. Продовжити?', () => {
-            recipes = []; paintCatalog = []; selectedIngredients = []; selectedRecipes = [];
-            saveData();
-            renderRecipes();
-            renderPaintCatalog();
-            showNotification('Всі дані видалено', 'success');
-        });
-    }
-
-    function showNotification(message, type = 'success', duration = 3000) { SICOMIX.utils.showNotification(message, type, duration); }
-    function showConfirmation(title, message, onConfirm, onCancel = null) { SICOMIX.utils.showConfirmation(title, message, onConfirm, onCancel); }
-
+    // ========== РЕДАГУВАННЯ ==========
     function editRecipe(id) {
         const recipe = recipes.find(r => r.id === id);
         if (!recipe) return;
         document.getElementById('recipeName').value = recipe.name;
         document.getElementById('recipeCategory').value = recipe.category;
         document.getElementById('recipeColor').value = recipe.color;
-        document.getElementById('colorPreview').style.background = recipe.color;
+        colorPreview.style.background = recipe.color;
         document.getElementById('recipeDescription').value = recipe.description || '';
         selectedIngredients = [...recipe.ingredients];
         renderIngredientsList();
         isEditingRecipe = true;
         editingRecipeId = id;
-        if (saveRecipeBtn) { saveRecipeBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="update_recipe">Оновити рецепт</span>`; SICOMIX.i18n.applyTranslations(); }
+        saveRecipeBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="update_recipe"></span>`;
+        SICOMIX.i18n.applyTranslations();
         switchPage('new-recipe');
-        showNotification(`Рецепт "${recipe.name}" завантажено для редагування`, 'info');
+        showNotification(`"${recipe.name}" ${SICOMIX.i18n.t('edit')}`, 'info');
     }
 
-    function editPaint(id) { showNotification(SICOMIX.i18n.t('feature_in_development'), 'info'); }
+    // ========== НАЛАШТУВАННЯ ==========
+    function saveSettings() {
+        currentSettings = {
+            language: languageSelect.value,
+            units: unitsSelect.value,
+            autoSave: autoSaveCheckbox.checked,
+            backup: backupCheckbox.checked,
+            theme: 'dark',
+            notifications: true,
+            defaultCategory: 'Standard',
+            defaultUnit: 'г',
+            calculationsPrecision: 2
+        };
+        saveData();
+        showNotification(SICOMIX.i18n.t('save_settings'), 'success');
+        if (SICOMIX.i18n.getLanguage() !== languageSelect.value) {
+            SICOMIX.i18n.setLanguage(languageSelect.value);
+            location.reload();
+        }
+    }
 
-    function setupEventListeners() {
-        setupNavigation();
-        if (recipeColor && colorPreview) recipeColor.addEventListener('input', function() { colorPreview.style.background = this.value; });
-        const recipePhotoInput = document.getElementById('recipePhoto');
-        if (recipePhotoInput) recipePhotoInput.addEventListener('change', function() { const fileName = this.files[0]?.name || SICOMIX.i18n.t('upload_photo'); const fileNameElement = document.getElementById('fileName'); if (fileNameElement) fileNameElement.textContent = fileName; });
-        if (addIngredientBtn) addIngredientBtn.addEventListener('click', addIngredient);
-        if (saveRecipeBtn) saveRecipeBtn.addEventListener('click', saveRecipe);
-        if (clearRecipeBtn) clearRecipeBtn.addEventListener('click', clearRecipeForm);
-        if (calculatePercentagesBtn) calculatePercentagesBtn.addEventListener('click', calculatePercentages);
-        if (exportRecipesBtn) exportRecipesBtn.addEventListener('click', exportAllRecipes);
-        if (importRecipesBtn) importRecipesBtn.addEventListener('click', importRecipes);
-        if (printRecipesBtn) printRecipesBtn.addEventListener('click', printRecipes);
-        if (deleteSelectedRecipesBtn) deleteSelectedRecipesBtn.addEventListener('click', deleteSelectedRecipes);
-        if (addNewPaintBtn) addNewPaintBtn.addEventListener('click', addNewPaint);
-        if (closePaintModal) closePaintModal.addEventListener('click', () => { if (addPaintModal) { addPaintModal.classList.remove('active'); document.body.style.overflow = 'auto'; } });
-        if (cancelPaintBtn) cancelPaintBtn.addEventListener('click', () => { if (addPaintModal) { addPaintModal.classList.remove('active'); document.body.style.overflow = 'auto'; } });
-        if (savePaintBtn) savePaintBtn.addEventListener('click', saveNewPaint);
-        if (paintSearch) paintSearch.addEventListener('input', SICOMIX.utils.debounce(renderIngredientsList, 300));
-        if (categoryFilter) categoryFilter.addEventListener('change', renderIngredientsList);
-        if (languageSelect) languageSelect.addEventListener('change', function() { currentSettings.language = this.value; saveData(); });
-        if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSettings);
-        if (resetSettingsBtn) resetSettingsBtn.addEventListener('click', resetSettings);
-        if (clearAllDataBtn) clearAllDataBtn.addEventListener('click', clearAllData);
-        window.addEventListener('resize', () => { if (window.innerWidth > 992 && sidebar.classList.contains('active')) { sidebar.classList.remove('active'); document.body.style.overflow = 'auto'; } });
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); if (saveRecipeBtn) saveRecipeBtn.click(); }
-            if (e.key === 'Escape') {
-                if (sidebar?.classList.contains('active') && window.innerWidth <= 992) { sidebar.classList.remove('active'); mainContainer.classList.remove('sidebar-open'); document.body.style.overflow = 'auto'; }
-                if (addPaintModal?.classList.contains('active')) { addPaintModal.classList.remove('active'); document.body.style.overflow = 'auto'; }
-                if (confirmationModal?.classList.contains('active')) confirmationModal.classList.remove('active');
+    function resetSettings() {
+        SICOMIX.utils.showConfirmation(
+            SICOMIX.i18n.t('reset_defaults'),
+            SICOMIX.i18n.t('confirmation_message'),
+            () => {
+                currentSettings = SICOMIX.data.defaultSettings;
+                saveData();
+                initSettings();
+                showNotification(SICOMIX.i18n.t('reset_defaults'), 'success');
             }
-        });
+        );
     }
 
-    function loadRecipes() { console.log(`Завантажено ${recipes.length} рецептів у SICO Spectrum`); }
+    function clearAllData() {
+        SICOMIX.utils.showConfirmation(
+            SICOMIX.i18n.t('clear_all_data'),
+            'УВАГА! Це видалить всі рецепти та фарби. Дія незворотна.',
+            () => {
+                recipes = [];
+                paintCatalog = [...SICOMIX.data.paints];
+                selectedIngredients = [];
+                selectedRecipes = [];
+                saveData();
+                renderRecipes();
+                renderPaintCatalog();
+                showNotification(SICOMIX.i18n.t('clear_all_data'), 'success');
+            }
+        );
+    }
+
+    // ========== ІНІЦІАЛІЗАЦІЯ ==========
+    function initApp() {
+        cacheDOMElements();
+        loadData();
+        initSettings();
+        setupEventListeners();
+        updatePaintCount();
+        renderPaintCatalog();
+        renderRecipes();
+        renderIngredientsList();
+        populateCategoryFilters();
+        if (window.innerWidth > 992) { sidebar.classList.add('active'); mainContainer.classList.add('sidebar-open'); }
+        document.getElementById('preloader')?.style.setProperty('opacity', '0');
+        setTimeout(() => document.getElementById('preloader')?.remove(), 500);
+        showNotification(SICOMIX.i18n.t('welcome_title'), 'success', 2000);
+    }
+
+    function populateCategoryFilters() {
+        const cats = SICOMIX.data.categories;
+        const selects = [document.getElementById('recipeCategory'), document.getElementById('paintCategory'), document.getElementById('categoryFilter'), document.getElementById('recipeCategoryFilter')];
+        selects.forEach(sel => {
+            if (!sel) return;
+            const current = sel.value;
+            sel.innerHTML = `<option value="" data-i18n="select_category">${SICOMIX.i18n.t('select_category')}</option>`;
+            cats.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                sel.appendChild(opt);
+            });
+            if (current && cats.includes(current)) sel.value = current;
+        });
+        SICOMIX.i18n.applyTranslations();
+    }
+
+    function showNotification(msg, type, dur) {
+        SICOMIX.utils.showNotification(msg, type, dur);
+    }
 
     return {
         init: initApp,
-        deleteRecipe: deleteRecipe,
-        exportRecipe: exportRecipe,
-        editRecipe: editRecipe,
-        deletePaint: deletePaint,
-        editPaint: editPaint,
-        showNotification: showNotification,
-        showConfirmation: showConfirmation
+        deleteRecipe,
+        exportRecipe,
+        editRecipe,
+        deletePaint,
+        showNotification
     };
 })();
-
-document.addEventListener('DOMContentLoaded', function() {
-    SICOMIX.i18n.init();
-    SICOMIX.app.init();
-    window.exportRecipe = SICOMIX.app.exportRecipe;
-    window.editPaint = SICOMIX.app.editPaint;
-    window.deletePaint = SICOMIX.app.deletePaint;
-});
 
 window.SICOMIX = SICOMIX;
