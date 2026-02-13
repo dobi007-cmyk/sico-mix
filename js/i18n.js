@@ -527,15 +527,30 @@ window.SICOMIX = window.SICOMIX || {};
             }
         };
 
-        // ---------- СЛОВНИК ПЕРЕКЛАДУ КАТЕГОРІЙ (додано "Пластики" як синонім) ----------
+         // Словник перекладу категорій (додано синоніми)
         const categoryTranslations = {
             "Універсальні": { uk: "Універсальні", en: "Universal", pl: "Uniwersalne" },
             "UV фарби": { uk: "УФ фарби", en: "UV paints", pl: "Farby UV" },
             "Папір/картон": { uk: "Папір/картон", en: "Paper/Cardboard", pl: "Papier/karton" },
-            "Пластик": { uk: "Пластик", en: "Plastic", pl: "Plastik" },
             "Пластики": { uk: "Пластик", en: "Plastic", pl: "Plastik" }, // синонім
             "Текстиль": { uk: "Текстиль", en: "Textile", pl: "Tekstylia" }
         };
+
+        // Локалізація позначень одиниць вимірювання
+        function localizeUnitSymbol(unitSymbol) {
+            const lang = currentLang;
+            // Мапінг символів: для української залишаємо кириличні, для інших – латинські
+            const unitMap = {
+                'г': { uk: 'г', en: 'g', pl: 'g' },
+                'кг': { uk: 'кг', en: 'kg', pl: 'kg' },
+                'мл': { uk: 'мл', en: 'ml', pl: 'ml' },
+                'л': { uk: 'л', en: 'l', pl: 'l' }
+            };
+            if (unitMap[unitSymbol] && unitMap[unitSymbol][lang]) {
+                return unitMap[unitSymbol][lang];
+            }
+            return unitSymbol; // fallback
+        }
 
         let currentLang = 'uk';
 
@@ -565,7 +580,6 @@ window.SICOMIX = window.SICOMIX || {};
         function translateCategory(categoryUk, lang = currentLang) {
             if (!categoryUk) return categoryUk;
             const trans = categoryTranslations[categoryUk];
-            // Якщо категорія не знайдена в словнику, повертаємо оригінал (не перекладаємо)
             return trans ? trans[lang] || categoryUk : categoryUk;
         }
 
@@ -605,12 +619,9 @@ window.SICOMIX = window.SICOMIX || {};
             getLanguage,
             t,
             translateCategory,
+            localizeUnitSymbol,
             applyTranslations,
             init
-        };
-    })();
-
-})(window);
         };
     })();
 
