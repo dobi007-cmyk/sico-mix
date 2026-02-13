@@ -9,8 +9,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- <base href="/sico-mix/"> -->
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
@@ -24,19 +22,16 @@
     <script>
         (function() {
             console.log('🛡️ Антикризовий захист активовано');
-
             window.addEventListener('error', function(e) {
                 console.error('❌ Помилка:', e.error || e.message);
                 console.error('   Стек:', e.error?.stack);
                 e.preventDefault();
                 return false;
             });
-
             window.addEventListener('unhandledrejection', function(e) {
                 console.error('❌ Unhandled Promise Rejection:', e.reason);
                 e.preventDefault();
             });
-
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
                     for (let registration of registrations) {
@@ -45,7 +40,6 @@
                     }
                 }).catch(console.error);
             }
-
             window.SICOMIX = window.SICOMIX || {};
             window.SICOMIX.data = window.SICOMIX.data || {};
             window.SICOMIX.data.paints = window.SICOMIX.data.paints || [];
@@ -62,7 +56,6 @@
             window.location.reload = function() {
                 console.warn('⚠️ Спроба викликати location.reload() – ЗАБЛОКОВАНО');
             };
-
             Object.defineProperty(window.location, 'href', {
                 set: function(value) {
                     console.warn('⚠️ Спроба змінити location.href на', value, '– ЗАБЛОКОВАНО');
@@ -71,7 +64,6 @@
                     return window.location.href;
                 }
             });
-
             console.log('🛡️ Захист завершено');
         })();
     </script>
@@ -585,7 +577,7 @@
     </div>
 
     <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ ========== -->
-    <script src="./js/data-colors.js"></script>
+    <script src="./js/data-colors.js"></script>   <!-- ВАЖЛИВО: правильне ім'я файлу -->
     <script src="./js/i18n.js"></script>
     <script src="./js/utils.js"></script>
     <script src="./js/app.js"></script>
@@ -596,13 +588,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 DOM готовий, ініціалізація...');
-            
             if (window.SICOMIX?.i18n?.init && typeof window.SICOMIX.i18n.init === 'function') {
                 window.SICOMIX.i18n.init();
             } else {
                 console.warn('⚠️ i18n.init не знайдено');
             }
-
             if (window.SICOMIX?.app?.init && typeof window.SICOMIX.app.init === 'function') {
                 window.SICOMIX.app.init();
             } else {
