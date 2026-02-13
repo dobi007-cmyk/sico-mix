@@ -936,4 +936,3 @@ SICOMIX.data = (function() {
         };
     }
 })();
-})(window);
