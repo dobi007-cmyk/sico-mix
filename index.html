@@ -9,7 +9,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- Якщо проєкт розгорнуто не в піддиректорії /sico-mix/, закоментуйте або видаліть цей рядок -->
     <!-- <base href="/sico-mix/"> -->
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,7 +25,6 @@
         (function() {
             console.log('🛡️ Антикризовий захист активовано');
 
-            // 1. Перехоплення помилок (включно з синтаксичними)
             window.addEventListener('error', function(e) {
                 console.error('❌ Помилка:', e.error || e.message);
                 console.error('   Стек:', e.error?.stack);
@@ -34,13 +32,11 @@
                 return false;
             });
 
-            // 2. Перехоплення необроблених Promise rejection
             window.addEventListener('unhandledrejection', function(e) {
                 console.error('❌ Unhandled Promise Rejection:', e.reason);
                 e.preventDefault();
             });
 
-            // 3. Примусове видалення ВСІХ сервіс-воркерів
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
                     for (let registration of registrations) {
@@ -50,12 +46,11 @@
                 }).catch(console.error);
             }
 
-            // 4. ГАРАНТОВАНА ІНІЦІАЛІЗАЦІЯ ВСІХ ДАНИХ
             window.SICOMIX = window.SICOMIX || {};
             window.SICOMIX.data = window.SICOMIX.data || {};
             window.SICOMIX.data.paints = window.SICOMIX.data.paints || [];
             window.SICOMIX.data.colors = window.SICOMIX.data.colors || [];
-            window.SICOMIX.data.recipes = window.SICOMIX.data.recipes || [];    // ← критично важливо!
+            window.SICOMIX.data.recipes = window.SICOMIX.data.recipes || [];
             window.SICOMIX.data.categories = window.SICOMIX.data.categories || [];
             window.SICOMIX.data.series = window.SICOMIX.data.series || [];
             window.SICOMIX.data.units = window.SICOMIX.data.units || [];
@@ -63,13 +58,11 @@
             window.SICOMIX.data.languages = window.SICOMIX.data.languages || [];
             window.SICOMIX.data.defaultSettings = window.SICOMIX.data.defaultSettings || {};
 
-            // 5. Захист від location.reload()
             const originalReload = window.location.reload;
             window.location.reload = function() {
                 console.warn('⚠️ Спроба викликати location.reload() – ЗАБЛОКОВАНО');
             };
 
-            // 6. Захист від зміни location.href
             Object.defineProperty(window.location, 'href', {
                 set: function(value) {
                     console.warn('⚠️ Спроба змінити location.href на', value, '– ЗАБЛОКОВАНО');
