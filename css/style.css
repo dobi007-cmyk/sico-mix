@@ -647,7 +647,7 @@ body {
 /* ===== RECIPE & PAINT CARDS ===== */
 .recipe-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
     margin-top: 30px;
 }
@@ -665,7 +665,7 @@ body {
     box-shadow: var(--shadow-hover);
 }
 .recipe-image {
-    height: 180px;
+    height: 120px;
     background-size: cover;
     background-position: center;
     display: flex;
@@ -675,19 +675,19 @@ body {
     color: rgba(255,255,255,0.8);
 }
 .recipe-content {
-    padding: 24px;
+    padding: 20px;
 }
 .recipe-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 .recipe-title {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     color: white;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 .recipe-category {
     background: rgba(58,134,255,0.2);
@@ -699,37 +699,38 @@ body {
 }
 .recipe-description {
     color: var(--text-secondary);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     line-height: 1.5;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    font-size: 14px;
 }
 .recipe-meta {
     display: flex;
     justify-content: space-between;
-    padding: 16px 0;
+    padding: 12px 0;
     border-top: 1px solid var(--border-light);
     border-bottom: 1px solid var(--border-light);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: 13px;
 }
 .recipe-actions {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: flex-end;
 }
 .recipe-btn {
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: var(--border-radius-xl);
     border: none;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     cursor: pointer;
     transition: var(--transition);
     background: rgba(255,255,255,0.05);
@@ -762,7 +763,7 @@ body {
     border: 1px solid var(--border-light);
     border-radius: var(--border-radius-md);
     padding: 28px;
-    max-width: 500px;
+    max-width: 600px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
@@ -810,6 +811,136 @@ body {
     border-color: var(--spectrum-blue);
     background: rgba(58,134,255,0.1);
     transform: translateY(-2px);
+}
+
+/* ===== NEW PAINT CARD STYLES ===== */
+.paint-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    transition: var(--transition);
+    position: relative;
+}
+.paint-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--spectrum-blue);
+    box-shadow: var(--shadow-hover);
+}
+.paint-card.locked {
+    opacity: 0.6;
+    pointer-events: none; /* повністю блокує кліки, крім кнопки інфо */
+}
+.paint-card.locked .btn-series-info {
+    pointer-events: auto; /* кнопка інфо залишається активною */
+}
+.paint-color {
+    height: 100px;
+    background-size: cover;
+    background-position: center;
+}
+.paint-info {
+    padding: 16px;
+    position: relative;
+}
+.paint-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 4px;
+}
+.paint-series-badge {
+    display: inline-block;
+    background: rgba(58,134,255,0.2);
+    padding: 4px 12px;
+    border-radius: var(--border-radius-xl);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--spectrum-cyan);
+    margin-bottom: 8px;
+}
+.paint-article {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+.paint-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+.paint-actions button {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-light);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.paint-actions button:hover {
+    background: rgba(58,134,255,0.2);
+}
+.paint-actions .btn-delete:hover {
+    background: var(--spectrum-red);
+}
+.lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    gap: 8px;
+    border-radius: var(--border-radius-md);
+    pointer-events: none;
+}
+.default-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.6);
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 400;
+    color: white;
+}
+.used-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: #ffbe0b;
+    color: #000;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* ===== SERIES DETAILS MODAL ===== */
+.series-properties {
+    list-style: none;
+    padding: 0;
+}
+.series-properties li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+.series-properties li strong {
+    color: var(--spectrum-cyan);
+    display: inline-block;
+    width: 120px;
 }
 
 /* ===== FOOTER ===== */
@@ -861,6 +992,9 @@ body {
     }
     .btn {
         width: 100%;
+        justify-content: center;
+    }
+    .paint-card .paint-actions {
         justify-content: center;
     }
 }
