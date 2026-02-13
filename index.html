@@ -45,16 +45,7 @@
                 return false;
             };
 
-            let currentHref = window.location.href;
-            Object.defineProperty(window.location, 'href', {
-                set: function(value) {
-                    console.warn('⚠️ Спроба змінити location.href на', value, '– ЗАБЛОКОВАНО');
-                },
-                get: function() {
-                    return currentHref;
-                },
-                configurable: false
-            });
+            // Видалено проблемний блок із перевизначенням location.href
 
             const originalReplace = window.location.replace;
             window.location.replace = function() {
@@ -621,5 +612,3 @@
     </script>
 </body>
 </html>
-
-})(window);
