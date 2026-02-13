@@ -266,7 +266,7 @@ window.SICOMIX = window.SICOMIX || {};
                     currentSettings.language = newLang;
                     SICOMIX.i18n.setLanguage(newLang);
                     SICOMIX.i18n.applyTranslations();
-                    populateCategoryFilters();
+                    populateCategoryFilters(); // оновлюємо всі селекти категорій
                     
                     // Оновлюємо поточну сторінку
                     const activePage = document.querySelector('.page-content.active');
@@ -849,6 +849,7 @@ window.SICOMIX = window.SICOMIX || {};
             saveData();
             addPaintModal.classList.remove('active');
             document.body.style.overflow = 'auto';
+            populateCategoryFilters(); // Оновлюємо фільтри після додавання нової категорії
             renderPaintCatalog();
             SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('paint_added')} "${name}"`, 'success');
         }
@@ -863,6 +864,7 @@ window.SICOMIX = window.SICOMIX || {};
                         userPaints.splice(index, 1);
                         paintCatalog = [...basePaints, ...userPaints];
                         saveData();
+                        populateCategoryFilters(); // Оновлюємо фільтри після видалення
                         renderPaintCatalog();
                         SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
                     }
@@ -940,6 +942,7 @@ window.SICOMIX = window.SICOMIX || {};
                     selectedIngredients = [];
                     selectedRecipes = [];
                     saveData();
+                    populateCategoryFilters(); // Оновлюємо фільтри після очищення
                     renderRecipes();
                     renderPaintCatalog();
                     updatePaintCount();
@@ -950,25 +953,35 @@ window.SICOMIX = window.SICOMIX || {};
 
         // ---------- ДОПОМІЖНІ ФУНКЦІЇ ----------
         function populateCategoryFilters() {
-            const cats = SICOMIX.data.categories || [];
+            // Отримуємо унікальні категорії з поточного каталогу фарб
+            const uniqueCategories = [...new Set(paintCatalog.map(p => p.category).filter(Boolean))].sort();
+            
             const selects = [
                 document.getElementById('recipeCategory'),
                 document.getElementById('paintCategory'),
                 document.getElementById('categoryFilter'),
                 document.getElementById('recipeCategoryFilter')
             ];
+            
             selects.forEach(sel => {
                 if (!sel) return;
                 const current = sel.value;
+                // Зберігаємо перший порожній варіант
                 sel.innerHTML = `<option value="" data-i18n="select_category">${SICOMIX.i18n.t('select_category')}</option>`;
-                cats.forEach(c => {
+                
+                uniqueCategories.forEach(c => {
                     const opt = document.createElement('option');
                     opt.value = c;
                     opt.textContent = SICOMIX.i18n.translateCategory(c);
                     sel.appendChild(opt);
                 });
-                if (current && cats.includes(current)) sel.value = current;
+                
+                // Якщо поточне значення все ще існує в новому списку, відновлюємо його
+                if (current && uniqueCategories.includes(current)) {
+                    sel.value = current;
+                }
             });
+            
             SICOMIX.i18n.applyTranslations();
         }
 
