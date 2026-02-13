@@ -186,7 +186,7 @@ SICOMIX.data = (function() {
             }
         ];
 
-        // ---------- БАЗОВІ КОЛЬОРИ (оновлено: додано прозорі 15,25,35,55,65,75) ----------
+        // ---------- БАЗОВІ КОЛЬОРИ ----------
         const baseColors = [
             { code: "10", name: { ua: "Фіолетовий", pl: "Fioletowy", en: "Violet" }, color: "#800080" },
             { code: "20", name: { ua: "Синій", pl: "Niebieski", en: "Blue" }, color: "#0000FF" },
@@ -239,7 +239,7 @@ SICOMIX.data = (function() {
             { code: "75", name: { ua: "Прозорий рожевий", pl: "Transparent różowy", en: "Transparent Pink" }, color: "#FFC0CB" }
         ];
 
-        // ---------- ГЕНЕРАЦІЯ ФАРБ (РЯДКОВІ ID) ----------
+        // ---------- ГЕНЕРАЦІЯ ФАРБ (РЯДКОВІ ID + isDefault: true) ----------
         function generatePaintsFromBaseColors() {
             const paints = [];
             let counter = 1;
@@ -261,7 +261,8 @@ SICOMIX.data = (function() {
                         properties: serie.properties || {},
                         colorName: baseColor.name.ua,
                         colorCode: baseColor.code,
-                        fullInfo: `Серія: ${serie.name}, Колір: ${baseColor.code} - ${baseColor.name.ua}, Категорія: ${serie.category}`
+                        fullInfo: `Серія: ${serie.name}, Колір: ${baseColor.code} - ${baseColor.name.ua}, Категорія: ${serie.category}`,
+                        isDefault: true  // ← ДОДАНО
                     });
                 });
             });
@@ -284,7 +285,8 @@ SICOMIX.data = (function() {
                     properties: ecSeries.properties,
                     colorName: "Вогненно-червоний",
                     colorCode: "60/146",
-                    fullInfo: "Серія: EC, Спеціальний колір: EC 60/146 - Вогненно-червоний"
+                    fullInfo: "Серія: EC, Спеціальний колір: EC 60/146 - Вогненно-червоний",
+                    isDefault: true
                 });
                 paints.push({
                     id: `paint-${counter++}`,
@@ -301,7 +303,8 @@ SICOMIX.data = (function() {
                     properties: ecSeries.properties,
                     colorName: "Темно-вогненно-червоний",
                     colorCode: "61/163",
-                    fullInfo: "Серія: EC, Спеціальний колір: EC 61/163 - Темно-вогненно-червоний"
+                    fullInfo: "Серія: EC, Спеціальний колір: EC 61/163 - Темно-вогненно-червоний",
+                    isDefault: true
                 });
                 paints.push({
                     id: `paint-${counter++}`,
@@ -318,7 +321,8 @@ SICOMIX.data = (function() {
                     properties: Object.assign({}, ecSeries.properties, { finish: "Напівмат" }),
                     colorName: "Напівматова біла",
                     colorCode: "91Q",
-                    fullInfo: "Серія: EC, Спеціальний колір: EC 91 Q - Напівматова біла"
+                    fullInfo: "Серія: EC, Спеціальний колір: EC 91 Q - Напівматова біла",
+                    isDefault: true
                 });
                 paints.push({
                     id: `paint-${counter++}`,
@@ -335,7 +339,8 @@ SICOMIX.data = (function() {
                     properties: ecSeries.properties,
                     colorName: "Золото",
                     colorCode: "RG120",
-                    fullInfo: "Серія: EC, Спеціальний колір: EC RG 120 - Золото"
+                    fullInfo: "Серія: EC, Спеціальний колір: EC RG 120 - Золото",
+                    isDefault: true
                 });
             }
 
@@ -344,7 +349,7 @@ SICOMIX.data = (function() {
 
         // ---------- ІНШІ СТРУКТУРИ ДАНИХ ----------
         const paints = generatePaintsFromBaseColors();
-        const recipes = []; // початково порожньо
+        const recipes = [];
         const categories = Array.from(new Set(series.map(s => s.category))).sort();
         const units = [
             { value: "г", label: "Грами" },
@@ -394,7 +399,6 @@ SICOMIX.data = (function() {
         };
     } catch (error) {
         console.error("[SICOMIX] КРИТИЧНА ПОМИЛКА в data-colors.js:", error);
-        // Повертаємо порожні, але валідні структури, щоб додаток не впав
         return {
             paints: [],
             recipes: [],
