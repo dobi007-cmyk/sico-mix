@@ -266,7 +266,10 @@ window.SICOMIX = window.SICOMIX || {};
                     currentSettings.language = newLang;
                     SICOMIX.i18n.setLanguage(newLang);
                     SICOMIX.i18n.applyTranslations();
-                    populateCategoryFilters(); // оновлюємо всі селекти категорій
+                    
+                    // Оновлюємо всі селекти категорій
+                    populateCategoryFilters();          // для фільтрів
+                    populateStandardCategorySelect();    // для модального вікна додавання фарби
                     
                     // Оновлюємо поточну сторінку
                     const activePage = document.querySelector('.page-content.active');
@@ -274,6 +277,7 @@ window.SICOMIX = window.SICOMIX || {};
                         const pageId = activePage.id.replace('-page', '');
                         if (pageId === 'recipes') renderRecipes();
                         if (pageId === 'catalog') renderPaintCatalog();
+                        if (pageId === 'new-recipe') renderIngredientsList(); // оновити одиниці в таблиці
                     }
                     
                     saveData();
@@ -375,10 +379,10 @@ window.SICOMIX = window.SICOMIX || {};
                     <td><input type="number" class="input-small" value="${ing.amount}" data-index="${idx}" data-field="amount" min="0" step="0.1"></td>
                     <td>
                         <select class="unit-select" data-index="${idx}" data-field="unit">
-                            <option value="г" ${ing.unit === 'г' ? 'selected' : ''}>г</option>
-                            <option value="кг" ${ing.unit === 'кг' ? 'selected' : ''}>кг</option>
-                            <option value="мл" ${ing.unit === 'мл' ? 'selected' : ''}>мл</option>
-                            <option value="л" ${ing.unit === 'л' ? 'selected' : ''}>л</option>
+                            <option value="г" ${ing.unit === 'г' ? 'selected' : ''}>${SICOMIX.i18n.localizeUnitSymbol('г')}</option>
+                            <option value="кг" ${ing.unit === 'кг' ? 'selected' : ''}>${SICOMIX.i18n.localizeUnitSymbol('кг')}</option>
+                            <option value="мл" ${ing.unit === 'мл' ? 'selected' : ''}>${SICOMIX.i18n.localizeUnitSymbol('мл')}</option>
+                            <option value="л" ${ing.unit === 'л' ? 'selected' : ''}>${SICOMIX.i18n.localizeUnitSymbol('л')}</option>
                         </select>
                     </td>
                     <td><input type="number" class="input-small" value="${ing.percentage || 0}" readonly> %</td>
@@ -569,7 +573,7 @@ window.SICOMIX = window.SICOMIX || {};
                         <p class="recipe-description">${r.description || SICOMIX.i18n.t('no_description')}</p>
                         <div class="recipe-meta">
                             <div><span style="font-size:12px;">${SICOMIX.i18n.t('ingredients_count')}</span><br><strong>${r.ingredients.length}</strong></div>
-                            <div><span style="font-size:12px;">${SICOMIX.i18n.t('total_weight')}</span><br><strong>${total} г</strong></div>
+                            <div><span style="font-size:12px;">${SICOMIX.i18n.t('total_weight')}</span><br><strong>${total} ${SICOMIX.i18n.localizeUnitSymbol('г')}</strong></div>
                             <div><span style="font-size:12px;">${SICOMIX.i18n.t('date')}</span><br><strong>${r.date}</strong></div>
                         </div>
                         <div class="recipe-actions">
@@ -812,7 +816,8 @@ window.SICOMIX = window.SICOMIX || {};
 
         function addNewPaint() {
             document.getElementById('paintName').value = '';
-            document.getElementById('paintCategory').value = '';
+            // Оновлюємо селект категорій стандартними значеннями перед відкриттям
+            populateStandardCategorySelect(document.getElementById('paintCategory'));
             document.getElementById('paintColorCode').value = '#3a86ff';
             document.getElementById('paintDescription').value = '';
             document.getElementById('paintManufacturer').value = 'SICO';
@@ -849,7 +854,7 @@ window.SICOMIX = window.SICOMIX || {};
             saveData();
             addPaintModal.classList.remove('active');
             document.body.style.overflow = 'auto';
-            populateCategoryFilters(); // Оновлюємо фільтри після додавання нової категорії
+            populateCategoryFilters(); // оновлюємо фільтри (бо з'явилась нова категорія)
             renderPaintCatalog();
             SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('paint_added')} "${name}"`, 'success');
         }
@@ -864,7 +869,7 @@ window.SICOMIX = window.SICOMIX || {};
                         userPaints.splice(index, 1);
                         paintCatalog = [...basePaints, ...userPaints];
                         saveData();
-                        populateCategoryFilters(); // Оновлюємо фільтри після видалення
+                        populateCategoryFilters(); // оновлюємо фільтри
                         renderPaintCatalog();
                         SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
                     }
@@ -942,7 +947,7 @@ window.SICOMIX = window.SICOMIX || {};
                     selectedIngredients = [];
                     selectedRecipes = [];
                     saveData();
-                    populateCategoryFilters(); // Оновлюємо фільтри після очищення
+                    populateCategoryFilters(); // оновлюємо фільтри
                     renderRecipes();
                     renderPaintCatalog();
                     updatePaintCount();
@@ -953,12 +958,11 @@ window.SICOMIX = window.SICOMIX || {};
 
         // ---------- ДОПОМІЖНІ ФУНКЦІЇ ----------
         function populateCategoryFilters() {
-            // Отримуємо унікальні категорії з поточного каталогу фарб
+            // Для фільтрів використовуємо всі категорії з каталогу
             const uniqueCategories = [...new Set(paintCatalog.map(p => p.category).filter(Boolean))].sort();
             
             const selects = [
                 document.getElementById('recipeCategory'),
-                document.getElementById('paintCategory'),
                 document.getElementById('categoryFilter'),
                 document.getElementById('recipeCategoryFilter')
             ];
@@ -966,7 +970,6 @@ window.SICOMIX = window.SICOMIX || {};
             selects.forEach(sel => {
                 if (!sel) return;
                 const current = sel.value;
-                // Зберігаємо перший порожній варіант
                 sel.innerHTML = `<option value="" data-i18n="select_category">${SICOMIX.i18n.t('select_category')}</option>`;
                 
                 uniqueCategories.forEach(c => {
@@ -976,12 +979,28 @@ window.SICOMIX = window.SICOMIX || {};
                     sel.appendChild(opt);
                 });
                 
-                // Якщо поточне значення все ще існує в новому списку, відновлюємо його
                 if (current && uniqueCategories.includes(current)) {
                     sel.value = current;
                 }
             });
             
+            SICOMIX.i18n.applyTranslations();
+        }
+
+        function populateStandardCategorySelect(selectElement) {
+            if (!selectElement) return;
+            const standardCategories = SICOMIX.data.categories || [];
+            const current = selectElement.value;
+            selectElement.innerHTML = `<option value="" data-i18n="select_category">${SICOMIX.i18n.t('select_category')}</option>`;
+            standardCategories.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = SICOMIX.i18n.translateCategory(c);
+                selectElement.appendChild(opt);
+            });
+            if (current && standardCategories.includes(current)) {
+                selectElement.value = current;
+            }
             SICOMIX.i18n.applyTranslations();
         }
 
@@ -995,7 +1014,8 @@ window.SICOMIX = window.SICOMIX || {};
             renderPaintCatalog();
             renderRecipes();
             renderIngredientsList();
-            populateCategoryFilters();
+            populateCategoryFilters(); // для фільтрів
+            // для модального вікна додавання фарби – буде заповнено при відкритті
 
             if (window.innerWidth > 992) {
                 sidebar.classList.add('active');
