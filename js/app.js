@@ -68,7 +68,7 @@ window.SICOMIX = window.SICOMIX || {};
 
         // ========== ЗАВАНТАЖЕННЯ ТА ЗБЕРЕЖЕННЯ ==========
         function loadData() {
-            // 1. Базові фарби з data-colors
+            // 1. Базові фарби з data-colors (НІКОЛИ НЕ ЗМІНЮЮТЬСЯ)
             if (SICOMIX.data && Array.isArray(SICOMIX.data.paints)) {
                 basePaints = SICOMIX.data.paints.map(p => ({
                     ...p,
@@ -80,7 +80,7 @@ window.SICOMIX = window.SICOMIX || {};
                 basePaints = [];
             }
 
-            // 2. Міграція старих даних
+            // 2. Міграція: якщо є старий ключ sicoSpectrumPaints – перетворюємо на userPaints
             const oldPaints = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumPaints', null);
             if (oldPaints && Array.isArray(oldPaints) && oldPaints.length > 0) {
                 userPaints = oldPaints.map(p => ({
@@ -88,14 +88,16 @@ window.SICOMIX = window.SICOMIX || {};
                     id: String(p.id),
                     isDefault: false
                 }));
+                // Видаляємо старий ключ
                 localStorage.removeItem('sicoSpectrumPaints');
                 console.log('[SICOMIX] Міграція старих фарб у userPaints');
             } else {
+                // Завантажуємо користувацькі фарби з нового ключа
                 userPaints = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumUserPaints', [])
                     .map(p => ({ ...p, id: String(p.id), isDefault: false }));
             }
 
-            // 3. Об'єднуємо
+            // 3. Об'єднуємо для відображення
             paintCatalog = [...basePaints, ...userPaints];
 
             // 4. Рецепти
@@ -114,85 +116,17 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         function saveData() {
+            // Зберігаємо тільки користувацькі фарби, рецепти, налаштування
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumUserPaints', userPaints);
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumRecipes', recipes);
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumSettings', currentSettings);
         }
 
-        // ========== РЕНДЕР КАТАЛОГУ (ПОСИЛЕНА БЕЗПЕКА) ==========
-        function renderPaintCatalog() {
-            if (!paintCatalogEl) {
-                console.warn('⚠️ paintCatalogEl не знайдено!');
-                return;
-            }
-
-            try {
-                const search = document.getElementById('catalogSearch')?.value.toLowerCase() || '';
-                let filtered = paintCatalog;
-                if (search) {
-                    filtered = filtered.filter(p => 
-                        p && p.name && p.name.toLowerCase().includes(search) || 
-                        (p.category && p.category.toLowerCase().includes(search))
-                    );
-                }
-
-                if (filtered.length === 0) {
-                    paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('catalog_empty')}</p>`;
-                    return;
-                }
-
-                paintCatalogEl.innerHTML = filtered.map(p => {
-                    // Захист від undefined
-                    if (!p) return '';
-                    const name = p.name || 'Без назви';
-                    const category = p.category || 'Інше';
-                    const color = p.color || '#7b2cbf';
-                    const manufacturer = p.manufacturer || 'SICO';
-                    const article = p.article || '—';
-                    const description = p.description || SICOMIX.i18n.t('no_description');
-                    const isDefault = p.isDefault === true;
-                    const canDelete = !isDefault;
-
-                    return `
-                        <div class="recipe-card" data-id="${p.id || ''}">
-                            <div class="recipe-image" style="background:${color};"></div>
-                            <div class="recipe-content">
-                                <div class="recipe-header">
-                                    <div><h3 class="recipe-title">${name}</h3><span class="recipe-category">${category}</span></div>
-                                    ${isDefault ? '<span style="font-size:11px; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:20px;">SICO</span>' : ''}
-                                </div>
-                                <div style="margin-bottom:15px;">
-                                    <div style="display:flex; gap:15px;">
-                                        <div><span style="font-size:12px;">${SICOMIX.i18n.t('manufacturer')}</span><br><strong>${manufacturer}</strong></div>
-                                        <div><span style="font-size:12px;">${SICOMIX.i18n.t('article')}</span><br><strong>${article}</strong></div>
-                                    </div>
-                                    <p style="color:var(--text-secondary);">${description}</p>
-                                </div>
-                                <div class="recipe-actions">
-                                    ${canDelete ? 
-                                        `<button class="recipe-btn delete-paint" data-id="${p.id}"><i class="fas fa-trash"></i> ${SICOMIX.i18n.t('delete')}</button>` : 
-                                        `<button class="recipe-btn" disabled style="opacity:0.5; cursor:not-allowed;"><i class="fas fa-ban"></i> Стандартна</button>`
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                paintCatalogEl.querySelectorAll('.delete-paint').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        deletePaint(btn.dataset.id);
-                    });
-                });
-
-                updatePaintCount();
-            } catch (error) {
-                console.error('❌ Помилка в renderPaintCatalog:', error);
-                paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
-                    <i class="fas fa-exclamation-triangle"></i> Помилка відображення каталогу.<br>${error.message}
-                </p>`;
-            }
+        function initSettings() {
+            if (unitsSelect) unitsSelect.value = currentSettings.units || 'grams';
+            if (autoSaveCheckbox) autoSaveCheckbox.checked = currentSettings.autoSave !== false;
+            if (backupCheckbox) backupCheckbox.checked = currentSettings.backup === true;
+            if (languageSelect) languageSelect.value = SICOMIX.i18n.getLanguage();
         }
 
         // ========== ПОДІЇ ==========
@@ -670,56 +604,79 @@ window.SICOMIX = window.SICOMIX || {};
             win.print();
         }
 
-        // ========== КАТАЛОГ ==========
+        // ========== КАТАЛОГ (ПОСИЛЕНА БЕЗПЕКА) ==========
         function renderPaintCatalog() {
-            if (!paintCatalogEl) return;
-            const search = document.getElementById('catalogSearch')?.value.toLowerCase() || '';
-            let filtered = paintCatalog;
-            if (search) filtered = filtered.filter(p => 
-                p.name.toLowerCase().includes(search) || 
-                (p.category && p.category.toLowerCase().includes(search))
-            );
-
-            if (filtered.length === 0) {
-                paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('catalog_empty')}</p>`;
+            if (!paintCatalogEl) {
+                console.warn('⚠️ paintCatalogEl не знайдено!');
                 return;
             }
 
-            paintCatalogEl.innerHTML = filtered.map(p => {
-                const canDelete = !p.isDefault; // Тільки користувацькі фарби можна видаляти
-                return `
-                    <div class="recipe-card" data-id="${p.id}">
-                        <div class="recipe-image" style="background:${p.color};"></div>
-                        <div class="recipe-content">
-                            <div class="recipe-header">
-                                <div><h3 class="recipe-title">${p.name}</h3><span class="recipe-category">${p.category}</span></div>
-                                ${p.isDefault ? '<span style="font-size:11px; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:20px;">SICO</span>' : ''}
-                            </div>
-                            <div style="margin-bottom:15px;">
-                                <div style="display:flex; gap:15px;">
-                                    <div><span style="font-size:12px;">${SICOMIX.i18n.t('manufacturer')}</span><br><strong>${p.manufacturer || 'SICO'}</strong></div>
-                                    <div><span style="font-size:12px;">${SICOMIX.i18n.t('article')}</span><br><strong>${p.article || '—'}</strong></div>
+            try {
+                const search = document.getElementById('catalogSearch')?.value.toLowerCase() || '';
+                let filtered = paintCatalog;
+                if (search) {
+                    filtered = filtered.filter(p => 
+                        p && p.name && p.name.toLowerCase().includes(search) || 
+                        (p.category && p.category.toLowerCase().includes(search))
+                    );
+                }
+
+                if (filtered.length === 0) {
+                    paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('catalog_empty')}</p>`;
+                    return;
+                }
+
+                paintCatalogEl.innerHTML = filtered.map(p => {
+                    if (!p) return '';
+                    const name = p.name || 'Без назви';
+                    const category = p.category || 'Інше';
+                    const color = p.color || '#7b2cbf';
+                    const manufacturer = p.manufacturer || 'SICO';
+                    const article = p.article || '—';
+                    const description = p.description || SICOMIX.i18n.t('no_description');
+                    const isDefault = p.isDefault === true;
+                    const canDelete = !isDefault;
+
+                    return `
+                        <div class="recipe-card" data-id="${p.id || ''}">
+                            <div class="recipe-image" style="background:${color};"></div>
+                            <div class="recipe-content">
+                                <div class="recipe-header">
+                                    <div><h3 class="recipe-title">${name}</h3><span class="recipe-category">${category}</span></div>
+                                    ${isDefault ? '<span style="font-size:11px; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:20px;">SICO</span>' : ''}
                                 </div>
-                                <p style="color:var(--text-secondary);">${p.description || SICOMIX.i18n.t('no_description')}</p>
-                            </div>
-                            <div class="recipe-actions">
-                                ${canDelete ? 
-                                    `<button class="recipe-btn delete-paint" data-id="${p.id}"><i class="fas fa-trash"></i> ${SICOMIX.i18n.t('delete')}</button>` : 
-                                    `<button class="recipe-btn" disabled style="opacity:0.5; cursor:not-allowed;"><i class="fas fa-ban"></i> Стандартна</button>`
-                                }
+                                <div style="margin-bottom:15px;">
+                                    <div style="display:flex; gap:15px;">
+                                        <div><span style="font-size:12px;">${SICOMIX.i18n.t('manufacturer')}</span><br><strong>${manufacturer}</strong></div>
+                                        <div><span style="font-size:12px;">${SICOMIX.i18n.t('article')}</span><br><strong>${article}</strong></div>
+                                    </div>
+                                    <p style="color:var(--text-secondary);">${description}</p>
+                                </div>
+                                <div class="recipe-actions">
+                                    ${canDelete ? 
+                                        `<button class="recipe-btn delete-paint" data-id="${p.id}"><i class="fas fa-trash"></i> ${SICOMIX.i18n.t('delete')}</button>` : 
+                                        `<button class="recipe-btn" disabled style="opacity:0.5; cursor:not-allowed;"><i class="fas fa-ban"></i> Стандартна</button>`
+                                    }
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
 
-            paintCatalogEl.querySelectorAll('.delete-paint').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    deletePaint(btn.dataset.id);
+                paintCatalogEl.querySelectorAll('.delete-paint').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deletePaint(btn.dataset.id);
+                    });
                 });
-            });
 
-            updatePaintCount();
+                updatePaintCount();
+            } catch (error) {
+                console.error('❌ Помилка в renderPaintCatalog:', error);
+                paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
+                    <i class="fas fa-exclamation-triangle"></i> Помилка відображення каталогу.<br>${error.message}
+                </p>`;
+            }
         }
 
         function addNewPaint() {
@@ -785,7 +742,7 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         function updatePaintCount() {
-            const count = paintCatalog.length;  // загальна кількість (базові + користувацькі)
+            const count = paintCatalog.length;
             if (totalPaintsEl) totalPaintsEl.textContent = count;
             if (headerPaintCount) headerPaintCount.textContent = count;
         }
@@ -873,14 +830,14 @@ window.SICOMIX = window.SICOMIX || {};
             );
         }
 
-          // ========== ІНІЦІАЛІЗАЦІЯ ==========
+        // ========== ІНІЦІАЛІЗАЦІЯ ==========
         function initApp() {
             cacheDOMElements();
             loadData();
             initSettings();
             setupEventListeners();
             updatePaintCount();
-            renderPaintCatalog();
+            renderPaintCatalog();  // тепер покаже всі базові + користувацькі
             renderRecipes();
             renderIngredientsList();
             populateCategoryFilters();
@@ -894,6 +851,29 @@ window.SICOMIX = window.SICOMIX || {};
                 setTimeout(() => preloader.remove(), 500);
             }
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('welcome_title'), 'success', 2000);
+        }
+
+        function populateCategoryFilters() {
+            const cats = SICOMIX.data.categories || [];
+            const selects = [
+                document.getElementById('recipeCategory'), 
+                document.getElementById('paintCategory'), 
+                document.getElementById('categoryFilter'), 
+                document.getElementById('recipeCategoryFilter')
+            ];
+            selects.forEach(sel => {
+                if (!sel) return;
+                const current = sel.value;
+                sel.innerHTML = `<option value="" data-i18n="select_category">${SICOMIX.i18n.t('select_category')}</option>`;
+                cats.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    sel.appendChild(opt);
+                });
+                if (current && cats.includes(current)) sel.value = current;
+            });
+            SICOMIX.i18n.applyTranslations();
         }
 
         return {
