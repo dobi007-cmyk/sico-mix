@@ -1,624 +1,842 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SICO Spectrum • Цифрова лабораторія кольору</title>
-    <meta name="description" content="Професійна система керування рецептами фарб. Спектр можливостей 2026.">
-    <meta name="theme-color" content="#7b2cbf">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+// ========== ГОЛОВНИЙ МОДУЛЬ ЗАСТОСУНКУ ==========
+window.SICOMIX = window.SICOMIX || {};
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="./css/style.css?v=2026.02.13">
-    <link rel="manifest" href="./manifest.json?v=2026.02.13">
-    <link rel="icon" href="./icons/favicon.ico?v=2026.02.13" type="image/x-icon">
-    <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.13">
+(function(global) {
+    const SICOMIX = global.SICOMIX;
+    const data = SICOMIX.data;
+    const i18n = SICOMIX.i18n;
+    const utils = SICOMIX.utils;
 
-    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ ========== -->
-    <script>
-        (function() {
-            console.log('🛡️ Антикризовий захист активовано');
+    // Стан застосунку
+    let state = {
+        paints: [],
+        recipes: [],
+        settings: { ...data.defaultSettings },
+        currentRecipe: null, // для редагування
+        ingredients: []      // поточний список інгредієнтів у формі
+    };
 
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                    for (let registration of registrations) {
-                        registration.unregister().then(success => {
-                            console.log(success ? '✅ SW видалено' : '❌ Не вдалося видалити SW');
-                        }).catch(e => console.error('Помилка видалення SW:', e));
-                    }
-                }).catch(console.error);
-                
-                const originalRegister = navigator.serviceWorker.register;
-                navigator.serviceWorker.register = function() {
-                    console.warn('⚠️ Спроба реєстрації SW – ЗАБЛОКОВАНО');
-                    return Promise.reject(new Error('Service Worker disabled'));
-                };
-            }
+    // DOM елементи
+    const elements = {};
 
-            const originalReload = window.location.reload;
-            window.location.reload = function() {
-                console.warn('⚠️ Спроба викликати location.reload() – ЗАБЛОКОВАНО');
-                return false;
-            };
+    function init() {
+        console.log('SICOMIX.app.init()');
+        cacheElements();
+        loadState();
+        setupEventListeners();
+        setupNavigation();
+        updatePaintCounts();
+        renderCategories();
+        renderCatalog();
+        renderRecipes();
+        applySettingsToUI();
+        hidePreloader();
+    }
 
-            let currentHref = window.location.href;
-            Object.defineProperty(window.location, 'href', {
-                set: function(value) {
-                    console.warn('⚠️ Спроба змінити location.href на', value, '– ЗАБЛОКОВАНО');
-                },
-                get: function() {
-                    return currentHref;
-                },
-                configurable: false
+    function cacheElements() {
+        elements.preloader = document.getElementById('preloader');
+        elements.sidebar = document.getElementById('sidebar');
+        elements.menuToggle = document.getElementById('menuToggle');
+        elements.desktopMenuToggle = document.getElementById('desktopMenuToggle');
+        elements.closeSidebar = document.getElementById('closeSidebar');
+        elements.mainContainer = document.getElementById('mainContainer');
+        elements.totalPaints = document.getElementById('totalPaints');
+        elements.headerPaintCount = document.getElementById('headerPaintCount');
+
+        // Сторінки
+        elements.pages = document.querySelectorAll('.page-content');
+        elements.navLinks = document.querySelectorAll('[data-page]');
+
+        // Новий рецепт
+        elements.recipeName = document.getElementById('recipeName');
+        elements.recipeCategory = document.getElementById('recipeCategory');
+        elements.recipeColor = document.getElementById('recipeColor');
+        elements.colorPreview = document.getElementById('colorPreview');
+        elements.recipeDescription = document.getElementById('recipeDescription');
+        elements.recipePhoto = document.getElementById('recipePhoto');
+        elements.fileName = document.getElementById('fileName');
+        elements.paintSearch = document.getElementById('paintSearch');
+        elements.categoryFilter = document.getElementById('categoryFilter');
+        elements.ingredientsList = document.getElementById('ingredientsList');
+        elements.addIngredientBtn = document.getElementById('addIngredientBtn');
+        elements.saveRecipeBtn = document.getElementById('saveRecipeBtn');
+        elements.calculatePercentagesBtn = document.getElementById('calculatePercentagesBtn');
+        elements.clearRecipeBtn = document.getElementById('clearRecipeBtn');
+
+        // Рецепти
+        elements.recipeSearch = document.getElementById('recipeSearch');
+        elements.recipeCategoryFilter = document.getElementById('recipeCategoryFilter');
+        elements.importRecipesBtn = document.getElementById('importRecipesBtn');
+        elements.exportRecipesBtn = document.getElementById('exportRecipesBtn');
+        elements.printRecipesBtn = document.getElementById('printRecipesBtn');
+        elements.deleteSelectedRecipesBtn = document.getElementById('deleteSelectedRecipesBtn');
+        elements.recipesContainer = document.getElementById('recipesContainer');
+
+        // Каталог
+        elements.catalogSearch = document.getElementById('catalogSearch');
+        elements.addNewPaintBtn = document.getElementById('addNewPaintBtn');
+        elements.paintCatalog = document.getElementById('paintCatalog');
+
+        // Імпорт/Експорт
+        elements.importFormat = document.getElementById('importFormat');
+        elements.importFile = document.getElementById('importFile');
+        elements.importFileName = document.getElementById('importFileName');
+        elements.importRecipesCheckbox = document.getElementById('importRecipesCheckbox');
+        elements.importPaintsCheckbox = document.getElementById('importPaintsCheckbox');
+        elements.startImportBtn = document.getElementById('startImportBtn');
+        elements.exportFormat = document.getElementById('exportFormat');
+        elements.exportRecipesCheckbox = document.getElementById('exportRecipesCheckbox');
+        elements.exportPaintsCheckbox = document.getElementById('exportPaintsCheckbox');
+        elements.exportCalculationsCheckbox = document.getElementById('exportCalculationsCheckbox');
+        elements.includePhotosCheckbox = document.getElementById('includePhotosCheckbox');
+        elements.compressDataCheckbox = document.getElementById('compressDataCheckbox');
+        elements.startExportBtn = document.getElementById('startExportBtn');
+
+        // Налаштування
+        elements.languageSelect = document.getElementById('languageSelect');
+        elements.unitsSelect = document.getElementById('unitsSelect');
+        elements.autoSaveCheckbox = document.getElementById('autoSaveCheckbox');
+        elements.backupCheckbox = document.getElementById('backupCheckbox');
+        elements.saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        elements.resetSettingsBtn = document.getElementById('resetSettingsBtn');
+        elements.clearAllDataBtn = document.getElementById('clearAllDataBtn');
+
+        // Модальні вікна
+        elements.addPaintModal = document.getElementById('addPaintModal');
+        elements.closePaintModal = document.getElementById('closePaintModal');
+        elements.paintName = document.getElementById('paintName');
+        elements.paintCategory = document.getElementById('paintCategory');
+        elements.paintColorCode = document.getElementById('paintColorCode');
+        elements.paintDescription = document.getElementById('paintDescription');
+        elements.paintManufacturer = document.getElementById('paintManufacturer');
+        elements.paintArticle = document.getElementById('paintArticle');
+        elements.savePaintBtn = document.getElementById('savePaintBtn');
+        elements.cancelPaintBtn = document.getElementById('cancelPaintBtn');
+
+        elements.confirmationModal = document.getElementById('confirmationModal');
+        elements.closeConfirmationModal = document.getElementById('closeConfirmationModal');
+        elements.confirmActionBtn = document.getElementById('confirmActionBtn');
+        elements.cancelActionBtn = document.getElementById('cancelActionBtn');
+
+        elements.paintSelectionModal = document.getElementById('paintSelectionModal');
+        elements.paintSelectionList = document.getElementById('paintSelectionList');
+        document.querySelectorAll('.close-paint-selection').forEach(btn => {
+            btn.addEventListener('click', () => closeModal(elements.paintSelectionModal));
+        });
+
+        elements.seriesDetailsModal = document.getElementById('seriesDetailsModal');
+        elements.seriesDetailsContent = document.getElementById('seriesDetailsContent');
+        document.querySelectorAll('.close-series-details').forEach(btn => {
+            btn.addEventListener('click', () => closeModal(elements.seriesDetailsModal));
+        });
+
+        // Колір
+        if (elements.recipeColor) {
+            elements.recipeColor.addEventListener('input', (e) => {
+                if (elements.colorPreview) elements.colorPreview.style.backgroundColor = e.target.value;
             });
+        }
+    }
 
-            const originalReplace = window.location.replace;
-            window.location.replace = function() {
-                console.warn('⚠️ Спроба викликати location.replace() – ЗАБЛОКОВАНО');
-            };
+    function hidePreloader() {
+        if (elements.preloader) {
+            elements.preloader.style.opacity = '0';
+            setTimeout(() => {
+                elements.preloader.style.display = 'none';
+            }, 500);
+        }
+    }
 
-            window.addEventListener('error', function(e) {
-                console.error('❌ Помилка перехоплена:', e.error || e.message);
+    function loadState() {
+        // Завантажуємо фарби: стандартні + користувацькі
+        const defaultPaints = data.paints || [];
+        const userPaints = utils.loadFromLocalStorage('sico_userPaints', []);
+        state.paints = [...defaultPaints, ...userPaints];
+
+        // Завантажуємо рецепти
+        state.recipes = utils.loadFromLocalStorage('sico_recipes', []);
+
+        // Завантажуємо налаштування
+        const savedSettings = utils.loadFromLocalStorage('sico_settings', {});
+        state.settings = { ...data.defaultSettings, ...savedSettings };
+    }
+
+    function saveState() {
+        // Зберігаємо тільки користувацькі фарби (без стандартних)
+        const defaultIds = new Set(data.paints.map(p => p.id));
+        const userPaints = state.paints.filter(p => !defaultIds.has(p.id));
+        utils.saveToLocalStorage('sico_userPaints', userPaints);
+        utils.saveToLocalStorage('sico_recipes', state.recipes);
+        utils.saveToLocalStorage('sico_settings', state.settings);
+    }
+
+    function updatePaintCounts() {
+        const count = state.paints.length;
+        if (elements.totalPaints) elements.totalPaints.textContent = count;
+        if (elements.headerPaintCount) elements.headerPaintCount.textContent = count;
+    }
+
+    function setupNavigation() {
+        elements.navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
                 e.preventDefault();
-                return true;
+                const pageId = link.dataset.page;
+                showPage(pageId);
+                if (window.innerWidth <= 992) {
+                    closeSidebar();
+                }
             });
+        });
+    }
 
-            window.addEventListener('unhandledrejection', function(e) {
-                console.error('❌ Unhandled Promise Rejection:', e.reason);
-                e.preventDefault();
-            });
+    function showPage(pageId) {
+        elements.pages.forEach(page => page.classList.remove('active'));
+        const target = document.getElementById(pageId + '-page');
+        if (target) target.classList.add('active');
 
-            window.SICOMIX = window.SICOMIX || {};
-            window.SICOMIX.data = window.SICOMIX.data || {};
+        elements.navLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`[data-page="${pageId}"]`);
+        if (activeLink) activeLink.classList.add('active');
 
-            console.log('🛡️ Захист завершено');
-        })();
-    </script>
-</head>
-<body>
-    <!-- Preloader -->
-    <div id="preloader">
-        <div class="spectrum-spinner"></div>
-    </div>
+        // Оновлюємо вміст залежно від сторінки
+        if (pageId === 'catalog') renderCatalog();
+        if (pageId === 'recipes') renderRecipes();
+    }
 
-    <!-- Mobile Navigation -->
-    <div class="mobile-nav">
-        <button class="menu-toggle" id="menuToggle" aria-label="Menu">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="mobile-nav-title">
-            <i class="fas fa-prism"></i> SICO Spectrum
-        </div>
-    </div>
+    function closeSidebar() {
+        elements.sidebar.classList.remove('active');
+        elements.mainContainer.classList.remove('sidebar-open');
+    }
 
-    <!-- Sidebar (Glass) -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo-container">
-                <h1><i class="fas fa-prism"></i> SICO Spectrum</h1>
-                <p data-i18n="app_subtitle">Цифрова лабораторія кольору</p>
-            </div>
-            <button class="close-sidebar" id="closeSidebar" aria-label="Close">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+    function openSidebar() {
+        elements.sidebar.classList.add('active');
+        elements.mainContainer.classList.add('sidebar-open');
+    }
 
-        <h3 class="nav-title" data-i18n="main_menu">Головне меню</h3>
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a class="nav-link active" href="#" data-page="home">
-                    <i class="fas fa-home"></i>
-                    <span data-i18n="home">Головна</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" data-page="new-recipe">
-                    <i class="fas fa-plus-circle"></i>
-                    <span data-i18n="new_recipe">Новий рецепт</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" data-page="recipes">
-                    <i class="fas fa-book-open"></i>
-                    <span data-i18n="recipes">Рецепти</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" data-page="catalog">
-                    <i class="fas fa-layer-group"></i>
-                    <span data-i18n="catalog">Каталог фарб</span>
-                </a>
-            </li>
-        </ul>
+    function setupEventListeners() {
+        // Меню
+        if (elements.menuToggle) elements.menuToggle.addEventListener('click', openSidebar);
+        if (elements.desktopMenuToggle) elements.desktopMenuToggle.addEventListener('click', openSidebar);
+        if (elements.closeSidebar) elements.closeSidebar.addEventListener('click', closeSidebar);
 
-        <h3 class="nav-title" data-i18n="import_export">Імпорт/Експорт</h3>
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a class="nav-link" href="#" data-page="import">
-                    <i class="fas fa-file-import"></i>
-                    <span data-i18n="import">Імпорт</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" data-page="export">
-                    <i class="fas fa-file-export"></i>
-                    <span data-i18n="export">Експорт</span>
-                </a>
-            </li>
-        </ul>
+        // Новий рецепт
+        if (elements.addIngredientBtn) elements.addIngredientBtn.addEventListener('click', openPaintSelection);
+        if (elements.saveRecipeBtn) elements.saveRecipeBtn.addEventListener('click', saveRecipe);
+        if (elements.calculatePercentagesBtn) elements.calculatePercentagesBtn.addEventListener('click', calculatePercentages);
+        if (elements.clearRecipeBtn) elements.clearRecipeBtn.addEventListener('click', clearRecipeForm);
+        if (elements.paintSearch) elements.paintSearch.addEventListener('input', utils.debounce(filterPaints, 300));
+        if (elements.categoryFilter) elements.categoryFilter.addEventListener('change', filterPaints);
 
-        <h3 class="nav-title" data-i18n="settings">Налаштування</h3>
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a class="nav-link" href="#" data-page="settings">
-                    <i class="fas fa-sliders-h"></i>
-                    <span data-i18n="settings">Налаштування</span>
-                </a>
-            </li>
-        </ul>
+        // Каталог
+        if (elements.addNewPaintBtn) elements.addNewPaintBtn.addEventListener('click', openAddPaintModal);
+        if (elements.catalogSearch) elements.catalogSearch.addEventListener('input', utils.debounce(renderCatalog, 300));
 
-        <div class="sidebar-footer">
-            <div class="paint-count">
-                <i class="fas fa-palette"></i>
-                <span id="totalPaints">0</span> <span data-i18n="paints_in_catalog">фарб у каталозі</span>
-            </div>
-        </div>
-    </aside>
+        // Модалка додавання фарби
+        if (elements.closePaintModal) elements.closePaintModal.addEventListener('click', () => closeModal(elements.addPaintModal));
+        if (elements.cancelPaintBtn) elements.cancelPaintBtn.addEventListener('click', () => closeModal(elements.addPaintModal));
+        if (elements.savePaintBtn) elements.savePaintBtn.addEventListener('click', addNewPaint);
 
-    <!-- Main Content -->
-    <div class="container" id="mainContainer">
-        <!-- Header -->
-        <header class="header">
-            <div class="desktop-nav">
-                <button class="menu-toggle" id="desktopMenuToggle" aria-label="Menu">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="logo-container">
-                    <h1><i class="fas fa-prism"></i> SICO Spectrum</h1>
-                </div>
-            </div>
-            <div class="paint-count">
-                <i class="fas fa-palette"></i>
-                <span id="headerPaintCount">0</span> <span data-i18n="paints_in_catalog">фарб у каталозі</span>
-            </div>
-        </header>
+        // Рецепти
+        if (elements.recipeSearch) elements.recipeSearch.addEventListener('input', utils.debounce(renderRecipes, 300));
+        if (elements.recipeCategoryFilter) elements.recipeCategoryFilter.addEventListener('change', renderRecipes);
+        if (elements.importRecipesBtn) elements.importRecipesBtn.addEventListener('click', () => showPage('import'));
+        if (elements.exportRecipesBtn) elements.exportRecipesBtn.addEventListener('click', exportRecipes);
+        if (elements.printRecipesBtn) elements.printRecipesBtn.addEventListener('click', printRecipes);
+        if (elements.deleteSelectedRecipesBtn) elements.deleteSelectedRecipesBtn.addEventListener('click', deleteSelectedRecipes);
 
-        <!-- Page Content -->
-        <main id="page-content">
-            <!-- HOME PAGE -->
-            <div class="page-content active" id="home-page">
-                <div class="welcome-section">
-                    <span class="spectrum-badge">2026 EDITION</span>
-                    <h2 class="welcome-title" data-i18n="welcome_title">Ласкаво просимо до SICO Spectrum</h2>
-                    <p class="welcome-subtitle" data-i18n="welcome_subtitle">Цифрова лабораторія кольору</p>
-                </div>
-                <div class="quick-actions-grid">
-                    <a class="action-card" href="#" data-page="new-recipe">
-                        <div class="action-icon">
-                            <i class="fas fa-plus"></i>
-                        </div>
-                        <h3 class="action-title" data-i18n="new_recipe">Новий рецепт</h3>
-                        <p class="action-description" data-i18n="new_recipe_desc">Створіть новий рецепт фарби</p>
-                    </a>
-                    <a class="action-card" href="#" data-page="recipes">
-                        <div class="action-icon">
-                            <i class="fas fa-book"></i>
-                        </div>
-                        <h3 class="action-title" data-i18n="my_recipes">Мої рецепти</h3>
-                        <p class="action-description" data-i18n="my_recipes_desc">Переглядайте та керуйте рецептами</p>
-                    </a>
-                    <a class="action-card" href="#" data-page="catalog">
-                        <div class="action-icon">
-                            <i class="fas fa-layer-group"></i>
-                        </div>
-                        <h3 class="action-title" data-i18n="paint_catalog">Каталог фарб</h3>
-                        <p class="action-description" data-i18n="catalog_desc">База всіх доступних фарб</p>
-                    </a>
-                    <a class="action-card" href="#" data-page="export">
-                        <div class="action-icon">
-                            <i class="fas fa-file-export"></i>
-                        </div>
-                        <h3 class="action-title" data-i18n="export_data">Експорт даних</h3>
-                        <p class="action-description" data-i18n="export_desc">Експортуйте рецепти у різних форматах</p>
-                    </a>
-                </div>
-            </div>
+        // Імпорт/Експорт
+        if (elements.importFile) elements.importFile.addEventListener('change', handleImportFileSelect);
+        if (elements.startImportBtn) elements.startImportBtn.addEventListener('click', startImport);
+        if (elements.startExportBtn) elements.startExportBtn.addEventListener('click', startExport);
 
-            <!-- NEW RECIPE PAGE -->
-            <div class="page-content" id="new-recipe-page">
-                <h2 class="page-title" data-i18n="new_recipe">Новий рецепт</h2>
-                <p class="page-description" data-i18n="new_recipe_desc_long">Створіть новий рецепт фарби, додаючи інгредієнти</p>
+        // Налаштування
+        if (elements.languageSelect) elements.languageSelect.addEventListener('change', changeLanguage);
+        if (elements.saveSettingsBtn) elements.saveSettingsBtn.addEventListener('click', saveSettings);
+        if (elements.resetSettingsBtn) elements.resetSettingsBtn.addEventListener('click', resetSettings);
+        if (elements.clearAllDataBtn) elements.clearAllDataBtn.addEventListener('click', clearAllData);
 
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-info-circle"></i>
-                        <span data-i18n="basic_info">Основна інформація</span>
-                    </h3>
-                    <div class="form-group">
-                        <label class="form-label required" data-i18n="recipe_name">Назва рецепту</label>
-                        <input type="text" class="form-input" id="recipeName" placeholder="" data-i18n-placeholder="recipe_name_placeholder" required>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label required" data-i18n="category">Категорія</label>
-                            <select class="form-select" id="recipeCategory" required>
-                                <option value="" data-i18n="select_category">Оберіть категорію</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="color">Колір</label>
-                            <div class="color-picker-container">
-                                <div class="color-preview" id="colorPreview" style="background: #3a86ff;"></div>
-                                <input type="color" class="color-input" id="recipeColor" value="#3a86ff">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="recipe_description">Опис рецепту</label>
-                        <textarea class="form-textarea" id="recipeDescription" placeholder="" data-i18n-placeholder="recipe_description_placeholder"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="recipe_photo">Фото рецепту</label>
-                        <div class="file-upload">
-                            <input type="file" class="file-input" id="recipePhoto" accept="image/*">
-                            <label class="file-label" for="recipePhoto">
-                                <i class="fas fa-camera"></i>
-                                <span id="fileName" data-i18n="upload_photo">Завантажити фото</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-flask"></i>
-                        <span data-i18n="recipe_ingredients">Інгредієнти рецепту</span>
-                    </h3>
-                    <div class="search-filter-container">
-                        <div class="search-box">
-                            <input type="text" class="search-input" id="paintSearch" placeholder="" data-i18n-placeholder="search_paints">
-                            <i class="fas fa-search search-icon"></i>
-                        </div>
-                        <select class="filter-select" id="categoryFilter">
-                            <option value="" data-i18n="all_categories">Всі категорії</option>
-                        </select>
-                    </div>
-                    <table class="ingredients-table">
-                        <thead>
-                            <tr>
-                                <th data-i18n="paint">Фарба</th>
-                                <th data-i18n="quantity">Кількість</th>
-                                <th data-i18n="units">Одиниці</th>
-                                <th data-i18n="percentage">Відсоток</th>
-                                <th data-i18n="actions">Дії</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ingredientsList"></tbody>
-                    </table>
-                    <button class="btn-add" id="addIngredientBtn">
-                        <i class="fas fa-plus"></i>
-                        <span data-i18n="add_ingredient">Додати інгредієнт</span>
-                    </button>
-                </div>
-
-                <div class="action-buttons">
-                    <button class="btn btn-primary" id="saveRecipeBtn">
-                        <i class="fas fa-save"></i>
-                        <span data-i18n="save_recipe">Зберегти рецепт</span>
-                    </button>
-                    <button class="btn btn-secondary" id="calculatePercentagesBtn">
-                        <i class="fas fa-calculator"></i>
-                        <span data-i18n="calculate_percentages">Розрахувати відсотки</span>
-                    </button>
-                    <button class="btn btn-warning" id="clearRecipeBtn">
-                        <i class="fas fa-trash"></i>
-                        <span data-i18n="clear_form">Очистити форму</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- RECIPES PAGE -->
-            <div class="page-content" id="recipes-page">
-                <h2 class="page-title" data-i18n="my_recipes">Мої рецепти</h2>
-                <p class="page-description" data-i18n="my_recipes_desc_long">Переглядайте, редагуйте та керуйте рецептами</p>
-                <div class="search-filter-container">
-                    <div class="search-box">
-                        <input type="text" class="search-input" id="recipeSearch" placeholder="" data-i18n-placeholder="search_recipes">
-                        <i class="fas fa-search search-icon"></i>
-                    </div>
-                    <select class="filter-select" id="recipeCategoryFilter">
-                        <option value="" data-i18n="all_categories">Всі категорії</option>
-                    </select>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-success" id="importRecipesBtn">
-                        <i class="fas fa-file-import"></i> <span data-i18n="import">Імпорт</span>
-                    </button>
-                    <button class="btn btn-primary" id="exportRecipesBtn">
-                        <i class="fas fa-file-export"></i> <span data-i18n="export">Експорт</span>
-                    </button>
-                    <button class="btn btn-warning" id="printRecipesBtn">
-                        <i class="fas fa-print"></i> <span data-i18n="print">Друк</span>
-                    </button>
-                    <button class="btn btn-danger" id="deleteSelectedRecipesBtn">
-                        <i class="fas fa-trash"></i> <span data-i18n="delete_selected">Видалити обрані</span>
-                    </button>
-                </div>
-                <div class="recipe-cards" id="recipesContainer"></div>
-            </div>
-
-            <!-- CATALOG PAGE -->
-            <div class="page-content" id="catalog-page">
-                <h2 class="page-title" data-i18n="paint_catalog">Каталог фарб</h2>
-                <p class="page-description" data-i18n="catalog_desc_long">База всіх доступних фарб</p>
-                <div class="search-filter-container">
-                    <div class="search-box">
-                        <input type="text" class="search-input" id="catalogSearch" placeholder="" data-i18n-placeholder="search_catalog">
-                        <i class="fas fa-search search-icon"></i>
-                    </div>
-                    <button class="btn btn-primary" id="addNewPaintBtn">
-                        <i class="fas fa-plus"></i> <span data-i18n="add_new_paint">Додати нову фарбу</span>
-                    </button>
-                </div>
-                <div class="recipe-cards" id="paintCatalog"></div>
-            </div>
-
-            <!-- IMPORT PAGE -->
-            <div class="page-content" id="import-page">
-                <h2 class="page-title" data-i18n="import">Імпорт даних</h2>
-                <p class="page-description" data-i18n="import_desc">Імпортуйте рецепти та каталог з файлів</p>
-                <div class="form-section">
-                    <h3 class="section-title"><i class="fas fa-file-import"></i> <span data-i18n="select_import_file">Виберіть файл для імпорту</span></h3>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="file_format">Формат файлу</label>
-                        <select class="form-select" id="importFormat">
-                            <option value="json">JSON (.json)</option>
-                            <option value="csv">CSV (.csv)</option>
-                            <option value="excel">Excel (.xlsx)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="select_file">Оберіть файл</label>
-                        <div class="file-upload">
-                            <input type="file" class="file-input" id="importFile" accept=".json,.csv,.xlsx">
-                            <label class="file-label" for="importFile">
-                                <i class="fas fa-folder-open"></i>
-                                <span id="importFileName" data-i18n="select_import_file">Оберіть файл для імпорту</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="import_data_type">Тип даних для імпорту</label>
-                        <div>
-                            <label style="display: block; margin-bottom: 10px;">
-                                <input type="checkbox" id="importRecipesCheckbox" checked> <span data-i18n="recipes">Рецепти</span>
-                            </label>
-                            <label style="display: block;">
-                                <input type="checkbox" id="importPaintsCheckbox"> <span data-i18n="paints">Фарби з каталогу</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-success" id="startImportBtn">
-                            <i class="fas fa-play"></i> <span data-i18n="start_import">Почати імпорт</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- EXPORT PAGE -->
-            <div class="page-content" id="export-page">
-                <h2 class="page-title" data-i18n="export">Експорт даних</h2>
-                <p class="page-description" data-i18n="export_desc_long">Експортуйте ваші дані у різних форматах</p>
-                <div class="form-section">
-                    <h3 class="section-title"><i class="fas fa-file-export"></i> <span data-i18n="export_settings">Налаштування експорту</span></h3>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="export_format">Формат експорту</label>
-                        <select class="form-select" id="exportFormat">
-                            <option value="json">JSON (.json)</option>
-                            <option value="csv">CSV (.csv)</option>
-                            <option value="excel">Excel (.xlsx)</option>
-                            <option value="pdf">PDF (.pdf)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="data_to_export">Дані для експорту</label>
-                        <div>
-                            <label style="display: block; margin-bottom: 10px;">
-                                <input type="checkbox" id="exportRecipesCheckbox" checked> <span data-i18n="recipes">Рецепти</span>
-                            </label>
-                            <label style="display: block; margin-bottom: 10px;">
-                                <input type="checkbox" id="exportPaintsCheckbox"> <span data-i18n="paint_catalog">Каталог фарб</span>
-                            </label>
-                            <label style="display: block;">
-                                <input type="checkbox" id="exportCalculationsCheckbox"> <span data-i18n="calculations">Розрахунки</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="additional_options">Додаткові опції</label>
-                        <div>
-                            <label style="display: block; margin-bottom: 10px;">
-                                <input type="checkbox" id="includePhotosCheckbox"> <span data-i18n="include_photos">Включати фотографії</span>
-                            </label>
-                            <label style="display: block;">
-                                <input type="checkbox" id="compressDataCheckbox"> <span data-i18n="compress_data">Стиснути дані (ZIP)</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-primary" id="startExportBtn">
-                            <i class="fas fa-download"></i> <span data-i18n="start_export">Почати експорт</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SETTINGS PAGE -->
-            <div class="page-content" id="settings-page">
-                <h2 class="page-title" data-i18n="settings">Налаштування</h2>
-                <p class="page-description" data-i18n="settings_desc">Налаштуйте систему за вашими потребами</p>
-                <div class="form-section">
-                    <h3 class="section-title"><i class="fas fa-cog"></i> <span data-i18n="general_settings">Загальні налаштування</span></h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="interface_language">Мова інтерфейсу</label>
-                            <select class="form-select" id="languageSelect">
-                                <option value="uk">Українська</option>
-                                <option value="en">English</option>
-                                <option value="pl">Polski</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="measurement_units">Одиниці вимірювання</label>
-                            <select class="form-select" id="unitsSelect">
-                                <option value="grams" data-i18n="grams">Грами (г)</option>
-                                <option value="ml" data-i18n="ml">Мілілітри (мл)</option>
-                                <option value="percent" data-i18n="percent">Відсотки (%)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="auto_save">Автоматичне збереження</label>
-                        <div>
-                            <label style="display: block; margin-bottom: 10px;">
-                                <input type="checkbox" id="autoSaveCheckbox" checked> <span data-i18n="auto_save_changes">Автоматично зберігати зміни</span>
-                            </label>
-                            <label style="display: block;">
-                                <input type="checkbox" id="backupCheckbox"> <span data-i18n="create_backups">Створювати резервні копії</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-primary" id="saveSettingsBtn">
-                            <i class="fas fa-save"></i> <span data-i18n="save_settings">Зберегти налаштування</span>
-                        </button>
-                        <button class="btn btn-warning" id="resetSettingsBtn">
-                            <i class="fas fa-undo"></i> <span data-i18n="reset_defaults">Скинути до стандартних</span>
-                        </button>
-                        <button class="btn btn-danger" id="clearAllDataBtn">
-                            <i class="fas fa-trash"></i> <span data-i18n="clear_all_data">Очистити всі дані</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <footer class="footer">
-            <p>SICO Spectrum • <span data-i18n="version">Версія</span> 1.0 • © 2026</p>
-        </footer>
-    </div>
-
-    <!-- MODAL: Add Paint -->
-    <div class="modal" id="addPaintModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" data-i18n="add_new_paint">Додати нову фарбу</h3>
-                <button class="modal-close" id="closePaintModal">&times;</button>
-            </div>
-            <div id="addPaintForm">
-                <div class="form-group">
-                    <label class="form-label required" data-i18n="paint_name">Назва фарби</label>
-                    <input type="text" class="form-input" id="paintName" placeholder="" data-i18n-placeholder="paint_name_placeholder" required>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label required" data-i18n="category">Категорія</label>
-                        <select class="form-select" id="paintCategory" required>
-                            <option value="" data-i18n="select_category">Оберіть категорію</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="color_code">Код кольору</label>
-                        <input type="text" class="form-input" id="paintColorCode" placeholder="#000000" data-i18n-placeholder="color_code_placeholder">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-i18n="paint_description">Опис фарби</label>
-                    <textarea class="form-textarea" id="paintDescription" placeholder="" data-i18n-placeholder="paint_description_placeholder"></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="manufacturer">Виробник</label>
-                        <input type="text" class="form-input" id="paintManufacturer" placeholder="SICO" data-i18n-placeholder="manufacturer_placeholder">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="article">Артикул</label>
-                        <input type="text" class="form-input" id="paintArticle" placeholder="" data-i18n-placeholder="article_placeholder">
-                    </div>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-primary" id="savePaintBtn"><span data-i18n="save_paint">Зберегти фарбу</span></button>
-                    <button class="btn btn-warning" id="cancelPaintBtn"><span data-i18n="cancel">Скасувати</span></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: Confirmation -->
-    <div class="modal" id="confirmationModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="confirmationTitle" data-i18n="confirmation">Підтвердження</h3>
-                <button class="modal-close" id="closeConfirmationModal">&times;</button>
-            </div>
-            <div id="confirmationMessage" style="padding: 20px; text-align: center;">
-                <span data-i18n="confirmation_message">Ви впевнені?</span>
-            </div>
-            <div class="action-buttons" style="justify-content: center;">
-                <button class="btn btn-danger" id="confirmActionBtn"><span data-i18n="confirm_action">Так</span></button>
-                <button class="btn btn-secondary" id="cancelActionBtn"><span data-i18n="cancel">Скасувати</span></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: Paint Selection -->
-    <div class="modal" id="paintSelectionModal">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h3 class="modal-title" data-i18n="select_paint">Оберіть фарбу</h3>
-                <button class="modal-close close-paint-selection">&times;</button>
-            </div>
-            <div id="paintSelectionList" style="max-height: 400px; overflow-y: auto;"></div>
-        </div>
-    </div>
-
-    <!-- MODAL: Series Details -->
-    <div class="modal" id="seriesDetailsModal">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h3 class="modal-title">Деталі серії</h3>
-                <button class="modal-close close-series-details">&times;</button>
-            </div>
-            <div id="seriesDetailsContent" style="max-height: 60vh; overflow-y: auto;"></div>
-        </div>
-    </div>
-
-    <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ ========== -->
-    <script src="./js/data-colors.js?v=2026.02.13"></script>
-    <script src="./js/i18n.js?v=2026.02.13"></script>
-    <script src="./js/utils.js?v=2026.02.13"></script>
-    <script src="./js/app.js?v=2026.02.13"></script>
-
-    <!-- Сервіс-воркер вимкнено -->
-    <!-- <script src="./js/service-worker.js"></script> -->
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 DOM готовий, ініціалізація...');
-            
-            if (window.SICOMIX?.i18n?.init) {
-                window.SICOMIX.i18n.init();
-            }
-            if (window.SICOMIX?.app?.init) {
-                window.SICOMIX.app.init();
+        // Закриття модалок по кліку на фон
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                closeModal(e.target);
             }
         });
-    </script>
-</body>
-</html>
+    }
+
+    function renderCategories() {
+        const cats = data.categories || [];
+        const selects = [
+            elements.recipeCategory,
+            elements.categoryFilter,
+            elements.recipeCategoryFilter,
+            elements.paintCategory
+        ];
+        selects.forEach(select => {
+            if (!select) return;
+            const currentValue = select.value;
+            select.innerHTML = '<option value="" data-i18n="select_category">Оберіть категорію</option>';
+            cats.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = i18n.translateCategory(cat);
+                select.appendChild(option);
+            });
+            if (currentValue) select.value = currentValue;
+        });
+        i18n.applyTranslations();
+    }
+
+    function renderCatalog() {
+        if (!elements.paintCatalog) return;
+        const search = elements.catalogSearch?.value.toLowerCase() || '';
+        const filtered = state.paints.filter(p => 
+            p.name.toLowerCase().includes(search) || 
+            (p.displayName?.[i18n.getLanguage()] || '').toLowerCase().includes(search)
+        );
+
+        if (filtered.length === 0) {
+            elements.paintCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${i18n.t('catalog_empty')}</p>`;
+            return;
+        }
+
+        elements.paintCatalog.innerHTML = filtered.map(paint => {
+            const isDefault = paint.isDefault === true;
+            const lang = i18n.getLanguage();
+            const displayName = paint.displayName?.[lang] || paint.name;
+            const desc = paint.description?.[lang] || '';
+            const color = paint.color || '#cccccc';
+            const seriesId = paint.series || '';
+
+            return `
+                <div class="paint-card ${isDefault ? 'locked' : ''}" data-id="${paint.id}">
+                    <div class="paint-color" style="background: ${color};"></div>
+                    <div class="paint-info">
+                        <div class="paint-name">${displayName}</div>
+                        <span class="paint-series-badge">${seriesId}</span>
+                        <div class="paint-article">${paint.article || ''}</div>
+                        <div class="paint-actions">
+                            <button class="btn-series-info" title="Інформація про серію" data-series="${seriesId}"><i class="fas fa-info-circle"></i></button>
+                            ${!isDefault ? `<button class="btn-delete" title="Видалити" data-id="${paint.id}"><i class="fas fa-trash"></i></button>` : ''}
+                        </div>
+                    </div>
+                    ${isDefault ? '<div class="default-badge"><i class="fas fa-lock"></i> ' + i18n.t('default_paint') + '</div>' : ''}
+                </div>
+            `;
+        }).join('');
+
+        // Додаємо слухачі для кнопок
+        document.querySelectorAll('.btn-series-info').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const seriesId = btn.dataset.series;
+                showSeriesDetails(seriesId);
+            });
+        });
+
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = btn.dataset.id;
+                confirmDeletePaint(id);
+            });
+        });
+    }
+
+    function showSeriesDetails(seriesId) {
+        const series = data.series.find(s => s.id === seriesId);
+        if (!series) return;
+
+        const lang = i18n.getLanguage();
+        const props = series.properties || {};
+        let html = `<div style="padding:10px;"><h3>${series.name[lang]}</h3>`;
+        html += `<p>${series.description[lang]}</p>`;
+        html += '<ul class="series-properties">';
+        for (let key in props) {
+            const val = props[key][lang];
+            if (val) {
+                html += `<li><strong>${key}:</strong> ${val}</li>`;
+            }
+        }
+        html += '</ul></div>';
+        elements.seriesDetailsContent.innerHTML = html;
+        openModal(elements.seriesDetailsModal);
+    }
+
+    function confirmDeletePaint(id) {
+        const paint = state.paints.find(p => p.id === id);
+        if (!paint) return;
+        utils.showConfirmation(
+            i18n.t('delete_paint'),
+            i18n.t('delete_paint_confirmation'),
+            () => deletePaint(id)
+        );
+    }
+
+    function deletePaint(id) {
+        state.paints = state.paints.filter(p => p.id !== id);
+        saveState();
+        renderCatalog();
+        updatePaintCounts();
+        utils.showNotification(i18n.t('paint_deleted'), 'success');
+    }
+
+    function openAddPaintModal() {
+        elements.paintName.value = '';
+        elements.paintCategory.value = '';
+        elements.paintColorCode.value = '#3a86ff';
+        elements.paintDescription.value = '';
+        elements.paintManufacturer.value = 'SICO';
+        elements.paintArticle.value = '';
+        openModal(elements.addPaintModal);
+    }
+
+    function addNewPaint() {
+        const name = elements.paintName.value.trim();
+        const category = elements.paintCategory.value;
+        const colorCode = elements.paintColorCode.value.trim() || '#3a86ff';
+        const description = elements.paintDescription.value.trim();
+        const manufacturer = elements.paintManufacturer.value.trim() || 'SICO';
+        const article = elements.paintArticle.value.trim();
+
+        if (!name || !category) {
+            utils.showNotification(i18n.t('fill_required_fields'), 'error');
+            return;
+        }
+
+        const newPaint = {
+            id: utils.generateId(),
+            name: name,
+            series: '',
+            baseColorCode: '',
+            category: category,
+            color: colorCode,
+            manufacturer: manufacturer,
+            article: article,
+            isDefault: false,
+            displayName: { uk: name, en: name, pl: name },
+            description: { uk: description, en: description, pl: description },
+            fullInfo: { uk: name, en: name, pl: name },
+            colorName: { uk: name, en: name, pl: name }
+        };
+
+        state.paints.push(newPaint);
+        saveState();
+        closeModal(elements.addPaintModal);
+        renderCatalog();
+        updatePaintCounts();
+        utils.showNotification(i18n.t('paint_added'), 'success');
+    }
+
+    function openPaintSelection() {
+        renderPaintSelectionList();
+        openModal(elements.paintSelectionModal);
+    }
+
+    function renderPaintSelectionList() {
+        const search = elements.paintSearch?.value.toLowerCase() || '';
+        const category = elements.categoryFilter?.value || '';
+        let filtered = state.paints.filter(p => 
+            (p.name.toLowerCase().includes(search) || (p.displayName?.[i18n.getLanguage()] || '').toLowerCase().includes(search)) &&
+            (category === '' || p.category === category)
+        );
+
+        if (filtered.length === 0) {
+            elements.paintSelectionList.innerHTML = `<p style="padding:20px;">${i18n.t('paints_not_found')}</p>`;
+            return;
+        }
+
+        elements.paintSelectionList.innerHTML = filtered.map(paint => {
+            const lang = i18n.getLanguage();
+            const displayName = paint.displayName?.[lang] || paint.name;
+            return `
+                <div class="paint-selection-card" data-id="${paint.id}">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:30px;height:30px;background:${paint.color};border-radius:6px;"></div>
+                        <div><strong>${displayName}</strong> (${paint.article || ''})</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.querySelectorAll('.paint-selection-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const id = card.dataset.id;
+                addIngredientToRecipe(id);
+                closeModal(elements.paintSelectionModal);
+            });
+        });
+    }
+
+    function addIngredientToRecipe(paintId) {
+        const paint = state.paints.find(p => p.id === paintId);
+        if (!paint) return;
+        // Перевірка, чи вже є така фарба
+        if (state.ingredients.some(ing => ing.paintId === paintId)) {
+            utils.showNotification(i18n.t('paint_already_added'), 'warning');
+            return;
+        }
+        state.ingredients.push({
+            paintId: paintId,
+            paintName: paint.displayName?.[i18n.getLanguage()] || paint.name,
+            amount: 0,
+            unit: 'г',
+            percentage: 0
+        });
+        renderIngredientsTable();
+    }
+
+    function renderIngredientsTable() {
+        if (!elements.ingredientsList) return;
+        if (state.ingredients.length === 0) {
+            elements.ingredientsList.innerHTML = '<tr><td colspan="5" style="text-align:center;">Немає інгредієнтів</td></tr>';
+            return;
+        }
+
+        elements.ingredientsList.innerHTML = state.ingredients.map((ing, index) => {
+            return `
+                <tr>
+                    <td>${ing.paintName}</td>
+                    <td><input type="number" class="input-small" data-index="${index}" value="${ing.amount}" step="0.1" min="0"></td>
+                    <td>
+                        <select class="unit-select" data-index="${index}">
+                            <option value="г" ${ing.unit === 'г' ? 'selected' : ''}>г</option>
+                            <option value="кг" ${ing.unit === 'кг' ? 'selected' : ''}>кг</option>
+                            <option value="мл" ${ing.unit === 'мл' ? 'selected' : ''}>мл</option>
+                            <option value="л" ${ing.unit === 'л' ? 'selected' : ''}>л</option>
+                            <option value="%" ${ing.unit === '%' ? 'selected' : ''}>%</option>
+                        </select>
+                    </td>
+                    <td>${ing.percentage}%</td>
+                    <td><button class="btn-icon remove-ingredient" data-index="${index}"><i class="fas fa-times"></i></button></td>
+                </tr>
+            `;
+        }).join('');
+
+        // Додаємо слухачі
+        document.querySelectorAll('.input-small').forEach(input => {
+            input.addEventListener('input', (e) => {
+                const index = e.target.dataset.index;
+                state.ingredients[index].amount = parseFloat(e.target.value) || 0;
+            });
+        });
+
+        document.querySelectorAll('.unit-select').forEach(select => {
+            select.addEventListener('change', (e) => {
+                const index = e.target.dataset.index;
+                state.ingredients[index].unit = e.target.value;
+            });
+        });
+
+        document.querySelectorAll('.remove-ingredient').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = e.currentTarget.dataset.index;
+                state.ingredients.splice(index, 1);
+                renderIngredientsTable();
+            });
+        });
+    }
+
+    function calculatePercentages() {
+        const total = state.ingredients.reduce((sum, ing) => sum + (ing.amount || 0), 0);
+        if (total === 0) {
+            utils.showNotification('Сума кількостей дорівнює 0', 'error');
+            return;
+        }
+        state.ingredients = state.ingredients.map(ing => ({
+            ...ing,
+            percentage: parseFloat(((ing.amount / total) * 100).toFixed(1))
+        }));
+        renderIngredientsTable();
+    }
+
+    function saveRecipe() {
+        const name = elements.recipeName?.value.trim();
+        const category = elements.recipeCategory?.value;
+        const color = elements.recipeColor?.value || '#3a86ff';
+        const description = elements.recipeDescription?.value.trim();
+        const photo = elements.recipePhoto?.files[0]; // поки не обробляємо
+
+        if (!name || !category || state.ingredients.length === 0) {
+            utils.showNotification(i18n.t('fill_required_fields'), 'error');
+            return;
+        }
+
+        const newRecipe = {
+            id: utils.generateId(),
+            name: name,
+            category: category,
+            color: color,
+            description: description,
+            ingredients: state.ingredients.map(ing => ({ ...ing })), // копія
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        state.recipes.push(newRecipe);
+        saveState();
+        clearRecipeForm();
+        showPage('recipes');
+        renderRecipes();
+        utils.showNotification(i18n.t('recipe_saved'), 'success');
+    }
+
+    function clearRecipeForm() {
+        elements.recipeName.value = '';
+        elements.recipeCategory.value = '';
+        elements.recipeColor.value = '#3a86ff';
+        elements.colorPreview.style.backgroundColor = '#3a86ff';
+        elements.recipeDescription.value = '';
+        elements.recipePhoto.value = '';
+        elements.fileName.textContent = i18n.t('upload_photo');
+        state.ingredients = [];
+        renderIngredientsTable();
+    }
+
+    function renderRecipes() {
+        if (!elements.recipesContainer) return;
+        const search = elements.recipeSearch?.value.toLowerCase() || '';
+        const category = elements.recipeCategoryFilter?.value || '';
+        const filtered = state.recipes.filter(r => 
+            r.name.toLowerCase().includes(search) &&
+            (category === '' || r.category === category)
+        );
+
+        if (filtered.length === 0) {
+            elements.recipesContainer.innerHTML = `<p style="text-align:center; padding:40px;">${i18n.t('no_recipes')}</p>`;
+            return;
+        }
+
+        elements.recipesContainer.innerHTML = filtered.map(recipe => {
+            const total = recipe.ingredients.reduce((sum, ing) => sum + (ing.amount || 0), 0);
+            return `
+                <div class="recipe-card" data-id="${recipe.id}">
+                    <div class="recipe-image" style="background: ${recipe.color};"></div>
+                    <div class="recipe-content">
+                        <div class="recipe-header">
+                            <h3 class="recipe-title">${recipe.name}</h3>
+                            <span class="recipe-category">${i18n.translateCategory(recipe.category)}</span>
+                        </div>
+                        <p class="recipe-description">${recipe.description || i18n.t('no_description')}</p>
+                        <div class="recipe-meta">
+                            <span><i class="fas fa-flask"></i> ${recipe.ingredients.length} ${i18n.t('ingredients_count')}</span>
+                            <span><i class="fas fa-weight-hanging"></i> ${total} г</span>
+                            <span><i class="fas fa-calendar"></i> ${new Date(recipe.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <div class="recipe-actions">
+                            <button class="recipe-btn edit-recipe" data-id="${recipe.id}"><i class="fas fa-edit"></i> ${i18n.t('edit')}</button>
+                            <button class="recipe-btn delete-recipe" data-id="${recipe.id}"><i class="fas fa-trash"></i> ${i18n.t('delete')}</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.querySelectorAll('.edit-recipe').forEach(btn => {
+            btn.addEventListener('click', () => editRecipe(btn.dataset.id));
+        });
+
+        document.querySelectorAll('.delete-recipe').forEach(btn => {
+            btn.addEventListener('click', () => confirmDeleteRecipe(btn.dataset.id));
+        });
+    }
+
+    function editRecipe(id) {
+        const recipe = state.recipes.find(r => r.id === id);
+        if (!recipe) return;
+        // Заповнити форму
+        elements.recipeName.value = recipe.name;
+        elements.recipeCategory.value = recipe.category;
+        elements.recipeColor.value = recipe.color;
+        elements.colorPreview.style.backgroundColor = recipe.color;
+        elements.recipeDescription.value = recipe.description || '';
+        state.ingredients = recipe.ingredients.map(ing => ({ ...ing }));
+        renderIngredientsTable();
+        showPage('new-recipe');
+    }
+
+    function confirmDeleteRecipe(id) {
+        utils.showConfirmation(
+            i18n.t('delete_recipe'),
+            i18n.t('delete_recipe_confirmation'),
+            () => deleteRecipe(id)
+        );
+    }
+
+    function deleteRecipe(id) {
+        state.recipes = state.recipes.filter(r => r.id !== id);
+        saveState();
+        renderRecipes();
+        utils.showNotification(i18n.t('recipe_deleted'), 'success');
+    }
+
+    function deleteSelectedRecipes() {
+        // Спрощено: видаляємо всі (для демонстрації)
+        if (state.recipes.length === 0) return;
+        utils.showConfirmation(
+            i18n.t('delete_recipes'),
+            i18n.t('delete_recipes_confirmation') + ' ' + state.recipes.length + '?',
+            () => {
+                state.recipes = [];
+                saveState();
+                renderRecipes();
+                utils.showNotification(i18n.t('deleted'), 'success');
+            }
+        );
+    }
+
+    function exportRecipes() {
+        if (state.recipes.length === 0) {
+            utils.showNotification(i18n.t('no_recipes_to_export'), 'warning');
+            return;
+        }
+        const dataStr = JSON.stringify(state.recipes, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sico_recipes_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        utils.showNotification(i18n.t('recipe_exported'), 'success');
+    }
+
+    function printRecipes() {
+        window.print(); // простий друк
+    }
+
+    function handleImportFileSelect(e) {
+        const file = e.target.files[0];
+        if (file) {
+            elements.importFileName.textContent = file.name;
+        }
+    }
+
+    function startImport() {
+        const file = elements.importFile.files[0];
+        if (!file) {
+            utils.showNotification('Виберіть файл', 'error');
+            return;
+        }
+        const format = elements.importFormat.value;
+        if (format !== 'json') {
+            utils.showNotification(i18n.t('feature_in_development'), 'warning');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (elements.importRecipesCheckbox.checked && Array.isArray(imported)) {
+                    state.recipes = [...state.recipes, ...imported];
+                }
+                // імпорт фарб пропущено для простоти
+                saveState();
+                renderRecipes();
+                utils.showNotification(i18n.t('imported'), 'success');
+                closeModal(elements.importPage); // умовно
+            } catch (err) {
+                utils.showNotification(i18n.t('invalid_file_format'), 'error');
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function startExport() {
+        const format = elements.exportFormat.value;
+        if (format !== 'json') {
+            utils.showNotification(i18n.t('feature_in_development'), 'warning');
+            return;
+        }
+        const dataToExport = {};
+        if (elements.exportRecipesCheckbox.checked) dataToExport.recipes = state.recipes;
+        if (elements.exportPaintsCheckbox.checked) dataToExport.paints = state.paints;
+        if (elements.exportCalculationsCheckbox.checked) dataToExport.calculations = []; // заглушка
+
+        const dataStr = JSON.stringify(dataToExport, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sico_export_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        utils.showNotification(i18n.t('exported'), 'success');
+    }
+
+    function changeLanguage() {
+        const lang = elements.languageSelect.value;
+        i18n.setLanguage(lang);
+        state.settings.language = lang;
+        saveSettings();
+        renderCategories();
+        renderCatalog();
+        renderRecipes();
+        if (state.ingredients.length) renderIngredientsTable();
+    }
+
+    function saveSettings() {
+        state.settings.language = elements.languageSelect.value;
+        state.settings.units = elements.unitsSelect.value;
+        state.settings.autoSave = elements.autoSaveCheckbox.checked;
+        state.settings.backup = elements.backupCheckbox.checked;
+        saveState();
+        utils.showNotification(i18n.t('settings_saved'), 'success');
+    }
+
+    function resetSettings() {
+        state.settings = { ...data.defaultSettings };
+        applySettingsToUI();
+        saveState();
+        i18n.setLanguage(state.settings.language);
+        i18n.applyTranslations();
+        renderCategories();
+        utils.showNotification(i18n.t('reset_defaults'), 'success');
+    }
+
+    function applySettingsToUI() {
+        if (elements.languageSelect) elements.languageSelect.value = state.settings.language;
+        if (elements.unitsSelect) elements.unitsSelect.value = state.settings.units;
+        if (elements.autoSaveCheckbox) elements.autoSaveCheckbox.checked = state.settings.autoSave;
+        if (elements.backupCheckbox) elements.backupCheckbox.checked = state.settings.backup;
+    }
+
+    function clearAllData() {
+        utils.showConfirmation(
+            i18n.t('clear_all_data'),
+            i18n.t('clear_all_data_confirmation'),
+            () => {
+                // Видаляємо всі рецепти та користувацькі фарби
+                state.recipes = [];
+                // Відновлюємо стандартні фарби
+                state.paints = [...data.paints];
+                saveState();
+                renderCatalog();
+                renderRecipes();
+                updatePaintCounts();
+                utils.showNotification(i18n.t('data_cleared'), 'success');
+            }
+        );
+    }
+
+    function filterPaints() {
+        // використовується в модалці вибору фарби
+        renderPaintSelectionList();
+    }
+
+    function openModal(modal) {
+        if (modal) modal.classList.add('active');
+    }
+
+    function closeModal(modal) {
+        if (modal) modal.classList.remove('active');
+    }
+
+    // Експортуємо публічні методи
+    SICOMIX.app = {
+        init,
+        showPage,
+        openModal,
+        closeModal
+    };
+
 })(window);
