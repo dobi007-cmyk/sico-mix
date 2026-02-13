@@ -1,4 +1,4 @@
-// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (СТАБІЛЬНА ВЕРСІЯ) ==========
+// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (СТАБІЛЬНА ВЕРСІЯ + ПАГІНАЦІЯ) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -7,15 +7,20 @@ window.SICOMIX = window.SICOMIX || {};
     SICOMIX.app = (function() {
         // ---------- СТАН ----------
         let recipes = [];
-        let basePaints = [];          // Незмінний базовий каталог SICO
-        let userPaints = [];          // Фарби, додані користувачем
-        let paintCatalog = [];        // basePaints + userPaints
+        let basePaints = [];
+        let userPaints = [];
+        let paintCatalog = [];
         let selectedIngredients = [];
         let selectedRecipes = [];
         let currentSettings = {};
         let isEditingRecipe = false;
         let editingRecipeId = null;
-        let recipeDraft = null;       // Чернетка для автозбереження
+        let recipeDraft = null;
+
+        // Для пагінації каталогу
+        let catalogFiltered = [];
+        let catalogPage = 1;
+        const CATALOG_PAGE_SIZE = 30;
 
         // ---------- DOM ЕЛЕМЕНТИ ----------
         let sidebar, menuToggle, desktopMenuToggle, closeSidebar, mainContainer;
@@ -248,7 +253,10 @@ window.SICOMIX = window.SICOMIX || {};
             if (paintSearch) paintSearch.addEventListener('input', SICOMIX.utils.debounce(renderIngredientsList, 300));
             if (categoryFilter) categoryFilter.addEventListener('change', renderIngredientsList);
             if (document.getElementById('catalogSearch')) {
-                document.getElementById('catalogSearch').addEventListener('input', SICOMIX.utils.debounce(renderPaintCatalog, 300));
+                document.getElementById('catalogSearch').addEventListener('input', SICOMIX.utils.debounce(() => {
+                    catalogPage = 1;
+                    renderPaintCatalog();
+                }, 300));
             }
 
             // ---- НАЛАШТУВАННЯ МОВИ – ВИПРАВЛЕНО: негайне перемикання ----
@@ -259,7 +267,6 @@ window.SICOMIX = window.SICOMIX || {};
                     SICOMIX.i18n.setLanguage(newLang);
                     SICOMIX.i18n.applyTranslations();
                     populateCategoryFilters();
-                    saveData();
                     
                     // Оновлюємо поточну сторінку
                     const activePage = document.querySelector('.page-content.active');
@@ -268,6 +275,8 @@ window.SICOMIX = window.SICOMIX || {};
                         if (pageId === 'recipes') renderRecipes();
                         if (pageId === 'catalog') renderPaintCatalog();
                     }
+                    
+                    saveData();
                 });
             }
 
@@ -687,7 +696,7 @@ window.SICOMIX = window.SICOMIX || {};
             win.print();
         }
 
-        // ---------- КАТАЛОГ ФАРБ (БЕЗПЕЧНИЙ РЕНДЕР) ----------
+        // ---------- КАТАЛОГ ФАРБ (З ПАГІНАЦІЄЮ) ----------
         function renderPaintCatalog() {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -706,12 +715,20 @@ window.SICOMIX = window.SICOMIX || {};
                     );
                 }
 
-                if (filtered.length === 0) {
+                catalogFiltered = filtered;
+
+                if (catalogFiltered.length === 0) {
                     paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('catalog_empty')}</p>`;
                     return;
                 }
 
-                paintCatalogEl.innerHTML = filtered.map(p => {
+                const isMobile = window.innerWidth <= 768;
+                const pageSize = isMobile ? CATALOG_PAGE_SIZE : Infinity;
+                const start = 0;
+                const end = isMobile ? catalogPage * pageSize : catalogFiltered.length;
+                const paginated = catalogFiltered.slice(start, end);
+
+                let html = paginated.map(p => {
                     const name = p.name || 'Без назви';
                     const category = p.category || 'Інше';
                     const color = p.color || '#7b2cbf';
@@ -746,6 +763,26 @@ window.SICOMIX = window.SICOMIX || {};
                         </div>
                     `;
                 }).join('');
+
+                if (isMobile && end < catalogFiltered.length) {
+                    html += `
+                        <div style="text-align:center; margin:20px 0;">
+                            <button class="btn btn-primary" id="loadMoreCatalogBtn">
+                                <i class="fas fa-arrow-down"></i> ${SICOMIX.i18n.t('load_more')} (${catalogFiltered.length - end} ${SICOMIX.i18n.t('paints')})
+                            </button>
+                        </div>
+                    `;
+                }
+
+                paintCatalogEl.innerHTML = html;
+
+                const loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
+                if (loadMoreBtn) {
+                    loadMoreBtn.addEventListener('click', () => {
+                        catalogPage++;
+                        renderPaintCatalog();
+                    });
+                }
 
                 paintCatalogEl.querySelectorAll('.delete-paint').forEach(btn => {
                     btn.addEventListener('click', (e) => {
