@@ -170,8 +170,14 @@ window.SICOMIX = window.SICOMIX || {};
                 of: "з",
                 paints: "фарб",
 
-                // НОВИЙ КЛЮЧ
-                default_paint: "Стандартна"
+                // Стандартна фарба
+                default_paint: "Стандартна",
+
+                // Нові ключі (додані для повноти)
+                cannot_delete_default_paint: "Стандартні фарби SICO не можна видалити",
+                data_cleared: "Дані очищено",
+                clear_all_data_confirmation: "УВАГА! Це видалить всі рецепти та додані вами фарби. Стандартний каталог SICO відновиться.",
+                catalog_render_error: "Помилка відображення каталогу."
             },
             en: {
                 // Глобальні
@@ -337,8 +343,14 @@ window.SICOMIX = window.SICOMIX || {};
                 of: "of",
                 paints: "paints",
 
-                // НОВИЙ КЛЮЧ
-                default_paint: "Standard"
+                // Стандартна фарба
+                default_paint: "Standard",
+
+                // Нові ключі
+                cannot_delete_default_paint: "Standard SICO paints cannot be deleted",
+                data_cleared: "Data cleared",
+                clear_all_data_confirmation: "WARNING! This will delete all recipes and user-added paints. The standard SICO catalog will be restored.",
+                catalog_render_error: "Error rendering catalog."
             },
             pl: {
                 // Глобальні
@@ -504,8 +516,14 @@ window.SICOMIX = window.SICOMIX || {};
                 of: "z",
                 paints: "farby",
 
-                // НОВИЙ КЛЮЧ
-                default_paint: "Standardowa"
+                // Стандартна фарба
+                default_paint: "Standardowa",
+
+                // Нові ключі
+                cannot_delete_default_paint: "Standardowe farby SICO nie mogą być usunięte",
+                data_cleared: "Dane wyczyszczone",
+                clear_all_data_confirmation: "UWAGA! Spowoduje to usunięcie wszystkich receptur i farb dodanych przez użytkownika. Standardowy katalog SICO zostanie przywrócony.",
+                catalog_render_error: "Błąd renderowania katalogu."
             }
         };
 
