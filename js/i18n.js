@@ -527,12 +527,13 @@ window.SICOMIX = window.SICOMIX || {};
             }
         };
 
-        // ---------- СЛОВНИК ПЕРЕКЛАДУ КАТЕГОРІЙ ----------
+        // ---------- СЛОВНИК ПЕРЕКЛАДУ КАТЕГОРІЙ (додано "Пластики" як синонім) ----------
         const categoryTranslations = {
             "Універсальні": { uk: "Універсальні", en: "Universal", pl: "Uniwersalne" },
             "UV фарби": { uk: "УФ фарби", en: "UV paints", pl: "Farby UV" },
             "Папір/картон": { uk: "Папір/картон", en: "Paper/Cardboard", pl: "Papier/karton" },
             "Пластик": { uk: "Пластик", en: "Plastic", pl: "Plastik" },
+            "Пластики": { uk: "Пластик", en: "Plastic", pl: "Plastik" }, // синонім
             "Текстиль": { uk: "Текстиль", en: "Textile", pl: "Tekstylia" }
         };
 
@@ -564,6 +565,7 @@ window.SICOMIX = window.SICOMIX || {};
         function translateCategory(categoryUk, lang = currentLang) {
             if (!categoryUk) return categoryUk;
             const trans = categoryTranslations[categoryUk];
+            // Якщо категорія не знайдена в словнику, повертаємо оригінал (не перекладаємо)
             return trans ? trans[lang] || categoryUk : categoryUk;
         }
 
@@ -605,6 +607,10 @@ window.SICOMIX = window.SICOMIX || {};
             translateCategory,
             applyTranslations,
             init
+        };
+    })();
+
+})(window);
         };
     })();
 
