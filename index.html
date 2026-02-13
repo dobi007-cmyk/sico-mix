@@ -18,7 +18,7 @@
     <link rel="icon" href="./icons/favicon.ico?v=2026.02.13" type="image/x-icon">
     <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.13">
 
-    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ (ВИПРАВЛЕНО) ========== -->
+    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ ========== -->
     <script>
         (function() {
             console.log('🛡️ Антикризовий захист активовано');
@@ -39,8 +39,27 @@
                 };
             }
 
-            // Видалено проблемне перевизначення location.href, reload, replace
-            // Вони не є критичними для захисту, але ламають роботу браузера
+            const originalReload = window.location.reload;
+            window.location.reload = function() {
+                console.warn('⚠️ Спроба викликати location.reload() – ЗАБЛОКОВАНО');
+                return false;
+            };
+
+            let currentHref = window.location.href;
+            Object.defineProperty(window.location, 'href', {
+                set: function(value) {
+                    console.warn('⚠️ Спроба змінити location.href на', value, '– ЗАБЛОКОВАНО');
+                },
+                get: function() {
+                    return currentHref;
+                },
+                configurable: false
+            });
+
+            const originalReplace = window.location.replace;
+            window.location.replace = function() {
+                console.warn('⚠️ Спроба викликати location.replace() – ЗАБЛОКОВАНО');
+            };
 
             window.addEventListener('error', function(e) {
                 console.error('❌ Помилка перехоплена:', e.error || e.message);
@@ -565,17 +584,6 @@
                 <button class="modal-close close-paint-selection">&times;</button>
             </div>
             <div id="paintSelectionList" style="max-height: 400px; overflow-y: auto;"></div>
-        </div>
-    </div>
-
-    <!-- MODAL: Series Details -->
-    <div class="modal" id="seriesDetailsModal">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h3 class="modal-title">Деталі серії</h3>
-                <button class="modal-close close-series-details">&times;</button>
-            </div>
-            <div id="seriesDetailsContent" style="max-height: 60vh; overflow-y: auto;"></div>
         </div>
     </div>
 
