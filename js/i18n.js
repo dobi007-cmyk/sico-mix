@@ -527,6 +527,15 @@ window.SICOMIX = window.SICOMIX || {};
             }
         };
 
+        // ---------- СЛОВНИК ПЕРЕКЛАДУ КАТЕГОРІЙ ----------
+        const categoryTranslations = {
+            "Універсальні": { uk: "Універсальні", en: "Universal", pl: "Uniwersalne" },
+            "UV фарби": { uk: "УФ фарби", en: "UV paints", pl: "Farby UV" },
+            "Папір/картон": { uk: "Папір/картон", en: "Paper/Cardboard", pl: "Papier/karton" },
+            "Пластик": { uk: "Пластик", en: "Plastic", pl: "Plastik" },
+            "Текстиль": { uk: "Текстиль", en: "Textile", pl: "Tekstylia" }
+        };
+
         let currentLang = 'uk';
 
         function setLanguage(lang) {
@@ -550,6 +559,12 @@ window.SICOMIX = window.SICOMIX || {};
                 return translations['uk'][key] || key;
             }
             return translation;
+        }
+
+        function translateCategory(categoryUk, lang = currentLang) {
+            if (!categoryUk) return categoryUk;
+            const trans = categoryTranslations[categoryUk];
+            return trans ? trans[lang] || categoryUk : categoryUk;
         }
 
         function applyTranslations() {
@@ -587,6 +602,7 @@ window.SICOMIX = window.SICOMIX || {};
             setLanguage,
             getLanguage,
             t,
+            translateCategory,
             applyTranslations,
             init
         };
