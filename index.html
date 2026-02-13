@@ -71,7 +71,7 @@
                 console.error('❌ Помилка перехоплена:', e.error || e.message);
                 console.error('   Стек:', e.error?.stack);
                 e.preventDefault();
-                return true;  // не передаємо далі
+                return true;
             });
 
             window.addEventListener('unhandledrejection', function(e) {
@@ -94,6 +94,15 @@
 
             console.log('🛡️ Захист завершено');
         })();
+    </script>
+
+    <!-- ДОДАТКОВИЙ ЗАХИСТ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ – блокування переходів по data-page -->
+    <script>
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.closest('[data-page]')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     </script>
 </head>
 <body>
