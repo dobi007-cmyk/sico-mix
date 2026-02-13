@@ -1,4 +1,4 @@
-// ========== МОДУЛЬ ІНТЕРНАЦІОНАЛІЗАЦІЇ (ПОВНІ ПЕРЕКЛАДИ) ==========
+// ========== МОДУЛЬ ІНТЕРНАЦІОНАЛІЗАЦІЇ (ПОВНІ ПЕРЕКЛАДИ + default_paint) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -168,7 +168,10 @@ window.SICOMIX = window.SICOMIX || {};
                 load_more: "Завантажити ще",
                 showing: "Показано",
                 of: "з",
-                paints: "фарб"
+                paints: "фарб",
+
+                // НОВИЙ КЛЮЧ
+                default_paint: "Стандартна"
             },
             en: {
                 // Глобальні
@@ -332,7 +335,10 @@ window.SICOMIX = window.SICOMIX || {};
                 load_more: "Load more",
                 showing: "Showing",
                 of: "of",
-                paints: "paints"
+                paints: "paints",
+
+                // НОВИЙ КЛЮЧ
+                default_paint: "Standard"
             },
             pl: {
                 // Глобальні
@@ -496,7 +502,10 @@ window.SICOMIX = window.SICOMIX || {};
                 load_more: "Załaduj więcej",
                 showing: "Pokazuje",
                 of: "z",
-                paints: "farby"
+                paints: "farby",
+
+                // НОВИЙ КЛЮЧ
+                default_paint: "Standardowa"
             }
         };
 
