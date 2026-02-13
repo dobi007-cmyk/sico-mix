@@ -592,6 +592,7 @@ window.SICOMIX = window.SICOMIX || {};
         renderIngredientsTable();
     }
 
+    // ========== ВИПРАВЛЕНО: додано перевірку на ingredients ==========
     function renderRecipes() {
         if (!elements.recipesContainer) return;
         const search = elements.recipeSearch?.value.toLowerCase() || '';
@@ -607,7 +608,9 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         elements.recipesContainer.innerHTML = filtered.map(recipe => {
-            const total = recipe.ingredients.reduce((sum, ing) => sum + (ing.amount || 0), 0);
+            // ✅ гарантуємо, що ingredients - масив
+            const ingredients = recipe.ingredients || [];
+            const total = ingredients.reduce((sum, ing) => sum + (ing.amount || 0), 0);
             return `
                 <div class="recipe-card" data-id="${recipe.id}">
                     <div class="recipe-image" style="background: ${recipe.color};"></div>
@@ -618,7 +621,7 @@ window.SICOMIX = window.SICOMIX || {};
                         </div>
                         <p class="recipe-description">${recipe.description || i18n.t('no_description')}</p>
                         <div class="recipe-meta">
-                            <span><i class="fas fa-flask"></i> ${recipe.ingredients.length} ${i18n.t('ingredients_count')}</span>
+                            <span><i class="fas fa-flask"></i> ${ingredients.length} ${i18n.t('ingredients_count')}</span>
                             <span><i class="fas fa-weight-hanging"></i> ${total} г</span>
                             <span><i class="fas fa-calendar"></i> ${new Date(recipe.createdAt).toLocaleDateString()}</span>
                         </div>
@@ -649,7 +652,7 @@ window.SICOMIX = window.SICOMIX || {};
         elements.recipeColor.value = recipe.color;
         elements.colorPreview.style.backgroundColor = recipe.color;
         elements.recipeDescription.value = recipe.description || '';
-        state.ingredients = recipe.ingredients.map(ing => ({ ...ing }));
+        state.ingredients = (recipe.ingredients || []).map(ing => ({ ...ing }));
         renderIngredientsTable();
         showPage('new-recipe');
     }
