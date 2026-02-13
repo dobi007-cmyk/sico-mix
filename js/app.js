@@ -745,7 +745,12 @@ window.SICOMIX = window.SICOMIX || {};
                     const color = p.color || '#7b2cbf';
                     const manufacturer = p.manufacturer || 'SICO';
                     const article = p.article || '—';
-                    const description = p.description || SICOMIX.i18n.t('no_description');
+                    // Отримуємо локалізований опис
+                    let descriptionText = SICOMIX.i18n.t('no_description');
+                    if (p.description) {
+                        const lang = SICOMIX.i18n.getLanguage();
+                        descriptionText = p.description[lang] || p.description['uk'] || descriptionText;
+                    }
                     const isDefault = p.isDefault === true;
                     const canDelete = !isDefault;
 
@@ -762,7 +767,7 @@ window.SICOMIX = window.SICOMIX || {};
                                         <div><span style="font-size:12px;">${SICOMIX.i18n.t('manufacturer')}</span><br><strong>${manufacturer}</strong></div>
                                         <div><span style="font-size:12px;">${SICOMIX.i18n.t('article')}</span><br><strong>${article}</strong></div>
                                     </div>
-                                    <p style="color:var(--text-secondary);">${description}</p>
+                                    <p style="color:var(--text-secondary);">${descriptionText}</p>
                                 </div>
                                 <div class="recipe-actions">
                                     ${canDelete ? 
