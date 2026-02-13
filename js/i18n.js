@@ -1,10 +1,10 @@
-// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (ВИПРАВЛЕНО) ==========
+// ========== МОДУЛЬ ІНТЕРНАЦІОНАЛІЗАЦІЇ (ВИПРАВЛЕНО) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
     const SICOMIX = global.SICOMIX;
 
-    SICOMIX.app = (function() {
+    SICOMIX.i18n = (function() {
         const translations = {
             uk: {
                 // Глобальні
@@ -165,10 +165,10 @@ window.SICOMIX = window.SICOMIX || {};
                 save_first: "Спочатку збережіть рецепт"
             },
             en: {
-                // ... (весь ваш англійський переклад) ...
+                // ... (додайте ваш англійський переклад або залиште коментар)
             },
             pl: {
-                // ... (весь ваш польський переклад) ...
+                // ... (додайте ваш польський переклад або залиште коментар)
             }
         };
 
@@ -191,14 +191,13 @@ window.SICOMIX = window.SICOMIX || {};
         function t(key) {
             const translation = translations[currentLang]?.[key];
             if (translation === undefined) {
-                console.warn(`Missing translation key: ${key} [${currentLang}]`);
+                console.warn(`⚠️ Missing translation key: ${key} [${currentLang}]`);
                 return translations['uk'][key] || key;
             }
             return translation;
         }
 
         function applyTranslations() {
-            // Якщо DOM ще не готовий – вийдемо, застосуємо пізніше
             if (!document || !document.querySelectorAll) return;
 
             document.querySelectorAll('[data-i18n]').forEach(el => {
