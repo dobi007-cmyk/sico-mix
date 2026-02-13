@@ -1,9 +1,8 @@
 // ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (ВИПРАВЛЕНО) ==========
-// Безпечно додаємо модуль app до вже існуючого SICOMIX
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
-    const SICOMIX = global.SICOMIX; // посилання на глобальний об'єкт
+    const SICOMIX = global.SICOMIX;
 
     SICOMIX.app = (function() {
         // Стан
@@ -66,8 +65,24 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         function loadData() {
-            recipes = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumRecipes', SICOMIX.data.recipes);
-            paintCatalog = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumPaints', SICOMIX.data.paints);
+            // Завантаження з міграцією: конвертуємо всі ID у рядки
+            const savedRecipes = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumRecipes', []);
+            recipes = savedRecipes.map(r => ({
+                ...r,
+                id: String(r.id),
+                ingredients: (r.ingredients || []).map(ing => ({
+                    ...ing,
+                    paintId: String(ing.paintId)
+                }))
+            }));
+
+            const savedPaints = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumPaints', []);
+            paintCatalog = savedPaints.map(p => ({ ...p, id: String(p.id) }));
+            if (paintCatalog.length === 0) {
+                // Якщо немає збережених, беремо дефолтні з data-colors і конвертуємо ID у рядки
+                paintCatalog = SICOMIX.data.paints.map(p => ({ ...p, id: String(p.id) }));
+            }
+
             currentSettings = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumSettings', SICOMIX.data.defaultSettings);
         }
 
@@ -207,7 +222,7 @@ window.SICOMIX = window.SICOMIX || {};
 
             let html = '';
             selectedIngredients.forEach((ing, idx) => {
-                const paint = paintCatalog.find(p => p.id === ing.paintId);
+                const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId));
                 if (!paint) return;
                 html += `<tr>
                     <td>
@@ -256,7 +271,7 @@ window.SICOMIX = window.SICOMIX || {};
             if (term) filtered = filtered.filter(p => p.name.toLowerCase().includes(term));
             if (cat) filtered = filtered.filter(p => p.category === cat);
             if (filtered.length === 0) {
-                showNotification(SICOMIX.i18n.t('paints_not_found'), 'error');
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('paints_not_found'), 'error');
                 return;
             }
             showPaintSelectionModal(filtered);
@@ -274,21 +289,33 @@ window.SICOMIX = window.SICOMIX || {};
                 </div>
             `).join('');
             modal.classList.add('active');
+
+            // Видаляємо старі слухачі
+            const oldCards = list.querySelectorAll('.paint-selection-card');
+            oldCards.forEach(card => {
+                card.replaceWith(card.cloneNode(true));
+            });
+
             list.querySelectorAll('.paint-selection-card').forEach(card => {
                 card.addEventListener('click', function() {
-                    const pid = parseInt(this.dataset.id);
-                    if (selectedIngredients.some(ing => ing.paintId === pid)) {
-                        showNotification(SICOMIX.i18n.t('paint_already_added'), 'warning');
+                    const pid = this.dataset.id; // рядок
+                    if (selectedIngredients.some(ing => String(ing.paintId) === pid)) {
+                        SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_already_added'), 'warning');
                     } else {
                         selectedIngredients.push({ paintId: pid, amount: 100, unit: 'г', percentage: 0 });
                         calculatePercentages();
                         renderIngredientsList();
-                        showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
+                        SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
                     }
                     modal.classList.remove('active');
                 });
             });
-            modal.querySelector('.close-paint-selection')?.addEventListener('click', () => modal.classList.remove('active'));
+
+            const closeBtn = modal.querySelector('.close-paint-selection');
+            if (closeBtn) {
+                closeBtn.replaceWith(closeBtn.cloneNode(true));
+                modal.querySelector('.close-paint-selection').addEventListener('click', () => modal.classList.remove('active'));
+            }
         }
 
         function deleteIngredient(index) {
@@ -311,16 +338,16 @@ window.SICOMIX = window.SICOMIX || {};
             const desc = document.getElementById('recipeDescription')?.value.trim();
 
             if (!name || !cat || selectedIngredients.length === 0) {
-                showNotification(SICOMIX.i18n.t('fill_required_fields'), 'error');
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('fill_required_fields'), 'error');
                 return;
             }
 
             if (isEditingRecipe && editingRecipeId) {
-                const idx = recipes.findIndex(r => r.id === editingRecipeId);
+                const idx = recipes.findIndex(r => String(r.id) === String(editingRecipeId));
                 if (idx !== -1) {
                     recipes[idx] = { ...recipes[idx], name, category: cat, color, description: desc, ingredients: [...selectedIngredients], date: new Date().toLocaleDateString('uk-UA') };
                     saveData();
-                    showNotification(`${SICOMIX.i18n.t('recipe_saved')} "${name}"`, 'success');
+                    SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('recipe_saved')} "${name}"`, 'success');
                     resetEditMode();
                 }
             } else {
@@ -333,7 +360,7 @@ window.SICOMIX = window.SICOMIX || {};
                 };
                 recipes.push(newRecipe);
                 saveData();
-                showNotification(`${SICOMIX.i18n.t('recipe_saved')} "${name}"`, 'success');
+                SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('recipe_saved')} "${name}"`, 'success');
             }
             clearRecipeForm();
             switchPage('recipes');
@@ -403,19 +430,19 @@ window.SICOMIX = window.SICOMIX || {};
             }).join('');
 
             recipesContainer.querySelectorAll('.edit-recipe').forEach(btn => btn.addEventListener('click', (e) => {
-                const id = parseInt(e.target.closest('.recipe-card').dataset.id);
+                const id = e.target.closest('.recipe-card').dataset.id;
                 editRecipe(id);
             }));
             recipesContainer.querySelectorAll('.delete-recipe').forEach(btn => btn.addEventListener('click', (e) => {
-                const id = parseInt(e.target.closest('.recipe-card').dataset.id);
+                const id = e.target.closest('.recipe-card').dataset.id;
                 deleteRecipe(id);
             }));
             recipesContainer.querySelectorAll('.export-recipe').forEach(btn => btn.addEventListener('click', (e) => {
-                const id = parseInt(e.target.closest('.recipe-card').dataset.id);
+                const id = e.target.closest('.recipe-card').dataset.id;
                 exportRecipe(id);
             }));
             recipesContainer.querySelectorAll('.recipe-select').forEach(cb => cb.addEventListener('change', function() {
-                const id = parseInt(this.value);
+                const id = this.value;
                 if (this.checked) { if (!selectedRecipes.includes(id)) selectedRecipes.push(id); }
                 else { selectedRecipes = selectedRecipes.filter(v => v !== id); }
             }));
@@ -426,48 +453,48 @@ window.SICOMIX = window.SICOMIX || {};
                 SICOMIX.i18n.t('delete_recipe'),
                 SICOMIX.i18n.t('delete_recipe_confirmation'),
                 () => {
-                    recipes = recipes.filter(r => r.id !== id);
-                    selectedRecipes = selectedRecipes.filter(rid => rid !== id);
+                    recipes = recipes.filter(r => String(r.id) !== String(id));
+                    selectedRecipes = selectedRecipes.filter(rid => String(rid) !== String(id));
                     saveData();
                     renderRecipes();
-                    showNotification(SICOMIX.i18n.t('recipe_deleted'), 'success');
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('recipe_deleted'), 'success');
                 }
             );
         }
 
         function deleteSelectedRecipes() {
             if (selectedRecipes.length === 0) {
-                showNotification(SICOMIX.i18n.t('select_recipes_to_delete'), 'warning');
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_recipes_to_delete'), 'warning');
                 return;
             }
             SICOMIX.utils.showConfirmation(
                 SICOMIX.i18n.t('delete_recipes'),
                 `${SICOMIX.i18n.t('delete_recipes_confirmation')} ${selectedRecipes.length} ${SICOMIX.i18n.t('recipes')}?`,
                 () => {
-                    recipes = recipes.filter(r => !selectedRecipes.includes(r.id));
+                    recipes = recipes.filter(r => !selectedRecipes.includes(String(r.id)));
                     selectedRecipes = [];
                     saveData();
                     renderRecipes();
-                    showNotification(`${SICOMIX.i18n.t('deleted')} ${selectedRecipes.length}`, 'success');
+                    SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('deleted')} ${selectedRecipes.length}`, 'success');
                 }
             );
         }
 
         function exportRecipe(id) {
-            const recipe = recipes.find(r => r.id === id);
+            const recipe = recipes.find(r => String(r.id) === String(id));
             if (recipe) {
                 SICOMIX.utils.exportToFile(recipe, `${recipe.name.replace(/\s+/g, '_')}.json`);
-                showNotification(`${SICOMIX.i18n.t('recipe_exported')}`, 'success');
+                SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('recipe_exported')}`, 'success');
             }
         }
 
         function exportAllRecipes() {
             if (recipes.length === 0) {
-                showNotification(SICOMIX.i18n.t('no_recipes_to_export'), 'warning');
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('no_recipes_to_export'), 'warning');
                 return;
             }
             SICOMIX.utils.exportToFile(recipes, `sico_spectrum_recipes_${new Date().toISOString().split('T')[0]}.json`);
-            showNotification(`${SICOMIX.i18n.t('exported')} ${recipes.length} ${SICOMIX.i18n.t('recipes')}`, 'success');
+            SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('exported')} ${recipes.length} ${SICOMIX.i18n.t('recipes')}`, 'success');
         }
 
         function importRecipes() {
@@ -486,14 +513,20 @@ window.SICOMIX = window.SICOMIX || {};
                             SICOMIX.i18n.t('import_recipes'),
                             `${SICOMIX.i18n.t('found_recipes')} ${arr.length}. ${SICOMIX.i18n.t('import_confirm')}`,
                             () => {
-                                arr.forEach(r => { r.id = SICOMIX.utils.generateId(); recipes.push(r); });
+                                arr.forEach(r => { 
+                                    r.id = SICOMIX.utils.generateId();
+                                    if (r.ingredients) {
+                                        r.ingredients = r.ingredients.map(ing => ({ ...ing, paintId: String(ing.paintId) }));
+                                    }
+                                    recipes.push(r);
+                                });
                                 saveData();
                                 renderRecipes();
-                                showNotification(`${SICOMIX.i18n.t('imported')} ${arr.length}`, 'success');
+                                SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('imported')} ${arr.length}`, 'success');
                             }
                         );
                     } catch (err) {
-                        showNotification(SICOMIX.i18n.t('invalid_file_format'), 'error');
+                        SICOMIX.utils.showNotification(SICOMIX.i18n.t('invalid_file_format'), 'error');
                     }
                 };
                 reader.readAsText(file);
@@ -521,7 +554,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             paintCatalogEl.innerHTML = filtered.map(p => `
-                <div class="recipe-card">
+                <div class="recipe-card" data-id="${p.id}">
                     <div class="recipe-image" style="background:${p.color};"></div>
                     <div class="recipe-content">
                         <div class="recipe-header">
@@ -542,7 +575,7 @@ window.SICOMIX = window.SICOMIX || {};
             `).join('');
 
             paintCatalogEl.querySelectorAll('.delete-paint').forEach(btn => btn.addEventListener('click', () => {
-                deletePaint(parseInt(btn.dataset.id));
+                deletePaint(btn.dataset.id);
             }));
             updatePaintCount();
         }
@@ -567,7 +600,7 @@ window.SICOMIX = window.SICOMIX || {};
             const art = document.getElementById('paintArticle').value.trim();
 
             if (!name || !cat) {
-                showNotification('Будь ласка, заповніть обов\'язкові поля', 'error');
+                SICOMIX.utils.showNotification('Будь ласка, заповніть обов\'язкові поля', 'error');
                 return;
             }
 
@@ -580,7 +613,7 @@ window.SICOMIX = window.SICOMIX || {};
             addPaintModal.classList.remove('active');
             document.body.style.overflow = 'auto';
             renderPaintCatalog();
-            showNotification(`${SICOMIX.i18n.t('paint_added')} "${name}"`, 'success');
+            SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('paint_added')} "${name}"`, 'success');
         }
 
         function deletePaint(id) {
@@ -588,10 +621,10 @@ window.SICOMIX = window.SICOMIX || {};
                 SICOMIX.i18n.t('delete_paint'),
                 SICOMIX.i18n.t('delete_paint_confirmation'),
                 () => {
-                    paintCatalog = paintCatalog.filter(p => p.id !== id);
+                    paintCatalog = paintCatalog.filter(p => String(p.id) !== String(id));
                     saveData();
                     renderPaintCatalog();
-                    showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
                 }
             );
         }
@@ -604,21 +637,21 @@ window.SICOMIX = window.SICOMIX || {};
 
         // ========== РЕДАГУВАННЯ ==========
         function editRecipe(id) {
-            const recipe = recipes.find(r => r.id === id);
+            const recipe = recipes.find(r => String(r.id) === String(id));
             if (!recipe) return;
             document.getElementById('recipeName').value = recipe.name;
             document.getElementById('recipeCategory').value = recipe.category;
             document.getElementById('recipeColor').value = recipe.color;
             colorPreview.style.background = recipe.color;
             document.getElementById('recipeDescription').value = recipe.description || '';
-            selectedIngredients = [...recipe.ingredients];
+            selectedIngredients = recipe.ingredients.map(ing => ({ ...ing, paintId: String(ing.paintId) }));
             renderIngredientsList();
             isEditingRecipe = true;
             editingRecipeId = id;
             saveRecipeBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="update_recipe"></span>`;
             SICOMIX.i18n.applyTranslations();
             switchPage('new-recipe');
-            showNotification(`"${recipe.name}" ${SICOMIX.i18n.t('edit')}`, 'info');
+            SICOMIX.utils.showNotification(`"${recipe.name}" ${SICOMIX.i18n.t('edit')}`, 'info');
         }
 
         // ========== НАЛАШТУВАННЯ ==========
@@ -635,23 +668,19 @@ window.SICOMIX = window.SICOMIX || {};
                 calculationsPrecision: 2
             };
             saveData();
-            showNotification(SICOMIX.i18n.t('save_settings'), 'success');
+            SICOMIX.utils.showNotification(SICOMIX.i18n.t('save_settings'), 'success');
             
-            // Зміна мови БЕЗ перезавантаження сторінки
             if (SICOMIX.i18n.getLanguage() !== languageSelect.value) {
                 SICOMIX.i18n.setLanguage(languageSelect.value);
-                // Перекладаємо всі динамічні елементи (кнопки, плейсхолдери)
                 SICOMIX.i18n.applyTranslations();
-                // Оновлюємо списки категорій (вони містять текст)
                 populateCategoryFilters();
-                // Перемальовуємо поточну сторінку, щоб оновити текст у картках тощо
                 const activePage = document.querySelector('.page-content.active');
                 if (activePage) {
                     const pageId = activePage.id.replace('-page', '');
                     if (pageId === 'recipes') renderRecipes();
                     if (pageId === 'catalog') renderPaintCatalog();
                 }
-                showNotification(`Мова змінена на ${languageSelect.selectedOptions[0].text}`, 'success');
+                SICOMIX.utils.showNotification(`Мова змінена на ${languageSelect.selectedOptions[0].text}`, 'success');
             }
         }
 
@@ -663,7 +692,7 @@ window.SICOMIX = window.SICOMIX || {};
                     currentSettings = SICOMIX.data.defaultSettings;
                     saveData();
                     initSettings();
-                    showNotification(SICOMIX.i18n.t('reset_defaults'), 'success');
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('reset_defaults'), 'success');
                 }
             );
         }
@@ -674,13 +703,13 @@ window.SICOMIX = window.SICOMIX || {};
                 'УВАГА! Це видалить всі рецепти та фарби. Дія незворотна.',
                 () => {
                     recipes = [];
-                    paintCatalog = [...SICOMIX.data.paints];
+                    paintCatalog = SICOMIX.data.paints.map(p => ({ ...p, id: String(p.id) }));
                     selectedIngredients = [];
                     selectedRecipes = [];
                     saveData();
                     renderRecipes();
                     renderPaintCatalog();
-                    showNotification(SICOMIX.i18n.t('clear_all_data'), 'success');
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('clear_all_data'), 'success');
                 }
             );
         }
@@ -699,7 +728,7 @@ window.SICOMIX = window.SICOMIX || {};
             if (window.innerWidth > 992) { sidebar.classList.add('active'); mainContainer.classList.add('sidebar-open'); }
             document.getElementById('preloader')?.style.setProperty('opacity', '0');
             setTimeout(() => document.getElementById('preloader')?.remove(), 500);
-            showNotification(SICOMIX.i18n.t('welcome_title'), 'success', 2000);
+            SICOMIX.utils.showNotification(SICOMIX.i18n.t('welcome_title'), 'success', 2000);
         }
 
         function populateCategoryFilters() {
@@ -720,18 +749,14 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.i18n.applyTranslations();
         }
 
-        function showNotification(msg, type, dur) {
-            SICOMIX.utils.showNotification(msg, type, dur);
-        }
-
         return {
             init: initApp,
             deleteRecipe,
             exportRecipe,
             editRecipe,
             deletePaint,
-            showNotification
+            showNotification: SICOMIX.utils.showNotification
         };
     })();
 
-})(window); // ← НЕМАЄ ШКІДЛИВОГО ПЕРЕЗАПИСУ!
+})(window);
