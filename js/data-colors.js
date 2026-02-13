@@ -239,15 +239,15 @@ SICOMIX.data = (function() {
             { code: "75", name: { ua: "Прозорий рожевий", pl: "Transparent różowy", en: "Transparent Pink" }, color: "#FFC0CB" }
         ];
 
-        // ---------- ГЕНЕРАЦІЯ ФАРБ (БЕЗ SPREAD, З ПЕРЕВІРКОЮ) ----------
+        // ---------- ГЕНЕРАЦІЯ ФАРБ (РЯДКОВІ ID) ----------
         function generatePaintsFromBaseColors() {
             const paints = [];
-            let id = 1;
+            let counter = 1;
             
             series.forEach(serie => {
                 baseColors.forEach(baseColor => {
                     paints.push({
-                        id: id++,
+                        id: `paint-${counter++}`,
                         name: `${serie.id}${baseColor.code}`,
                         displayName: `${serie.name} ${baseColor.name.ua}`,
                         searchName: `${serie.id}${baseColor.code}`,
@@ -270,7 +270,7 @@ SICOMIX.data = (function() {
             const ecSeries = series.find(s => s.id === "EC");
             if (ecSeries) {
                 paints.push({
-                    id: id++,
+                    id: `paint-${counter++}`,
                     name: "EC60/146",
                     displayName: "EC Вогненно-червоний 60/146",
                     searchName: "EC60/146",
@@ -287,7 +287,7 @@ SICOMIX.data = (function() {
                     fullInfo: "Серія: EC, Спеціальний колір: EC 60/146 - Вогненно-червоний"
                 });
                 paints.push({
-                    id: id++,
+                    id: `paint-${counter++}`,
                     name: "EC61/163",
                     displayName: "EC Темно-вогненно-червоний 61/163",
                     searchName: "EC61/163",
@@ -304,7 +304,7 @@ SICOMIX.data = (function() {
                     fullInfo: "Серія: EC, Спеціальний колір: EC 61/163 - Темно-вогненно-червоний"
                 });
                 paints.push({
-                    id: id++,
+                    id: `paint-${counter++}`,
                     name: "EC91Q",
                     displayName: "EC Напівматова біла 91 Q",
                     searchName: "EC91Q",
@@ -321,7 +321,7 @@ SICOMIX.data = (function() {
                     fullInfo: "Серія: EC, Спеціальний колір: EC 91 Q - Напівматова біла"
                 });
                 paints.push({
-                    id: id++,
+                    id: `paint-${counter++}`,
                     name: "ECRG120",
                     displayName: "EC Золота RG 120",
                     searchName: "ECRG120",
