@@ -1,4 +1,4 @@
-// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (СТАБІЛЬНА ВЕРСІЯ + ПАГІНАЦІЯ) ==========
+// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (СТАБІЛЬНА ВЕРСІЯ + ПАГІНАЦІЯ + ПЕРЕКЛАД) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -722,8 +722,15 @@ window.SICOMIX = window.SICOMIX || {};
                     return;
                 }
 
+                // Визначаємо, чи показувати пагінацію (на мобільних)
                 const isMobile = window.innerWidth <= 768;
                 const pageSize = isMobile ? CATALOG_PAGE_SIZE : Infinity;
+                
+                // Скидаємо сторінку, якщо поточна перевищує доступну кількість
+                const maxPage = Math.ceil(catalogFiltered.length / pageSize);
+                if (catalogPage > maxPage) catalogPage = maxPage;
+                if (catalogPage < 1) catalogPage = 1;
+
                 const start = 0;
                 const end = isMobile ? catalogPage * pageSize : catalogFiltered.length;
                 const paginated = catalogFiltered.slice(start, end);
@@ -744,7 +751,7 @@ window.SICOMIX = window.SICOMIX || {};
                             <div class="recipe-content">
                                 <div class="recipe-header">
                                     <div><h3 class="recipe-title">${name}</h3><span class="recipe-category">${category}</span></div>
-                                    ${isDefault ? '<span style="font-size:11px; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:20px;">SICO</span>' : ''}
+                                    ${isDefault ? `<span style="font-size:11px; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:20px;">SICO · ${SICOMIX.i18n.t('default_paint')}</span>` : ''}
                                 </div>
                                 <div style="margin-bottom:15px;">
                                     <div style="display:flex; gap:15px;">
@@ -756,7 +763,7 @@ window.SICOMIX = window.SICOMIX || {};
                                 <div class="recipe-actions">
                                     ${canDelete ? 
                                         `<button class="recipe-btn delete-paint" data-id="${p.id}"><i class="fas fa-trash"></i> ${SICOMIX.i18n.t('delete')}</button>` : 
-                                        `<button class="recipe-btn" disabled style="opacity:0.5; cursor:not-allowed;"><i class="fas fa-ban"></i> Стандартна</button>`
+                                        `<button class="recipe-btn" disabled style="opacity:0.5; cursor:not-allowed;"><i class="fas fa-ban"></i> ${SICOMIX.i18n.t('default_paint')}</button>`
                                     }
                                 </div>
                             </div>
@@ -764,6 +771,7 @@ window.SICOMIX = window.SICOMIX || {};
                     `;
                 }).join('');
 
+                // Кнопка "Завантажити ще" тільки якщо є невідображені елементи
                 if (isMobile && end < catalogFiltered.length) {
                     html += `
                         <div style="text-align:center; margin:20px 0;">
@@ -776,6 +784,7 @@ window.SICOMIX = window.SICOMIX || {};
 
                 paintCatalogEl.innerHTML = html;
 
+                // Додаємо обробник для кнопки "Завантажити ще"
                 const loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
                 if (loadMoreBtn) {
                     loadMoreBtn.addEventListener('click', () => {
@@ -784,6 +793,7 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 }
 
+                // Обробники видалення
                 paintCatalogEl.querySelectorAll('.delete-paint').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
