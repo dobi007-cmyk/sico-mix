@@ -4,12 +4,12 @@ const SICOMIX = window.SICOMIX;
 
 SICOMIX.data = (function() {
     try {
-        // ---------- СЕРІЇ ФАРБ (багатомовні) ----------
+        // ---------- СЕРІЇ ФАРБ (категорії тепер рядки) ----------
         const series = [
             { 
                 id: "EC",
                 name: { ua: "EC", pl: "EC", en: "EC" },
-                category: { ua: "Універсальні", pl: "Uniwersalne", en: "Universal" },
+                category: "Універсальні",   // було об'єктом, тепер рядок
                 description: {
                     ua: "Універсальна розчинникова фарба. Легка в друці, високий глянець. Підходить для самоклейних матеріалів, ПВХ, паперу, картону, лакированих металів. З додаванням 5% HEC – для поліпропілену, priplack, ABS, forex, банерів.",
                     pl: "Uniwersalna farba rozpuszczalnikowa. Łatwa w druku, wysoki połysk. Nadaje się do materiałów samoprzylepnych, PCV, papieru, tektury, metali lakierowanych. Z dodatkiem 5% HEC – do polipropylenu, priplack, ABS, forex, banerów.",
@@ -71,7 +71,7 @@ SICOMIX.data = (function() {
             { 
                 id: "CF",
                 name: { ua: "CARTOFLEX CF", pl: "CARTOFLEX CF", en: "CARTOFLEX CF" },
-                category: { ua: "Папір/картон", pl: "Papier/tektura", en: "Paper/cardboard" },
+                category: "Папір/картон",
                 description: {
                     ua: "Розчинникова фарба для картону, паперу, самоклейних паперів, дерева, лакированих металів. Промисловий друк: сталеві бочки, вогнегасники, пробки для оливи, суха пінопласт EPS. Для плівок Penstick з поліестеровим покриттям, поліестеру, PET, поліуретану – серія CF A&S.",
                     pl: "Farba rozpuszczalnikowa do tektury, papieru, papierów samoprzylepnych, drewna, metali lakierowanych. Druk przemysłowy: beczki stalowe, gaśnice, korki olejowe, suchy styropian EPS. Do folii Penstick z powłoką poliestrową, poliestru, PET, poliuretanu – seria CF A&S.",
@@ -128,7 +128,7 @@ SICOMIX.data = (function() {
             { 
                 id: "PLUV",
                 name: { ua: "UVIPLAST PLUV", pl: "UVIPLAST PLUV", en: "UVIPLAST PLUV" },
-                category: { ua: "UV фарби", pl: "Farby UV", en: "UV inks" },
+                category: "UV фарби",
                 description: {
                     ua: "Фарба та лак УФ. Для самоклейних матеріалів, банерів, лакированого металу, ПП, пінопласту, попередньо активованого поліетилену, полікарбонату, паперу, ПВХ. Лак PLUV 150 – високоглянцевий для офсету та трафаретного друку.",
                     pl: "Farba i lakier UV. Do materiałów samoprzylepnych, banerów, metalu lakierowanego, PP, styropianu, wstępnie aktywowanego polietylenu, poliwęglanu, papieru, PCV. Lakier PLUV 150 – wysoki połysk do offsetu i druku sitowego.",
@@ -190,7 +190,7 @@ SICOMIX.data = (function() {
             { 
                 id: "SX",
                 name: { ua: "SICOTEX SX", pl: "SICOTEX SX", en: "SICOTEX SX" },
-                category: { ua: "Текстиль", pl: "Tekstylia", en: "Textile" },
+                category: "Текстиль",
                 description: {
                     ua: "Водна фарба для бавовни, синтетичних тканин та їх сумішей. Екологічна, сертифікат Oeko-Tex 100 клас I-IV. Без розчинників, важких металів, шкідливих пігментів, PVC.",
                     pl: "Farba wodna do bawełny, tkanin syntetycznych i ich mieszanek. Ekologiczna, certyfikat Oeko-Tex 100 klasa I-IV. Bez rozpuszczalników, metali ciężkich, szkodliwych pigmentów, PVC.",
@@ -252,7 +252,7 @@ SICOMIX.data = (function() {
             { 
                 id: "SPTN",
                 name: { ua: "SICOPLAST SPTN", pl: "SICOPLAST SPTN", en: "SICOPLAST SPTN" },
-                category: { ua: "Текстиль", pl: "Tekstylia", en: "Textile" },
+                category: "Текстиль",
                 description: {
                     ua: "Пластизольова фарба для всіх тканинних матеріалів – натуральних та синтетичних. Прямий та трансферний друк.",
                     pl: "Farba plastizolowa do wszystkich materiałów tekstylnych – naturalnych i syntetycznych. Druk bezpośredni i transferowy.",
@@ -314,7 +314,7 @@ SICOMIX.data = (function() {
             { 
                 id: "AS",
                 name: { ua: "AQUASET AS", pl: "AQUASET AS", en: "AQUASET AS" },
-                category: { ua: "Папір/картон", pl: "Papier/tektura", en: "Paper/cardboard" },
+                category: "Папір/картон",
                 description: {
                     ua: "Водна фарба для картону, товстого паперу (мін. 130 г/м²), дерева, гофрокартону. Екологічна, без важких металів, підходить для дитячих іграшок та харчової упаковки.",
                     pl: "Farba wodna do tektury, grubego papieru (min. 130 g/m²), drewna, tektury falistej. Ekologiczna, bez metali ciężkich, odpowiednia do zabawek dla dzieci i opakowań spożywczych.",
@@ -371,7 +371,7 @@ SICOMIX.data = (function() {
             { 
                 id: "OTF",
                 name: { ua: "OPATEX OTF", pl: "OPATEX OTF", en: "OPATEX OTF" },
-                category: { ua: "Текстиль", pl: "Tekstylia", en: "Textile" },
+                category: "Текстиль",
                 description: {
                     ua: "Суперкриюча водна фарба для прямого та трансферного друку на темних тканинах (натуральних та більшості синтетичних).",
                     pl: "Superkryjąca farba wodna do druku bezpośredniego i transferowego na ciemnych tkaninach (naturalnych i większości syntetycznych).",
@@ -433,7 +433,7 @@ SICOMIX.data = (function() {
             { 
                 id: "TPP",
                 name: { ua: "POLYPRO TPP", pl: "POLYPRO TPP", en: "POLYPRO TPP" },
-                category: { ua: "Пластики", pl: "Tworzywa sztuczne", en: "Plastics" },
+                category: "Пластики",
                 description: {
                     ua: "Розчинникова фарба для поліетилену, поліпропілену та полікарбонату (priplack, akylux, duoprop). Для попередньо активованого поліетилену – додати HTPP SLOW.",
                     pl: "Farba rozpuszczalnikowa do polietylenu, polipropylenu i poliwęglanu (priplack, akylux, duoprop). Do wstępnie aktywowanego polietylenu – dodać HTPP SLOW.",
@@ -495,7 +495,7 @@ SICOMIX.data = (function() {
             { 
                 id: "UV",
                 name: { ua: "UVILUX UV", pl: "UVILUX UV", en: "UVILUX UV" },
-                category: { ua: "UV фарби", pl: "Farby UV", en: "UV inks" },
+                category: "UV фарби",
                 description: {
                     ua: "Фарба та лак УФ для паперу, картону, офсетного друку. Лак UV 150 – ідеальний для офсету та трафаретного друку, особливо для чорних відбитків, проблемних при згинанні.",
                     pl: "Farba i lakier UV do papieru, tektury, druku offsetowego. Lakier UV 150 – idealny do offsetu i druku sitowego, zwłaszcza do czarnych nadruków, problematycznych przy zginaniu.",
@@ -557,7 +557,7 @@ SICOMIX.data = (function() {
             { 
                 id: "NST",
                 name: { ua: "NYLONSTAR NST", pl: "NYLONSTAR NST", en: "NYLONSTAR NST" },
-                category: { ua: "Текстиль", pl: "Tekstylia", en: "Textile" },
+                category: "Текстиль",
                 description: {
                     ua: "Розчинникова фарба для поліаміду (нейлон) та сумок non-woven. Висока еластичність, стійкість до стирання, атмосферних впливів та прання.",
                     pl: "Farba rozpuszczalnikowa do poliamidu (nylon) i toreb non-woven. Wysoka elastyczność, odporność na ścieranie, warunki atmosferyczne i pranie.",
@@ -684,7 +684,7 @@ SICOMIX.data = (function() {
                         name: `${serie.id}${baseColor.code}`,
                         series: serie.id,
                         baseColorCode: baseColor.code,
-                        category: serie.category, // залишаємо об'єкт для категорії
+                        category: serie.category, // тепер рядок
                         color: baseColor.color,
                         manufacturer: "SICO",
                         article: `${serie.id}-${baseColor.code}`,
@@ -703,9 +703,9 @@ SICOMIX.data = (function() {
                             en: `${serie.description.en} Color: ${baseColor.name.en}`
                         },
                         fullInfo: {
-                            ua: `Серія: ${serie.name.ua}, Колір: ${baseColor.code} - ${baseColor.name.ua}, Категорія: ${serie.category.ua}`,
-                            pl: `Seria: ${serie.name.pl}, Kolor: ${baseColor.code} - ${baseColor.name.pl}, Kategoria: ${serie.category.pl}`,
-                            en: `Series: ${serie.name.en}, Color: ${baseColor.code} - ${baseColor.name.en}, Category: ${serie.category.en}`
+                            ua: `Серія: ${serie.name.ua}, Колір: ${baseColor.code} - ${baseColor.name.ua}, Категорія: ${serie.category}`,
+                            pl: `Seria: ${serie.name.pl}, Kolor: ${baseColor.code} - ${baseColor.name.pl}, Kategoria: ${serie.category}`,
+                            en: `Series: ${serie.name.en}, Color: ${baseColor.code} - ${baseColor.name.en}, Category: ${serie.category}`
                         },
                         colorName: {
                             ua: baseColor.name.ua,
@@ -873,10 +873,7 @@ SICOMIX.data = (function() {
         // ---------- ІНШІ СТРУКТУРИ ДАНИХ ----------
         const paints = generatePaintsFromBaseColors();
         const recipes = []; // початково порожньо
-        // Категорії тепер багатомовні – витягуємо унікальні об'єкти? Для простоти залишимо як масив рядків, але можна зробити масив об'єктів.
-        // Для сумісності залишимо categories як масив унікальних назв (українською), але можна додати багатомовні варіанти.
-        // Простіше буде, якщо додаток використовує category як ключ, тому залишимо як є (рядки).
-        const categories = Array.from(new Set(series.map(s => s.category.ua))).sort();
+        const categories = Array.from(new Set(series.map(s => s.category))).sort();
         
         const units = [
             { value: "г", label: { ua: "Грами", pl: "Gramy", en: "Grams" } },
