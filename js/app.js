@@ -1,27 +1,11 @@
-// ========== GŁÓWNY MODUŁ APLIKACJI ==========
+// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (СТАБІЛЬНА ВЕРСІЯ + ПАГІНАЦІЯ + ПЕРЕКЛАД) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
     const SICOMIX = global.SICOMIX;
 
-    // ===== KONFIGURACJA FIREBASE – ZASTĄP SWOIMI DANYMI =====
-    const firebaseConfig = {
-        apiKey: "AIzaSyBzF_4h7h8eK7f7s9d0fghjk1234567890",
-        authDomain: "twoj-projekt.firebaseapp.com",
-        projectId: "twoj-projekt",
-        storageBucket: "twoj-projekt.appspot.com",
-        messagingSenderId: "1234567890",
-        appId: "1:1234567890:web:abcdef123456"
-    };
-
-    // Inicjalizacja Firebase (tylko jeśli nie jest jeszcze zainicjowana)
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.firestore();
-
     SICOMIX.app = (function() {
-        // ---------- STAN ----------
+        // ---------- СТАН ----------
         let recipes = [];
         let basePaints = [];
         let userPaints = [];
@@ -33,17 +17,12 @@ window.SICOMIX = window.SICOMIX || {};
         let editingRecipeId = null;
         let recipeDraft = null;
 
-        // Identyfikator użytkownika (generowany i przechowywany lokalnie)
-        let userId = localStorage.getItem('sicoSpectrumUserId');
-        if (!userId) {
-            userId = 'user_' + Math.random().toString(36).substring(2, 15) + Date.now();
-            localStorage.setItem('sicoSpectrumUserId', userId);
-        }
+        // Для пагінації каталогу
+        let catalogFiltered = [];
+        let catalogPage = 1;
+        const CATALOG_PAGE_SIZE = 30;
 
-        // Flaga zapobiegająca zapętleniu synchronizacji
-        let syncing = false;
-
-        // ---------- DOM ----------
+        // ---------- DOM ЕЛЕМЕНТИ ----------
         let sidebar, menuToggle, desktopMenuToggle, closeSidebar, mainContainer;
         let navLinks, pageContents, totalPaintsEl, headerPaintCount;
         let colorPreview, recipeColor, ingredientsList, paintSearch, categoryFilter;
@@ -51,13 +30,9 @@ window.SICOMIX = window.SICOMIX || {};
         let recipesContainer, exportRecipesBtn, importRecipesBtn, printRecipesBtn, deleteSelectedRecipesBtn;
         let paintCatalogEl, addNewPaintBtn, addPaintModal, closePaintModal, savePaintBtn, cancelPaintBtn;
         let languageSelect, unitsSelect, autoSaveCheckbox, backupCheckbox, saveSettingsBtn, resetSettingsBtn, clearAllDataBtn;
+        let actionCards;
 
-        // Dla paginacji katalogu
-        let catalogFiltered = [];
-        let catalogPage = 1;
-        const CATALOG_PAGE_SIZE = 30;
-
-        // ---------- KESZOWANIE DOM ----------
+        // ---------- КЕШУВАННЯ DOM ----------
         function cacheDOMElements() {
             sidebar = document.getElementById('sidebar');
             menuToggle = document.getElementById('menuToggle');
@@ -88,6 +63,7 @@ window.SICOMIX = window.SICOMIX || {};
             closePaintModal = document.getElementById('closePaintModal');
             savePaintBtn = document.getElementById('savePaintBtn');
             cancelPaintBtn = document.getElementById('cancelPaintBtn');
+            actionCards = document.querySelectorAll('.action-card');
             languageSelect = document.getElementById('languageSelect');
             unitsSelect = document.getElementById('unitsSelect');
             autoSaveCheckbox = document.getElementById('autoSaveCheckbox');
@@ -97,50 +73,7 @@ window.SICOMIX = window.SICOMIX || {};
             clearAllDataBtn = document.getElementById('clearAllDataBtn');
         }
 
-        // ---------- FUNKCJE POMOCNICZE DLA FIREBASE ----------
-        async function syncFromFirebase() {
-            try {
-                const docRef = db.collection('users').doc(userId);
-                const docSnap = await docRef.get();
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    if (data.recipes) recipes = data.recipes;
-                    if (data.userPaints) userPaints = data.userPaints;
-                    if (data.settings) currentSettings = data.settings;
-                    // Aktualizuj lokalny zapas
-                    SICOMIX.utils.saveToLocalStorage('sicoSpectrumRecipes', recipes);
-                    SICOMIX.utils.saveToLocalStorage('sicoSpectrumUserPaints', userPaints);
-                    SICOMIX.utils.saveToLocalStorage('sicoSpectrumSettings', currentSettings);
-                    paintCatalog = [...basePaints, ...userPaints];
-                    console.log('✅ Dane zsynchronizowane z Firebase');
-                } else {
-                    console.log('ℹ️ Brak danych w Firebase, używam lokalnych');
-                }
-            } catch (error) {
-                console.error('❌ Błąd synchronizacji z Firebase:', error);
-            }
-        }
-
-        async function syncToFirebase() {
-            if (syncing) return;
-            syncing = true;
-            try {
-                const data = {
-                    recipes,
-                    userPaints,
-                    settings: currentSettings,
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                await db.collection('users').doc(userId).set(data, { merge: true });
-                console.log('✅ Dane zapisane w Firebase');
-            } catch (error) {
-                console.error('❌ Błąd zapisu do Firebase:', error);
-            } finally {
-                syncing = false;
-            }
-        }
-
-        // ---------- ŁADOWANIE I ZAPIS DANYCH ----------
+        // ---------- ЗАВАНТАЖЕННЯ ТА ЗБЕРЕЖЕННЯ ----------
         function loadData() {
             if (SICOMIX.data && Array.isArray(SICOMIX.data.paints)) {
                 basePaints = SICOMIX.data.paints.map(p => ({
@@ -149,7 +82,7 @@ window.SICOMIX = window.SICOMIX || {};
                     isDefault: true
                 }));
             } else {
-                console.error('[SICOMIX] data.paints nie znaleziono!');
+                console.error('[SICOMIX] data.paints не знайдено!');
                 basePaints = [];
             }
 
@@ -176,24 +109,9 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumUserPaints', userPaints);
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumRecipes', recipes);
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumSettings', currentSettings);
-            // Wyślij do Firebase
-            syncToFirebase();
         }
 
-        // ---------- POBIERANIE DANYCH Z FIREBASE PRZY STARCIE ----------
-        async function initData() {
-            loadData(); // najpierw lokalne
-            await syncFromFirebase(); // potem z chmury (nadpisze lokalne jeśli nowsze)
-            // Po pobraniu zaktualizuj widoki
-            updatePaintCount();
-            renderPaintCatalog();
-            renderRecipes();
-            renderIngredientsList();
-            populateCategoryFilters();
-            initSettings();
-        }
-
-        // ---------- AUTOMATYCZNY ZAPIS SZKICU RECEPTURY ----------
+        // ---------- АВТОЗБЕРЕЖЕННЯ ЧЕРНЕТКИ РЕЦЕПТУ ----------
         function autoSaveRecipeDraft() {
             if (!document.getElementById('new-recipe-page')?.classList.contains('active')) return;
             if (isEditingRecipe) return;
@@ -240,7 +158,7 @@ window.SICOMIX = window.SICOMIX || {};
             recipeDraft = null;
         }
 
-        // ---------- USTAWIENIA ----------
+        // ---------- НАЛАШТУВАННЯ ----------
         function initSettings() {
             if (unitsSelect) unitsSelect.value = currentSettings.units || 'grams';
             if (autoSaveCheckbox) autoSaveCheckbox.checked = currentSettings.autoSave !== false;
@@ -248,9 +166,9 @@ window.SICOMIX = window.SICOMIX || {};
             if (languageSelect) languageSelect.value = SICOMIX.i18n.getLanguage();
         }
 
-        // ---------- ZDARZENIA ----------
+        // ---------- ПОДІЇ ----------
         function setupEventListeners() {
-            // Delegowany handler nawigacji
+            // ---- Делегований обробник навігації ----
             document.addEventListener('click', function(e) {
                 const navItem = e.target.closest('[data-page]');
                 if (navItem) {
@@ -264,7 +182,7 @@ window.SICOMIX = window.SICOMIX || {};
                 }
             });
 
-            // Mobilne menu
+            // ---- Мобільне меню ----
             if (menuToggle) {
                 menuToggle.addEventListener('click', () => {
                     sidebar.classList.add('active');
@@ -290,7 +208,7 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
-            // Color picker
+            // ---- Колір пікер ----
             if (recipeColor && colorPreview) {
                 recipeColor.addEventListener('input', () => {
                     colorPreview.style.background = recipeColor.value;
@@ -298,7 +216,7 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
-            // Zdjęcie
+            // ---- Фото ----
             const recipePhoto = document.getElementById('recipePhoto');
             if (recipePhoto) {
                 recipePhoto.addEventListener('change', function() {
@@ -307,19 +225,19 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
-            // Nowa receptura
+            // ---- Новий рецепт ----
             if (addIngredientBtn) addIngredientBtn.addEventListener('click', addIngredient);
             if (saveRecipeBtn) saveRecipeBtn.addEventListener('click', saveRecipe);
             if (clearRecipeBtn) clearRecipeBtn.addEventListener('click', clearRecipeForm);
             if (calculatePercentagesBtn) calculatePercentagesBtn.addEventListener('click', calculatePercentages);
 
-            // Receptury
+            // ---- Рецепти ----
             if (exportRecipesBtn) exportRecipesBtn.addEventListener('click', exportAllRecipes);
             if (importRecipesBtn) importRecipesBtn.addEventListener('click', importRecipes);
             if (printRecipesBtn) printRecipesBtn.addEventListener('click', printRecipes);
             if (deleteSelectedRecipesBtn) deleteSelectedRecipesBtn.addEventListener('click', deleteSelectedRecipes);
 
-            // Katalog
+            // ---- Каталог ----
             if (addNewPaintBtn) addNewPaintBtn.addEventListener('click', addNewPaint);
             if (closePaintModal) closePaintModal.addEventListener('click', () => {
                 addPaintModal.classList.remove('active');
@@ -331,7 +249,7 @@ window.SICOMIX = window.SICOMIX || {};
             });
             if (savePaintBtn) savePaintBtn.addEventListener('click', saveNewPaint);
 
-            // Szukanie z debounce
+            // ---- Пошук з дебаунсом ----
             if (paintSearch) paintSearch.addEventListener('input', SICOMIX.utils.debounce(renderIngredientsList, 300));
             if (categoryFilter) categoryFilter.addEventListener('change', renderIngredientsList);
             if (document.getElementById('catalogSearch')) {
@@ -341,7 +259,7 @@ window.SICOMIX = window.SICOMIX || {};
                 }, 300));
             }
 
-            // Zmiana języka
+            // ---- НАЛАШТУВАННЯ МОВИ – ВИПРАВЛЕНО: негайне перемикання ----
             if (languageSelect) {
                 languageSelect.addEventListener('change', function() {
                     const newLang = this.value;
@@ -350,6 +268,7 @@ window.SICOMIX = window.SICOMIX || {};
                     SICOMIX.i18n.applyTranslations();
                     populateCategoryFilters();
                     
+                    // Оновлюємо поточну сторінку
                     const activePage = document.querySelector('.page-content.active');
                     if (activePage) {
                         const pageId = activePage.id.replace('-page', '');
@@ -365,7 +284,7 @@ window.SICOMIX = window.SICOMIX || {};
             if (resetSettingsBtn) resetSettingsBtn.addEventListener('click', resetSettings);
             if (clearAllDataBtn) clearAllDataBtn.addEventListener('click', clearAllData);
 
-            // Skróty klawiszowe
+            // ---- Гарячі клавіші ----
             document.addEventListener('keydown', function(e) {
                 if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                     e.preventDefault();
@@ -383,7 +302,7 @@ window.SICOMIX = window.SICOMIX || {};
                 }
             });
 
-            // Zamknięcie sidebara kliknięciem poza nim (mobile)
+            // ---- Закриття сайдбару кліком поза ним (мобільні) ----
             document.addEventListener('click', function(e) {
                 if (!sidebar || window.innerWidth > 992) return;
                 if (!sidebar.classList.contains('active')) return;
@@ -396,7 +315,7 @@ window.SICOMIX = window.SICOMIX || {};
             attachAutoSaveListeners();
         }
 
-        // ---------- NAWIGACJA ----------
+        // ---------- НАВІГАЦІЯ ----------
         function switchPage(pageId) {
             if (!pageId) return;
             const targetPage = document.getElementById(`${pageId}-page`);
@@ -428,7 +347,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ---------- NOWA RECEPTURA ----------
+        // ---------- НОВИЙ РЕЦЕПТ ----------
         function renderIngredientsList() {
             if (!ingredientsList) return;
             if (selectedIngredients.length === 0) {
@@ -619,7 +538,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ---------- RECEPTURY ----------
+        // ---------- РЕЦЕПТИ ----------
         function renderRecipes() {
             if (!recipesContainer) return;
             const search = document.getElementById('recipeSearch')?.value.toLowerCase() || '';
@@ -650,7 +569,7 @@ window.SICOMIX = window.SICOMIX || {};
                         <p class="recipe-description">${r.description || SICOMIX.i18n.t('no_description')}</p>
                         <div class="recipe-meta">
                             <div><span style="font-size:12px;">${SICOMIX.i18n.t('ingredients_count')}</span><br><strong>${r.ingredients.length}</strong></div>
-                            <div><span style="font-size:12px;">${SICOMIX.i18n.t('total_weight')}</span><br><strong>${total} g</strong></div>
+                            <div><span style="font-size:12px;">${SICOMIX.i18n.t('total_weight')}</span><br><strong>${total} г</strong></div>
                             <div><span style="font-size:12px;">${SICOMIX.i18n.t('date')}</span><br><strong>${r.date}</strong></div>
                         </div>
                         <div class="recipe-actions">
@@ -777,10 +696,10 @@ window.SICOMIX = window.SICOMIX || {};
             win.print();
         }
 
-        // ---------- KATALOG FARB ----------
+        // ---------- КАТАЛОГ ФАРБ (З ПАГІНАЦІЄЮ) ----------
         function renderPaintCatalog() {
             if (!paintCatalogEl) {
-                console.warn('⚠️ paintCatalogEl nie znaleziony!');
+                console.warn('⚠️ paintCatalogEl не знайдено!');
                 return;
             }
 
@@ -803,9 +722,11 @@ window.SICOMIX = window.SICOMIX || {};
                     return;
                 }
 
+                // Визначаємо, чи показувати пагінацію (на мобільних)
                 const isMobile = window.innerWidth <= 768;
                 const pageSize = isMobile ? CATALOG_PAGE_SIZE : Infinity;
                 
+                // Скидаємо сторінку, якщо поточна перевищує доступну кількість
                 const maxPage = Math.ceil(catalogFiltered.length / pageSize);
                 if (catalogPage > maxPage) catalogPage = maxPage;
                 if (catalogPage < 1) catalogPage = 1;
@@ -815,8 +736,8 @@ window.SICOMIX = window.SICOMIX || {};
                 const paginated = catalogFiltered.slice(start, end);
 
                 let html = paginated.map(p => {
-                    const name = p.name || 'Bez nazwy';
-                    const category = p.category || 'Inne';
+                    const name = p.name || 'Без назви';
+                    const category = p.category || 'Інше';
                     const color = p.color || '#7b2cbf';
                     const manufacturer = p.manufacturer || 'SICO';
                     const article = p.article || '—';
@@ -850,6 +771,7 @@ window.SICOMIX = window.SICOMIX || {};
                     `;
                 }).join('');
 
+                // Кнопка "Завантажити ще" тільки якщо є невідображені елементи
                 if (isMobile && end < catalogFiltered.length) {
                     html += `
                         <div style="text-align:center; margin:20px 0;">
@@ -862,6 +784,7 @@ window.SICOMIX = window.SICOMIX || {};
 
                 paintCatalogEl.innerHTML = html;
 
+                // Додаємо обробник для кнопки "Завантажити ще"
                 const loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
                 if (loadMoreBtn) {
                     loadMoreBtn.addEventListener('click', () => {
@@ -870,6 +793,7 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 }
 
+                // Обробники видалення
                 paintCatalogEl.querySelectorAll('.delete-paint').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -879,9 +803,9 @@ window.SICOMIX = window.SICOMIX || {};
 
                 updatePaintCount();
             } catch (error) {
-                console.error('❌ Błąd w renderPaintCatalog:', error);
+                console.error('❌ Помилка в renderPaintCatalog:', error);
                 paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
-                    <i class="fas fa-exclamation-triangle"></i> Błąd wyświetlania katalogu.<br>${error.message}
+                    <i class="fas fa-exclamation-triangle"></i> ${SICOMIX.i18n.t('catalog_render_error')}<br>${error.message}
                 </p>`;
             }
         }
@@ -906,7 +830,7 @@ window.SICOMIX = window.SICOMIX || {};
             const art = document.getElementById('paintArticle').value.trim();
 
             if (!name || !cat) {
-                SICOMIX.utils.showNotification('Proszę wypełnić wymagane pola', 'error');
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('fill_required_fields'), 'error');
                 return;
             }
 
@@ -944,7 +868,7 @@ window.SICOMIX = window.SICOMIX || {};
                     }
                 );
             } else {
-                SICOMIX.utils.showNotification('Standardowe farby SICO nie mogą być usunięte', 'warning');
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('cannot_delete_default_paint'), 'warning');
             }
         }
 
@@ -954,7 +878,7 @@ window.SICOMIX = window.SICOMIX || {};
             if (headerPaintCount) headerPaintCount.textContent = count;
         }
 
-        // ---------- EDYCJA RECEPTURY ----------
+        // ---------- РЕДАГУВАННЯ РЕЦЕПТУ ----------
         function editRecipe(id) {
             const recipe = recipes.find(r => String(r.id) === String(id));
             if (!recipe) return;
@@ -975,7 +899,7 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.showNotification(`"${recipe.name}" ${SICOMIX.i18n.t('edit')}`, 'info');
         }
 
-        // ---------- USTAWIENIA ----------
+        // ---------- НАЛАШТУВАННЯ ----------
         function saveSettings() {
             currentSettings = {
                 language: languageSelect.value,
@@ -985,7 +909,7 @@ window.SICOMIX = window.SICOMIX || {};
                 theme: 'dark',
                 notifications: true,
                 defaultCategory: 'Standard',
-                defaultUnit: 'g',
+                defaultUnit: 'г',
                 calculationsPrecision: 2
             };
             saveData();
@@ -1008,7 +932,7 @@ window.SICOMIX = window.SICOMIX || {};
         function clearAllData() {
             SICOMIX.utils.showConfirmation(
                 SICOMIX.i18n.t('clear_all_data'),
-                'UWAGA! To usunie wszystkie receptury i dodane farby. Standardowy katalog SICO zostanie przywrócony.',
+                SICOMIX.i18n.t('clear_all_data_confirmation'),
                 () => {
                     recipes = [];
                     userPaints = [];
@@ -1019,12 +943,12 @@ window.SICOMIX = window.SICOMIX || {};
                     renderRecipes();
                     renderPaintCatalog();
                     updatePaintCount();
-                    SICOMIX.utils.showNotification('Dane wyczyszczone', 'success');
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('data_cleared'), 'success');
                 }
             );
         }
 
-        // ---------- FUNKCJE POMOCNICZE ----------
+        // ---------- ДОПОМІЖНІ ФУНКЦІЇ ----------
         function populateCategoryFilters() {
             const cats = SICOMIX.data.categories || [];
             const selects = [
@@ -1040,15 +964,7 @@ window.SICOMIX = window.SICOMIX || {};
                 cats.forEach(c => {
                     const opt = document.createElement('option');
                     opt.value = c;
-                    // Tłumaczenie kategorii
-                    let translationKey = '';
-                    if (c === 'Універсальні') translationKey = 'category_universal';
-                    else if (c === 'Папір/картон') translationKey = 'category_paper';
-                    else if (c === 'Пластики') translationKey = 'category_plastics';
-                    else if (c === 'Текстиль') translationKey = 'category_textile';
-                    else if (c === 'UV фарби') translationKey = 'category_uv';
-                    else translationKey = c; // fallback
-                    opt.textContent = SICOMIX.i18n.t(translationKey) || c;
+                    opt.textContent = c;
                     sel.appendChild(opt);
                 });
                 if (current && cats.includes(current)) sel.value = current;
@@ -1056,11 +972,17 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.i18n.applyTranslations();
         }
 
-        // ---------- INICJALIZACJA ----------
-        async function initApp() {
+        // ---------- ІНІЦІАЛІЗАЦІЯ ----------
+        function initApp() {
             cacheDOMElements();
-            await initData();
+            loadData();
+            initSettings();
             setupEventListeners();
+            updatePaintCount();
+            renderPaintCatalog();
+            renderRecipes();
+            renderIngredientsList();
+            populateCategoryFilters();
 
             if (window.innerWidth > 992) {
                 sidebar.classList.add('active');
