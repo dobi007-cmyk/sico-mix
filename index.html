@@ -18,23 +18,23 @@
     <link rel="icon" href="./icons/favicon.ico?v=2026.02.13" type="image/x-icon">
     <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.13">
 
-    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ (БЕЗ БЛОКУВАННЯ ДОТИКІВ) ========== -->
+    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ ========== -->
     <script>
         (function() {
-            console.log('🛡️ Антикризовий захист активовано (посилена версія)');
+            console.log('🛡️ Антикризовий захист активовано');
 
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
                     for (let registration of registrations) {
                         registration.unregister().then(success => {
-                            console.log(success ? '✅ SW успішно видалено' : '❌ Не вдалося видалити SW');
+                            console.log(success ? '✅ SW видалено' : '❌ Не вдалося видалити SW');
                         }).catch(e => console.error('Помилка видалення SW:', e));
                     }
                 }).catch(console.error);
                 
                 const originalRegister = navigator.serviceWorker.register;
                 navigator.serviceWorker.register = function() {
-                    console.warn('⚠️ Спроба реєстрації Service Worker – ЗАБЛОКОВАНО');
+                    console.warn('⚠️ Спроба реєстрації SW – ЗАБЛОКОВАНО');
                     return Promise.reject(new Error('Service Worker disabled'));
                 };
             }
@@ -63,7 +63,6 @@
 
             window.addEventListener('error', function(e) {
                 console.error('❌ Помилка перехоплена:', e.error || e.message);
-                console.error('   Стек:', e.error?.stack);
                 e.preventDefault();
                 return true;
             });
@@ -75,20 +74,22 @@
 
             window.SICOMIX = window.SICOMIX || {};
             window.SICOMIX.data = window.SICOMIX.data || {};
-            window.SICOMIX.data.paints = window.SICOMIX.data.paints || [];
-            window.SICOMIX.data.colors = window.SICOMIX.data.colors || [];
-            window.SICOMIX.data.recipes = window.SICOMIX.data.recipes || [];
-            window.SICOMIX.data.categories = window.SICOMIX.data.categories || [];
-            window.SICOMIX.data.series = window.SICOMIX.data.series || [];
-            window.SICOMIX.data.units = window.SICOMIX.data.units || [];
-            window.SICOMIX.data.fileFormats = window.SICOMIX.data.fileFormats || [];
-            window.SICOMIX.data.languages = window.SICOMIX.data.languages || [];
-            window.SICOMIX.data.defaultSettings = window.SICOMIX.data.defaultSettings || {};
 
             console.log('🛡️ Захист завершено');
         })();
     </script>
-    <!-- ЖОДНИХ БЛОКУВАНЬ ДОТИКІВ – НАВІГАЦІЯ ПРАЦЮЄ -->
+
+    <!-- ===== ДОДАТКОВИЙ ЗАХИСТ ДЛЯ МОБІЛЬНИХ ===== -->
+    <script>
+        // Блокуємо вбудовану навігацію на дотик (щоб уникнути перезавантажень)
+        document.addEventListener('touchstart', function(e) {
+            const target = e.target.closest('[data-page]');
+            if (target) {
+                e.preventDefault(); // Запобігає переходу за посиланням
+                // Не викликаємо switchPage тут – дамо спрацювати обробнику click
+            }
+        }, { passive: false });
+    </script>
 </head>
 <body>
     <!-- Preloader -->
@@ -598,29 +599,24 @@
         </div>
     </div>
 
-    <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ (з версіями) ========== -->
+    <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ ========== -->
     <script src="./js/data-colors.js?v=2026.02.13"></script>
     <script src="./js/i18n.js?v=2026.02.13"></script>
     <script src="./js/utils.js?v=2026.02.13"></script>
     <script src="./js/app.js?v=2026.02.13"></script>
 
-    <!-- Сервіс-воркер – ПОВНІСТЮ ВИМКНЕНО -->
+    <!-- Сервіс-воркер вимкнено -->
     <!-- <script src="./js/service-worker.js"></script> -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 DOM готовий, ініціалізація...');
             
-            if (window.SICOMIX?.i18n?.init && typeof window.SICOMIX.i18n.init === 'function') {
+            if (window.SICOMIX?.i18n?.init) {
                 window.SICOMIX.i18n.init();
-            } else {
-                console.warn('⚠️ i18n.init не знайдено');
             }
-
-            if (window.SICOMIX?.app?.init && typeof window.SICOMIX.app.init === 'function') {
+            if (window.SICOMIX?.app?.init) {
                 window.SICOMIX.app.init();
-            } else {
-                console.warn('⚠️ app.init не знайдено');
             }
         });
     </script>
