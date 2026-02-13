@@ -18,12 +18,11 @@
     <link rel="icon" href="./icons/favicon.ico?v=2026.02.13" type="image/x-icon">
     <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.13">
 
-    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ + ПРИМУСОВЕ ВИДАЛЕННЯ SERVICE WORKER ========== -->
+    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ (БЕЗ БЛОКУВАННЯ ДОТИКІВ) ========== -->
     <script>
         (function() {
             console.log('🛡️ Антикризовий захист активовано (посилена версія)');
 
-            // 1. Негайне видалення всіх Service Worker
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
                     for (let registration of registrations) {
@@ -33,7 +32,6 @@
                     }
                 }).catch(console.error);
                 
-                // Блокуємо подальшу реєстрацію SW
                 const originalRegister = navigator.serviceWorker.register;
                 navigator.serviceWorker.register = function() {
                     console.warn('⚠️ Спроба реєстрації Service Worker – ЗАБЛОКОВАНО');
@@ -41,14 +39,12 @@
                 };
             }
 
-            // 2. Блокування перезавантаження сторінки
             const originalReload = window.location.reload;
             window.location.reload = function() {
                 console.warn('⚠️ Спроба викликати location.reload() – ЗАБЛОКОВАНО');
                 return false;
             };
 
-            // 3. Блокування зміни location.href
             let currentHref = window.location.href;
             Object.defineProperty(window.location, 'href', {
                 set: function(value) {
@@ -60,13 +56,11 @@
                 configurable: false
             });
 
-            // 4. Блокування перезавантаження через replace
             const originalReplace = window.location.replace;
             window.location.replace = function() {
                 console.warn('⚠️ Спроба викликати location.replace() – ЗАБЛОКОВАНО');
             };
 
-            // 5. Глобальний перехоплювач помилок (не дає сторінці "впасти")
             window.addEventListener('error', function(e) {
                 console.error('❌ Помилка перехоплена:', e.error || e.message);
                 console.error('   Стек:', e.error?.stack);
@@ -79,7 +73,6 @@
                 e.preventDefault();
             });
 
-            // 6. Ініціалізація глобального об'єкта SICOMIX
             window.SICOMIX = window.SICOMIX || {};
             window.SICOMIX.data = window.SICOMIX.data || {};
             window.SICOMIX.data.paints = window.SICOMIX.data.paints || [];
@@ -95,15 +88,7 @@
             console.log('🛡️ Захист завершено');
         })();
     </script>
-
-    <!-- ДОДАТКОВИЙ ЗАХИСТ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ – блокування переходів по data-page -->
-    <script>
-        document.addEventListener('touchstart', function(e) {
-            if (e.target.closest('[data-page]')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-    </script>
+    <!-- ЖОДНИХ БЛОКУВАНЬ ДОТИКІВ – НАВІГАЦІЯ ПРАЦЮЄ -->
 </head>
 <body>
     <!-- Preloader -->
