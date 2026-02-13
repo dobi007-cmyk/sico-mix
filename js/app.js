@@ -368,7 +368,7 @@ window.SICOMIX = window.SICOMIX || {};
                             <div style="width:24px; height:24px; background:${paint.color}; border-radius:6px; border:1px solid rgba(255,255,255,0.2);"></div>
                             <div>
                                 <div style="font-weight:600;">${paint.name}</div>
-                                <div style="font-size:12px; color:var(--text-secondary);">${paint.category}</div>
+                                <div style="font-size:12px; color:var(--text-secondary);">${SICOMIX.i18n.translateCategory(paint.category)}</div>
                             </div>
                         </div>
                     </td>
@@ -430,7 +430,7 @@ window.SICOMIX = window.SICOMIX || {};
                 <div class="paint-selection-card" data-id="${p.id}">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <div style="width:32px; height:32px; background:${p.color}; border-radius:8px;"></div>
-                        <div><strong>${p.name}</strong><br><span style="font-size:12px;">${p.category}</span></div>
+                        <div><strong>${p.name}</strong><br><span style="font-size:12px;">${SICOMIX.i18n.translateCategory(p.category)}</span></div>
                     </div>
                 </div>
             `).join('');
@@ -560,7 +560,7 @@ window.SICOMIX = window.SICOMIX || {};
                     </div>
                     <div class="recipe-content">
                         <div class="recipe-header">
-                            <div><h3 class="recipe-title">${r.name}</h3><span class="recipe-category">${r.category}</span></div>
+                            <div><h3 class="recipe-title">${r.name}</h3><span class="recipe-category">${SICOMIX.i18n.translateCategory(r.category)}</span></div>
                             <div class="recipe-select-container">
                                 <input type="checkbox" class="recipe-select" value="${r.id}" ${selectedRecipes.includes(r.id) ? 'checked' : ''}>
                                 <span>${SICOMIX.i18n.t('select')}</span>
@@ -737,7 +737,7 @@ window.SICOMIX = window.SICOMIX || {};
 
                 let html = paginated.map(p => {
                     const name = p.name || 'Без назви';
-                    const category = p.category || 'Інше';
+                    const category = SICOMIX.i18n.translateCategory(p.category) || 'Інше';
                     const color = p.color || '#7b2cbf';
                     const manufacturer = p.manufacturer || 'SICO';
                     const article = p.article || '—';
@@ -964,7 +964,7 @@ window.SICOMIX = window.SICOMIX || {};
                 cats.forEach(c => {
                     const opt = document.createElement('option');
                     opt.value = c;
-                    opt.textContent = c;
+                    opt.textContent = SICOMIX.i18n.translateCategory(c);
                     sel.appendChild(opt);
                 });
                 if (current && cats.includes(current)) sel.value = current;
