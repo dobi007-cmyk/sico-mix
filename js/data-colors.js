@@ -239,7 +239,7 @@ SICOMIX.data = (function() {
             { code: "75", name: { ua: "Прозорий рожевий", pl: "Transparent różowy", en: "Transparent Pink" }, color: "#FFC0CB" }
         ];
 
-       // ---------- ГЕНЕРАЦІЯ ФАРБ ----------
+        // ---------- ГЕНЕРАЦІЯ ФАРБ (РЯДКОВІ ID + isDefault: true) ----------
         function generatePaintsFromBaseColors() {
             const paints = [];
             let counter = 1;
@@ -262,11 +262,11 @@ SICOMIX.data = (function() {
                         colorName: baseColor.name.ua,
                         colorCode: baseColor.code,
                         fullInfo: `Серія: ${serie.name}, Колір: ${baseColor.code} - ${baseColor.name.ua}, Категорія: ${serie.category}`,
-                        isDefault: true  // ← ВАЖЛИВО!
+                        isDefault: true
                     });
                 });
             });
-            
+
             // ---------- СПЕЦІАЛЬНІ ФАРБИ EC (з перевіркою наявності) ----------
             const ecSeries = series.find(s => s.id === "EC");
             if (ecSeries) {
@@ -349,7 +349,7 @@ SICOMIX.data = (function() {
 
         // ---------- ІНШІ СТРУКТУРИ ДАНИХ ----------
         const paints = generatePaintsFromBaseColors();
-        const recipes = [];
+        const recipes = []; // початково порожньо
         const categories = Array.from(new Set(series.map(s => s.category))).sort();
         const units = [
             { value: "г", label: "Грами" },
@@ -386,20 +386,6 @@ SICOMIX.data = (function() {
         console.log(`[SICOMIX] Згенеровано ${paints.length} фарб (включно зі спеціальними)`);
         console.log(`[SICOMIX] Базових кольорів: ${baseColors.length}, серій: ${series.length}`);
 
-          return paints;
-        }
-
-        const paints = generatePaintsFromBaseColors();
-        const recipes = [];
-        const categories = Array.from(new Set(series.map(s => s.category))).sort();
-        const units = [ /* ... */ ];
-        const fileFormats = [ /* ... */ ];
-        const languages = [ /* ... */ ];
-        const defaultSettings = { /* ... */ };
-
-        console.log(`[SICOMIX] Згенеровано ${paints.length} фарб (включно зі спеціальними)`);
-        console.log(`[SICOMIX] Базових кольорів: ${baseColors.length}, серій: ${series.length}`);
-
         return {
             paints,
             recipes,
@@ -413,6 +399,7 @@ SICOMIX.data = (function() {
         };
     } catch (error) {
         console.error("[SICOMIX] КРИТИЧНА ПОМИЛКА в data-colors.js:", error);
+        // Повертаємо порожні, але валідні структури, щоб додаток не впав
         return {
             paints: [],
             recipes: [],
