@@ -18,7 +18,7 @@
     <link rel="icon" href="./icons/favicon.ico?v=2026.02.13" type="image/x-icon">
     <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.13">
 
-    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ ========== -->
+    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ (ВИПРАВЛЕНО) ========== -->
     <script>
         (function() {
             console.log('🛡️ Антикризовий захист активовано');
@@ -39,27 +39,8 @@
                 };
             }
 
-            const originalReload = window.location.reload;
-            window.location.reload = function() {
-                console.warn('⚠️ Спроба викликати location.reload() – ЗАБЛОКОВАНО');
-                return false;
-            };
-
-            let currentHref = window.location.href;
-            Object.defineProperty(window.location, 'href', {
-                set: function(value) {
-                    console.warn('⚠️ Спроба змінити location.href на', value, '– ЗАБЛОКОВАНО');
-                },
-                get: function() {
-                    return currentHref;
-                },
-                configurable: false
-            });
-
-            const originalReplace = window.location.replace;
-            window.location.replace = function() {
-                console.warn('⚠️ Спроба викликати location.replace() – ЗАБЛОКОВАНО');
-            };
+            // Видалено проблемне перевизначення location.href, reload, replace
+            // Вони не є критичними для захисту, але ламають роботу браузера
 
             window.addEventListener('error', function(e) {
                 console.error('❌ Помилка перехоплена:', e.error || e.message);
