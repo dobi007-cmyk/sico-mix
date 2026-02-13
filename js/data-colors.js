@@ -239,7 +239,7 @@ SICOMIX.data = (function() {
             { code: "75", name: { ua: "Прозорий рожевий", pl: "Transparent różowy", en: "Transparent Pink" }, color: "#FFC0CB" }
         ];
 
-        // ---------- ГЕНЕРАЦІЯ ФАРБ (РЯДКОВІ ID + isDefault: true) ----------
+       // ---------- ГЕНЕРАЦІЯ ФАРБ ----------
         function generatePaintsFromBaseColors() {
             const paints = [];
             let counter = 1;
@@ -262,11 +262,11 @@ SICOMIX.data = (function() {
                         colorName: baseColor.name.ua,
                         colorCode: baseColor.code,
                         fullInfo: `Серія: ${serie.name}, Колір: ${baseColor.code} - ${baseColor.name.ua}, Категорія: ${serie.category}`,
-                        isDefault: true  // ← ДОДАНО
+                        isDefault: true  // ← ВАЖЛИВО!
                     });
                 });
             });
-
+            
             // ---------- СПЕЦІАЛЬНІ ФАРБИ EC (з перевіркою наявності) ----------
             const ecSeries = series.find(s => s.id === "EC");
             if (ecSeries) {
@@ -382,6 +382,20 @@ SICOMIX.data = (function() {
             calculationsPrecision: 2,
             defaultSeries: "EC"
         };
+
+        console.log(`[SICOMIX] Згенеровано ${paints.length} фарб (включно зі спеціальними)`);
+        console.log(`[SICOMIX] Базових кольорів: ${baseColors.length}, серій: ${series.length}`);
+
+          return paints;
+        }
+
+        const paints = generatePaintsFromBaseColors();
+        const recipes = [];
+        const categories = Array.from(new Set(series.map(s => s.category))).sort();
+        const units = [ /* ... */ ];
+        const fileFormats = [ /* ... */ ];
+        const languages = [ /* ... */ ];
+        const defaultSettings = { /* ... */ };
 
         console.log(`[SICOMIX] Згенеровано ${paints.length} фарб (включно зі спеціальними)`);
         console.log(`[SICOMIX] Базових кольорів: ${baseColors.length}, серій: ${series.length}`);
