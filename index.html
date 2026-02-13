@@ -13,33 +13,73 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="manifest" href="./manifest.json">
-    <link rel="icon" href="./icons/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    <link rel="stylesheet" href="./css/style.css?v=2026.02.13">
+    <link rel="manifest" href="./manifest.json?v=2026.02.13">
+    <link rel="icon" href="./icons/favicon.ico?v=2026.02.13" type="image/x-icon">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.13">
 
-    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ ========== -->
+    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ + ПРИМУСОВЕ ВИДАЛЕННЯ SERVICE WORKER ========== -->
     <script>
         (function() {
-            console.log('🛡️ Антикризовий захист активовано');
+            console.log('🛡️ Антикризовий захист активовано (посилена версія)');
+
+            // 1. Негайне видалення всіх Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for (let registration of registrations) {
+                        registration.unregister().then(success => {
+                            console.log(success ? '✅ SW успішно видалено' : '❌ Не вдалося видалити SW');
+                        }).catch(e => console.error('Помилка видалення SW:', e));
+                    }
+                }).catch(console.error);
+                
+                // Блокуємо подальшу реєстрацію SW
+                const originalRegister = navigator.serviceWorker.register;
+                navigator.serviceWorker.register = function() {
+                    console.warn('⚠️ Спроба реєстрації Service Worker – ЗАБЛОКОВАНО');
+                    return Promise.reject(new Error('Service Worker disabled'));
+                };
+            }
+
+            // 2. Блокування перезавантаження сторінки
+            const originalReload = window.location.reload;
+            window.location.reload = function() {
+                console.warn('⚠️ Спроба викликати location.reload() – ЗАБЛОКОВАНО');
+                return false;
+            };
+
+            // 3. Блокування зміни location.href
+            let currentHref = window.location.href;
+            Object.defineProperty(window.location, 'href', {
+                set: function(value) {
+                    console.warn('⚠️ Спроба змінити location.href на', value, '– ЗАБЛОКОВАНО');
+                },
+                get: function() {
+                    return currentHref;
+                },
+                configurable: false
+            });
+
+            // 4. Блокування перезавантаження через replace
+            const originalReplace = window.location.replace;
+            window.location.replace = function() {
+                console.warn('⚠️ Спроба викликати location.replace() – ЗАБЛОКОВАНО');
+            };
+
+            // 5. Глобальний перехоплювач помилок (не дає сторінці "впасти")
             window.addEventListener('error', function(e) {
-                console.error('❌ Помилка:', e.error || e.message);
+                console.error('❌ Помилка перехоплена:', e.error || e.message);
                 console.error('   Стек:', e.error?.stack);
                 e.preventDefault();
-                return false;
+                return true;  // не передаємо далі
             });
+
             window.addEventListener('unhandledrejection', function(e) {
                 console.error('❌ Unhandled Promise Rejection:', e.reason);
                 e.preventDefault();
             });
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                    for (let registration of registrations) {
-                        registration.unregister();
-                        console.log('🗑️ Сервіс-воркер видалено');
-                    }
-                }).catch(console.error);
-            }
+
+            // 6. Ініціалізація глобального об'єкта SICOMIX
             window.SICOMIX = window.SICOMIX || {};
             window.SICOMIX.data = window.SICOMIX.data || {};
             window.SICOMIX.data.paints = window.SICOMIX.data.paints || [];
@@ -52,18 +92,6 @@
             window.SICOMIX.data.languages = window.SICOMIX.data.languages || [];
             window.SICOMIX.data.defaultSettings = window.SICOMIX.data.defaultSettings || {};
 
-            const originalReload = window.location.reload;
-            window.location.reload = function() {
-                console.warn('⚠️ Спроба викликати location.reload() – ЗАБЛОКОВАНО');
-            };
-            Object.defineProperty(window.location, 'href', {
-                set: function(value) {
-                    console.warn('⚠️ Спроба змінити location.href на', value, '– ЗАБЛОКОВАНО');
-                },
-                get: function() {
-                    return window.location.href;
-                }
-            });
             console.log('🛡️ Захист завершено');
         })();
     </script>
@@ -576,11 +604,11 @@
         </div>
     </div>
 
-    <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ ========== -->
-    <script src="./js/data-colors.js"></script>   <!-- ВАЖЛИВО: правильне ім'я файлу -->
-    <script src="./js/i18n.js"></script>
-    <script src="./js/utils.js"></script>
-    <script src="./js/app.js"></script>
+    <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ (з версіями) ========== -->
+    <script src="./js/data-colors.js?v=2026.02.13"></script>
+    <script src="./js/i18n.js?v=2026.02.13"></script>
+    <script src="./js/utils.js?v=2026.02.13"></script>
+    <script src="./js/app.js?v=2026.02.13"></script>
 
     <!-- Сервіс-воркер – ПОВНІСТЮ ВИМКНЕНО -->
     <!-- <script src="./js/service-worker.js"></script> -->
@@ -588,11 +616,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 DOM готовий, ініціалізація...');
+            
             if (window.SICOMIX?.i18n?.init && typeof window.SICOMIX.i18n.init === 'function') {
                 window.SICOMIX.i18n.init();
             } else {
                 console.warn('⚠️ i18n.init не знайдено');
             }
+
             if (window.SICOMIX?.app?.init && typeof window.SICOMIX.app.init === 'function') {
                 window.SICOMIX.app.init();
             } else {
