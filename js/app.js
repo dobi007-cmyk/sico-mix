@@ -888,16 +888,35 @@ window.SICOMIX = window.SICOMIX || {};
                 
                 // Отримуємо всі серії
                 const allSeries = SICOMIX.data.series || [];
+                const lang = SICOMIX.i18n.getLanguage();
                 
-                // Фільтруємо серії за пошуком (якщо є)
-                let filteredSeries = allSeries;
+                // Фільтруємо серії: якщо є пошук, серія має відповідати або містити фарби, що відповідають пошуку
+                let filteredSeries = [];
+                
                 if (search) {
-                    filteredSeries = allSeries.filter(s => {
-                        const seriesName = s.name[SICOMIX.i18n.getLanguage()] || s.id;
+                    // Спочатку фільтруємо серії за назвою/id/категорією
+                    const seriesByName = allSeries.filter(s => {
+                        const seriesName = s.name[lang] || s.id;
                         return seriesName.toLowerCase().includes(search) || 
                                s.id.toLowerCase().includes(search) ||
-                               s.category.toLowerCase().includes(search);
+                               (s.category && s.category.toLowerCase().includes(search));
                     });
+                    
+                    // Також шукаємо фарби, що відповідають пошуку, і додаємо їхні серії
+                    const matchingPaintSeries = new Set();
+                    paintCatalog.forEach(p => {
+                        if (p.name.toLowerCase().includes(search) ||
+                            (p.article && p.article.toLowerCase().includes(search)) ||
+                            (p.displayName && p.displayName[lang]?.toLowerCase().includes(search))) {
+                            matchingPaintSeries.add(p.series);
+                        }
+                    });
+                    
+                    // Об'єднуємо: серії, знайдені за назвою, та серії, що містять фарби
+                    const seriesSet = new Set([...seriesByName.map(s => s.id), ...matchingPaintSeries]);
+                    filteredSeries = allSeries.filter(s => seriesSet.has(s.id));
+                } else {
+                    filteredSeries = allSeries;
                 }
 
                 if (filteredSeries.length === 0) {
@@ -908,20 +927,20 @@ window.SICOMIX = window.SICOMIX || {};
                 let html = '';
                 
                 filteredSeries.forEach(series => {
-                    // Фільтруємо фарби цієї серії
+                    // Фільтруємо фарби цієї серії з урахуванням пошуку
                     let seriesPaints = paintCatalog.filter(p => p.series === series.id);
                     
-                    // Якщо є пошук, додатково фільтруємо фарби за назвою
                     if (search) {
                         seriesPaints = seriesPaints.filter(p => 
                             p.name.toLowerCase().includes(search) ||
-                            (p.displayName && p.displayName[SICOMIX.i18n.getLanguage()]?.toLowerCase().includes(search))
+                            (p.article && p.article.toLowerCase().includes(search)) ||
+                            (p.displayName && p.displayName[lang]?.toLowerCase().includes(search))
                         );
                     }
                     
-                    if (seriesPaints.length === 0 && !search) return; // без пошуку не показуємо серію без фарб
+                    // Якщо після фільтрації немає фарб і немає пошуку, пропускаємо серію
+                    if (seriesPaints.length === 0 && !search) return;
                     
-                    const lang = SICOMIX.i18n.getLanguage();
                     const seriesName = series.name[lang] || series.id;
                     const category = series.category || '';
                     const description = series.description[lang] || series.description['uk'] || '';
@@ -936,14 +955,14 @@ window.SICOMIX = window.SICOMIX || {};
                                         <span class="recipe-category">${SICOMIX.i18n.translateCategory(category)}</span>
                                     </div>
                                     <button class="btn-icon toggle-series" style="font-size: 20px;">
-                                        <i class="fas fa-chevron-up"></i>
+                                        <i class="fas fa-chevron-down"></i> <!-- початково згорнуто -->
                                     </button>
                                 </div>
                                 <p style="margin-top: 15px; color: var(--text-secondary);">${description}</p>
                             </div>
                             
-                            <!-- Властивості серії -->
-                            <div class="series-properties" style="padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; margin: 15px 0;">
+                            <!-- Властивості серії (початково приховані) -->
+                            <div class="series-properties" style="display: none; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; margin: 15px 0;">
                                 <h4 style="margin-bottom: 10px; color: var(--spectrum-cyan);" data-i18n="properties">Властивості</h4>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
                                     ${properties.type ? `<div><strong data-i18n="type">Тип:</strong> ${properties.type[lang] || properties.type['uk']}</div>` : ''}
@@ -959,8 +978,8 @@ window.SICOMIX = window.SICOMIX || {};
                                 </div>
                             </div>
                             
-                            <!-- Список фарб серії -->
-                            <div class="series-paints" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
+                            <!-- Список фарб серії (початково прихований) -->
+                            <div class="series-paints" style="display: none; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
                                 ${seriesPaints.map(p => `
                                     <div class="paint-mini-card" style="background: ${p.color}; border-radius: 8px; padding: 10px; text-align: center; color: ${p.color === '#FFFFFF' ? '#000' : '#fff'}; text-shadow: 0 1px 3px rgba(0,0,0,0.3);">
                                         <strong>${p.name}</strong>
@@ -984,15 +1003,28 @@ window.SICOMIX = window.SICOMIX || {};
                         const icon = this.querySelector('i');
                         
                         if (paintsDiv.style.display === 'none') {
+                            // Розгорнути
                             paintsDiv.style.display = 'grid';
                             propertiesDiv.style.display = 'grid';
                             icon.classList.remove('fa-chevron-down');
                             icon.classList.add('fa-chevron-up');
                         } else {
+                            // Згорнути
                             paintsDiv.style.display = 'none';
                             propertiesDiv.style.display = 'none';
                             icon.classList.remove('fa-chevron-up');
                             icon.classList.add('fa-chevron-down');
+                        }
+                    });
+                });
+
+                // Також можна додати обробник на клік по заголовку серії (опціонально)
+                document.querySelectorAll('.series-header').forEach(header => {
+                    header.addEventListener('click', function(e) {
+                        // Якщо клік не по кнопці, то імітуємо клік по кнопці
+                        if (!e.target.closest('.toggle-series')) {
+                            const btn = this.querySelector('.toggle-series');
+                            if (btn) btn.click();
                         }
                     });
                 });
