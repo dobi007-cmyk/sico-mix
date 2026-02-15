@@ -39,7 +39,8 @@ window.SICOMIX = window.SICOMIX || {};
                 recipe_name_placeholder: "Введіть назву рецепту",
                 category: "Категорія",
                 select_category: "Оберіть категорію",
-                color: "Колір",
+                series: "Серія фарб",
+                select_series: "Оберіть серію",
                 recipe_description: "Опис рецепту",
                 recipe_description_placeholder: "Додайте опис (необов'язково)",
                 recipe_photo: "Фото рецепту",
@@ -101,6 +102,21 @@ window.SICOMIX = window.SICOMIX || {};
                 delete_paint_confirmation: "Ви впевнені, що хочете видалити цю фарбу?",
                 paint_deleted: "Фарбу видалено",
                 paint_added: "Фарбу додано",
+                series_description: "Опис серії",
+                paints_in_series: "Фарби в серії",
+                properties: "Властивості",
+                type: "Тип",
+                finish: "Поверхня",
+                drying: "Сушіння",
+                mesh: "Сітка",
+                cleaning: "Очищення",
+                storage: "Зберігання",
+                resistance: "Стійкість",
+                thinning: "Розрідження",
+                additives: "Добавки",
+                special: "Спеціальне",
+                collapse: "Згорнути",
+                expand: "Розгорнути",
 
                 // Імпорт/Експорт
                 import_desc: "Імпортуйте рецепти та каталог з файлів",
@@ -173,11 +189,15 @@ window.SICOMIX = window.SICOMIX || {};
                 // Стандартна фарба
                 default_paint: "Стандартна",
 
-                // Нові ключі (додані для повноти)
+                // Нові ключі
                 cannot_delete_default_paint: "Стандартні фарби SICO не можна видалити",
                 data_cleared: "Дані очищено",
                 clear_all_data_confirmation: "УВАГА! Це видалить всі рецепти та додані вами фарби. Стандартний каталог SICO відновиться.",
-                catalog_render_error: "Помилка відображення каталогу."
+                catalog_render_error: "Помилка відображення каталогу.",
+                select_series_first: "Спочатку оберіть серію фарб",
+                paints_not_found_in_series: "У цій серії немає фарб за заданим фільтром",
+                series_mismatch: "Не можна додавати фарбу з іншої серії",
+                select_recipes_to_print: "Оберіть рецепти для друку"
             },
             en: {
                 // Глобальні
@@ -212,7 +232,8 @@ window.SICOMIX = window.SICOMIX || {};
                 recipe_name_placeholder: "Enter recipe name",
                 category: "Category",
                 select_category: "Select category",
-                color: "Color",
+                series: "Paint Series",
+                select_series: "Select series",
                 recipe_description: "Recipe Description",
                 recipe_description_placeholder: "Add description (optional)",
                 recipe_photo: "Recipe Photo",
@@ -274,6 +295,21 @@ window.SICOMIX = window.SICOMIX || {};
                 delete_paint_confirmation: "Are you sure you want to delete this paint?",
                 paint_deleted: "Paint deleted",
                 paint_added: "Paint added",
+                series_description: "Series Description",
+                paints_in_series: "Paints in series",
+                properties: "Properties",
+                type: "Type",
+                finish: "Finish",
+                drying: "Drying",
+                mesh: "Mesh",
+                cleaning: "Cleaning",
+                storage: "Storage",
+                resistance: "Resistance",
+                thinning: "Thinning",
+                additives: "Additives",
+                special: "Special",
+                collapse: "Collapse",
+                expand: "Expand",
 
                 // Імпорт/Експорт
                 import_desc: "Import recipes and catalog from files",
@@ -350,7 +386,11 @@ window.SICOMIX = window.SICOMIX || {};
                 cannot_delete_default_paint: "Standard SICO paints cannot be deleted",
                 data_cleared: "Data cleared",
                 clear_all_data_confirmation: "WARNING! This will delete all recipes and user-added paints. The standard SICO catalog will be restored.",
-                catalog_render_error: "Error rendering catalog."
+                catalog_render_error: "Error rendering catalog.",
+                select_series_first: "First select a paint series",
+                paints_not_found_in_series: "No paints in this series matching the filter",
+                series_mismatch: "Cannot add paint from another series",
+                select_recipes_to_print: "Select recipes to print"
             },
             pl: {
                 // Глобальні
@@ -385,7 +425,8 @@ window.SICOMIX = window.SICOMIX || {};
                 recipe_name_placeholder: "Wprowadź nazwę receptury",
                 category: "Kategoria",
                 select_category: "Wybierz kategorię",
-                color: "Kolor",
+                series: "Seria farb",
+                select_series: "Wybierz serię",
                 recipe_description: "Opis receptury",
                 recipe_description_placeholder: "Dodaj opis (opcjonalnie)",
                 recipe_photo: "Zdjęcie receptury",
@@ -447,6 +488,21 @@ window.SICOMIX = window.SICOMIX || {};
                 delete_paint_confirmation: "Czy na pewno chcesz usunąć tę farbę?",
                 paint_deleted: "Farba usunięta",
                 paint_added: "Farba dodana",
+                series_description: "Opis serii",
+                paints_in_series: "Farby w serii",
+                properties: "Właściwości",
+                type: "Typ",
+                finish: "Wykończenie",
+                drying: "Suszenie",
+                mesh: "Siatka",
+                cleaning: "Czyszczenie",
+                storage: "Przechowywanie",
+                resistance: "Odporność",
+                thinning: "Rozcieńczanie",
+                additives: "Dodatki",
+                special: "Specjalne",
+                collapse: "Zwiń",
+                expand: "Rozwiń",
 
                 // Імпорт/Експорт
                 import_desc: "Importuj receptury i katalog z plików",
@@ -523,7 +579,11 @@ window.SICOMIX = window.SICOMIX || {};
                 cannot_delete_default_paint: "Standardowe farby SICO nie mogą być usunięte",
                 data_cleared: "Dane wyczyszczone",
                 clear_all_data_confirmation: "UWAGA! Spowoduje to usunięcie wszystkich receptur i farb dodanych przez użytkownika. Standardowy katalog SICO zostanie przywrócony.",
-                catalog_render_error: "Błąd renderowania katalogu."
+                catalog_render_error: "Błąd renderowania katalogu.",
+                select_series_first: "Najpierw wybierz serię farb",
+                paints_not_found_in_series: "Brak farb w tej serii pasujących do filtra",
+                series_mismatch: "Nie można dodać farby z innej serii",
+                select_recipes_to_print: "Wybierz receptury do druku"
             }
         };
 
