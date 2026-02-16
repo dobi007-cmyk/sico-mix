@@ -1,4 +1,4 @@
-/* ===== SICO Spectrum 2026 – Glass Design (оновлено) ===== */
+/* ===== SICO Spectrum 2026 – Glass Design (АДАПТИВ) ===== */
 :root {
     --bg-primary: #0a0c0f;
     --bg-secondary: #14181c;
@@ -822,7 +822,7 @@ body {
     border-top: 1px solid var(--border-light);
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== RESPONSIVE – ТІЛЬКИ ДЛЯ МОБІЛЬНИХ (до 768px) ===== */
 @media (max-width: 992px) {
     .mobile-nav {
         display: flex;
@@ -847,23 +847,137 @@ body {
     }
 }
 @media (max-width: 768px) {
+    /* Загальні налаштування для мобільних */
     .container {
-        padding: 16px;
+        padding: 12px;
     }
     .page-content {
-        padding: 24px;
+        padding: 16px;
+    }
+    .page-title {
+        font-size: 24px;
+    }
+    .page-description {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+    .section-title {
+        font-size: 18px;
+        margin-bottom: 16px;
     }
     .form-row {
         grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .form-section {
+        padding: 16px;
     }
     .action-buttons {
         flex-direction: column;
+        gap: 12px;
     }
     .btn {
         width: 100%;
         justify-content: center;
+        padding: 16px; /* Більші кнопки для пальців */
+    }
+    .btn-add {
+        width: 100%;
+        justify-content: center;
+    }
+    .search-filter-container {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .search-box {
+        width: 100%;
+        min-width: auto;
+    }
+    .filter-select {
+        width: 100%;
+    }
+    /* Таблиці – горизонтальний скрол */
+    .ingredients-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    /* Рецепти – одна колонка */
+    .recipe-cards {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .recipe-card {
+        margin-bottom: 0;
+    }
+    .recipe-image {
+        height: 140px;
+    }
+    .recipe-content {
+        padding: 16px;
+    }
+    .recipe-title {
+        font-size: 18px;
+    }
+    .recipe-category {
+        font-size: 10px;
+    }
+    .recipe-meta {
+        font-size: 12px;
+        padding: 12px 0;
+    }
+    /* Каталог – мобільна версія */
+    .series-card {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+    .series-header h3 {
+        font-size: 20px;
+    }
+    .series-properties {
+        padding: 12px;
+        font-size: 13px;
+    }
+    .series-paints {
+        grid-template-columns: 1fr !important; /* Одна колонка */
+        gap: 8px;
+    }
+    .paint-mini-card {
+        padding: 12px;
+    }
+    .paint-mini-swatch {
+        width: 36px;
+        height: 36px;
+    }
+    .paint-mini-name {
+        font-size: 14px;
+    }
+    .paint-mini-article {
+        font-size: 11px;
+    }
+    .toggle-series {
+        width: 44px;
+        height: 44px;
+    }
+    /* Модальні вікна */
+    .modal-content {
+        padding: 20px;
+        width: 95%;
+    }
+    .modal-title {
+        font-size: 18px;
+    }
+    .paint-selection-card {
+        padding: 12px;
+    }
+    /* Футер */
+    .footer {
+        margin-top: 30px;
+        padding: 16px;
+        font-size: 12px;
     }
 }
+
 /* ===== SERIES CATALOG – СУЧАСНИЙ ДИЗАЙН ===== */
 .series-card {
     background: var(--bg-elevated);
