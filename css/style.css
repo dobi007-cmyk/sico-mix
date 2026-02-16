@@ -1032,6 +1032,35 @@ body.theme-organic .nav-link.active {
     transform: translateX(4px);
 }
 
+/* ===== PAGINATION ===== */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+.load-more-btn {
+    background: linear-gradient(145deg, var(--spectrum-blue), var(--spectrum-violet));
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-base);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: var(--shadow-glow);
+}
+.load-more-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glow-hover);
+}
+.load-more-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
 /* ===== FOOTER ===== */
 .footer {
     text-align: center;
