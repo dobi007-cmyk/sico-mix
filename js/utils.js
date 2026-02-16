@@ -13,23 +13,26 @@ window.SICOMIX = window.SICOMIX || {};
             notification.className = `notification ${type}`;
             notification.style.cssText = `
                 position: fixed;
-                top: 20px;
-                right: 20px;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
                 background: ${type === 'success' ? 'linear-gradient(145deg, #3a86ff, #7b2cbf)' : 
                              type === 'error' ? '#e63946' : 
                              type === 'warning' ? '#fb8500' : '#3a86ff'};
                 color: white;
-                padding: 16px 28px;
-                border-radius: 40px;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+                padding: 10px 20px;
+                border-radius: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                 z-index: 3000;
                 font-weight: 500;
+                font-size: 14px;
                 display: flex;
                 align-items: center;
-                gap: 12px;
+                gap: 8px;
+                max-width: 300px;
                 backdrop-filter: blur(8px);
                 border: 1px solid rgba(255,255,255,0.2);
-                animation: slideIn 0.3s ease;
+                animation: slideUp 0.3s ease;
             `;
             const icon = type === 'success' ? 'fa-check-circle' :
                          type === 'error' ? 'fa-exclamation-circle' :
@@ -152,4 +155,4 @@ window.SICOMIX = window.SICOMIX || {};
         };
     })();
 
-})(window);   // ← НЕМАЄ ШКІДЛИВОГО РЯДКА!
+})(window);
