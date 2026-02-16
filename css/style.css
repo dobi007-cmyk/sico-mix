@@ -1,6 +1,6 @@
 /* ===== SICO Spectrum 2026 – Сучасний гармонійний дизайн ===== */
 :root {
-    /* Основні кольори (темна тема) */
+    /* Основні кольори */
     --bg-primary: #0a0c0f;
     --bg-secondary: #14181c;
     --bg-card: rgba(20, 24, 28, 0.7);
@@ -52,26 +52,6 @@
     --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Світла тема */
-body.light-theme {
-    --bg-primary: #f5f7fa;
-    --bg-secondary: #ffffff;
-    --bg-card: rgba(255, 255, 255, 0.9);
-    --bg-glass: rgba(255, 255, 255, 0.7);
-    --bg-elevated: #ffffff;
-    --text-primary: #1a1e24;
-    --text-secondary: #4a5568;
-    --text-tertiary: #718096;
-    --border-light: rgba(0, 0, 0, 0.08);
-    --border-medium: rgba(0, 0, 0, 0.12);
-    --border-accent: rgba(58, 134, 255, 0.5);
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.15);
-    --shadow-glow: 0 8px 32px rgba(58, 134, 255, 0.2);
-    --shadow-glow-hover: 0 12px 48px rgba(123, 44, 191, 0.3);
-}
-
 * {
     margin: 0;
     padding: 0;
@@ -89,21 +69,89 @@ body {
     font-family: var(--font-sans);
     line-height: 1.6;
     min-height: 100vh;
-    transition: background-color 0.3s, color 0.3s;
-}
-body.light-theme {
-    background: radial-gradient(circle at 80% 20%, #e0e7ff, var(--bg-primary));
+    transition: var(--transition-base);
+    position: relative;
+    overflow-x: hidden;
 }
 
-/* Логотип SVG */
-.logo-svg {
-    width: 32px;
-    height: 32px;
-    display: inline-block;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%233a86ff"/><stop offset="100%" stop-color="%237b2cbf"/></linearGradient></defs><polygon points="50,10 90,80 10,80" fill="url(%23grad)" stroke="white" stroke-width="2"/><circle cx="50" cy="65" r="8" fill="white" opacity="0.9"/></svg>') no-repeat center;
-    background-size: contain;
-    margin-right: 8px;
-    vertical-align: middle;
+/* ===== АБСТРАКТНА ПЛЯМА ФАРБИ (декоративний елемент) ===== */
+.paint-blob {
+    position: fixed;
+    top: -20vh;
+    right: -10vw;
+    width: 80vmax;
+    height: 80vmax;
+    background: radial-gradient(circle at 30% 30%, 
+        rgba(123, 44, 191, 0.15) 0%, 
+        rgba(58, 134, 255, 0.1) 30%, 
+        rgba(76, 201, 240, 0.05) 60%, 
+        transparent 80%);
+    border-radius: 50%;
+    filter: blur(60px);
+    z-index: -1;
+    animation: blobMove 20s infinite alternate ease-in-out;
+    pointer-events: none;
+}
+
+@keyframes blobMove {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-5%, 5%) scale(1.1); }
+}
+
+/* ===== ОРГАНІЧНА ТЕМА (природні матеріали) ===== */
+body.theme-organic {
+    --bg-primary: #e8e3d5;
+    --bg-secondary: #d6cebc;
+    --bg-card: rgba(240, 235, 220, 0.8);
+    --bg-glass: rgba(235, 225, 210, 0.7);
+    --bg-elevated: #f2ede0;
+    
+    --spectrum-violet: #9b6b9b;
+    --spectrum-blue: #6a8e9b;
+    --spectrum-cyan: #8fb3b3;
+    --spectrum-green: #8f9b6e;
+    --spectrum-yellow: #e0c894;
+    --spectrum-orange: #c99e6e;
+    --spectrum-red: #b87c7c;
+    
+    --text-primary: #2e2a24;
+    --text-secondary: #5e5547;
+    --text-tertiary: #8e8476;
+    
+    --border-light: rgba(70, 60, 50, 0.15);
+    --border-medium: rgba(70, 60, 50, 0.25);
+    --border-accent: rgba(106, 142, 155, 0.5);
+    
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.2);
+    --shadow-glow: 0 8px 32px rgba(106, 142, 155, 0.3);
+    --shadow-glow-hover: 0 12px 48px rgba(155, 107, 155, 0.3);
+    
+    background: #f2ede0 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="1" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.05"/></svg>');
+}
+
+body.theme-organic .header,
+body.theme-organic .sidebar,
+body.theme-organic .page-content,
+body.theme-organic .modal-content,
+body.theme-organic .action-card,
+body.theme-organic .recipe-card,
+body.theme-organic .series-card {
+    backdrop-filter: none;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+}
+
+body.theme-organic .btn-primary {
+    background: linear-gradient(145deg, var(--spectrum-blue), var(--spectrum-violet));
+    color: white;
+}
+
+body.theme-organic .nav-link.active {
+    background: var(--spectrum-blue);
+    color: white;
 }
 
 /* ===== PRELOADER ===== */
@@ -158,10 +206,6 @@ body.light-theme {
     align-items: center;
     gap: 8px;
 }
-.mobile-nav-title .logo-svg {
-    width: 24px;
-    height: 24px;
-}
 .menu-toggle {
     background: rgba(255,255,255,0.05);
     border: 1px solid var(--border-light);
@@ -210,11 +254,6 @@ body.light-theme {
     padding-bottom: 20px;
     border-bottom: 1px solid var(--border-light);
 }
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
 .logo-container h1 {
     font-size: 24px;
     font-weight: 700;
@@ -224,7 +263,6 @@ body.light-theme {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin: 0;
 }
 .logo-container p {
     font-size: 12px;
@@ -407,9 +445,6 @@ body.light-theme {
     padding: 8px;
     border-radius: var(--radius-full);
 }
-.light-theme .section-title {
-    color: var(--text-primary);
-}
 
 /* ===== WELCOME SECTION ===== */
 .welcome-section {
@@ -465,9 +500,6 @@ body.light-theme {
     transition: var(--transition-base);
     position: relative;
     overflow: hidden;
-}
-.light-theme .action-card {
-    color: var(--text-primary);
 }
 .action-card::before {
     content: '';
@@ -555,15 +587,9 @@ body.light-theme {
     background: rgba(0,0,0,0.4);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-sm);
-    color: var(--text-primary);
+    color: white;
     font-size: 15px;
     transition: var(--transition-fast);
-}
-.light-theme .form-input,
-.light-theme .form-select,
-.light-theme .form-textarea {
-    background: rgba(255,255,255,0.8);
-    color: #1a1e24;
 }
 .form-input:focus,
 .form-select:focus,
@@ -572,11 +598,6 @@ body.light-theme {
     border-color: var(--spectrum-blue);
     box-shadow: 0 0 0 3px rgba(58,134,255,0.15);
     background: rgba(0,0,0,0.6);
-}
-.light-theme .form-input:focus,
-.light-theme .form-select:focus,
-.light-theme .form-textarea:focus {
-    background: white;
 }
 .form-textarea {
     min-height: 100px;
@@ -735,10 +756,6 @@ body.light-theme {
     font-size: 15px;
     transition: var(--transition-fast);
 }
-.light-theme .search-input {
-    background: rgba(255,255,255,0.8);
-    color: #1a1e24;
-}
 .search-input:focus {
     border-color: var(--spectrum-blue);
     box-shadow: 0 0 0 3px rgba(58,134,255,0.15);
@@ -760,10 +777,6 @@ body.light-theme {
     min-width: 180px;
     cursor: pointer;
     transition: var(--transition-fast);
-}
-.light-theme .filter-select {
-    background: rgba(255,255,255,0.8);
-    color: #1a1e24;
 }
 .filter-select:hover {
     border-color: var(--spectrum-blue);
@@ -791,10 +804,6 @@ body.light-theme {
     backdrop-filter: blur(8px);
     border: 1px solid var(--border-light);
     color: white;
-}
-.light-theme .btn {
-    background: rgba(0,0,0,0.05);
-    color: #1a1e24;
 }
 .btn-primary {
     background: linear-gradient(145deg, var(--spectrum-blue), var(--spectrum-violet));
@@ -887,9 +896,6 @@ body.light-theme {
     margin-bottom: 6px;
     line-height: 1.3;
 }
-.light-theme .recipe-title {
-    color: #1a1e24;
-}
 .recipe-category {
     background: rgba(58,134,255,0.2);
     padding: 4px 12px;
@@ -939,10 +945,6 @@ body.light-theme {
     background: rgba(255,255,255,0.03);
     color: white;
     border: 1px solid var(--border-light);
-}
-.light-theme .recipe-btn {
-    background: rgba(0,0,0,0.03);
-    color: #1a1e24;
 }
 .recipe-btn:hover {
     background: rgba(58,134,255,0.15);
@@ -1002,9 +1004,6 @@ body.light-theme {
     font-weight: 700;
     color: white;
 }
-.light-theme .modal-title {
-    color: #1a1e24;
-}
 .modal-close {
     background: transparent;
     border: none;
@@ -1016,14 +1015,6 @@ body.light-theme {
 .modal-close:hover {
     color: var(--spectrum-red);
     transform: rotate(90deg);
-}
-.modal-overlay-close {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
 }
 
 /* ===== PAINT SELECTION CARD ===== */
@@ -1051,7 +1042,8 @@ body.light-theme {
     border-top: 1px solid var(--border-light);
 }
 
-/* ===== SERIES CATALOG – ОНОВЛЕНИЙ ДИЗАЙН ===== */
+/* ===== SERIES CATALOG – МІНІМАЛІСТИЧНИЙ ЕСТЕТИЧНИЙ ДИЗАЙН ===== */
+/* ===== ВАРІАНТ 2: НЕОН (яскравий, контрастний) ===== */
 .series-card {
     background: #0b0d10;
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -1062,11 +1054,6 @@ body.light-theme {
     box-shadow: 0 10px 30px -15px #000;
     position: relative;
     overflow: hidden;
-}
-.light-theme .series-card {
-    background: #ffffff;
-    border-color: rgba(0,0,0,0.1);
-    box-shadow: 0 10px 30px -15px rgba(0,0,0,0.2);
 }
 
 .series-card::after {
@@ -1115,10 +1102,6 @@ body.light-theme {
     margin: 0;
     letter-spacing: -0.3px;
 }
-.light-theme .series-header h3 {
-    color: #1a1e24;
-    text-shadow: none;
-}
 
 .series-header .recipe-category {
     background: rgba(58, 134, 255, 0.15);
@@ -1140,9 +1123,6 @@ body.light-theme {
     margin: 15px 0 0 0;
     max-width: 80%;
 }
-.light-theme .series-description {
-    color: #4a5568;
-}
 
 .series-properties {
     background: #0f1215;
@@ -1151,11 +1131,6 @@ body.light-theme {
     margin: 20px 0;
     border: 1px solid rgba(58, 134, 255, 0.2);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-    transition: all 0.3s ease;
-}
-.light-theme .series-properties {
-    background: #f7fafc;
-    border-color: rgba(58, 134, 255, 0.3);
 }
 
 .series-properties h4 {
@@ -1168,9 +1143,10 @@ body.light-theme {
     gap: 10px;
     text-shadow: 0 0 5px rgba(58, 134, 255, 0.3);
 }
-.light-theme .series-properties h4 {
-    color: #1a1e24;
-    text-shadow: none;
+
+.series-properties h4 i {
+    color: #3a86ff;
+    font-size: 20px;
 }
 
 .properties-grid {
@@ -1185,10 +1161,6 @@ body.light-theme {
     padding: 14px 16px;
     border: 1px solid rgba(58, 134, 255, 0.2);
     transition: all 0.2s;
-}
-.light-theme .property-item {
-    background: #edf2f7;
-    border-color: rgba(58, 134, 255, 0.3);
 }
 
 .property-item:hover {
@@ -1209,16 +1181,12 @@ body.light-theme {
     color: white;
     font-size: 14px;
 }
-.light-theme .property-item span {
-    color: #1a1e24;
-}
 
 .series-paints {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 16px;
     margin-top: 20px;
-    transition: all 0.3s ease;
 }
 
 .paint-mini-card {
@@ -1230,10 +1198,6 @@ body.light-theme {
     border: 1px solid rgba(58, 134, 255, 0.2);
     box-shadow: 0 5px 15px -10px #000;
     position: relative;
-}
-.light-theme .paint-mini-card {
-    background: #ffffff;
-    border-color: rgba(0,0,0,0.1);
 }
 
 .paint-mini-card:hover {
@@ -1264,9 +1228,6 @@ body.light-theme {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-.light-theme .paint-mini-name {
-    color: #1a1e24;
 }
 
 .paint-mini-article {
@@ -1299,22 +1260,20 @@ body.light-theme {
     box-shadow: 0 0 15px #3a86ff;
 }
 
-.load-more-paints {
-    margin-top: 20px;
-    text-align: center;
-}
-.load-more-btn {
-    background: transparent;
-    border: 1px solid var(--spectrum-blue);
-    color: var(--spectrum-blue);
-    padding: 8px 24px;
-    border-radius: var(--radius-full);
-    cursor: pointer;
-    transition: var(--transition-fast);
-}
-.load-more-btn:hover {
-    background: var(--spectrum-blue);
-    color: white;
+/* Адаптація */
+@media (max-width: 768px) {
+    .series-card {
+        padding: 20px;
+    }
+    .series-header h3 {
+        font-size: 24px;
+    }
+    .series-description {
+        max-width: 100%;
+    }
+    .series-paints {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ===== RESPONSIVE – МОБІЛЬНА АДАПТАЦІЯ ===== */
@@ -1441,7 +1400,7 @@ body.light-theme {
     }
 }
 
-/* Анімація для спливаючого вікна */
+/* Анімація для спливаючого вікна (вже є в utils.js) */
 @keyframes slideUp {
     from {
         opacity: 0;
