@@ -5,6 +5,17 @@ window.SICOMIX = window.SICOMIX || {};
     const SICOMIX = global.SICOMIX;
 
     SICOMIX.utils = (function() {
+        // Екранування HTML для захисту від XSS
+        function escapeHtml(unsafe) {
+            if (unsafe === undefined || unsafe === null) return '';
+            return String(unsafe)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         function showNotification(message, type = 'success', duration = 3000) {
             const existing = document.querySelectorAll('.notification');
             existing.forEach(n => n.remove());
@@ -37,7 +48,7 @@ window.SICOMIX = window.SICOMIX || {};
             const icon = type === 'success' ? 'fa-check-circle' :
                          type === 'error' ? 'fa-exclamation-circle' :
                          type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
-            notification.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+            notification.innerHTML = `<i class="fas ${icon}"></i><span>${escapeHtml(message)}</span>`;
             document.body.appendChild(notification);
 
             setTimeout(() => {
@@ -55,7 +66,7 @@ window.SICOMIX = window.SICOMIX || {};
             const closeBtn = document.getElementById('closeConfirmationModal');
 
             titleEl.textContent = title;
-            msgEl.innerHTML = `<span>${message}</span>`;
+            msgEl.innerHTML = `<span>${escapeHtml(message)}</span>`;
             modal.classList.add('active');
 
             const handleConfirm = () => {
@@ -97,7 +108,14 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         function exportToFile(data, filename, type = 'application/json') {
-            const content = type === 'application/json' ? JSON.stringify(data, null, 2) : convertToCSV(data);
+            let content;
+            if (type === 'application/json') {
+                content = JSON.stringify(data, null, 2);
+            } else if (type === 'text/csv') {
+                content = convertToCSV(data);
+            } else {
+                content = JSON.stringify(data, null, 2); // fallback
+            }
             const blob = new Blob([content], { type });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -110,8 +128,35 @@ window.SICOMIX = window.SICOMIX || {};
         function convertToCSV(data) {
             if (!Array.isArray(data) || data.length === 0) return '';
             const headers = Object.keys(data[0]);
-            const rows = data.map(item => headers.map(h => item[h] ?? '').join(','));
+            const rows = data.map(item => 
+                headers.map(h => {
+                    const val = item[h] ?? '';
+                    // Екрануємо коми та лапки
+                    if (typeof val === 'string' && (val.includes(',') || val.includes('"') || val.includes('\n'))) {
+                        return `"${val.replace(/"/g, '""')}"`;
+                    }
+                    return val;
+                }).join(',')
+            );
             return [headers.join(','), ...rows].join('\n');
+        }
+
+        // Простий парсер CSV (припускає, що поля не містять ком, крім роздільників)
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n').filter(line => line.trim() !== '');
+            if (lines.length === 0) return [];
+            const headers = lines[0].split(',').map(h => h.trim());
+            const result = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                if (values.length !== headers.length) continue; // пропускаємо некоректні рядки
+                const obj = {};
+                headers.forEach((h, idx) => {
+                    obj[h] = values[idx];
+                });
+                result.push(obj);
+            }
+            return result;
         }
 
         function debounce(fn, delay) {
@@ -128,6 +173,7 @@ window.SICOMIX = window.SICOMIX || {};
                 return true;
             } catch (e) {
                 console.error('LocalStorage save error:', e);
+                showNotification('Помилка збереження даних. Можливо, перевищено ліміт пам\'яті.', 'error');
                 return false;
             }
         }
@@ -143,12 +189,14 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         return {
+            escapeHtml,
             showNotification,
             showConfirmation,
             generateId,
             calculateIngredientPercentages,
             exportToFile,
             convertToCSV,
+            parseCSV,
             debounce,
             saveToLocalStorage,
             loadFromLocalStorage
