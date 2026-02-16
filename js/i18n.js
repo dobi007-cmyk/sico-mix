@@ -55,7 +55,6 @@ window.SICOMIX = window.SICOMIX || {};
                 all_categories: "Всі категорії",
                 add_ingredient: "Додати інгредієнт",
                 save_recipe: "Зберегти рецепт",
-                calculate_percentages: "Розрахувати відсотки",
                 clear_form: "Очистити форму",
                 update_recipe: "Оновити рецепт",
 
@@ -184,7 +183,7 @@ window.SICOMIX = window.SICOMIX || {};
                 load_more: "Завантажити ще",
                 showing: "Показано",
                 of: "з",
-                paints: "фарб",
+                paints_short: "фарб",
 
                 // Стандартна фарба
                 default_paint: "Стандартна",
@@ -204,7 +203,9 @@ window.SICOMIX = window.SICOMIX || {};
                 theme_spectrum: "Спектр (за замовчуванням)",
                 theme_organic: "Органічна",
                 paint_in_use_title: "Фарба використовується",
-                paint_in_use_message: "Ця фарба є в рецептах. Видалити її з усіх рецептів?"
+                paint_in_use_message: "Ця фарба використовується в {count} рецептах. Видалити її з усіх рецептів?",
+                unsaved_changes_warning: "У вас є незбережені зміни. Ви впевнені, що хочете покинути сторінку?",
+                csv_parsing_error: "Помилка розбору CSV. Переконайтеся, що файл має правильний формат."
             },
             en: {
                 // Глобальні
@@ -255,7 +256,6 @@ window.SICOMIX = window.SICOMIX || {};
                 all_categories: "All categories",
                 add_ingredient: "Add ingredient",
                 save_recipe: "Save recipe",
-                calculate_percentages: "Calculate percentages",
                 clear_form: "Clear form",
                 update_recipe: "Update recipe",
 
@@ -384,7 +384,7 @@ window.SICOMIX = window.SICOMIX || {};
                 load_more: "Load more",
                 showing: "Showing",
                 of: "of",
-                paints: "paints",
+                paints_short: "paints",
 
                 // Стандартна фарба
                 default_paint: "Standard",
@@ -404,7 +404,9 @@ window.SICOMIX = window.SICOMIX || {};
                 theme_spectrum: "Spectrum (default)",
                 theme_organic: "Organic",
                 paint_in_use_title: "Paint in use",
-                paint_in_use_message: "This paint is used in recipes. Remove it from all recipes?"
+                paint_in_use_message: "This paint is used in {count} recipes. Remove it from all recipes?",
+                unsaved_changes_warning: "You have unsaved changes. Are you sure you want to leave?",
+                csv_parsing_error: "CSV parsing error. Ensure the file has the correct format."
             },
             pl: {
                 // Глобальні
@@ -455,7 +457,6 @@ window.SICOMIX = window.SICOMIX || {};
                 all_categories: "Wszystkie kategorie",
                 add_ingredient: "Dodaj składnik",
                 save_recipe: "Zapisz recepturę",
-                calculate_percentages: "Oblicz procenty",
                 clear_form: "Wyczyść formularz",
                 update_recipe: "Aktualizuj recepturę",
 
@@ -584,7 +585,7 @@ window.SICOMIX = window.SICOMIX || {};
                 load_more: "Załaduj więcej",
                 showing: "Pokazuje",
                 of: "z",
-                paints: "farby",
+                paints_short: "farby",
 
                 // Стандартна фарба
                 default_paint: "Standardowa",
@@ -604,23 +605,24 @@ window.SICOMIX = window.SICOMIX || {};
                 theme_spectrum: "Spectrum (domyślny)",
                 theme_organic: "Organiczny",
                 paint_in_use_title: "Farba w użyciu",
-                paint_in_use_message: "Ta farba jest używana w recepturach. Usunąć ją ze wszystkich receptur?"
+                paint_in_use_message: "Ta farba jest używana w {count} recepturach. Usunąć ją ze wszystkich receptur?",
+                unsaved_changes_warning: "Masz niezapisane zmiany. Czy na pewno chcesz opuścić stronę?",
+                csv_parsing_error: "Błąd parsowania CSV. Upewnij się, że plik ma prawidłowy format."
             }
         };
 
-        // Словник перекладу категорій (додано синоніми)
+        // Словник перекладу категорій
         const categoryTranslations = {
             "Універсальні": { uk: "Універсальні", en: "Universal", pl: "Uniwersalne" },
             "UV фарби": { uk: "УФ фарби", en: "UV paints", pl: "Farby UV" },
             "Папір/картон": { uk: "Папір/картон", en: "Paper/Cardboard", pl: "Papier/karton" },
-            "Пластики": { uk: "Пластик", en: "Plastic", pl: "Plastik" }, // синонім
+            "Пластики": { uk: "Пластик", en: "Plastic", pl: "Plastik" },
             "Текстиль": { uk: "Текстиль", en: "Textile", pl: "Tekstylia" }
         };
 
         // Локалізація позначень одиниць вимірювання
         function localizeUnitSymbol(unitSymbol) {
             const lang = currentLang;
-            // Мапінг символів: для української залишаємо кириличні, для інших – латинські
             const unitMap = {
                 'г': { uk: 'г', en: 'g', pl: 'g' },
                 'кг': { uk: 'кг', en: 'kg', pl: 'kg' },
@@ -630,7 +632,7 @@ window.SICOMIX = window.SICOMIX || {};
             if (unitMap[unitSymbol] && unitMap[unitSymbol][lang]) {
                 return unitMap[unitSymbol][lang];
             }
-            return unitSymbol; // fallback
+            return unitSymbol;
         }
 
         let currentLang = 'uk';
@@ -649,13 +651,14 @@ window.SICOMIX = window.SICOMIX || {};
             return currentLang;
         }
 
-        function t(key) {
-            const translation = translations[currentLang]?.[key];
+        function t(key, params = {}) {
+            let translation = translations[currentLang]?.[key];
             if (translation === undefined) {
                 console.warn(`⚠️ Missing translation key: ${key} [${currentLang}]`);
-                return translations['uk'][key] || key;
+                translation = translations['uk'][key] || key;
             }
-            return translation;
+            // Заміна параметрів {count} тощо
+            return translation.replace(/\{(\w+)\}/g, (match, p1) => params[p1] || match);
         }
 
         function translateCategory(categoryUk, lang = currentLang) {
