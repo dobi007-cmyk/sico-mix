@@ -98,12 +98,12 @@ body {
     100% { transform: translate(-5%, 5%) scale(1.1); }
 }
 
-/* ===== ОРГАНІЧНА ТЕМА (природні матеріали) – ОНОВЛЕНО ===== */
+/* ===== ОРГАНІЧНА ТЕМА (природні матеріали) – ПОКРАЩЕНО ===== */
 body.theme-organic {
     --bg-primary: #faf7f2;        /* дуже світлий бежевий */
     --bg-secondary: #f0ebe4;       /* трохи темніший */
-    --bg-card: rgba(255, 250, 240, 0.9); /* майже білий напівпрозорий */
-    --bg-glass: rgba(250, 245, 235, 0.8);
+    --bg-card: rgba(255, 250, 240, 0.95); /* майже білий, менш прозорий */
+    --bg-glass: rgba(250, 245, 235, 0.9);
     --bg-elevated: #ffffff;        /* білий для піднятих елементів */
     
     --spectrum-violet: #a48b9f;    /* приглушений фіолетовий */
@@ -114,22 +114,22 @@ body.theme-organic {
     --spectrum-orange: #dbba9e;    /* теракотовий */
     --spectrum-red: #c9a9a9;       /* світло-червоний */
     
-    --text-primary: #3e3a35;       /* темно-коричневий, високий контраст */
-    --text-secondary: #6b6258;     /* середній коричневий */
-    --text-tertiary: #9a8f84;      /* світло-коричневий */
+    --text-primary: #2c2a27;       /* темно-коричневий, максимальний контраст */
+    --text-secondary: #4f4a45;     /* середній коричневий */
+    --text-tertiary: #736c64;      /* світло-коричневий */
     
-    --border-light: rgba(120, 100, 80, 0.15);
-    --border-medium: rgba(100, 80, 60, 0.25);
-    --border-accent: rgba(127, 154, 165, 0.6); /* акцентний синій */
+    --border-light: rgba(80, 60, 40, 0.2);
+    --border-medium: rgba(60, 40, 20, 0.3);
+    --border-accent: rgba(127, 154, 165, 0.7); /* акцентний синій */
     
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.15);
-    --shadow-glow: 0 8px 32px rgba(127, 154, 165, 0.25);
-    --shadow-glow-hover: 0 12px 48px rgba(164, 139, 159, 0.3);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.2);
+    --shadow-glow: 0 8px 32px rgba(127, 154, 165, 0.3);
+    --shadow-glow-hover: 0 12px 48px rgba(164, 139, 159, 0.35);
     
-    /* М'яка текстура паперу */
-    background: #f5efe8 url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="1" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.03"/></svg>');
+    /* М'яка текстура паперу (трохи світліша) */
+    background: #f8f3ec url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="1" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.02"/></svg>');
 }
 
 /* Стилі для карток та панелей в органічній темі */
@@ -144,19 +144,27 @@ body.theme-organic .series-card {
     background: var(--bg-card);
     box-shadow: var(--shadow-md);
     border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg); /* трохи більші радіуси */
+    border-radius: var(--radius-lg);
 }
 
-/* Підвищуємо контраст для заголовків */
+/* Підвищуємо контраст для заголовків – робимо їх темнішими */
 body.theme-organic .page-title,
 body.theme-organic .welcome-title,
 body.theme-organic .section-title,
 body.theme-organic .action-title,
 body.theme-organic .recipe-title {
-    color: var(--text-primary);
-    -webkit-text-fill-color: initial; /* скасовуємо градієнтний текст */
+    color: #1e1c1a; /* майже чорний */
+    -webkit-text-fill-color: initial;
     background: none;
     text-shadow: none;
+    font-weight: 700; /* трішки жирніше */
+}
+
+/* Звичайний текст */
+body.theme-organic p,
+body.theme-organic span,
+body.theme-organic div:not(.special) {
+    color: var(--text-primary);
 }
 
 /* Кнопки з природними градієнтами */
@@ -180,16 +188,15 @@ body.theme-organic .nav-link.active {
 body.theme-organic .form-input,
 body.theme-organic .form-select,
 body.theme-organic .form-textarea {
-    background: rgba(255, 255, 255, 0.7);
+    background: white;
     border-color: var(--border-medium);
-    color: var(--text-primary);
+    color: #1e1c1a;
 }
 body.theme-organic .form-input:focus,
 body.theme-organic .form-select:focus,
 body.theme-organic .form-textarea:focus {
-    background: white;
     border-color: var(--spectrum-blue);
-    box-shadow: 0 0 0 3px rgba(127, 154, 165, 0.2);
+    box-shadow: 0 0 0 3px rgba(127, 154, 165, 0.3);
 }
 
 /* Таблиця інгредієнтів */
@@ -199,6 +206,7 @@ body.theme-organic .ingredients-table th {
 }
 body.theme-organic .ingredients-table td {
     border-bottom-color: var(--border-light);
+    color: var(--text-primary);
 }
 
 /* Картки рецептів та фарб */
@@ -209,22 +217,27 @@ body.theme-organic .series-card {
 body.theme-organic .recipe-card .recipe-meta {
     border-top-color: var(--border-light);
     border-bottom-color: var(--border-light);
+    color: var(--text-secondary);
 }
 
 /* Кнопки дій у картках */
 body.theme-organic .recipe-btn {
-    background: rgba(127, 154, 165, 0.1);
+    background: rgba(127, 154, 165, 0.15);
     border-color: var(--border-light);
     color: var(--text-primary);
 }
 body.theme-organic .recipe-btn:hover {
-    background: rgba(127, 154, 165, 0.2);
+    background: rgba(127, 154, 165, 0.3);
     border-color: var(--spectrum-blue);
+    color: #000;
 }
 
 /* Модальні вікна */
 body.theme-organic .modal-content {
     background: white;
+}
+body.theme-organic .modal-title {
+    color: #1e1c1a;
 }
 
 /* Бейдж категорії */
@@ -235,7 +248,7 @@ body.theme-organic .recipe-category {
 
 /* Лічильник фарб */
 body.theme-organic .paint-count {
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.7);
     border-color: var(--border-light);
     color: var(--text-secondary);
 }
