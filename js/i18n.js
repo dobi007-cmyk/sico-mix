@@ -197,8 +197,12 @@ window.SICOMIX = window.SICOMIX || {};
                 select_series_first: "Спочатку оберіть серію фарб",
                 paints_not_found_in_series: "У цій серії немає фарб за заданим фільтром",
                 series_mismatch: "Не можна додавати фарбу з іншої серії",
-                select_recipes_to_print: "Оберіть рецепти для друку"
-            },
+                select_recipes_to_print: "Оберіть рецепти для друку",
+                
+                // Новий ключ для дублювання
+                duplicate: "Дублювати"
+
+ },
             en: {
                 // Глобальні
                 app_subtitle: "Digital Color Laboratory",
@@ -391,6 +395,7 @@ window.SICOMIX = window.SICOMIX || {};
                 paints_not_found_in_series: "No paints in this series matching the filter",
                 series_mismatch: "Cannot add paint from another series",
                 select_recipes_to_print: "Select recipes to print"
+                   duplicate: "Duplicate"
             },
             pl: {
                 // Глобальні
@@ -584,6 +589,7 @@ window.SICOMIX = window.SICOMIX || {};
                 paints_not_found_in_series: "Brak farb w tej serii pasujących do filtra",
                 series_mismatch: "Nie można dodać farby z innej serii",
                 select_recipes_to_print: "Wybierz receptury do druku"
+                duplicate: "Duplikuj"
             }
         };
 
