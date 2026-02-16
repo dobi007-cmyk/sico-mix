@@ -1,4 +1,4 @@
-/* ===== SICO Spectrum 2026 – Glass Design ===== */
+/* ===== SICO Spectrum 2026 – Glass Design (оновлено) ===== */
 :root {
     --bg-primary: #0a0c0f;
     --bg-secondary: #14181c;
@@ -864,7 +864,7 @@ body {
         justify-content: center;
     }
 }
-/* ===== SERIES CATALOG ===== */
+/* ===== SERIES CATALOG – СУЧАСНИЙ ДИЗАЙН ===== */
 .series-card {
     background: var(--bg-elevated);
     backdrop-filter: blur(8px);
@@ -873,6 +873,7 @@ body {
     padding: 24px;
     margin-bottom: 24px;
     transition: var(--transition);
+    overflow: hidden;
 }
 .series-card:hover {
     border-color: var(--spectrum-blue);
@@ -885,46 +886,66 @@ body {
     border-radius: var(--border-radius-sm);
     padding: 10px;
     margin: -10px -10px 0 -10px;
+    background: linear-gradient(145deg, rgba(58,134,255,0.15), rgba(123,44,191,0.1));
+    transition: background 0.2s;
+}
+.series-header:hover {
+    background: linear-gradient(145deg, rgba(58,134,255,0.25), rgba(123,44,191,0.15));
 }
 .series-properties {
     transition: var(--transition);
+    background: rgba(0,0,0,0.2);
+    border-radius: var(--border-radius-sm);
+    padding: 15px;
+    margin: 15px 0;
+    border-left: 3px solid var(--spectrum-blue);
 }
 .series-paints {
     transition: var(--transition);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
 }
 .paint-mini-card {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: rgba(20, 24, 28, 0.8);
+    gap: 12px;
+    background: rgba(20, 24, 28, 0.7);
+    backdrop-filter: blur(4px);
     border: 1px solid var(--border-light);
     border-radius: var(--border-radius-sm);
-    padding: 8px 10px;
-    transition: var(--transition);
+    padding: 10px 12px;
+    transition: all 0.2s ease;
     cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 .paint-mini-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     border-color: var(--spectrum-blue);
     background: rgba(30, 35, 40, 0.9);
+    box-shadow: 0 8px 16px rgba(58,134,255,0.2);
 }
 .paint-mini-swatch {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    border: 1px solid rgba(255,255,255,0.2);
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.2);
     flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 .paint-mini-info {
     flex: 1;
     min-width: 0;
 }
 .paint-mini-name {
-    font-weight: 500;
+    font-weight: 600;
     font-size: 13px;
+    color: white;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-bottom: 2px;
 }
 .paint-mini-article {
     font-size: 10px;
@@ -941,7 +962,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: var(--transition);
 }
 .toggle-series:hover {
     background: rgba(255,255,255,0.2);
+    transform: scale(1.05);
 }
