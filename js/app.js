@@ -1,4 +1,4 @@
-// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (ВИПРАВЛЕНО) ==========
+// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (ВИПРАВЛЕНО + ТЕМИ) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -30,7 +30,7 @@ window.SICOMIX = window.SICOMIX || {};
         let addIngredientBtn, saveRecipeBtn, clearRecipeBtn, calculatePercentagesBtn;
         let recipesContainer, exportRecipesBtn, importRecipesBtn, printRecipesBtn, deleteSelectedRecipesBtn;
         let paintCatalogEl, addNewPaintBtn, addPaintModal, closePaintModal, savePaintBtn, cancelPaintBtn;
-        let languageSelect, unitsSelect, autoSaveCheckbox, backupCheckbox, saveSettingsBtn, resetSettingsBtn, clearAllDataBtn;
+        let languageSelect, unitsSelect, themeSelect, autoSaveCheckbox, backupCheckbox, saveSettingsBtn, resetSettingsBtn, clearAllDataBtn;
         let actionCards;
         // Елементи для імпорту/експорту
         let startImportBtn, startExportBtn, importFormat, exportFormat, importFile, importRecipesCheckbox, importPaintsCheckbox;
@@ -68,6 +68,7 @@ window.SICOMIX = window.SICOMIX || {};
             actionCards = document.querySelectorAll('.action-card');
             languageSelect = document.getElementById('languageSelect');
             unitsSelect = document.getElementById('unitsSelect');
+            themeSelect = document.getElementById('themeSelect');
             autoSaveCheckbox = document.getElementById('autoSaveCheckbox');
             backupCheckbox = document.getElementById('backupCheckbox');
             saveSettingsBtn = document.getElementById('saveSettingsBtn');
@@ -130,6 +131,7 @@ window.SICOMIX = window.SICOMIX || {};
 
         // ---------- АВТОЗБЕРЕЖЕННЯ ЧЕРНЕТКИ РЕЦЕПТУ ----------
         function autoSaveRecipeDraft() {
+            if (!currentSettings.autoSave) return; // <-- враховуємо налаштування
             if (!document.getElementById('new-recipe-page')?.classList.contains('active')) return;
             if (isEditingRecipe) return;
 
@@ -181,6 +183,16 @@ window.SICOMIX = window.SICOMIX || {};
             if (autoSaveCheckbox) autoSaveCheckbox.checked = currentSettings.autoSave !== false;
             if (backupCheckbox) backupCheckbox.checked = currentSettings.backup === true;
             if (languageSelect) languageSelect.value = SICOMIX.i18n.getLanguage();
+            if (themeSelect) themeSelect.value = currentSettings.theme || 'spectrum';
+            applyTheme(currentSettings.theme || 'spectrum');
+        }
+
+        function applyTheme(theme) {
+            document.body.classList.remove('theme-organic');
+            if (theme === 'organic') {
+                document.body.classList.add('theme-organic');
+            }
+            // spectrum – це тема за замовчуванням, без класу
         }
 
         // ---------- ПОДІЇ ----------
@@ -272,7 +284,7 @@ window.SICOMIX = window.SICOMIX || {};
             if (startImportBtn) startImportBtn.addEventListener('click', startImport);
             if (startExportBtn) startExportBtn.addEventListener('click', startExport);
 
-            // Налаштування мови
+            // Налаштування мови та теми
             if (languageSelect) {
                 languageSelect.addEventListener('change', function() {
                     const newLang = this.value;
@@ -292,6 +304,14 @@ window.SICOMIX = window.SICOMIX || {};
                         if (pageId === 'new-recipe') renderIngredientsList();
                     }
                     
+                    saveData();
+                });
+            }
+
+            if (themeSelect) {
+                themeSelect.addEventListener('change', function() {
+                    currentSettings.theme = this.value;
+                    applyTheme(this.value);
                     saveData();
                 });
             }
@@ -381,12 +401,13 @@ window.SICOMIX = window.SICOMIX || {};
             selectedIngredients.forEach((ing, idx) => {
                 const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId));
                 if (!paint) return;
+                const paintName = paint.displayName?.[SICOMIX.i18n.getLanguage()] || paint.name;
                 html += `<tr>
                     <td>
                         <div style="display:flex; align-items:center; gap:10px;">
                             <div style="width:24px; height:24px; background:${paint.color}; border-radius:6px; border:1px solid rgba(255,255,255,0.2);"></div>
                             <div>
-                                <div style="font-weight:600;">${paint.name}</div>
+                                <div style="font-weight:600;">${paintName}</div>
                                 <div style="font-size:12px; color:var(--text-secondary);">
                                     ${SICOMIX.i18n.translateCategory(paint.category)} 
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:12px; margin-left:6px;">${paint.series}</span>
@@ -458,14 +479,16 @@ window.SICOMIX = window.SICOMIX || {};
         function showPaintSelectionModal(paints) {
             const modal = document.getElementById('paintSelectionModal');
             const list = document.getElementById('paintSelectionList');
-            list.innerHTML = paints.map(p => `
+            list.innerHTML = paints.map(p => {
+                const paintName = p.displayName?.[SICOMIX.i18n.getLanguage()] || p.name;
+                return `
                 <div class="paint-selection-card" data-id="${p.id}">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <div style="width:32px; height:32px; background:${p.color}; border-radius:8px;"></div>
-                        <div><strong>${p.displayName ? p.displayName[SICOMIX.i18n.getLanguage()] : p.name}</strong><br><span style="font-size:12px;">${SICOMIX.i18n.translateCategory(p.category)} (${p.series})</span></div>
+                        <div><strong>${paintName}</strong><br><span style="font-size:12px;">${SICOMIX.i18n.translateCategory(p.category)} (${p.series})</span></div>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
             modal.classList.add('active');
 
             list.querySelectorAll('.paint-selection-card').forEach(card => {
@@ -791,7 +814,7 @@ window.SICOMIX = window.SICOMIX || {};
                 `;
                 recipe.ingredients.forEach(ing => {
                     const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId));
-                    const paintName = paint ? paint.name : '?';
+                    const paintName = paint ? (paint.displayName?.[lang] || paint.name) : '?';
                     html += `
                         <tr>
                             <td>${paintName}</td>
@@ -822,7 +845,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- КАТАЛОГ ФАРБ ----------
+        // ---------- КАТАЛОГ ФАРБ (оновлений: використання displayName, data-paint-id) ----------
         function renderPaintCatalog() {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -846,9 +869,9 @@ window.SICOMIX = window.SICOMIX || {};
                     
                     const matchingPaintSeries = new Set();
                     paintCatalog.forEach(p => {
-                        if (p.name.toLowerCase().includes(search) ||
-                            (p.article && p.article.toLowerCase().includes(search)) ||
-                            (p.displayName && p.displayName[lang]?.toLowerCase().includes(search))) {
+                        const paintName = p.displayName?.[lang] || p.name;
+                        if (paintName.toLowerCase().includes(search) ||
+                            (p.article && p.article.toLowerCase().includes(search))) {
                             matchingPaintSeries.add(p.series);
                         }
                     });
@@ -870,11 +893,11 @@ window.SICOMIX = window.SICOMIX || {};
                     let seriesPaints = paintCatalog.filter(p => p.series === series.id);
                     
                     if (search) {
-                        seriesPaints = seriesPaints.filter(p => 
-                            p.name.toLowerCase().includes(search) ||
-                            (p.article && p.article.toLowerCase().includes(search)) ||
-                            (p.displayName && p.displayName[lang]?.toLowerCase().includes(search))
-                        );
+                        seriesPaints = seriesPaints.filter(p => {
+                            const paintName = p.displayName?.[lang] || p.name;
+                            return paintName.toLowerCase().includes(search) ||
+                                   (p.article && p.article.toLowerCase().includes(search));
+                        });
                     }
                     
                     if (seriesPaints.length === 0 && !search) return;
@@ -916,11 +939,13 @@ window.SICOMIX = window.SICOMIX || {};
                             </div>
                             
                             <div class="series-paints" style="display: none; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
-                                ${seriesPaints.map(p => `
-                                    <div class="paint-mini-card" data-paint-id="${p.id}" data-paint='${JSON.stringify(p).replace(/'/g, "&apos;")}'>
+                                ${seriesPaints.map(p => {
+                                    const paintName = p.displayName?.[lang] || p.name;
+                                    return `
+                                    <div class="paint-mini-card" data-paint-id="${p.id}">
                                         <div class="paint-mini-swatch" style="background: ${p.color};"></div>
                                         <div class="paint-mini-info">
-                                            <div class="paint-mini-name">${p.name}</div>
+                                            <div class="paint-mini-name">${paintName}</div>
                                             <div class="paint-mini-article">${p.article || ''}</div>
                                         </div>
                                         ${!p.isDefault ? `
@@ -929,7 +954,7 @@ window.SICOMIX = window.SICOMIX || {};
                                             </button>
                                         ` : ''}
                                     </div>
-                                `).join('')}
+                                `}).join('')}
                             </div>
                         </div>
                     `;
@@ -970,19 +995,13 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 });
 
-                // Обробники для карток фарб (показати деталі)
+                // Обробники для карток фарб (показати деталі) – використовуємо data-paint-id
                 document.querySelectorAll('.paint-mini-card').forEach(card => {
                     card.addEventListener('click', function(e) {
-                        if (e.target.closest('.delete-paint')) return; // ігноруємо клік на кнопку видалення
-                        const paintData = this.dataset.paint;
-                        if (paintData) {
-                            try {
-                                const paint = JSON.parse(paintData.replace(/&apos;/g, "'"));
-                                showPaintDetails(paint);
-                            } catch (error) {
-                                console.error('Помилка парсингу paint data:', error);
-                            }
-                        }
+                        if (e.target.closest('.delete-paint')) return;
+                        const paintId = this.dataset.paintId;
+                        const paint = paintCatalog.find(p => String(p.id) === paintId);
+                        if (paint) showPaintDetails(paint);
                     });
                 });
 
@@ -1012,10 +1031,11 @@ window.SICOMIX = window.SICOMIX || {};
             const modal = document.getElementById('paintSelectionModal');
             const list = document.getElementById('paintSelectionList');
             const lang = SICOMIX.i18n.getLanguage();
+            const paintName = paint.displayName?.[lang] || paint.name;
             
             // Змінюємо заголовок модального вікна
             const modalTitle = modal.querySelector('.modal-title');
-            if (modalTitle) modalTitle.textContent = paint.name;
+            if (modalTitle) modalTitle.textContent = paintName;
             
             // Формуємо вміст
             list.innerHTML = `
@@ -1023,7 +1043,7 @@ window.SICOMIX = window.SICOMIX || {};
                     <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
                         <div style="width: 80px; height: 80px; background: ${paint.color}; border-radius: 12px; border: 2px solid rgba(255,255,255,0.2);"></div>
                         <div>
-                            <h2 style="font-size: 24px; margin-bottom: 5px;">${paint.name}</h2>
+                            <h2 style="font-size: 24px; margin-bottom: 5px;">${paintName}</h2>
                             <p style="color: var(--text-secondary);">${paint.article || ''}</p>
                         </div>
                     </div>
@@ -1079,7 +1099,9 @@ window.SICOMIX = window.SICOMIX || {};
                 description: desc,
                 manufacturer: mfr,
                 article: art,
-                isDefault: false
+                isDefault: false,
+                // Для сумісності з displayName, можна додати, але не обов'язково
+                displayName: { uk: name, en: name, pl: name }
             };
             userPaints.push(newPaint);
             paintCatalog = [...basePaints, ...userPaints];
@@ -1092,22 +1114,44 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         function deletePaint(id) {
-            const index = userPaints.findIndex(p => String(p.id) === String(id));
-            if (index !== -1) {
+            const paint = paintCatalog.find(p => String(p.id) === String(id));
+            if (!paint) return;
+            
+            if (paint.isDefault) {
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('cannot_delete_default_paint'), 'warning');
+                return;
+            }
+
+            // Перевірка, чи використовується в рецептах
+            const usedInRecipes = recipes.some(r => 
+                r.ingredients.some(ing => String(ing.paintId) === String(id))
+            );
+
+            if (usedInRecipes) {
                 SICOMIX.utils.showConfirmation(
-                    SICOMIX.i18n.t('delete_paint'),
-                    SICOMIX.i18n.t('delete_paint_confirmation'),
+                    SICOMIX.i18n.t('paint_in_use_title') || 'Фарба використовується',
+                    SICOMIX.i18n.t('paint_in_use_message') || 'Ця фарба є в рецептах. Видалити її з усіх рецептів?',
                     () => {
-                        userPaints.splice(index, 1);
+                        // Видалити з усіх рецептів
+                        recipes.forEach(r => {
+                            r.ingredients = r.ingredients.filter(ing => String(ing.paintId) !== String(id));
+                        });
+                        // Видалити з userPaints
+                        userPaints = userPaints.filter(p => String(p.id) !== String(id));
                         paintCatalog = [...basePaints, ...userPaints];
                         saveData();
-                        populateCategoryFilters();
                         renderPaintCatalog();
+                        renderRecipes();
                         SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
                     }
                 );
             } else {
-                SICOMIX.utils.showNotification(SICOMIX.i18n.t('cannot_delete_default_paint'), 'warning');
+                // Просто видалити
+                userPaints = userPaints.filter(p => String(p.id) !== String(id));
+                paintCatalog = [...basePaints, ...userPaints];
+                saveData();
+                renderPaintCatalog();
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
             }
         }
 
@@ -1145,7 +1189,7 @@ window.SICOMIX = window.SICOMIX || {};
                 units: unitsSelect.value,
                 autoSave: autoSaveCheckbox.checked,
                 backup: backupCheckbox.checked,
-                theme: 'dark',
+                theme: themeSelect.value,
                 notifications: true,
                 defaultCategory: 'Standard',
                 defaultUnit: 'г',
