@@ -1,10 +1,10 @@
-// ========== ДАНІ ПРО ФАРБИ SICO (БАГАТОМОВНА ВЕРСІЯ) ==========
+// ========== ДАНІ ПРО ФАРБИ SICO (БАГАТОМОВНА ВЕРСІЯ + ДОДАВКИ) ==========
 window.SICOMIX = window.SICOMIX || {};
 const SICOMIX = window.SICOMIX;
 
 SICOMIX.data = (function() {
     try {
-        // ---------- СЕРІЇ ФАРБ (категорії тепер рядки) ----------
+        // ---------- СЕРІЇ ФАРБ ----------
         const series = [
             { 
                 id: "EC",
@@ -66,7 +66,13 @@ SICOMIX.data = (function() {
                         pl: "EC 91 Q – biała półmatowa o wyższej lepkości do papieru i tektury; EC 60/146, EC 61/163 – ogniste czerwienie z ekstremalną odpornością na światło; ECRG 120 – złota farba gotowa do użycia",
                         en: "EC 91 Q – semi-matte white with higher viscosity for paper and cardboard; EC 60/146, EC 61/163 – fire reds with extreme lightfastness; ECRG 120 – gold ink ready to use"
                     }
-                }
+                },
+                // Спеціальні добавки для цієї серії (тільки ті, що потрібні)
+                additivePaints: [
+                    { code: "EC 160", name: { uk: "Криюча паста", pl: "Pasta kryjąca", en: "Opaque paste" }, color: "#CCCCCC" },
+                    { code: "EC 150", name: { uk: "Прозора база", pl: "Baza przezroczysta", en: "Transparent base" }, color: "#DDDDDD" },
+                    { code: "EC 1501 HG", name: { uk: "Захисний лак", pl: "Lakier ochronny", en: "Protective varnish" }, color: "#EEEEEE" }
+                ]
             },
             { 
                 id: "CF",
@@ -123,7 +129,12 @@ SICOMIX.data = (function() {
                         pl: "CF 150 – baza przezroczysta; CF 1501 HG – lakier wykończeniowy (wysoki połysk, odporność na ścieranie); CF 160 – dodatek wykrzywiający do detali (do 10%); CF 1702 – silny opóźniacz w żelu (do 10%); AS 1000 – antystatyk do 5%; HCF – wolny utwardzacz 5% dla poprawy przyczepności",
                         en: "CF 150 – transparent base; CF 1501 HG – finishing varnish (high gloss, abrasion resistance); CF 160 – distorting additive for details (up to 10%); CF 1702 – strong gel retarder (up to 10%); AS 1000 – antistatic up to 5%; HCF – slow hardener 5% for improved adhesion"
                     }
-                }
+                },
+                additivePaints: [
+                    { code: "CF 150", name: { uk: "Прозора база", pl: "Baza przezroczysta", en: "Transparent base" }, color: "#DDDDDD" },
+                    { code: "CF 1501 HG", name: { uk: "Фінішний лак", pl: "Lakier wykończeniowy", en: "Finishing varnish" }, color: "#EEEEEE" },
+                    { code: "CF 160", name: { uk: "Викривлююча добавка", pl: "Dodatek wykrzywiający", en: "Distorting additive" }, color: "#BBBBBB" }
+                ]
             },
             { 
                 id: "PLUV",
@@ -185,7 +196,11 @@ SICOMIX.data = (function() {
                         pl: "Doskonała elastyczność, możliwość bigowania. Zawsze testować przed produkcją.",
                         en: "Excellent elasticity, possibility of creasing. Always test before production."
                     }
-                }
+                },
+                additivePaints: [
+                    { code: "PLUV 150", name: { uk: "Високоглянцевий лак", pl: "Lakier wysokopołyskowy", en: "High gloss varnish" }, color: "#EEEEEE" },
+                    { code: "HPLUV", name: { uk: "Каталізатор", pl: "Katalizator", en: "Catalyst" }, color: "#AAAAAA" }
+                ]
             },
             { 
                 id: "SX",
@@ -247,7 +262,11 @@ SICOMIX.data = (function() {
                         pl: "Skoncentrowane, przezroczyste, żywe kolory. Dostępne CMYK i fluo. Bardzo elastyczna, nie pęka.",
                         en: "Concentrated, transparent, vivid colors. CMYK and fluo available. Very elastic, does not crack."
                     }
-                }
+                },
+                additivePaints: [
+                    { code: "HSX", name: { uk: "Затверджувач", pl: "Utwardzacz", en: "Hardener" }, color: "#AAAAAA" },
+                    { code: "SX 150", name: { uk: "Прозора база", pl: "Baza przezroczysta", en: "Transparent base" }, color: "#DDDDDD" }
+                ]
             },
             { 
                 id: "SPTN",
@@ -309,7 +328,12 @@ SICOMIX.data = (function() {
                         pl: "Flash white SPTN91 – szybkoschnąca biała do bazy; Opaque white SPTN91/l – bardzo kryjąca i elastyczna",
                         en: "Flash white SPTN91 – fast drying white for base; Opaque white SPTN91/l – very opaque and elastic"
                     }
-                }
+                },
+                additivePaints: [
+                    { code: "SPTHNYL", name: { uk: "Добавка для адгезії", pl: "Dodatek przyczepności", en: "Adhesion additive" }, color: "#AAAAAA" },
+                    { code: "Nyloncoat", name: { uk: "Для нейлону", pl: "Do nylonu", en: "For nylon" }, color: "#BBBBBB" },
+                    { code: "SPT nr 2", name: { uk: "Клей трансферний", pl: "Klej transferowy", en: "Transfer adhesive" }, color: "#CCCCCC" }
+                ]
             },
             { 
                 id: "AS",
@@ -366,7 +390,10 @@ SICOMIX.data = (function() {
                         pl: "Utwardzacz do wodoodporności",
                         en: "Hardener for water resistance"
                     }
-                }
+                },
+                additivePaints: [
+                    { code: "AS 5000", name: { uk: "Сповільнювач", pl: "Opóźniacz", en: "Retarder" }, color: "#AAAAAA" }
+                ]
             },
             { 
                 id: "OTF",
@@ -428,7 +455,12 @@ SICOMIX.data = (function() {
                         pl: "Bardzo kryjąca, elastyczna, pomimo wysokich właściwości kryjących. Transfer: protokół dla 1-kolorowych i wielokolorowych; Transferglue OTF nr 2 – klej z proszkiem w środku; proszki Soft nr 3, nr 12, nr 4, nr 13; Cold peel.",
                         en: "Very opaque, elastic, despite high opacity. Transfer: protocol for 1-color and multicolor; Transferglue OTF nr 2 – adhesive with powder inside; Soft powders nr 3, nr 12, nr 4, nr 13; Cold peel."
                     }
-                }
+                },
+                additivePaints: [
+                    { code: "HOT", name: { uk: "Затверджувач", pl: "Utwardzacz", en: "Hardener" }, color: "#AAAAAA" },
+                    { code: "OTF 150/14", name: { uk: "Лак для трансферу", pl: "Lakier transferowy", en: "Transfer varnish" }, color: "#EEEEEE" },
+                    { code: "OTF 100/101", name: { uk: "Блокатор міграції", pl: "Blokator migracji", en: "Migration blocker" }, color: "#000000" }
+                ]
             },
             { 
                 id: "TPP",
@@ -490,7 +522,12 @@ SICOMIX.data = (function() {
                         pl: "Nie dodawać proszku matującego – zmniejsza przyczepność. Do problematycznych powierzchni – materiał musi być aktywowany.",
                         en: "Do not add matting powder – reduces adhesion. For problem surfaces – material must be activated."
                     }
-                }
+                },
+                additivePaints: [
+                    { code: "HTPP SLOW", name: { uk: "Затверджувач", pl: "Utwardzacz", en: "Hardener" }, color: "#AAAAAA" },
+                    { code: "TPP 150", name: { uk: "Прозора база/лак", pl: "Baza przezroczysta/lakier", en: "Transparent base/varnish" }, color: "#DDDDDD" },
+                    { code: "TPP 160", name: { uk: "Викривлююча добавка", pl: "Dodatek wykrzywiający", en: "Distorting additive" }, color: "#BBBBBB" }
+                ]
             },
             { 
                 id: "UV",
@@ -552,7 +589,10 @@ SICOMIX.data = (function() {
                         pl: "Wysoka elastyczność – można zginać/składać (ważne dla materiałów POS). Produkty UV nie zawierają rozpuszczalników.",
                         en: "High elasticity – can be bent/folded (important for POS materials). UV products are solvent-free."
                     }
-                }
+                },
+                additivePaints: [
+                    { code: "UV 150", name: { uk: "Лак", pl: "Lakier", en: "Varnish" }, color: "#EEEEEE" }
+                ]
             },
             { 
                 id: "NST",
@@ -614,11 +654,15 @@ SICOMIX.data = (function() {
                         pl: "Ultrakryjące kolory: 40, 42, 56. Przezroczyste kolory: 15, 25, 35, 55, 65, 75, 130-136, 140-143. Fluo – niższa odporność na światło. Wszystkie kolory mieszają się.",
                         en: "Ultra-opaque colors: 40, 42, 56. Transparent colors: 15, 25, 35, 55, 65, 75, 130-136, 140-143. Fluo – lower lightfastness. All colors are mixable."
                     }
-                }
+                },
+                additivePaints: [
+                    { code: "HNST SLOW", name: { uk: "Каталізатор", pl: "Katalizator", en: "Catalyst" }, color: "#AAAAAA" },
+                    { code: "NST 150", name: { uk: "Прозора база", pl: "Baza przezroczysta", en: "Transparent base" }, color: "#DDDDDD" }
+                ]
             }
         ];
 
-        // ---------- БАЗОВІ КОЛЬОРИ (вже багатомовні) ----------
+        // ---------- БАЗОВІ КОЛЬОРИ ----------
         const baseColors = [
             { code: "10", name: { uk: "Фіолетовий", pl: "Fioletowy", en: "Violet" }, color: "#800080" },
             { code: "20", name: { uk: "Синій", pl: "Niebieski", en: "Blue" }, color: "#0000FF" },
@@ -677,21 +721,20 @@ SICOMIX.data = (function() {
             let counter = 1;
             
             series.forEach(serie => {
+                // Основні кольори
                 baseColors.forEach(baseColor => {
-                    // Для кожного кольору створюємо об'єкт з окремими мовними версіями
                     const paint = {
                         id: `paint-${counter++}`,
                         name: `${serie.id}${baseColor.code}`,
                         series: serie.id,
                         baseColorCode: baseColor.code,
-                        category: serie.category, // тепер рядок
+                        category: serie.category,
                         color: baseColor.color,
                         manufacturer: "SICO",
                         article: `${serie.id}-${baseColor.code}`,
-                        properties: serie.properties, // залишаємо багатомовний об'єкт
+                        properties: serie.properties,
                         colorCode: baseColor.code,
                         isDefault: true,
-                        // Багатомовні поля
                         displayName: {
                             uk: `${serie.name.uk} ${baseColor.name.uk}`,
                             pl: `${serie.name.pl} ${baseColor.name.pl}`,
@@ -715,6 +758,46 @@ SICOMIX.data = (function() {
                     };
                     paints.push(paint);
                 });
+
+                // Додаткові фарби (добавки) для цієї серії
+                if (serie.additivePaints && Array.isArray(serie.additivePaints)) {
+                    serie.additivePaints.forEach(add => {
+                        const paint = {
+                            id: `paint-${counter++}`,
+                            name: add.code,
+                            series: serie.id,
+                            baseColorCode: add.code,
+                            category: serie.category,
+                            color: add.color || "#CCCCCC",
+                            manufacturer: "SICO",
+                            article: `${serie.id}-${add.code.replace(/\s+/g, '')}`,
+                            properties: serie.properties,
+                            colorCode: add.code,
+                            isDefault: true,
+                            displayName: {
+                                uk: add.name.uk,
+                                pl: add.name.pl,
+                                en: add.name.en
+                            },
+                            description: {
+                                uk: `${serie.description.uk} Добавка: ${add.name.uk}`,
+                                pl: `${serie.description.pl} Dodatek: ${add.name.pl}`,
+                                en: `${serie.description.en} Additive: ${add.name.en}`
+                            },
+                            fullInfo: {
+                                uk: `Серія: ${serie.name.uk}, Добавка: ${add.code} - ${add.name.uk}`,
+                                pl: `Seria: ${serie.name.pl}, Dodatek: ${add.code} - ${add.name.pl}`,
+                                en: `Series: ${serie.name.en}, Additive: ${add.code} - ${add.name.en}`
+                            },
+                            colorName: {
+                                uk: add.name.uk,
+                                pl: add.name.pl,
+                                en: add.name.en
+                            }
+                        };
+                        paints.push(paint);
+                    });
+                }
             });
 
             // ---------- СПЕЦІАЛЬНІ ФАРБИ EC (з перевіркою наявності) ----------
@@ -907,7 +990,7 @@ SICOMIX.data = (function() {
             defaultSeries: "EC"
         };
 
-        console.log(`[SICOMIX] Згенеровано ${paints.length} фарб (багатомовна версія)`);
+        console.log(`[SICOMIX] Згенеровано ${paints.length} фарб (багатомовна версія з добавками)`);
         console.log(`[SICOMIX] Базових кольорів: ${baseColors.length}, серій: ${series.length}`);
 
         return {
