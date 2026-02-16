@@ -276,12 +276,24 @@ body {
 
 /* ===== TYPOGRAPHY ===== */
 .page-title {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 700;
     background: linear-gradient(135deg, white, var(--spectrum-cyan));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 16px;
+    position: relative;
+    display: inline-block;
+}
+.page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--spectrum-blue), var(--spectrum-violet));
+    border-radius: 3px;
 }
 .page-description {
     color: var(--text-secondary);
@@ -461,29 +473,6 @@ body {
     background: rgba(58,134,255,0.1);
 }
 
-/* ===== COLOR PICKER ===== */
-.color-picker-container {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
-.color-preview {
-    width: 46px;
-    height: 46px;
-    border-radius: var(--border-radius-sm);
-    border: 2px solid var(--border-light);
-    transition: var(--transition);
-}
-.color-input {
-    flex: 1;
-    padding: 12px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius-sm);
-    color: white;
-    height: 46px;
-}
-
 /* ===== INGREDIENTS TABLE ===== */
 .ingredients-table {
     width: 100%;
@@ -566,18 +555,24 @@ body {
     flex: 1;
     min-width: 260px;
     position: relative;
+    max-width: 400px;
 }
 .search-input {
     width: 100%;
     padding: 14px 20px 14px 48px;
     background: rgba(0,0,0,0.3);
     border: 1px solid var(--border-light);
-    border-radius: var(--border-radius-xl);
+    border-radius: 30px;
     color: white;
     font-size: 16px;
+    height: 48px;
+    transition: all 0.2s;
 }
 .search-input:focus {
     border-color: var(--spectrum-blue);
+    box-shadow: 0 0 0 3px rgba(58,134,255,0.2);
+    background: rgba(0,0,0,0.5);
+    outline: none;
 }
 .search-icon {
     position: absolute;
@@ -585,12 +580,13 @@ body {
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-secondary);
+    font-size: 16px;
 }
 .filter-select {
     padding: 14px 24px;
     background: rgba(0,0,0,0.3);
     border: 1px solid var(--border-light);
-    border-radius: var(--border-radius-xl);
+    border-radius: 30px;
     color: white;
     font-size: 16px;
     min-width: 180px;
@@ -657,7 +653,7 @@ body {
     border: 1px solid var(--border-light);
     border-radius: var(--border-radius-md);
     overflow: hidden;
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 .recipe-card:hover {
     transform: translateY(-6px);
@@ -863,55 +859,14 @@ body {
         width: 100%;
         justify-content: center;
     }
+    .page-title {
+        font-size: 28px;
+    }
+    .welcome-title {
+        font-size: 32px;
+    }
 }
-/* ===== SERIES CATALOG ===== */
-.series-card {
-    background: var(--bg-elevated);
-    backdrop-filter: blur(8px);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius-md);
-    padding: 24px;
-    margin-bottom: 24px;
-    transition: var(--transition);
-}
-.series-card:hover {
-    border-color: var(--spectrum-blue);
-    box-shadow: var(--shadow-hover);
-}
-.series-header {
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-    border-radius: var(--border-radius-sm);
-    padding: 10px;
-    margin: -10px -10px 0 -10px;
-}
-.series-properties {
-    transition: var(--transition);
-}
-.series-paints {
-    transition: var(--transition);
-}
-.paint-mini-card {
-    transition: var(--transition);
-    cursor: pointer;
-}
-.paint-mini-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-.toggle-series {
-    background: rgba(255,255,255,0.1);
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.toggle-series:hover {
-    background: rgba(255,255,255,0.2);
-}
+
 /* ===== СУЧАСНИЙ КАТАЛОГ ФАРБ ===== */
 .series-card {
     background: var(--bg-elevated);
@@ -1069,17 +1024,6 @@ body {
     border-left-width: 6px;
 }
 
-/* Анімації */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
 /* Property items */
 .property-item {
     background: rgba(255,255,255,0.05);
@@ -1098,7 +1042,18 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Адаптивність */
+/* Анімації */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Адаптивність для каталогу */
 @media (max-width: 768px) {
     .paints-grid {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -1144,4 +1099,109 @@ body {
         page-break-inside: avoid;
         border: 1px solid #ccc !important;
     }
+    
+    .paint-card::before {
+        display: none;
+    }
+}
+
+/* ===== ДОДАТКОВІ ПОКРАЩЕННЯ ===== */
+/* Стилі для скролбару */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(58,134,255,0.3);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(58,134,255,0.5);
+}
+
+/* Покращення для карток рецептів */
+.recipe-card {
+    position: relative;
+    overflow: visible;
+}
+
+.recipe-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--spectrum-blue), var(--spectrum-violet));
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.recipe-card:hover::after {
+    opacity: 1;
+}
+
+/* Стилі для виділення тексту */
+::selection {
+    background: var(--spectrum-blue);
+    color: white;
+}
+
+/* Покращення для кнопок в модальних вікнах */
+.modal .action-buttons {
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+/* Анімація для завантаження */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Стилі для повідомлень */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 16px 24px;
+    background: var(--bg-elevated);
+    border-left: 4px solid var(--spectrum-blue);
+    border-radius: var(--border-radius-sm);
+    color: white;
+    box-shadow: var(--shadow-glass);
+    z-index: 3000;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.notification.success {
+    border-left-color: var(--spectrum-green);
+}
+
+.notification.error {
+    border-left-color: var(--spectrum-red);
+}
+
+.notification.warning {
+    border-left-color: var(--spectrum-orange);
+}
+
+.notification.info {
+    border-left-color: var(--spectrum-blue);
 }
