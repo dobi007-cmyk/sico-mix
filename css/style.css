@@ -912,3 +912,236 @@ body {
 .toggle-series:hover {
     background: rgba(255,255,255,0.2);
 }
+/* ===== СУЧАСНИЙ КАТАЛОГ ФАРБ ===== */
+.series-card {
+    background: var(--bg-elevated);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-md);
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+}
+
+.series-card:hover {
+    border-color: var(--spectrum-blue);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+.series-header {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    border-radius: var(--border-radius-sm);
+    padding: 10px;
+    margin: -10px -10px 0 -10px;
+    transition: background 0.2s;
+}
+
+.series-header:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+.toggle-series {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-primary);
+    font-size: 18px;
+}
+
+.toggle-series:hover {
+    background: rgba(58, 134, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.series-properties {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.series-paints {
+    transition: all 0.3s ease;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.paints-group {
+    margin-bottom: 30px;
+    animation: slideDown 0.3s ease;
+}
+
+.paints-group-title {
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.paints-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.paint-card {
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.paint-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.paint-card:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    border-color: white;
+    z-index: 10;
+}
+
+.paint-card:hover::before {
+    opacity: 1;
+}
+
+.paint-card-content {
+    position: relative;
+    z-index: 1;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    width: 100%;
+}
+
+.paint-card-content strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.paint-code {
+    font-size: 11px;
+    opacity: 0.8;
+    display: block;
+}
+
+/* Спеціальні картки для добавок */
+.additive-card {
+    background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+    border-left: 4px solid;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.additive-card .paint-card-content {
+    color: #fff;
+    text-shadow: none;
+}
+
+.additive-card:hover {
+    border-left-width: 6px;
+}
+
+/* Анімації */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Property items */
+.property-item {
+    background: rgba(255,255,255,0.05);
+    padding: 10px 15px;
+    border-radius: 10px;
+    border-left: 3px solid var(--spectrum-blue);
+    font-size: 14px;
+}
+
+.property-item strong {
+    color: var(--spectrum-cyan);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Адаптивність */
+@media (max-width: 768px) {
+    .paints-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+    }
+    
+    .paint-card {
+        padding: 12px 8px;
+        min-height: 60px;
+    }
+    
+    .paint-card-content strong {
+        font-size: 12px;
+    }
+    
+    .paint-code {
+        font-size: 9px;
+    }
+    
+    .series-card {
+        padding: 16px;
+    }
+    
+    .series-header h3 {
+        font-size: 20px !important;
+    }
+}
+
+/* Друк */
+@media print {
+    .toggle-series,
+    .series-header {
+        cursor: default;
+    }
+    
+    .series-paints,
+    .series-properties {
+        display: block !important;
+    }
+    
+    .paint-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 1px solid #ccc !important;
+    }
+}
