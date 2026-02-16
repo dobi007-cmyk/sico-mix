@@ -12,12 +12,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="./css/style.css?v=2026.02.16">
-    <link rel="manifest" href="./manifest.json?v=2026.02.16">
-    <link rel="icon" href="./icons/logo.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="./icons/icon-512.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="./css/style.css?v=2026.02.13">
+    <link rel="manifest" href="./manifest.json?v=2026.02.13">
+    <link rel="icon" href="./icons/favicon.ico?v=2026.02.13" type="image/x-icon">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.13">
 
     <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ ========== -->
     <script>
@@ -86,14 +85,16 @@
         <div class="spectrum-spinner"></div>
     </div>
 
+    <!-- Декоративна абстрактна пляма фарби -->
+    <div class="paint-blob"></div>
+
     <!-- Mobile Navigation -->
     <div class="mobile-nav">
         <button class="menu-toggle" id="menuToggle" aria-label="Menu">
             <i class="fas fa-bars"></i>
         </button>
         <div class="mobile-nav-title">
-            <img src="./icons/logo.svg" alt="SICO Spectrum" style="width:1.1em; height:1.1em; vertical-align:-0.12em; margin-right:0.35em;">
-            SICO Spectrum
+            <i class="fas fa-prism"></i> SICO Spectrum
         </div>
     </div>
 
@@ -101,7 +102,7 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-container">
-                <h1><img src="./icons/logo.svg" alt="SICO Spectrum" style="width:1.1em; height:1.1em; vertical-align:-0.12em; margin-right:0.35em;"> SICO Spectrum</h1>
+                <h1><i class="fas fa-prism"></i> SICO Spectrum</h1>
                 <p data-i18n="app_subtitle">Цифрова лабораторія кольору</p>
             </div>
             <button class="close-sidebar" id="closeSidebar" aria-label="Close">
@@ -180,7 +181,7 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo-container">
-                    <h1><img src="./icons/logo.svg" alt="SICO Spectrum" style="width:1.1em; height:1.1em; vertical-align:-0.12em; margin-right:0.35em;"> SICO Spectrum</h1>
+                    <h1><i class="fas fa-prism"></i> SICO Spectrum</h1>
                 </div>
             </div>
             <div class="paint-count">
@@ -459,7 +460,7 @@
                 </div>
             </div>
 
-            <!-- SETTINGS PAGE -->
+            <!-- SETTINGS PAGE (оновлено: додано вибір теми) -->
             <div class="page-content" id="settings-page">
                 <h2 class="page-title" data-i18n="settings">Налаштування</h2>
                 <p class="page-description" data-i18n="settings_desc">Налаштуйте систему за вашими потребами</p>
@@ -482,6 +483,13 @@
                                 <option value="percent" data-i18n="percent">Відсотки (%)</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="theme">Тема оформлення</label>
+                        <select class="form-select" id="themeSelect">
+                            <option value="spectrum" data-i18n="theme_spectrum">Спектр (за замовчуванням)</option>
+                            <option value="organic" data-i18n="theme_organic">Органічна</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-i18n="auto_save">Автоматичне збереження</label>
@@ -589,10 +597,13 @@
     </div>
 
     <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ ========== -->
-    <script src="./js/data-colors.js?v=2026.02.16"></script>
-    <script src="./js/i18n.js?v=2026.02.16"></script>
-    <script src="./js/utils.js?v=2026.02.16"></script>
-    <script src="./js/app.js?v=2026.02.16"></script>
+    <script src="./js/data-colors.js?v=2026.02.13"></script>
+    <script src="./js/i18n.js?v=2026.02.13"></script>
+    <script src="./js/utils.js?v=2026.02.13"></script>
+    <script src="./js/app.js?v=2026.02.13"></script>
+
+    <!-- Сервіс-воркер вимкнено -->
+    <!-- <script src="./js/service-worker.js"></script> -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
