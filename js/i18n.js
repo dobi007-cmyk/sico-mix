@@ -1,4 +1,4 @@
-// ========== МОДУЛЬ ІНТЕРНАЦІОНАЛІЗАЦІЇ ==========
+// ========== МОДУЛЬ ІНТЕРНАЦІОНАЛІЗАЦІЇ (ПОВНІ ПЕРЕКЛАДИ + default_paint) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -189,7 +189,7 @@ window.SICOMIX = window.SICOMIX || {};
                 // Стандартна фарба
                 default_paint: "Стандартна",
 
-                // Інші
+                // Нові ключі
                 cannot_delete_default_paint: "Стандартні фарби SICO не можна видалити",
                 data_cleared: "Дані очищено",
                 clear_all_data_confirmation: "УВАГА! Це видалить всі рецепти та додані вами фарби. Стандартний каталог SICO відновиться.",
@@ -197,16 +197,7 @@ window.SICOMIX = window.SICOMIX || {};
                 select_series_first: "Спочатку оберіть серію фарб",
                 paints_not_found_in_series: "У цій серії немає фарб за заданим фільтром",
                 series_mismatch: "Не можна додавати фарбу з іншої серії",
-                select_recipes_to_print: "Оберіть рецепти для друку",
-
-                // Нові ключі (додані)
-                dark_theme: "Темна",
-                light_theme: "Світла",
-                add_to_recipe: "Додати до рецепту",
-                add_paint_to_recipe_confirm: "Бажаєте додати цю фарбу до нового рецепту?",
-                go_and_add: "Перейти і додати",
-                theme: "Тема оформлення",
-                select_data_to_export: "Оберіть дані для експорту"
+                select_recipes_to_print: "Оберіть рецепти для друку"
             },
             en: {
                 // Глобальні
@@ -391,7 +382,7 @@ window.SICOMIX = window.SICOMIX || {};
                 // Стандартна фарба
                 default_paint: "Standard",
 
-                // Інші
+                // Нові ключі
                 cannot_delete_default_paint: "Standard SICO paints cannot be deleted",
                 data_cleared: "Data cleared",
                 clear_all_data_confirmation: "WARNING! This will delete all recipes and user-added paints. The standard SICO catalog will be restored.",
@@ -399,16 +390,7 @@ window.SICOMIX = window.SICOMIX || {};
                 select_series_first: "First select a paint series",
                 paints_not_found_in_series: "No paints in this series matching the filter",
                 series_mismatch: "Cannot add paint from another series",
-                select_recipes_to_print: "Select recipes to print",
-
-                // Нові ключі
-                dark_theme: "Dark",
-                light_theme: "Light",
-                add_to_recipe: "Add to recipe",
-                add_paint_to_recipe_confirm: "Do you want to add this paint to a new recipe?",
-                go_and_add: "Go and add",
-                theme: "Theme",
-                select_data_to_export: "Select data to export"
+                select_recipes_to_print: "Select recipes to print"
             },
             pl: {
                 // Глобальні
@@ -593,7 +575,7 @@ window.SICOMIX = window.SICOMIX || {};
                 // Стандартна фарба
                 default_paint: "Standardowa",
 
-                // Інші
+                // Нові ключі
                 cannot_delete_default_paint: "Standardowe farby SICO nie mogą być usunięte",
                 data_cleared: "Dane wyczyszczone",
                 clear_all_data_confirmation: "UWAGA! Spowoduje to usunięcie wszystkich receptur i farb dodanych przez użytkownika. Standardowy katalog SICO zostanie przywrócony.",
@@ -601,38 +583,33 @@ window.SICOMIX = window.SICOMIX || {};
                 select_series_first: "Najpierw wybierz serię farb",
                 paints_not_found_in_series: "Brak farb w tej serii pasujących do filtra",
                 series_mismatch: "Nie można dodać farby z innej serii",
-                select_recipes_to_print: "Wybierz receptury do druku",
-
-                // Нові ключі
-                dark_theme: "Ciemna",
-                light_theme: "Jasna",
-                add_to_recipe: "Dodaj do receptury",
-                add_paint_to_recipe_confirm: "Czy chcesz dodać tę farbę do nowej receptury?",
-                go_and_add: "Przejdź i dodaj",
-                theme: "Motyw",
-                select_data_to_export: "Wybierz dane do eksportu"
+                select_recipes_to_print: "Wybierz receptury do druku"
             }
         };
 
-        // Словник перекладу категорій
+         // Словник перекладу категорій (додано синоніми)
         const categoryTranslations = {
             "Універсальні": { uk: "Універсальні", en: "Universal", pl: "Uniwersalne" },
             "UV фарби": { uk: "УФ фарби", en: "UV paints", pl: "Farby UV" },
             "Папір/картон": { uk: "Папір/картон", en: "Paper/Cardboard", pl: "Papier/karton" },
-            "Пластики": { uk: "Пластик", en: "Plastic", pl: "Plastik" },
+            "Пластики": { uk: "Пластик", en: "Plastic", pl: "Plastik" }, // синонім
             "Текстиль": { uk: "Текстиль", en: "Textile", pl: "Tekstylia" }
         };
 
         // Локалізація позначень одиниць вимірювання
         function localizeUnitSymbol(unitSymbol) {
             const lang = currentLang;
+            // Мапінг символів: для української залишаємо кириличні, для інших – латинські
             const unitMap = {
                 'г': { uk: 'г', en: 'g', pl: 'g' },
                 'кг': { uk: 'кг', en: 'kg', pl: 'kg' },
                 'мл': { uk: 'мл', en: 'ml', pl: 'ml' },
                 'л': { uk: 'л', en: 'l', pl: 'l' }
             };
-            return (unitMap[unitSymbol] && unitMap[unitSymbol][lang]) || unitSymbol;
+            if (unitMap[unitSymbol] && unitMap[unitSymbol][lang]) {
+                return unitMap[unitSymbol][lang];
+            }
+            return unitSymbol; // fallback
         }
 
         let currentLang = 'uk';
@@ -669,7 +646,6 @@ window.SICOMIX = window.SICOMIX || {};
         function applyTranslations() {
             if (!document || !document.querySelectorAll) return;
 
-            // Оновлюємо всі елементи з data-i18n
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 const text = t(key);
@@ -684,15 +660,9 @@ window.SICOMIX = window.SICOMIX || {};
                 }
             });
 
-            // Оновлюємо плейсхолдери
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
                 el.placeholder = t(key);
-            });
-
-            // Спеціально для радіокнопок теми
-            document.querySelectorAll('input[type="radio"] + span[data-i18n]').forEach(span => {
-                span.textContent = t(span.dataset.i18n);
             });
 
             document.title = `SICO Spectrum • ${t('paint_catalog')}`;
