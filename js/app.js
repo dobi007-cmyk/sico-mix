@@ -1,4 +1,4 @@
-// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (СТАБІЛЬНА ВЕРСІЯ + ПАГІНАЦІЯ + ПЕРЕКЛАД) ==========
+// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (ВИПРАВЛЕНО) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -16,7 +16,7 @@ window.SICOMIX = window.SICOMIX || {};
         let isEditingRecipe = false;
         let editingRecipeId = null;
         let recipeDraft = null;
-        let selectedSeries = ''; // поточна обрана серія для нового рецепта
+        let selectedSeries = '';
 
         // Для пагінації каталогу
         let catalogFiltered = [];
@@ -32,6 +32,9 @@ window.SICOMIX = window.SICOMIX || {};
         let paintCatalogEl, addNewPaintBtn, addPaintModal, closePaintModal, savePaintBtn, cancelPaintBtn;
         let languageSelect, unitsSelect, autoSaveCheckbox, backupCheckbox, saveSettingsBtn, resetSettingsBtn, clearAllDataBtn;
         let actionCards;
+        // Елементи для імпорту/експорту
+        let startImportBtn, startExportBtn, importFormat, exportFormat, importFile, importRecipesCheckbox, importPaintsCheckbox;
+        let exportRecipesCheckbox, exportPaintsCheckbox, exportCalculationsCheckbox, includePhotosCheckbox, compressDataCheckbox;
 
         // ---------- КЕШУВАННЯ DOM ----------
         function cacheDOMElements() {
@@ -70,6 +73,20 @@ window.SICOMIX = window.SICOMIX || {};
             saveSettingsBtn = document.getElementById('saveSettingsBtn');
             resetSettingsBtn = document.getElementById('resetSettingsBtn');
             clearAllDataBtn = document.getElementById('clearAllDataBtn');
+
+            // Імпорт/експорт
+            startImportBtn = document.getElementById('startImportBtn');
+            startExportBtn = document.getElementById('startExportBtn');
+            importFormat = document.getElementById('importFormat');
+            exportFormat = document.getElementById('exportFormat');
+            importFile = document.getElementById('importFile');
+            importRecipesCheckbox = document.getElementById('importRecipesCheckbox');
+            importPaintsCheckbox = document.getElementById('importPaintsCheckbox');
+            exportRecipesCheckbox = document.getElementById('exportRecipesCheckbox');
+            exportPaintsCheckbox = document.getElementById('exportPaintsCheckbox');
+            exportCalculationsCheckbox = document.getElementById('exportCalculationsCheckbox');
+            includePhotosCheckbox = document.getElementById('includePhotosCheckbox');
+            compressDataCheckbox = document.getElementById('compressDataCheckbox');
         }
 
         // ---------- ЗАВАНТАЖЕННЯ ТА ЗБЕРЕЖЕННЯ ----------
@@ -108,6 +125,7 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumUserPaints', userPaints);
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumRecipes', recipes);
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumSettings', currentSettings);
+            updatePaintCount();
         }
 
         // ---------- АВТОЗБЕРЕЖЕННЯ ЧЕРНЕТКИ РЕЦЕПТУ ----------
@@ -167,7 +185,7 @@ window.SICOMIX = window.SICOMIX || {};
 
         // ---------- ПОДІЇ ----------
         function setupEventListeners() {
-            // ---- Делегований обробник навігації ----
+            // Делегований обробник навігації
             document.addEventListener('click', function(e) {
                 const navItem = e.target.closest('[data-page]');
                 if (navItem) {
@@ -181,7 +199,7 @@ window.SICOMIX = window.SICOMIX || {};
                 }
             });
 
-            // ---- Мобільне меню ----
+            // Мобільне меню
             if (menuToggle) {
                 menuToggle.addEventListener('click', () => {
                     sidebar.classList.add('active');
@@ -207,7 +225,7 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
-            // ---- Фото ----
+            // Фото
             const recipePhoto = document.getElementById('recipePhoto');
             if (recipePhoto) {
                 recipePhoto.addEventListener('change', function() {
@@ -216,19 +234,19 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
-            // ---- Новий рецепт ----
+            // Новий рецепт
             if (addIngredientBtn) addIngredientBtn.addEventListener('click', addIngredient);
             if (saveRecipeBtn) saveRecipeBtn.addEventListener('click', saveRecipe);
             if (clearRecipeBtn) clearRecipeBtn.addEventListener('click', clearRecipeForm);
             if (calculatePercentagesBtn) calculatePercentagesBtn.addEventListener('click', calculatePercentages);
 
-            // ---- Рецепти ----
+            // Рецепти
             if (exportRecipesBtn) exportRecipesBtn.addEventListener('click', exportAllRecipes);
             if (importRecipesBtn) importRecipesBtn.addEventListener('click', importRecipes);
             if (printRecipesBtn) printRecipesBtn.addEventListener('click', printRecipes);
             if (deleteSelectedRecipesBtn) deleteSelectedRecipesBtn.addEventListener('click', deleteSelectedRecipes);
 
-            // ---- Каталог ----
+            // Каталог
             if (addNewPaintBtn) addNewPaintBtn.addEventListener('click', addNewPaint);
             if (closePaintModal) closePaintModal.addEventListener('click', () => {
                 addPaintModal.classList.remove('active');
@@ -240,7 +258,7 @@ window.SICOMIX = window.SICOMIX || {};
             });
             if (savePaintBtn) savePaintBtn.addEventListener('click', saveNewPaint);
 
-            // ---- Пошук з дебаунсом ----
+            // Пошук з дебаунсом
             if (paintSearch) paintSearch.addEventListener('input', SICOMIX.utils.debounce(renderIngredientsList, 300));
             if (categoryFilter) categoryFilter.addEventListener('change', renderIngredientsList);
             if (document.getElementById('catalogSearch')) {
@@ -250,7 +268,11 @@ window.SICOMIX = window.SICOMIX || {};
                 }, 300));
             }
 
-            // ---- НАЛАШТУВАННЯ МОВИ – ВИПРАВЛЕНО: негайне перемикання ----
+            // Імпорт/експорт
+            if (startImportBtn) startImportBtn.addEventListener('click', startImport);
+            if (startExportBtn) startExportBtn.addEventListener('click', startExport);
+
+            // Налаштування мови
             if (languageSelect) {
                 languageSelect.addEventListener('change', function() {
                     const newLang = this.value;
@@ -258,18 +280,16 @@ window.SICOMIX = window.SICOMIX || {};
                     SICOMIX.i18n.setLanguage(newLang);
                     SICOMIX.i18n.applyTranslations();
                     
-                    // Оновлюємо всі селекти категорій
-                    populateCategoryFilters();          // для фільтрів
-                    populateStandardCategorySelect();    // для модального вікна додавання фарби
-                    populateSeriesSelect();              // для вибору серії
+                    populateCategoryFilters();
+                    populateStandardCategorySelect();
+                    populateSeriesSelect();
                     
-                    // Оновлюємо поточну сторінку
                     const activePage = document.querySelector('.page-content.active');
                     if (activePage) {
                         const pageId = activePage.id.replace('-page', '');
                         if (pageId === 'recipes') renderRecipes();
                         if (pageId === 'catalog') renderPaintCatalog();
-                        if (pageId === 'new-recipe') renderIngredientsList(); // оновити одиниці в таблиці
+                        if (pageId === 'new-recipe') renderIngredientsList();
                     }
                     
                     saveData();
@@ -280,11 +300,14 @@ window.SICOMIX = window.SICOMIX || {};
             if (resetSettingsBtn) resetSettingsBtn.addEventListener('click', resetSettings);
             if (clearAllDataBtn) clearAllDataBtn.addEventListener('click', clearAllData);
 
-            // ---- Гарячі клавіші ----
+            // Гарячі клавіші
             document.addEventListener('keydown', function(e) {
                 if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                     e.preventDefault();
-                    saveRecipeBtn?.click();
+                    // Зберігати тільки якщо на сторінці нового рецепту
+                    if (document.getElementById('new-recipe-page')?.classList.contains('active')) {
+                        saveRecipeBtn?.click();
+                    }
                 }
                 if (e.key === 'Escape') {
                     if (sidebar?.classList.contains('active') && window.innerWidth <= 992) {
@@ -298,7 +321,7 @@ window.SICOMIX = window.SICOMIX || {};
                 }
             });
 
-            // ---- Закриття сайдбару кліком поза ним (мобільні) ----
+            // Закриття сайдбару кліком поза ним (мобільні)
             document.addEventListener('click', function(e) {
                 if (!sidebar || window.innerWidth > 992) return;
                 if (!sidebar.classList.contains('active')) return;
@@ -410,7 +433,6 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         function addIngredient() {
-            // Перевіряємо, чи обрана серія
             const seriesSelect = document.getElementById('recipeSeries');
             if (!seriesSelect || !seriesSelect.value) {
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_series_first'), 'warning');
@@ -421,7 +443,6 @@ window.SICOMIX = window.SICOMIX || {};
             const term = paintSearch?.value.toLowerCase() || '';
             const cat = categoryFilter?.value || '';
             
-            // Фільтруємо фарби: тільки ті, що належать обраній серії
             let filtered = paintCatalog.filter(p => p.series === selectedSeries);
             
             if (term) filtered = filtered.filter(p => p && p.name && p.name.toLowerCase().includes(term));
@@ -441,7 +462,7 @@ window.SICOMIX = window.SICOMIX || {};
                 <div class="paint-selection-card" data-id="${p.id}">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <div style="width:32px; height:32px; background:${p.color}; border-radius:8px;"></div>
-                        <div><strong>${p.name}</strong><br><span style="font-size:12px;">${SICOMIX.i18n.translateCategory(p.category)} (${p.series})</span></div>
+                        <div><strong>${p.displayName ? p.displayName[SICOMIX.i18n.getLanguage()] : p.name}</strong><br><span style="font-size:12px;">${SICOMIX.i18n.translateCategory(p.category)} (${p.series})</span></div>
                     </div>
                 </div>
             `).join('');
@@ -453,7 +474,6 @@ window.SICOMIX = window.SICOMIX || {};
                     const paint = paintCatalog.find(p => String(p.id) === pid);
                     if (!paint) return;
                     
-                    // Перевірка, чи серія фарби збігається з обраною
                     if (paint.series !== selectedSeries) {
                         SICOMIX.utils.showNotification(SICOMIX.i18n.t('series_mismatch'), 'error');
                         return;
@@ -716,14 +736,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             const recipesToPrint = recipes.filter(r => selectedRecipes.includes(String(r.id)));
-            
-            // Створюємо нове вікно для друку
-            const printWindow = window.open('', '_blank');
-            
-            // Отримуємо поточну мову для перекладів
             const lang = SICOMIX.i18n.getLanguage();
-            
-            // Формуємо HTML для друку
             let html = `
             <!DOCTYPE html>
             <html lang="${lang}">
@@ -731,87 +744,19 @@ window.SICOMIX = window.SICOMIX || {};
                 <meta charset="UTF-8">
                 <title>${SICOMIX.i18n.t('print_recipes')}</title>
                 <style>
-                    body {
-                        font-family: 'Inter', sans-serif;
-                        background: #0a0c0f;
-                        color: #f0f4f8;
-                        padding: 30px;
-                        margin: 0;
-                    }
-                    .print-header {
-                        display: flex;
-                        align-items: center;
-                        gap: 20px;
-                        margin-bottom: 40px;
-                        border-bottom: 2px solid #3a86ff;
-                        padding-bottom: 20px;
-                    }
-                    .logo {
-                        font-size: 48px;
-                        color: #3a86ff;
-                        background: linear-gradient(145deg, #3a86ff, #7b2cbf);
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                    }
-                    .company-name {
-                        font-size: 32px;
-                        font-weight: 700;
-                        background: linear-gradient(145deg, white, #4cc9f0);
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                    }
-                    .print-date {
-                        margin-left: auto;
-                        color: #b0c0ce;
-                    }
-                    .recipe-card {
-                        background: rgba(20, 24, 28, 0.9);
-                        border: 1px solid rgba(255,255,255,0.1);
-                        border-radius: 20px;
-                        padding: 25px;
-                        margin-bottom: 30px;
-                        page-break-inside: avoid;
-                    }
-                    .recipe-title {
-                        font-size: 28px;
-                        font-weight: 700;
-                        color: white;
-                        margin-bottom: 10px;
-                    }
-                    .recipe-meta {
-                        display: flex;
-                        gap: 20px;
-                        margin-bottom: 20px;
-                        color: #b0c0ce;
-                    }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin: 20px 0;
-                    }
-                    th {
-                        background: rgba(58, 134, 255, 0.2);
-                        padding: 12px;
-                        text-align: left;
-                        color: white;
-                    }
-                    td {
-                        padding: 12px;
-                        border-bottom: 1px solid rgba(255,255,255,0.05);
-                    }
-                    .footer {
-                        text-align: center;
-                        margin-top: 50px;
-                        color: #b0c0ce;
-                        font-size: 12px;
-                    }
-                    @media print {
-                        body { background: white; color: black; }
-                        .recipe-card { background: #f5f5f5; border: 1px solid #ccc; }
-                        th { background: #ddd; color: black; }
-                        .company-name { -webkit-text-fill-color: #333; }
-                        .print-date { color: #666; }
-                    }
+                    body { font-family: 'Inter', sans-serif; background: #0a0c0f; color: #f0f4f8; padding: 30px; margin: 0; }
+                    .print-header { display: flex; align-items: center; gap: 20px; margin-bottom: 40px; border-bottom: 2px solid #3a86ff; padding-bottom: 20px; }
+                    .logo { font-size: 48px; color: #3a86ff; background: linear-gradient(145deg, #3a86ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+                    .company-name { font-size: 32px; font-weight: 700; background: linear-gradient(145deg, white, #4cc9f0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+                    .print-date { margin-left: auto; color: #b0c0ce; }
+                    .recipe-card { background: rgba(20, 24, 28, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; margin-bottom: 30px; page-break-inside: avoid; }
+                    .recipe-title { font-size: 28px; font-weight: 700; color: white; margin-bottom: 10px; }
+                    .recipe-meta { display: flex; gap: 20px; margin-bottom: 20px; color: #b0c0ce; }
+                    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                    th { background: rgba(58, 134, 255, 0.2); padding: 12px; text-align: left; color: white; }
+                    td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+                    .footer { text-align: center; margin-top: 50px; color: #b0c0ce; font-size: 12px; }
+                    @media print { body { background: white; color: black; } .recipe-card { background: #f5f5f5; border: 1px solid #ccc; } th { background: #ddd; color: black; } .company-name { -webkit-text-fill-color: #333; } .print-date { color: #666; } }
                 </style>
             </head>
             <body>
@@ -870,13 +815,14 @@ window.SICOMIX = window.SICOMIX || {};
             </html>
             `;
 
+            const printWindow = window.open('', '_blank');
             printWindow.document.write(html);
             printWindow.document.close();
             printWindow.focus();
             printWindow.print();
         }
 
-        // ---------- КАТАЛОГ ФАРБ (НОВИЙ, ГРУПОВАНИЙ ЗА СЕРІЯМИ) ----------
+        // ---------- КАТАЛОГ ФАРБ ----------
         function renderPaintCatalog() {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -885,16 +831,12 @@ window.SICOMIX = window.SICOMIX || {};
 
             try {
                 const search = document.getElementById('catalogSearch')?.value?.toLowerCase() || '';
-                
-                // Отримуємо всі серії
                 const allSeries = SICOMIX.data.series || [];
                 const lang = SICOMIX.i18n.getLanguage();
                 
-                // Фільтруємо серії: якщо є пошук, серія має відповідати або містити фарби, що відповідають пошуку
                 let filteredSeries = [];
                 
                 if (search) {
-                    // Спочатку фільтруємо серії за назвою/id/категорією
                     const seriesByName = allSeries.filter(s => {
                         const seriesName = s.name[lang] || s.id;
                         return seriesName.toLowerCase().includes(search) || 
@@ -902,7 +844,6 @@ window.SICOMIX = window.SICOMIX || {};
                                (s.category && s.category.toLowerCase().includes(search));
                     });
                     
-                    // Також шукаємо фарби, що відповідають пошуку, і додаємо їхні серії
                     const matchingPaintSeries = new Set();
                     paintCatalog.forEach(p => {
                         if (p.name.toLowerCase().includes(search) ||
@@ -912,7 +853,6 @@ window.SICOMIX = window.SICOMIX || {};
                         }
                     });
                     
-                    // Об'єднуємо: серії, знайдені за назвою, та серії, що містять фарби
                     const seriesSet = new Set([...seriesByName.map(s => s.id), ...matchingPaintSeries]);
                     filteredSeries = allSeries.filter(s => seriesSet.has(s.id));
                 } else {
@@ -927,7 +867,6 @@ window.SICOMIX = window.SICOMIX || {};
                 let html = '';
                 
                 filteredSeries.forEach(series => {
-                    // Фільтруємо фарби цієї серії з урахуванням пошуку
                     let seriesPaints = paintCatalog.filter(p => p.series === series.id);
                     
                     if (search) {
@@ -938,7 +877,6 @@ window.SICOMIX = window.SICOMIX || {};
                         );
                     }
                     
-                    // Якщо після фільтрації немає фарб і немає пошуку, пропускаємо серію
                     if (seriesPaints.length === 0 && !search) return;
                     
                     const seriesName = series.name[lang] || series.id;
@@ -955,13 +893,12 @@ window.SICOMIX = window.SICOMIX || {};
                                         <span class="recipe-category">${SICOMIX.i18n.translateCategory(category)}</span>
                                     </div>
                                     <button class="btn-icon toggle-series" style="font-size: 20px;">
-                                        <i class="fas fa-chevron-down"></i> <!-- початково згорнуто -->
+                                        <i class="fas fa-chevron-down"></i>
                                     </button>
                                 </div>
                                 <p style="margin-top: 15px; color: var(--text-secondary);">${description}</p>
                             </div>
                             
-                            <!-- Властивості серії (початково приховані) -->
                             <div class="series-properties" style="display: none; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; margin: 15px 0;">
                                 <h4 style="margin-bottom: 10px; color: var(--spectrum-cyan);" data-i18n="properties">Властивості</h4>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
@@ -978,15 +915,19 @@ window.SICOMIX = window.SICOMIX || {};
                                 </div>
                             </div>
                             
-                            <!-- Список фарб серії (початково прихований) -->
                             <div class="series-paints" style="display: none; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
                                 ${seriesPaints.map(p => `
-                                    <div class="paint-mini-card" data-paint-id="${p.id}">
+                                    <div class="paint-mini-card" data-paint-id="${p.id}" data-paint='${JSON.stringify(p).replace(/'/g, "&apos;")}'>
                                         <div class="paint-mini-swatch" style="background: ${p.color};"></div>
                                         <div class="paint-mini-info">
                                             <div class="paint-mini-name">${p.name}</div>
                                             <div class="paint-mini-article">${p.article || ''}</div>
                                         </div>
+                                        ${!p.isDefault ? `
+                                            <button class="btn-icon delete-paint" data-paint-id="${p.id}" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); border-radius: 50%; padding: 5px;">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        ` : ''}
                                     </div>
                                 `).join('')}
                             </div>
@@ -996,7 +937,7 @@ window.SICOMIX = window.SICOMIX || {};
 
                 paintCatalogEl.innerHTML = html;
 
-                // Додаємо обробники для згортання/розгортання серій
+                // Обробники для згортання/розгортання серій
                 document.querySelectorAll('.toggle-series').forEach(btn => {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
@@ -1006,13 +947,11 @@ window.SICOMIX = window.SICOMIX || {};
                         const icon = this.querySelector('i');
                         
                         if (paintsDiv.style.display === 'none') {
-                            // Розгорнути
                             paintsDiv.style.display = 'grid';
                             propertiesDiv.style.display = 'grid';
                             icon.classList.remove('fa-chevron-down');
                             icon.classList.add('fa-chevron-up');
                         } else {
-                            // Згорнути
                             paintsDiv.style.display = 'none';
                             propertiesDiv.style.display = 'none';
                             icon.classList.remove('fa-chevron-up');
@@ -1021,10 +960,9 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 });
 
-                // Також можна додати обробник на клік по заголовку серії (опціонально)
+                // Обробники для кліку по заголовку серії (розгортання)
                 document.querySelectorAll('.series-header').forEach(header => {
                     header.addEventListener('click', function(e) {
-                        // Якщо клік не по кнопці, то імітуємо клік по кнопці
                         if (!e.target.closest('.toggle-series')) {
                             const btn = this.querySelector('.toggle-series');
                             if (btn) btn.click();
@@ -1032,7 +970,33 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 });
 
-                // Оновлюємо переклади
+                // Обробники для карток фарб (показати деталі)
+                document.querySelectorAll('.paint-mini-card').forEach(card => {
+                    card.addEventListener('click', function(e) {
+                        if (e.target.closest('.delete-paint')) return; // ігноруємо клік на кнопку видалення
+                        const paintData = this.dataset.paint;
+                        if (paintData) {
+                            try {
+                                const paint = JSON.parse(paintData.replace(/&apos;/g, "'"));
+                                showPaintDetails(paint);
+                            } catch (error) {
+                                console.error('Помилка парсингу paint data:', error);
+                            }
+                        }
+                    });
+                });
+
+                // Обробники для видалення фарб (тільки для користувацьких)
+                document.querySelectorAll('.delete-paint').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const paintId = this.dataset.paintId;
+                        if (paintId) {
+                            deletePaint(paintId);
+                        }
+                    });
+                });
+
                 SICOMIX.i18n.applyTranslations();
 
             } catch (error) {
@@ -1043,9 +1007,48 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
+        // Показати деталі фарби у модальному вікні
+        function showPaintDetails(paint) {
+            const modal = document.getElementById('paintSelectionModal');
+            const list = document.getElementById('paintSelectionList');
+            const lang = SICOMIX.i18n.getLanguage();
+            
+            // Змінюємо заголовок модального вікна
+            const modalTitle = modal.querySelector('.modal-title');
+            if (modalTitle) modalTitle.textContent = paint.name;
+            
+            // Формуємо вміст
+            list.innerHTML = `
+                <div style="padding: 20px;">
+                    <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                        <div style="width: 80px; height: 80px; background: ${paint.color}; border-radius: 12px; border: 2px solid rgba(255,255,255,0.2);"></div>
+                        <div>
+                            <h2 style="font-size: 24px; margin-bottom: 5px;">${paint.name}</h2>
+                            <p style="color: var(--text-secondary);">${paint.article || ''}</p>
+                        </div>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr><th style="text-align: left; padding: 8px;">${SICOMIX.i18n.t('category')}</th><td>${SICOMIX.i18n.translateCategory(paint.category)}</td></tr>
+                        <tr><th style="text-align: left; padding: 8px;">${SICOMIX.i18n.t('series')}</th><td>${paint.series}</td></tr>
+                        <tr><th style="text-align: left; padding: 8px;">${SICOMIX.i18n.t('manufacturer')}</th><td>${paint.manufacturer || 'SICO'}</td></tr>
+                        <tr><th style="text-align: left; padding: 8px;">${SICOMIX.i18n.t('color_code')}</th><td>${paint.color}</td></tr>
+                        <tr><th style="text-align: left; padding: 8px;">${SICOMIX.i18n.t('article')}</th><td>${paint.article || '-'}</td></tr>
+                    </table>
+                    <p style="margin-top: 20px;">${paint.description || ''}</p>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+            
+            // Закриття модального вікна
+            const closeBtn = modal.querySelector('.close-paint-selection');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => modal.classList.remove('active'), { once: true });
+            }
+        }
+
         function addNewPaint() {
             document.getElementById('paintName').value = '';
-            // Оновлюємо селект категорій стандартними значеннями перед відкриттям
             populateStandardCategorySelect(document.getElementById('paintCategory'));
             document.getElementById('paintColorCode').value = '#3a86ff';
             document.getElementById('paintDescription').value = '';
@@ -1083,7 +1086,7 @@ window.SICOMIX = window.SICOMIX || {};
             saveData();
             addPaintModal.classList.remove('active');
             document.body.style.overflow = 'auto';
-            populateCategoryFilters(); // оновлюємо фільтри (бо з'явилась нова категорія)
+            populateCategoryFilters();
             renderPaintCatalog();
             SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('paint_added')} "${name}"`, 'success');
         }
@@ -1098,7 +1101,7 @@ window.SICOMIX = window.SICOMIX || {};
                         userPaints.splice(index, 1);
                         paintCatalog = [...basePaints, ...userPaints];
                         saveData();
-                        populateCategoryFilters(); // оновлюємо фільтри
+                        populateCategoryFilters();
                         renderPaintCatalog();
                         SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
                     }
@@ -1176,7 +1179,7 @@ window.SICOMIX = window.SICOMIX || {};
                     selectedIngredients = [];
                     selectedRecipes = [];
                     saveData();
-                    populateCategoryFilters(); // оновлюємо фільтри
+                    populateCategoryFilters();
                     renderRecipes();
                     renderPaintCatalog();
                     updatePaintCount();
@@ -1185,9 +1188,72 @@ window.SICOMIX = window.SICOMIX || {};
             );
         }
 
+        // ---------- ІМПОРТ/ЕКСПОРТ КАТАЛОГУ ----------
+        function startImport() {
+            if (!importFile || !importFile.files || importFile.files.length === 0) {
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_import_file'), 'error');
+                return;
+            }
+            const file = importFile.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    const importRecipes = importRecipesCheckbox?.checked;
+                    const importPaints = importPaintsCheckbox?.checked;
+
+                    if (importRecipes && data.recipes && Array.isArray(data.recipes)) {
+                        data.recipes.forEach(r => {
+                            r.id = SICOMIX.utils.generateId();
+                            if (r.ingredients) {
+                                r.ingredients = r.ingredients.map(ing => ({ ...ing, paintId: String(ing.paintId) }));
+                            }
+                            recipes.push(r);
+                        });
+                    }
+                    if (importPaints && data.paints && Array.isArray(data.paints)) {
+                        data.paints.forEach(p => {
+                            p.id = SICOMIX.utils.generateId();
+                            p.isDefault = false;
+                            userPaints.push(p);
+                        });
+                        paintCatalog = [...basePaints, ...userPaints];
+                    }
+                    saveData();
+                    populateCategoryFilters();
+                    renderRecipes();
+                    renderPaintCatalog();
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('imported') + '!', 'success');
+                } catch (err) {
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('invalid_file_format'), 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function startExport() {
+            const format = exportFormat?.value || 'json';
+            const exportRecipes = exportRecipesCheckbox?.checked;
+            const exportPaints = exportPaintsCheckbox?.checked;
+            const exportCalculations = exportCalculationsCheckbox?.checked;
+
+            const exportData = {};
+            if (exportRecipes) exportData.recipes = recipes;
+            if (exportPaints) exportData.paints = userPaints; // експортуємо тільки додані користувачем фарби
+            if (exportCalculations) exportData.calculations = []; // поки що порожньо
+
+            if (Object.keys(exportData).length === 0) {
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_data_to_export'), 'warning');
+                return;
+            }
+
+            const filename = `sico_spectrum_export_${new Date().toISOString().split('T')[0]}.${format}`;
+            SICOMIX.utils.exportToFile(exportData, filename, format === 'json' ? 'application/json' : 'text/csv');
+            SICOMIX.utils.showNotification(SICOMIX.i18n.t('exported') + '!', 'success');
+        }
+
         // ---------- ДОПОМІЖНІ ФУНКЦІЇ ----------
         function populateCategoryFilters() {
-            // Для фільтрів використовуємо всі категорії з каталогу
             const uniqueCategories = [...new Set(paintCatalog.map(p => p.category).filter(Boolean))].sort();
             
             const selects = [
@@ -1237,7 +1303,6 @@ window.SICOMIX = window.SICOMIX || {};
             const seriesSelect = document.getElementById('recipeSeries');
             if (!seriesSelect) return;
             
-            // Отримуємо всі серії з SICOMIX.data.series
             const allSeries = SICOMIX.data.series || [];
             const current = seriesSelect.value;
             
@@ -1246,7 +1311,6 @@ window.SICOMIX = window.SICOMIX || {};
             allSeries.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s.id;
-                // Використовуємо локалізовану назву
                 opt.textContent = s.name[SICOMIX.i18n.getLanguage()] || s.id;
                 seriesSelect.appendChild(opt);
             });
@@ -1270,9 +1334,8 @@ window.SICOMIX = window.SICOMIX || {};
             renderPaintCatalog();
             renderRecipes();
             renderIngredientsList();
-            populateCategoryFilters(); // для фільтрів
-            populateSeriesSelect();    // для вибору серії
-            // для модального вікна додавання фарби – буде заповнено при відкритті
+            populateCategoryFilters();
+            populateSeriesSelect();
 
             if (window.innerWidth > 992) {
                 sidebar.classList.add('active');
