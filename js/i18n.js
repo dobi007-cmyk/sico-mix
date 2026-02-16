@@ -1,4 +1,4 @@
-// ========== МОДУЛЬ ІНТЕРНАЦІОНАЛІЗАЦІЇ (ПОВНІ ПЕРЕКЛАДИ + default_paint) ==========
+// ========== МОДУЛЬ ІНТЕРНАЦІОНАЛІЗАЦІЇ (ПОВНІ ПЕРЕКЛАДИ + НОВІ КЛЮЧІ) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -199,10 +199,13 @@ window.SICOMIX = window.SICOMIX || {};
                 series_mismatch: "Не можна додавати фарбу з іншої серії",
                 select_recipes_to_print: "Оберіть рецепти для друку",
                 
-                // Новий ключ для дублювання
-                duplicate: "Дублювати"
-
- },
+                // ДОДАНІ КЛЮЧІ
+                theme: "Тема оформлення",
+                theme_spectrum: "Спектр (за замовчуванням)",
+                theme_organic: "Органічна",
+                paint_in_use_title: "Фарба використовується",
+                paint_in_use_message: "Ця фарба є в рецептах. Видалити її з усіх рецептів?"
+            },
             en: {
                 // Глобальні
                 app_subtitle: "Digital Color Laboratory",
@@ -394,8 +397,14 @@ window.SICOMIX = window.SICOMIX || {};
                 select_series_first: "First select a paint series",
                 paints_not_found_in_series: "No paints in this series matching the filter",
                 series_mismatch: "Cannot add paint from another series",
-                select_recipes_to_print: "Select recipes to print"
-                   duplicate: "Duplicate"
+                select_recipes_to_print: "Select recipes to print",
+                
+                // ДОДАНІ КЛЮЧІ
+                theme: "Theme",
+                theme_spectrum: "Spectrum (default)",
+                theme_organic: "Organic",
+                paint_in_use_title: "Paint in use",
+                paint_in_use_message: "This paint is used in recipes. Remove it from all recipes?"
             },
             pl: {
                 // Глобальні
@@ -588,12 +597,18 @@ window.SICOMIX = window.SICOMIX || {};
                 select_series_first: "Najpierw wybierz serię farb",
                 paints_not_found_in_series: "Brak farb w tej serii pasujących do filtra",
                 series_mismatch: "Nie można dodać farby z innej serii",
-                select_recipes_to_print: "Wybierz receptury do druku"
-                duplicate: "Duplikuj"
+                select_recipes_to_print: "Wybierz receptury do druku",
+                
+                // ДОДАНІ КЛЮЧІ
+                theme: "Motyw",
+                theme_spectrum: "Spectrum (domyślny)",
+                theme_organic: "Organiczny",
+                paint_in_use_title: "Farba w użyciu",
+                paint_in_use_message: "Ta farba jest używana w recepturach. Usunąć ją ze wszystkich receptur?"
             }
         };
 
-         // Словник перекладу категорій (додано синоніми)
+        // Словник перекладу категорій (додано синоніми)
         const categoryTranslations = {
             "Універсальні": { uk: "Універсальні", en: "Universal", pl: "Uniwersalne" },
             "UV фарби": { uk: "УФ фарби", en: "UV paints", pl: "Farby UV" },
