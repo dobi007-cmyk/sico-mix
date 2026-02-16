@@ -1,4 +1,4 @@
-// ========== ДАНІ ПРО ФАРБИ SICO (БАГАТОМОВНА ВЕРСІЯ) ==========
+// ========== ДАНІ ПРО ФАРБИ SICO (БАГАТОМОВНА ВЕРСІЯ + ДОДАВКИ) ==========
 window.SICOMIX = window.SICOMIX || {};
 const SICOMIX = window.SICOMIX;
 
@@ -671,12 +671,52 @@ SICOMIX.data = (function() {
             { code: "75", name: { uk: "Прозорий рожевий", pl: "Transparent różowy", en: "Transparent Pink" }, color: "#FFC0CB" }
         ];
 
+        // ---------- ФУНКЦІЯ ДЛЯ ПАРСИНГУ ДОБАВОК ІЗ РЯДКА ----------
+        function parseAdditivesFromString(additivesStr, seriesId, seriesCategory, seriesName) {
+            if (!additivesStr) return [];
+            const paints = [];
+            // Розділяємо за крапкою з комою
+            const parts = additivesStr.split(';').map(s => s.trim()).filter(s => s.length > 0);
+            parts.forEach(part => {
+                // Шукаємо код (наприклад, "EC 160" або "AS 1000")
+                const match = part.match(/([A-Z]+\s*[\d\/]+[A-Z]*)\s*[–-]\s*(.+)/);
+                if (match) {
+                    let code = match[1].trim();
+                    // Якщо код не містить префікс серії, додаємо його
+                    if (!code.startsWith(seriesId)) {
+                        code = seriesId + ' ' + code;
+                    }
+                    const name = match[2].trim();
+                    // Видаляємо можливі дужки з відсотками з назви для стислості
+                    const shortName = name.replace(/\s*\([^)]*\)/g, '').trim();
+                    paints.push({
+                        code: code,
+                        name: shortName,
+                        fullDesc: part
+                    });
+                } else {
+                    // Якщо не вдалося розпарсити, пробуємо взяти перше слово як код
+                    const words = part.split(' ');
+                    if (words.length >= 2) {
+                        const possibleCode = words[0] + ' ' + words[1];
+                        paints.push({
+                            code: possibleCode,
+                            name: part,
+                            fullDesc: part
+                        });
+                    }
+                }
+            });
+            return paints;
+        }
+
         // ---------- ГЕНЕРАЦІЯ ФАРБ ІЗ БАГАТОМОВНИМИ ПОЛЯМИ ----------
         function generatePaintsFromBaseColors() {
             const paints = [];
             let counter = 1;
             
             series.forEach(serie => {
+                // Спочатку додаємо основні кольори
                 baseColors.forEach(baseColor => {
                     // Для кожного кольору створюємо об'єкт з окремими мовними версіями
                     const paint = {
@@ -684,14 +724,14 @@ SICOMIX.data = (function() {
                         name: `${serie.id}${baseColor.code}`,
                         series: serie.id,
                         baseColorCode: baseColor.code,
-                        category: serie.category, // тепер рядок
+                        category: serie.category,
                         color: baseColor.color,
                         manufacturer: "SICO",
                         article: `${serie.id}-${baseColor.code}`,
-                        properties: serie.properties, // залишаємо багатомовний об'єкт
+                        properties: serie.properties,
                         colorCode: baseColor.code,
                         isDefault: true,
-                        // Багатомовні поля
+                        paintType: "base", // тип: основний колір
                         displayName: {
                             uk: `${serie.name.uk} ${baseColor.name.uk}`,
                             pl: `${serie.name.pl} ${baseColor.name.pl}`,
@@ -715,157 +755,230 @@ SICOMIX.data = (function() {
                     };
                     paints.push(paint);
                 });
-            });
 
-            // ---------- СПЕЦІАЛЬНІ ФАРБИ EC (з перевіркою наявності) ----------
-            const ecSeries = series.find(s => s.id === "EC");
-            if (ecSeries) {
-                // EC60/146
-                paints.push({
-                    id: `paint-${counter++}`,
-                    name: "EC60/146",
-                    series: "EC",
-                    baseColorCode: "60/146",
-                    category: ecSeries.category,
-                    color: "#E34234",
-                    manufacturer: "SICO",
-                    article: "EC-60/146",
-                    properties: ecSeries.properties,
-                    colorCode: "60/146",
-                    isDefault: true,
-                    displayName: {
-                        uk: "EC Вогненно-червоний 60/146",
-                        pl: "EC Ognista czerwień 60/146",
-                        en: "EC Fire red 60/146"
-                    },
-                    description: {
-                        uk: "Вогненно-червоний колір з екстремально довгою світлостійкістю. Відтінок як №60.",
-                        pl: "Ognista czerwień o ekstremalnie długiej odporności na światło. Odcień jak nr 60.",
-                        en: "Fire red color with extremely long lightfastness. Shade like No. 60."
-                    },
-                    fullInfo: {
-                        uk: `Серія: EC, Спеціальний колір: EC 60/146 - Вогненно-червоний`,
-                        pl: `Seria: EC, Kolor specjalny: EC 60/146 - Ognista czerwień`,
-                        en: `Series: EC, Special color: EC 60/146 - Fire red`
-                    },
-                    colorName: {
-                        uk: "Вогненно-червоний",
-                        pl: "Ognista czerwień",
-                        en: "Fire red"
-                    }
-                });
-                // EC61/163
-                paints.push({
-                    id: `paint-${counter++}`,
-                    name: "EC61/163",
-                    series: "EC",
-                    baseColorCode: "61/163",
-                    category: ecSeries.category,
-                    color: "#C41E3A",
-                    manufacturer: "SICO",
-                    article: "EC-61/163",
-                    properties: ecSeries.properties,
-                    colorCode: "61/163",
-                    isDefault: true,
-                    displayName: {
-                        uk: "EC Темно-вогненно-червоний 61/163",
-                        pl: "EC Ciemna ognista czerwień 61/163",
-                        en: "EC Dark fire red 61/163"
-                    },
-                    description: {
-                        uk: "Темно-вогненно-червоний колір з екстремально довгою світлостійкістю. Відтінок як №61.",
-                        pl: "Ciemna ognista czerwień o ekstremalnie długiej odporności na światło. Odcień jak nr 61.",
-                        en: "Dark fire red color with extremely long lightfastness. Shade like No. 61."
-                    },
-                    fullInfo: {
-                        uk: `Серія: EC, Спеціальний колір: EC 61/163 - Темно-вогненно-червоний`,
-                        pl: `Seria: EC, Kolor specjalny: EC 61/163 - Ciemna ognista czerwień`,
-                        en: `Series: EC, Special color: EC 61/163 - Dark fire red`
-                    },
-                    colorName: {
-                        uk: "Темно-вогненно-червоний",
-                        pl: "Ciemna ognista czerwień",
-                        en: "Dark fire red"
-                    }
-                });
-                // EC91Q
-                paints.push({
-                    id: `paint-${counter++}`,
-                    name: "EC91Q",
-                    series: "EC",
-                    baseColorCode: "91Q",
-                    category: ecSeries.category,
-                    color: "#F8F8FF",
-                    manufacturer: "SICO",
-                    article: "EC-91Q",
-                    properties: (() => {
-                        // копіюємо властивості, але змінюємо finish на напівмат
-                        let props = JSON.parse(JSON.stringify(ecSeries.properties));
-                        props.finish = {
-                            uk: "Напівмат",
-                            pl: "Półmat",
-                            en: "Semi-matte"
+                // Додаємо спеціальні фарби (EC91Q, EC60/146, EC61/163, ECRG120)
+                if (serie.id === "EC") {
+                    // EC91Q
+                    paints.push({
+                        id: `paint-${counter++}`,
+                        name: "EC91Q",
+                        series: "EC",
+                        baseColorCode: "91Q",
+                        category: serie.category,
+                        color: "#F8F8FF",
+                        manufacturer: "SICO",
+                        article: "EC-91Q",
+                        properties: (() => {
+                            let props = JSON.parse(JSON.stringify(serie.properties));
+                            props.finish = {
+                                uk: "Напівмат",
+                                pl: "Półmat",
+                                en: "Semi-matte"
+                            };
+                            return props;
+                        })(),
+                        colorCode: "91Q",
+                        isDefault: true,
+                        paintType: "special",
+                        displayName: {
+                            uk: "EC Напівматова біла 91 Q",
+                            pl: "EC Biała półmatowa 91 Q",
+                            en: "EC Semi-matte white 91 Q"
+                        },
+                        description: {
+                            uk: "Напівматова біла фарба з вищою в'язкістю для вбирних паперів та картону.",
+                            pl: "Biała farba półmatowa o wyższej lepkości do chłonnych papierów i tektury.",
+                            en: "Semi-matte white ink with higher viscosity for absorbent papers and cardboard."
+                        },
+                        fullInfo: {
+                            uk: `Серія: EC, Спеціальний колір: EC 91 Q - Напівматова біла`,
+                            pl: `Seria: EC, Kolor specjalny: EC 91 Q - Biała półmatowa`,
+                            en: `Series: EC, Special color: EC 91 Q - Semi-matte white`
+                        },
+                        colorName: {
+                            uk: "Напівматова біла",
+                            pl: "Biała półmatowa",
+                            en: "Semi-matte white"
+                        }
+                    });
+                    
+                    // EC60/146
+                    paints.push({
+                        id: `paint-${counter++}`,
+                        name: "EC60/146",
+                        series: "EC",
+                        baseColorCode: "60/146",
+                        category: serie.category,
+                        color: "#E34234",
+                        manufacturer: "SICO",
+                        article: "EC-60/146",
+                        properties: serie.properties,
+                        colorCode: "60/146",
+                        isDefault: true,
+                        paintType: "special",
+                        displayName: {
+                            uk: "EC Вогненно-червоний 60/146",
+                            pl: "EC Ognista czerwień 60/146",
+                            en: "EC Fire red 60/146"
+                        },
+                        description: {
+                            uk: "Вогненно-червоний колір з екстремально довгою світлостійкістю.",
+                            pl: "Ognista czerwień o ekstremalnie długiej odporności na światło.",
+                            en: "Fire red color with extremely long lightfastness."
+                        },
+                        fullInfo: {
+                            uk: `Серія: EC, Спеціальний колір: EC 60/146 - Вогненно-червоний`,
+                            pl: `Seria: EC, Kolor specjalny: EC 60/146 - Ognista czerwień`,
+                            en: `Series: EC, Special color: EC 60/146 - Fire red`
+                        },
+                        colorName: {
+                            uk: "Вогненно-червоний",
+                            pl: "Ognista czerwień",
+                            en: "Fire red"
+                        }
+                    });
+                    
+                    // EC61/163
+                    paints.push({
+                        id: `paint-${counter++}`,
+                        name: "EC61/163",
+                        series: "EC",
+                        baseColorCode: "61/163",
+                        category: serie.category,
+                        color: "#C41E3A",
+                        manufacturer: "SICO",
+                        article: "EC-61/163",
+                        properties: serie.properties,
+                        colorCode: "61/163",
+                        isDefault: true,
+                        paintType: "special",
+                        displayName: {
+                            uk: "EC Темно-вогненно-червоний 61/163",
+                            pl: "EC Ciemna ognista czerwień 61/163",
+                            en: "EC Dark fire red 61/163"
+                        },
+                        description: {
+                            uk: "Темно-вогненно-червоний колір з екстремально довгою світлостійкістю.",
+                            pl: "Ciemna ognista czerwień o ekstremalnie długiej odporności na światło.",
+                            en: "Dark fire red color with extremely long lightfastness."
+                        },
+                        fullInfo: {
+                            uk: `Серія: EC, Спеціальний колір: EC 61/163 - Темно-вогненно-червоний`,
+                            pl: `Seria: EC, Kolor specjalny: EC 61/163 - Ciemna ognista czerwień`,
+                            en: `Series: EC, Special color: EC 61/163 - Dark fire red`
+                        },
+                        colorName: {
+                            uk: "Темно-вогненно-червоний",
+                            pl: "Ciemna ognista czerwień",
+                            en: "Dark fire red"
+                        }
+                    });
+                    
+                    // ECRG120
+                    paints.push({
+                        id: `paint-${counter++}`,
+                        name: "ECRG120",
+                        series: "EC",
+                        baseColorCode: "RG120",
+                        category: serie.category,
+                        color: "#FFD700",
+                        manufacturer: "SICO",
+                        article: "EC-RG120",
+                        properties: serie.properties,
+                        colorCode: "RG120",
+                        isDefault: true,
+                        paintType: "special",
+                        displayName: {
+                            uk: "EC Золота RG 120",
+                            pl: "EC Złota RG 120",
+                            en: "EC Gold RG 120"
+                        },
+                        description: {
+                            uk: "Золота фарба, готова до використання.",
+                            pl: "Złota farba gotowa do użycia.",
+                            en: "Gold ink, ready to use."
+                        },
+                        fullInfo: {
+                            uk: `Серія: EC, Спеціальний колір: EC RG 120 - Золото`,
+                            pl: `Seria: EC, Kolor specjalny: EC RG 120 - Złoto`,
+                            en: `Series: EC, Special color: EC RG 120 - Gold`
+                        },
+                        colorName: {
+                            uk: "Золото",
+                            pl: "Złoto",
+                            en: "Gold"
+                        }
+                    });
+                }
+
+                // Додаємо добавки з властивостей
+                if (serie.properties && serie.properties.additives) {
+                    const additivesUa = serie.properties.additives.uk || '';
+                    const additivesPl = serie.properties.additives.pl || '';
+                    const additivesEn = serie.properties.additives.en || '';
+                    
+                    const parsedAdditives = parseAdditivesFromString(additivesUa, serie.id, serie.category, serie.name);
+                    
+                    parsedAdditives.forEach((add, idx) => {
+                        // Перевіряємо, чи це саме ті добавки, які потрібні для кожної серії
+                        // Для EC: EC 160, EC 150, EC 1501 HG, AS 1000, EC 170/1702, MP 1000, EC 150/10, MP 3000, HEC
+                        // Для CF: CF 150, CF 1501 HG, CF 160, CF 1702, AS 1000, HCF
+                        // Для інших серій - відповідні добавки
+                        
+                        const paintId = `paint-${counter++}`;
+                        let color = "#AAAAAA";
+                        
+                        // Визначаємо колір за типом добавки
+                        if (add.code.includes("Gold") || add.code.includes("Złoto") || add.code.includes("Золото")) color = "#FFD700";
+                        if (add.code.includes("Silver") || add.code.includes("Srebro") || add.code.includes("Срібло")) color = "#C0C0C0";
+                        if (add.code.includes("White") || add.code.includes("Biały") || add.code.includes("Білий")) color = "#FFFFFF";
+                        if (add.code.includes("Black") || add.code.includes("Czarny") || add.code.includes("Чорний")) color = "#000000";
+                        if (add.code.includes("Base") || add.code.includes("Baza") || add.code.includes("База")) color = "#E0E0E0";
+                        if (add.code.includes("Varnish") || add.code.includes("Lakier") || add.code.includes("Лак")) color = "#FFE4B5";
+                        if (add.code.includes("Hardener") || add.code.includes("Utwardzacz") || add.code.includes("Затверджувач")) color = "#D2B48C";
+                        
+                        const displayName = {
+                            uk: add.code,
+                            pl: add.code,
+                            en: add.code
                         };
-                        return props;
-                    })(),
-                    colorCode: "91Q",
-                    isDefault: true,
-                    displayName: {
-                        uk: "EC Напівматова біла 91 Q",
-                        pl: "EC Biała półmatowa 91 Q",
-                        en: "EC Semi-matte white 91 Q"
-                    },
-                    description: {
-                        uk: "Напівматова біла фарба з вищою в'язкістю для вбирних паперів та картону. Також підходить для ПВХ, наклейок, ABS, Forex.",
-                        pl: "Biała farba półmatowa o wyższej lepkości do chłonnych papierów i tektury. Nadaje się również do PCV, naklejek, ABS, Forex.",
-                        en: "Semi-matte white ink with higher viscosity for absorbent papers and cardboard. Also suitable for PVC, stickers, ABS, Forex."
-                    },
-                    fullInfo: {
-                        uk: `Серія: EC, Спеціальний колір: EC 91 Q - Напівматова біла`,
-                        pl: `Seria: EC, Kolor specjalny: EC 91 Q - Biała półmatowa`,
-                        en: `Series: EC, Special color: EC 91 Q - Semi-matte white`
-                    },
-                    colorName: {
-                        uk: "Напівматова біла",
-                        pl: "Biała półmatowa",
-                        en: "Semi-matte white"
-                    }
-                });
-                // ECRG120
-                paints.push({
-                    id: `paint-${counter++}`,
-                    name: "ECRG120",
-                    series: "EC",
-                    baseColorCode: "RG120",
-                    category: ecSeries.category,
-                    color: "#FFD700",
-                    manufacturer: "SICO",
-                    article: "EC-RG120",
-                    properties: ecSeries.properties,
-                    colorCode: "RG120",
-                    isDefault: true,
-                    displayName: {
-                        uk: "EC Золота RG 120",
-                        pl: "EC Złota RG 120",
-                        en: "EC Gold RG 120"
-                    },
-                    description: {
-                        uk: "Золота фарба, готова до використання. Без необхідності змішування.",
-                        pl: "Złota farba gotowa do użycia. Bez konieczności mieszania.",
-                        en: "Gold ink, ready to use. No mixing required."
-                    },
-                    fullInfo: {
-                        uk: `Серія: EC, Спеціальний колір: EC RG 120 - Золото`,
-                        pl: `Seria: EC, Kolor specjalny: EC RG 120 - Złoto`,
-                        en: `Series: EC, Special color: EC RG 120 - Gold`
-                    },
-                    colorName: {
-                        uk: "Золото",
-                        pl: "Złoto",
-                        en: "Gold"
-                    }
-                });
-            }
+                        
+                        const description = {
+                            uk: additivesUa.split(';').find(p => p.includes(add.code)) || add.fullDesc,
+                            pl: additivesPl.split(';').find(p => p.includes(add.code)) || add.fullDesc,
+                            en: additivesEn.split(';').find(p => p.includes(add.code)) || add.fullDesc
+                        };
+                        
+                        const paint = {
+                            id: paintId,
+                            name: add.code,
+                            series: serie.id,
+                            baseColorCode: add.code,
+                            category: serie.category,
+                            color: color,
+                            manufacturer: "SICO",
+                            article: `${serie.id}-${add.code.replace(/\s+/g, '')}`,
+                            properties: serie.properties,
+                            colorCode: add.code,
+                            isDefault: true,
+                            paintType: "additive", // тип: добавка
+                            displayName: displayName,
+                            description: description,
+                            fullInfo: {
+                                uk: `Серія: ${serie.name.uk}, Добавка: ${add.code} - ${add.name}`,
+                                pl: `Seria: ${serie.name.pl}, Dodatek: ${add.code} - ${add.name}`,
+                                en: `Series: ${serie.name.en}, Additive: ${add.code} - ${add.name}`
+                            },
+                            colorName: {
+                                uk: add.name,
+                                pl: add.name,
+                                en: add.name
+                            }
+                        };
+                        paints.push(paint);
+                    });
+                }
+            });
 
             return paints;
         }
@@ -907,7 +1020,7 @@ SICOMIX.data = (function() {
             defaultSeries: "EC"
         };
 
-        console.log(`[SICOMIX] Згенеровано ${paints.length} фарб (багатомовна версія)`);
+        console.log(`[SICOMIX] Згенеровано ${paints.length} фарб (багатомовна версія з добавками)`);
         console.log(`[SICOMIX] Базових кольорів: ${baseColors.length}, серій: ${series.length}`);
 
         return {
