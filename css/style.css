@@ -961,115 +961,101 @@ body {
 }
 
 /* ===== SERIES CATALOG – МІНІМАЛІСТИЧНИЙ ЕСТЕТИЧНИЙ ДИЗАЙН ===== */
-/* ===== ВАРІАНТ 3: МІНІМАЛ-ЛЮКС (Дорогий мінімалізм) ===== */
+/* ===== ВАРІАНТ 2: НЕОН (Яскравий, контрастний) ===== */
 .series-card {
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    padding: 25px 0;
-    margin-bottom: 30px;
+    background: #0f1217;
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    border-radius: 24px;
+    padding: 28px;
+    margin-bottom: 28px;
     transition: all 0.3s ease;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 20px 35px -15px #00000080;
     position: relative;
 }
 
-.series-card:first-of-type {
-    border-top: none;
+.series-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 24px;
+    border: 1px solid transparent;
+    transition: all 0.3s;
+    pointer-events: none;
 }
 
 .series-card:hover {
-    transform: translateX(8px);
+    transform: translateY(-4px);
+    box-shadow: 0 25px 45px -15px #3a86ff80;
+}
+
+.series-card:hover::after {
+    border-color: #3a86ff;
+    box-shadow: 0 0 20px #3a86ff, inset 0 0 10px #3a86ff20;
 }
 
 .series-header {
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    padding: 0;
-    margin-bottom: 15px;
+    padding: 5px 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #3a86ff30;
 }
 
 .series-header h3 {
-    font-size: 34px;
-    font-weight: 350;
-    letter-spacing: -1px;
+    font-size: 30px;
+    font-weight: 700;
     color: #fff;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
-    gap: 20px;
-    transition: color 0.2s;
-}
-
-.series-header h3 i {
-    color: #3a86ff;
-    font-size: 28px;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-}
-
-.series-card:hover .series-header h3 i {
-    opacity: 1;
+    gap: 15px;
+    text-shadow: 0 0 10px #3a86ff;
 }
 
 .series-header .recipe-category {
-    background: transparent;
-    padding: 0;
-    border-radius: 0;
-    font-size: 13px;
-    font-weight: 400;
-    color: #7f8c9a;
-    letter-spacing: 1.5px;
+    background: #3a86ff20;
+    padding: 6px 18px;
+    border-radius: 40px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #aac8ff;
+    letter-spacing: 1px;
     text-transform: uppercase;
+    border: 1px solid #3a86ff60;
     width: fit-content;
-    border: none;
-    position: relative;
-    margin-bottom: 8px;
-}
-
-.series-header .recipe-category::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 40px;
-    height: 2px;
-    background: #3a86ff;
-    transition: width 0.3s;
-}
-
-.series-card:hover .series-header .recipe-category::after {
-    width: 70px;
+    box-shadow: 0 0 15px #3a86ff40;
 }
 
 .series-description {
-    color: #a0b0c0;
+    color: #b0c0d0;
     font-size: 15px;
-    font-weight: 350;
     line-height: 1.7;
     margin: 10px 0 5px;
-    max-width: 70%;
+    max-width: 80%;
 }
 
 .series-properties {
-    background: rgba(20, 25, 33, 0.7);
-    backdrop-filter: blur(5px);
-    border-radius: 0;
-    padding: 25px 30px;
+    background: #0b0e12;
+    border-radius: 20px;
+    padding: 25px;
     margin: 25px 0;
-    border-left: 3px solid #3a86ff;
-    transition: all 0.3s;
+    border: 1px solid #3a86ff30;
+    box-shadow: inset 0 0 10px #00000080, 0 5px 15px #00000080;
 }
 
 .series-properties h4 {
     color: #fff;
     font-size: 18px;
-    font-weight: 400;
+    font-weight: 600;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
     gap: 10px;
-    letter-spacing: -0.3px;
+    text-shadow: 0 0 8px #3a86ff;
 }
 
 .series-properties h4 i {
@@ -1079,140 +1065,134 @@ body {
 
 .properties-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
 }
 
 .property-item {
-    background: transparent;
-    border-bottom: 1px dashed rgba(255,255,255,0.1);
-    padding: 10px 0;
-    transition: border-color 0.2s;
+    background: #151a21;
+    border-radius: 16px;
+    padding: 14px 16px;
+    border: 1px solid #3a86ff20;
+    transition: all 0.2s;
 }
 
 .property-item:hover {
-    border-bottom-color: #3a86ff;
+    border-color: #3a86ff;
+    box-shadow: 0 0 15px #3a86ff40;
+    background: #1a212a;
 }
 
 .property-item strong {
     display: block;
-    font-size: 11px;
+    font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #7f8c9a;
-    margin-bottom: 4px;
-    font-weight: 400;
+    letter-spacing: 1px;
+    color: #a0b0c0;
+    margin-bottom: 6px;
 }
 
 .property-item span {
     color: white;
-    font-size: 15px;
-    font-weight: 350;
+    font-size: 14px;
+    font-weight: 500;
     line-height: 1.5;
 }
 
 .series-paints {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 18px;
     margin-top: 25px;
 }
 
 .paint-mini-card {
-    background: transparent;
-    border-radius: 0;
+    background: #11161d;
+    border-radius: 20px;
     overflow: hidden;
     transition: all 0.25s ease;
     cursor: pointer;
-    border: none;
-    text-align: center;
+    border: 1px solid #3a86ff20;
+    box-shadow: 0 8px 20px -10px #000;
 }
 
 .paint-mini-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-5px) scale(1.02);
+    border-color: #3a86ff;
+    box-shadow: 0 15px 30px -10px #3a86ff, 0 0 20px #3a86ff40;
 }
 
 .paint-mini-swatch {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    margin: 0 auto 15px;
-    transition: all 0.3s;
-    border: 2px solid rgba(255,255,255,0.1);
-    box-shadow: 0 10px 20px -10px rgba(0,0,0,0.5);
+    height: 90px;
+    width: 100%;
+    transition: transform 0.3s;
 }
 
 .paint-mini-card:hover .paint-mini-swatch {
-    transform: scale(1.1);
-    border-color: #3a86ff;
-    box-shadow: 0 15px 30px -10px #3a86ff;
+    transform: scale(1.05);
 }
 
 .paint-mini-info {
-    padding: 0;
+    padding: 16px 14px;
 }
 
 .paint-mini-name {
-    font-weight: 400;
+    font-weight: 600;
     font-size: 15px;
     color: white;
     margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: color 0.2s;
-}
-
-.paint-mini-card:hover .paint-mini-name {
-    color: #3a86ff;
 }
 
 .paint-mini-article {
     font-size: 11px;
-    color: #7f8c9a;
+    color: #8a9ab0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: 0.3px;
 }
 
 .toggle-series {
-    background: transparent;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
+    background: #1a1f27;
+    border-radius: 40px;
+    width: 46px;
+    height: 46px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #a0b0c0;
+    border: 1px solid #3a86ff40;
+    color: #aac8ff;
     font-size: 18px;
 }
 
 .toggle-series:hover {
+    background: #3a86ff30;
     border-color: #3a86ff;
-    color: #3a86ff;
+    color: white;
     transform: scale(1.1);
+    box-shadow: 0 0 20px #3a86ff;
 }
 
 @media (max-width: 768px) {
     .series-card {
-        padding: 20px 0;
+        padding: 20px;
     }
     .series-header h3 {
-        font-size: 28px;
+        font-size: 26px;
     }
     .series-description {
         max-width: 100%;
         font-size: 14px;
     }
     .series-paints {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+        grid-template-columns: 1fr;
     }
     .paint-mini-swatch {
-        width: 70px;
-        height: 70px;
+        height: 80px;
     }
 }
 
