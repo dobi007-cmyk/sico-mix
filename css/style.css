@@ -961,17 +961,17 @@ body {
 }
 
 /* ===== SERIES CATALOG – МІНІМАЛІСТИЧНИЙ ЕСТЕТИЧНИЙ ДИЗАЙН ===== */
-/* ===== ВАРІАНТ 1: АВРОРА (Скляний, м’яке світло) ===== */
+/* ===== ВАРІАНТ 1: АВРОРА (м'яке скло) ===== */
 .series-card {
-    background: rgba(20, 25, 35, 0.4);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.03);
+    background: rgba(20, 25, 30, 0.3);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 40px;
     padding: 30px;
     margin-bottom: 30px;
-    transition: all 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1);
-    box-shadow: 0 25px 45px -20px rgba(0, 0, 0, 0.5);
+    transition: all 0.5s cubic-bezier(0.2, 0.9, 0.3, 1);
+    box-shadow: 0 25px 50px -20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
     position: relative;
     overflow: hidden;
 }
@@ -979,85 +979,88 @@ body {
 .series-card::before {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at 30% 40%, rgba(100, 150, 255, 0.15), transparent 60%);
+    top: -30%;
+    left: -30%;
+    width: 160%;
+    height: 160%;
+    background: radial-gradient(circle at 30% 40%, rgba(100, 180, 255, 0.2), transparent 60%);
     opacity: 0;
     transition: opacity 0.8s ease;
     pointer-events: none;
-}
-
-.series-card:hover {
-    transform: translateY(-8px) scale(1.01);
-    border-color: rgba(120, 180, 255, 0.3);
-    box-shadow: 0 30px 60px -20px rgba(70, 130, 255, 0.4);
 }
 
 .series-card:hover::before {
     opacity: 1;
 }
 
+.series-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(120, 180, 255, 0.3);
+    box-shadow: 0 35px 70px -20px rgba(70, 130, 255, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
 .series-header {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
     cursor: pointer;
-    padding: 10px 0;
-    margin-bottom: 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 10px;
+    margin: -10px -10px 0 -10px;
+    border-radius: 36px;
+    transition: background 0.3s;
+}
+
+.series-header:hover {
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .series-header h3 {
     font-size: 32px;
-    font-weight: 300;
-    letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #fff, #d0e0ff);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #ffffff, #d0e0ff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
+    margin: 0;
+    line-height: 1.2;
 }
 
 .series-header .recipe-category {
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(5px);
-    padding: 5px 16px;
-    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    padding: 6px 16px;
+    border-radius: 40px;
     font-size: 12px;
-    font-weight: 300;
+    font-weight: 400;
     color: #b0d0ff;
-    letter-spacing: 1px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     text-transform: uppercase;
-    border: 1px solid rgba(255,255,255,0.1);
-    width: fit-content;
+    letter-spacing: 1px;
 }
 
 .series-description {
-    color: rgba(255,255,255,0.6);
+    color: rgba(255, 255, 255, 0.5);
     font-size: 15px;
-    font-weight: 300;
     line-height: 1.7;
-    margin: 15px 0 5px;
+    margin: 20px 0 0 0;
+    font-weight: 300;
     max-width: 80%;
 }
 
 .series-properties {
-    background: rgba(10, 15, 25, 0.4);
-    backdrop-filter: blur(10px);
-    border-radius: 30px;
-    padding: 25px;
+    background: rgba(10, 15, 20, 0.4);
+    backdrop-filter: blur(8px);
+    border-radius: 32px;
+    padding: 24px;
     margin: 25px 0;
-    border: 1px solid rgba(255,255,255,0.03);
-    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.5);
 }
 
 .series-properties h4 {
-    color: #fff;
+    color: rgba(255, 255, 255, 0.8);
     font-size: 18px;
-    font-weight: 300;
+    font-weight: 400;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -1065,79 +1068,78 @@ body {
 }
 
 .series-properties h4 i {
-    color: #7aa5ff;
+    color: #6a8cff;
     font-size: 20px;
-    opacity: 0.8;
 }
 
 .properties-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
 }
 
 .property-item {
-    background: rgba(255,255,255,0.02);
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 20px;
-    padding: 14px 18px;
-    border: 1px solid rgba(255,255,255,0.02);
-    transition: background 0.2s;
+    padding: 14px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    transition: all 0.2s;
 }
 
 .property-item:hover {
-    background: rgba(90, 140, 255, 0.08);
+    background: rgba(60, 100, 200, 0.1);
+    border-color: rgba(100, 160, 255, 0.2);
 }
 
 .property-item strong {
     display: block;
     font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: rgba(255,255,255,0.3);
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.3);
     margin-bottom: 6px;
-    font-weight: 400;
 }
 
 .property-item span {
-    color: rgba(255,255,255,0.9);
+    color: rgba(255, 255, 255, 0.9);
     font-size: 14px;
     font-weight: 300;
-    line-height: 1.5;
 }
 
 .series-paints {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 20px;
     margin-top: 25px;
 }
 
 .paint-mini-card {
-    background: rgba(30, 35, 45, 0.4);
+    background: rgba(25, 30, 35, 0.5);
     backdrop-filter: blur(8px);
     border-radius: 30px;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1);
+    transition: all 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
     cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.02);
-    box-shadow: 0 15px 30px -15px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    box-shadow: 0 10px 20px -12px rgba(0, 0, 0, 0.6);
 }
 
 .paint-mini-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    border-color: rgba(100, 160, 255, 0.4);
-    box-shadow: 0 25px 40px -15px rgba(70, 130, 255, 0.5);
+    transform: scale(1.02) translateY(-6px);
+    border-color: rgba(120, 180, 255, 0.3);
+    box-shadow: 0 20px 30px -12px rgba(70, 130, 255, 0.3);
+    background: rgba(35, 45, 55, 0.7);
 }
 
 .paint-mini-swatch {
-    height: 90px;
+    height: 100px;
     width: 100%;
+    transition: transform 0.4s ease;
     background-size: cover;
-    transition: transform 0.4s;
 }
 
 .paint-mini-card:hover .paint-mini-swatch {
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
 .paint-mini-info {
@@ -1148,7 +1150,7 @@ body {
     font-weight: 400;
     font-size: 16px;
     color: white;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1156,41 +1158,42 @@ body {
 
 .paint-mini-article {
     font-size: 11px;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255, 255, 255, 0.3);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
 }
 
 .toggle-series {
-    background: rgba(255,255,255,0.02);
+    background: rgba(255, 255, 255, 0.02);
     backdrop-filter: blur(8px);
-    border-radius: 50px;
+    border-radius: 50%;
     width: 48px;
     height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s;
-    border: 1px solid rgba(255,255,255,0.05);
-    color: rgba(255,255,255,0.5);
-    font-size: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 18px;
+    cursor: pointer;
 }
 
 .toggle-series:hover {
-    background: rgba(80, 140, 255, 0.15);
-    border-color: rgba(80, 140, 255, 0.4);
+    background: rgba(80, 140, 255, 0.2);
+    border-color: rgba(100, 160, 255, 0.4);
     color: white;
-    transform: scale(1.15);
-    box-shadow: 0 0 25px rgba(70, 130, 255, 0.4);
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(80, 140, 255, 0.3);
 }
 
-/* Адаптація */
+/* Адаптація для мобільних */
 @media (max-width: 768px) {
     .series-card {
         padding: 20px;
-        border-radius: 30px;
+        border-radius: 32px;
     }
     .series-header h3 {
         font-size: 26px;
@@ -1209,7 +1212,6 @@ body {
         grid-template-columns: 1fr;
     }
 }
-
 /* ===== RESPONSIVE – МОБІЛЬНА АДАПТАЦІЯ ===== */
 @media (max-width: 992px) {
     .mobile-nav {
