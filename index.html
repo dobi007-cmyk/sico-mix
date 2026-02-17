@@ -81,9 +81,9 @@
     </script>
 </head>
 <body>
-    <!-- Preloader (Варіант 2: Крапля як спінер з анімацією) -->
+    <!-- Preloader -->
     <div id="preloader">
-        <div class="spectrum-spinner" style="width: 120px; height: 120px; background: url('1.jpg') center/cover; border-radius: 50%; animation: spin 8s linear infinite; box-shadow: 0 0 60px rgba(100, 200, 255, 0.6);"></div>
+        <div class="spectrum-spinner"></div>
     </div>
 
     <!-- Декоративна абстрактна пляма фарби -->
@@ -212,12 +212,15 @@
 
         <!-- Page Content -->
         <main id="page-content">
-            <!-- HOME PAGE -->
+            <!-- HOME PAGE (Варіант 3: Крапля як герой-зображення на головній) -->
             <div class="page-content active" id="home-page">
                 <div class="welcome-section">
                     <span class="spectrum-badge">2026 EDITION</span>
                     <h2 class="welcome-title" data-i18n="welcome_title">Ласкаво просимо до SICO Spectrum</h2>
                     <p class="welcome-subtitle" data-i18n="welcome_subtitle">Цифрова лабораторія кольору</p>
+                </div>
+                <div class="hero-splash" style="margin: 2rem auto; max-width: 800px; overflow: hidden; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);">
+                    <img src="1.jpg" alt="Spectrum paint explosion" style="width: 100%; height: auto; display: block; object-fit: cover;">
                 </div>
                 <div class="quick-actions-grid">
                     <a class="action-card" href="#" data-page="new-recipe">
@@ -637,10 +640,5 @@
             }
         });
     </script>
-    <style>
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
 </body>
 </html>
