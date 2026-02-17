@@ -1,4 +1,4 @@
-// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (ВИПРАВЛЕНО + ТЕМИ) ==========
+// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (ВИПРАВЛЕНО + ТЕМИ + ФОТО) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -17,6 +17,7 @@ window.SICOMIX = window.SICOMIX || {};
         let editingRecipeId = null;
         let recipeDraft = null;
         let selectedSeries = '';
+        let recipePhotoDataUrl = null; // ADDED
 
         // Для пагінації каталогу
         let catalogFilteredSeries = [];
@@ -35,6 +36,8 @@ window.SICOMIX = window.SICOMIX || {};
         let startImportBtn, startExportBtn, importFormat, exportFormat, importFile, importRecipesCheckbox, importPaintsCheckbox;
         let exportRecipesCheckbox, exportPaintsCheckbox, exportCalculationsCheckbox, includePhotosCheckbox, compressDataCheckbox;
         let loadMoreCatalogBtn;
+        // ADDED: photo elements
+        let recipePhotoInput, recipePhotoPreview, recipePhotoImg, fileNameSpan;
 
         // ---------- КЕШУВАННЯ DOM ----------
         function cacheDOMElements() {
@@ -86,6 +89,11 @@ window.SICOMIX = window.SICOMIX || {};
             includePhotosCheckbox = document.getElementById('includePhotosCheckbox');
             compressDataCheckbox = document.getElementById('compressDataCheckbox');
             loadMoreCatalogBtn = document.getElementById('loadMoreCatalogBtn');
+            // ADDED
+            recipePhotoInput = document.getElementById('recipePhoto');
+            recipePhotoPreview = document.getElementById('recipePhotoPreview');
+            recipePhotoImg = document.getElementById('recipePhotoImg');
+            fileNameSpan = document.getElementById('fileName');
         }
 
         // ---------- ЗАВАНТАЖЕННЯ ТА ЗБЕРЕЖЕННЯ ----------
@@ -118,6 +126,10 @@ window.SICOMIX = window.SICOMIX || {};
 
             currentSettings = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumSettings', SICOMIX.data.defaultSettings || {});
             recipeDraft = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumRecipeDraft', null);
+            // If draft has photo, set it
+            if (recipeDraft && recipeDraft.photo) {
+                recipePhotoDataUrl = recipeDraft.photo;
+            }
         }
 
         function saveData() {
@@ -131,14 +143,15 @@ window.SICOMIX = window.SICOMIX || {};
         function autoSaveRecipeDraft() {
             if (!currentSettings.autoSave) return;
             if (!document.getElementById('new-recipe-page')?.classList.contains('active')) return;
-            if (isEditingRecipe) return;
+            if (isEditingRecipe) return; // Don't auto-save draft when editing (we could, but careful)
 
             const draft = {
                 name: document.getElementById('recipeName')?.value || '',
                 category: document.getElementById('recipeCategory')?.value || '',
                 series: document.getElementById('recipeSeries')?.value || '',
                 description: document.getElementById('recipeDescription')?.value || '',
-                ingredients: selectedIngredients.map(ing => ({ ...ing }))
+                ingredients: selectedIngredients.map(ing => ({ ...ing })),
+                photo: recipePhotoDataUrl // ADDED
             };
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumRecipeDraft', draft);
             recipeDraft = draft;
@@ -166,6 +179,13 @@ window.SICOMIX = window.SICOMIX || {};
             selectedSeries = recipeDraft.series || '';
             document.getElementById('recipeDescription').value = recipeDraft.description || '';
             selectedIngredients = (recipeDraft.ingredients || []).map(ing => ({ ...ing }));
+            // ADDED: load photo
+            if (recipeDraft.photo) {
+                recipePhotoDataUrl = recipeDraft.photo;
+                showPhotoPreview(recipePhotoDataUrl);
+            } else {
+                resetPhotoPreview();
+            }
             renderIngredientsList();
             calculatePercentages();
         }
@@ -173,6 +193,25 @@ window.SICOMIX = window.SICOMIX || {};
         function clearRecipeDraft() {
             localStorage.removeItem('sicoSpectrumRecipeDraft');
             recipeDraft = null;
+            // ADDED: clear photo
+            recipePhotoDataUrl = null;
+            resetPhotoPreview();
+        }
+
+        // ADDED: photo preview helpers
+        function showPhotoPreview(dataUrl) {
+            if (recipePhotoImg && recipePhotoPreview) {
+                recipePhotoImg.src = dataUrl;
+                recipePhotoPreview.style.display = 'block';
+            }
+            if (fileNameSpan) {
+                fileNameSpan.textContent = SICOMIX.i18n.t('upload_photo') + ' (фото обрано)';
+            }
+        }
+        function resetPhotoPreview() {
+            if (recipePhotoPreview) recipePhotoPreview.style.display = 'none';
+            if (recipePhotoImg) recipePhotoImg.src = '#';
+            if (fileNameSpan) fileNameSpan.textContent = SICOMIX.i18n.t('upload_photo');
         }
 
         // ---------- НАЛАШТУВАННЯ ----------
@@ -232,11 +271,23 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
-            const recipePhoto = document.getElementById('recipePhoto');
-            if (recipePhoto) {
-                recipePhoto.addEventListener('change', function() {
-                    const fileName = this.files[0]?.name || SICOMIX.i18n.t('upload_photo');
-                    document.getElementById('fileName').textContent = fileName;
+            // MODIFIED: handle photo change
+            if (recipePhotoInput) {
+                recipePhotoInput.addEventListener('change', function() {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            recipePhotoDataUrl = e.target.result;
+                            showPhotoPreview(recipePhotoDataUrl);
+                            debouncedAutoSave(); // autosave when photo selected
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        recipePhotoDataUrl = null;
+                        resetPhotoPreview();
+                        debouncedAutoSave();
+                    }
                 });
             }
 
@@ -349,7 +400,7 @@ window.SICOMIX = window.SICOMIX || {};
                 if (document.getElementById('new-recipe-page')?.classList.contains('active') && !isEditingRecipe) {
                     const currentName = document.getElementById('recipeName')?.value;
                     const currentIngredients = selectedIngredients.length;
-                    if (currentName || currentIngredients > 0) {
+                    if (currentName || currentIngredients > 0 || recipePhotoDataUrl) {
                         const message = SICOMIX.i18n.t('unsaved_changes_warning');
                         e.returnValue = message;
                         return message;
@@ -558,16 +609,22 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
+            // MODIFIED: include photo
+            const recipeData = {
+                name,
+                category: cat,
+                series,
+                description: desc,
+                ingredients: [...selectedIngredients],
+                photo: recipePhotoDataUrl || null
+            };
+
             if (isEditingRecipe && editingRecipeId) {
                 const idx = recipes.findIndex(r => String(r.id) === String(editingRecipeId));
                 if (idx !== -1) {
                     recipes[idx] = {
                         ...recipes[idx],
-                        name,
-                        category: cat,
-                        series,
-                        description: desc,
-                        ingredients: [...selectedIngredients],
+                        ...recipeData,
                         date: new Date().toLocaleDateString('uk-UA')
                     };
                     saveData();
@@ -577,13 +634,8 @@ window.SICOMIX = window.SICOMIX || {};
             } else {
                 const newRecipe = {
                     id: SICOMIX.utils.generateId(),
-                    name,
-                    category: cat,
-                    series,
-                    description: desc,
-                    ingredients: [...selectedIngredients],
-                    date: new Date().toLocaleDateString('uk-UA'),
-                    photo: null
+                    ...recipeData,
+                    date: new Date().toLocaleDateString('uk-UA')
                 };
                 recipes.push(newRecipe);
                 saveData();
@@ -601,6 +653,9 @@ window.SICOMIX = window.SICOMIX || {};
             selectedSeries = '';
             document.getElementById('recipeDescription').value = '';
             selectedIngredients = [];
+            // ADDED: clear photo
+            recipePhotoDataUrl = null;
+            resetPhotoPreview();
             renderIngredientsList();
             resetEditMode();
         }
@@ -630,9 +685,11 @@ window.SICOMIX = window.SICOMIX || {};
 
             recipesContainer.innerHTML = filtered.map(r => {
                 const total = r.ingredients.reduce((s, i) => s + (i.amount || 0), 0);
+                // MODIFIED: display photo if exists
+                const photoHtml = r.photo ? `<img src="${SICOMIX.utils.escapeHtml(r.photo)}" style="width:100%; height:100%; object-fit:cover;">` : `<i class="fas fa-palette"></i>`;
                 return `<div class="recipe-card" data-id="${r.id}">
                     <div class="recipe-image" style="background: linear-gradient(145deg, #3a86ff80, #7b2cbf80);">
-                        <i class="fas fa-palette"></i>
+                        ${photoHtml}
                     </div>
                     <div class="recipe-content">
                         <div class="recipe-header">
@@ -1185,6 +1242,13 @@ window.SICOMIX = window.SICOMIX || {};
             selectedSeries = recipe.series || '';
             document.getElementById('recipeDescription').value = recipe.description || '';
             selectedIngredients = recipe.ingredients.map(ing => ({ ...ing, paintId: String(ing.paintId) }));
+            // ADDED: load photo
+            recipePhotoDataUrl = recipe.photo || null;
+            if (recipePhotoDataUrl) {
+                showPhotoPreview(recipePhotoDataUrl);
+            } else {
+                resetPhotoPreview();
+            }
             renderIngredientsList();
             calculatePercentages();
             isEditingRecipe = true;
