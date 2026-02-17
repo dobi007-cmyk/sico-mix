@@ -293,7 +293,7 @@
 
         <!-- Page Content -->
         <main id="page-content">
-            <!-- HOME PAGE (із новими логотипами) -->
+            <!-- HOME PAGE (із преміальними логотипами) -->
             <div class="page-content active" id="home-page">
                 <div class="welcome-section">
                     <span class="spectrum-badge">2026 EDITION</span>
@@ -301,99 +301,104 @@
                     <p class="welcome-subtitle" data-i18n="welcome_subtitle">Цифрова лабораторія кольору</p>
                 </div>
 
-                <!-- ========== НОВІ ВАРІАНТИ ЛОГОТИПІВ ========== -->
+                <!-- ========== НОВІ ПРЕМІАЛЬНІ ВАРІАНТИ ЛОГОТИПІВ ========== -->
                 <div class="logo-variants-section">
-                    <h3 class="logo-variants-title">Оберіть стиль логотипу</h3>
+                    <h3 class="logo-variants-title">Варіанти логотипу</h3>
                     <div class="logo-variants-grid">
-                        <!-- Варіант 1: Крапля змішування -->
+                        <!-- Варіант 1: Призма (спектр) -->
                         <div class="logo-variant-item">
                             <div class="logo-variant-svg">
                                 <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M30 50 Q40 25 60 30 Q70 40 65 60 Q55 75 35 70 Q25 60 30 50" fill="url(#grad1)" stroke="#7b2cbf" stroke-width="1.5"/>
-                                    <circle cx="50" cy="48" r="12" fill="white" fill-opacity="0.3"/>
+                                    <path d="M20 70 L50 20 L80 70 Z" fill="url(#prismGrad)" stroke="#fff" stroke-width="1.5" stroke-linejoin="round" />
+                                    <path d="M30 60 L50 30 L70 60 Z" fill="white" fill-opacity="0.3" />
                                     <defs>
-                                        <linearGradient id="grad1" x1="25" y1="25" x2="75" y2="75" gradientUnits="userSpaceOnUse">
-                                            <stop stop-color="#7b2cbf"/>
-                                            <stop offset="0.5" stop-color="#3a86ff"/>
-                                            <stop offset="1" stop-color="#4cc9f0"/>
+                                        <linearGradient id="prismGrad" x1="20" y1="20" x2="80" y2="70" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#f72585" />
+                                            <stop offset="0.25" stop-color="#b5179e" />
+                                            <stop offset="0.5" stop-color="#3a86ff" />
+                                            <stop offset="0.75" stop-color="#4cc9f0" />
+                                            <stop offset="1" stop-color="#f72585" />
                                         </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <div class="logo-variant-label">Призма<br><span>спектр</span></div>
+                        </div>
+
+                        <!-- Варіант 2: Крапля змішування (сучасна) -->
+                        <div class="logo-variant-item">
+                            <div class="logo-variant-svg">
+                                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M50 20 C65 30 75 45 70 60 C65 75 50 80 35 70 C25 60 25 45 35 35 C40 28 45 23 50 20 Z" fill="url(#dropGrad)" stroke="#fff" stroke-width="1.5" />
+                                    <circle cx="55" cy="45" r="5" fill="white" fill-opacity="0.5" />
+                                    <defs>
+                                        <radialGradient id="dropGrad" cx="50" cy="50" r="30" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#7b2cbf" />
+                                            <stop offset="0.5" stop-color="#3a86ff" />
+                                            <stop offset="1" stop-color="#4cc9f0" />
+                                        </radialGradient>
                                     </defs>
                                 </svg>
                             </div>
                             <div class="logo-variant-label">Крапля<br><span>змішування</span></div>
                         </div>
 
-                        <!-- Варіант 2: Стилізований пензель -->
+                        <!-- Варіант 3: Абстрактне коло (кольорове коло) -->
                         <div class="logo-variant-item">
                             <div class="logo-variant-svg">
                                 <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="35" y="20" width="8" height="45" rx="4" fill="#7b2cbf" opacity="0.7"/>
-                                    <path d="M25 65 L43 65 L39 75 L29 75 L25 65" fill="#3a86ff"/>
-                                    <path d="M55 30 L80 20 L75 35 L60 38 L55 30" fill="url(#grad2)"/>
+                                    <circle cx="50" cy="50" r="35" fill="none" stroke="url(#circleStroke)" stroke-width="3" />
+                                    <circle cx="50" cy="50" r="12" fill="white" fill-opacity="0.2" stroke="#fff" stroke-width="1.5" />
                                     <defs>
-                                        <linearGradient id="grad2" x1="55" y1="30" x2="80" y2="20" gradientUnits="userSpaceOnUse">
-                                            <stop stop-color="#4cc9f0"/>
-                                            <stop offset="1" stop-color="#7b2cbf"/>
+                                        <linearGradient id="circleStroke" x1="15" y1="15" x2="85" y2="85" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#f72585" />
+                                            <stop offset="0.3" stop-color="#b5179e" />
+                                            <stop offset="0.6" stop-color="#3a86ff" />
+                                            <stop offset="1" stop-color="#4cc9f0" />
                                         </linearGradient>
                                     </defs>
                                 </svg>
                             </div>
-                            <div class="logo-variant-label">Пензель<br><span>художній</span></div>
+                            <div class="logo-variant-label">Кольорове коло<br><span>гармонія</span></div>
                         </div>
 
-                        <!-- Варіант 3: Палітра -->
+                        <!-- Варіант 4: HEX-куб (технологічний) -->
                         <div class="logo-variant-item">
                             <div class="logo-variant-svg">
                                 <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="50" cy="50" r="35" stroke="#7b2cbf" stroke-width="2" fill="none"/>
-                                    <circle cx="30" cy="35" r="8" fill="#7b2cbf" opacity="0.7"/>
-                                    <circle cx="70" cy="35" r="8" fill="#3a86ff" opacity="0.7"/>
-                                    <circle cx="70" cy="65" r="8" fill="#4cc9f0" opacity="0.7"/>
-                                    <circle cx="30" cy="65" r="8" fill="#f72585" opacity="0.7"/>
-                                    <circle cx="50" cy="50" r="6" fill="white" opacity="0.5"/>
-                                </svg>
-                            </div>
-                            <div class="logo-variant-label">Палітра<br><span>кольорове коло</span></div>
-                        </div>
-
-                        <!-- Варіант 4: Абстрактний сплеск -->
-                        <div class="logo-variant-item">
-                            <div class="logo-variant-svg">
-                                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M25 35 Q40 20 60 25 Q75 35 70 55 Q60 75 40 70 Q20 60 25 35" fill="url(#grad4)"/>
-                                    <circle cx="45" cy="45" r="8" fill="white" fill-opacity="0.5"/>
-                                    <circle cx="65" cy="40" r="5" fill="white" fill-opacity="0.4"/>
+                                    <polygon points="50,20 75,32.5 75,67.5 50,80 25,67.5 25,32.5" fill="none" stroke="url(#hexGrad)" stroke-width="2.5" />
+                                    <polygon points="50,35 60,40 60,55 50,60 40,55 40,40" fill="url(#hexFill)" stroke="#fff" stroke-width="1" />
                                     <defs>
-                                        <radialGradient id="grad4" cx="50" cy="50" r="40" gradientUnits="userSpaceOnUse">
-                                            <stop stop-color="#7b2cbf"/>
-                                            <stop offset="0.6" stop-color="#3a86ff"/>
-                                            <stop offset="1" stop-color="#4cc9f0"/>
-                                        </radialGradient>
-                                    </defs>
-                                </svg>
-                            </div>
-                            <div class="logo-variant-label">Сплеск<br><span>фарби</span></div>
-                        </div>
-
-                        <!-- Варіант 5: Спектр (веселка) -->
-                        <div class="logo-variant-item">
-                            <div class="logo-variant-svg">
-                                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M20 60 Q50 20 80 60" stroke="url(#grad5)" stroke-width="12" fill="none" stroke-linecap="round"/>
-                                    <path d="M25 70 Q50 35 75 70" stroke="url(#grad5)" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.7"/>
-                                    <path d="M30 80 Q50 50 70 80" stroke="url(#grad5)" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.5"/>
-                                    <defs>
-                                        <linearGradient id="grad5" x1="20" y1="40" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-                                            <stop stop-color="#f72585"/>
-                                            <stop offset="0.25" stop-color="#b5179e"/>
-                                            <stop offset="0.5" stop-color="#3a86ff"/>
-                                            <stop offset="0.75" stop-color="#4cc9f0"/>
-                                            <stop offset="1" stop-color="#f72585"/>
+                                        <linearGradient id="hexGrad" x1="25" y1="20" x2="75" y2="80" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#7b2cbf" />
+                                            <stop offset="1" stop-color="#4cc9f0" />
+                                        </linearGradient>
+                                        <linearGradient id="hexFill" x1="40" y1="35" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#3a86ff" />
+                                            <stop offset="1" stop-color="#b5179e" />
                                         </linearGradient>
                                     </defs>
                                 </svg>
                             </div>
-                            <div class="logo-variant-label">Спектр<br><span>веселка</span></div>
+                            <div class="logo-variant-label">HEX-куб<br><span>техно</span></div>
+                        </div>
+
+                        <!-- Варіант 5: Стилізована літера "S" (SICO) -->
+                        <div class="logo-variant-item">
+                            <div class="logo-variant-svg">
+                                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M30 40 Q40 20 60 25 Q75 30 70 45 Q65 55 50 55 Q40 60 45 70 Q48 78 60 75 Q75 70 70 60" stroke="url(#sGrad)" stroke-width="8" stroke-linecap="round" fill="none" />
+                                    <circle cx="35" cy="48" r="4" fill="#f72585" />
+                                    <circle cx="65" cy="58" r="4" fill="#4cc9f0" />
+                                    <defs>
+                                        <linearGradient id="sGrad" x1="30" y1="20" x2="75" y2="75" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#7b2cbf" />
+                                            <stop offset="1" stop-color="#3a86ff" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <div class="logo-variant-label">Літера S<br><span>брендовий</span></div>
                         </div>
                     </div>
                 </div>
