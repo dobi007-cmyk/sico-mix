@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>SICO Spectrum • Цифрова лабораторія кольору</title>
     <meta name="description" content="Професійна система керування рецептами фарб. Спектр можливостей 2026.">
-    <meta name="theme-color" content="#1E3A8A"> <!-- Темно-синій, як у DeepSeek -->
+    <meta name="theme-color" content="#7b2cbf">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="./css/style.css?v=2026.02.13">
     <link rel="manifest" href="./manifest.json?v=2026.02.13">
-    <!-- Новий фавікон у стилі DeepSeek: синя крапля з білою хвилею -->
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%231E3A8A'/%3E%3Cpath d='M10 16 Q16 8 22 16 Q16 24 10 16' fill='white' opacity='0.9'/%3E%3C/svg%3E" type="image/svg+xml">
+    <!-- SVG-фавікон (data URI) -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='2' y1='16' x2='30' y2='16' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%237b2cbf'/%3E%3Cstop offset='0.5' stop-color='%233a86ff'/%3E%3Cstop offset='1' stop-color='%234cc9f0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M16 2 L30 12 L30 22 L16 30 L2 22 L2 12 L16 2Z' fill='url(%23grad)' /%3E%3C/svg%3E" type="image/svg+xml">
     <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.13">
 
     <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ ========== -->
@@ -95,10 +95,16 @@
             <i class="fas fa-bars"></i>
         </button>
         <div class="mobile-nav-title">
-            <!-- Логотип у стилі DeepSeek: синій круг з білою хвилею -->
+            <!-- Логотип SVG для мобільної версії -->
             <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
-                <circle cx="16" cy="16" r="14" fill="#1E3A8A"/>
-                <path d="M10 16 Q16 8 22 16 Q16 24 10 16" fill="white" opacity="0.9"/>
+                <path d="M16 2 L30 12 L30 22 L16 30 L2 22 L2 12 L16 2Z" fill="url(#grad_mobile)" />
+                <defs>
+                    <linearGradient id="grad_mobile" x1="2" y1="16" x2="30" y2="16" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#7b2cbf"/>
+                        <stop offset="0.5" stop-color="#3a86ff"/>
+                        <stop offset="1" stop-color="#4cc9f0"/>
+                    </linearGradient>
+                </defs>
             </svg>
             SICO Spectrum
         </div>
@@ -108,11 +114,17 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-container">
-                <!-- Логотип для сайдбару -->
+                <!-- Логотип SVG для сайдбару -->
                 <h1 style="display: flex; align-items: center; gap: 10px;">
                     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="16" cy="16" r="14" fill="#1E3A8A"/>
-                        <path d="M10 16 Q16 8 22 16 Q16 24 10 16" fill="white" opacity="0.9"/>
+                        <path d="M16 2 L30 12 L30 22 L16 30 L2 22 L2 12 L16 2Z" fill="url(#grad_sidebar)" />
+                        <defs>
+                            <linearGradient id="grad_sidebar" x1="2" y1="16" x2="30" y2="16" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#7b2cbf"/>
+                                <stop offset="0.5" stop-color="#3a86ff"/>
+                                <stop offset="1" stop-color="#4cc9f0"/>
+                            </linearGradient>
+                        </defs>
                     </svg>
                     SICO Spectrum
                 </h1>
@@ -194,11 +206,17 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo-container">
-                    <!-- Логотип для хедера -->
+                    <!-- Логотип SVG для десктопного хедера -->
                     <h1 style="display: flex; align-items: center; gap: 10px;">
                         <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="16" cy="16" r="14" fill="#1E3A8A"/>
-                            <path d="M10 16 Q16 8 22 16 Q16 24 10 16" fill="white" opacity="0.9"/>
+                            <path d="M16 2 L30 12 L30 22 L16 30 L2 22 L2 12 L16 2Z" fill="url(#grad_header)" />
+                            <defs>
+                                <linearGradient id="grad_header" x1="2" y1="16" x2="30" y2="16" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#7b2cbf"/>
+                                    <stop offset="0.5" stop-color="#3a86ff"/>
+                                    <stop offset="1" stop-color="#4cc9f0"/>
+                                </linearGradient>
+                            </defs>
                         </svg>
                         SICO Spectrum
                     </h1>
@@ -212,15 +230,12 @@
 
         <!-- Page Content -->
         <main id="page-content">
-            <!-- HOME PAGE (Варіант 3: Крапля як герой-зображення на головній) -->
+            <!-- HOME PAGE -->
             <div class="page-content active" id="home-page">
                 <div class="welcome-section">
                     <span class="spectrum-badge">2026 EDITION</span>
                     <h2 class="welcome-title" data-i18n="welcome_title">Ласкаво просимо до SICO Spectrum</h2>
                     <p class="welcome-subtitle" data-i18n="welcome_subtitle">Цифрова лабораторія кольору</p>
-                </div>
-                <div class="hero-splash" style="margin: 2rem auto; max-width: 800px; overflow: hidden; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);">
-                    <img src="1.jpg" alt="Spectrum paint explosion" style="width: 100%; height: auto; display: block; object-fit: cover;">
                 </div>
                 <div class="quick-actions-grid">
                     <a class="action-card" href="#" data-page="new-recipe">
