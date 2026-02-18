@@ -1252,15 +1252,48 @@ body.theme-organic .paint-count {
     max-width: 80%;
 }
 
-.series-properties {
-    background: #0f1215;
-    border-radius: 20px;
-    padding: 24px;
-    margin: 20px 0;
-    border: 1px solid rgba(58, 134, 255, 0.2);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+.series-paints {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
 }
 
+/* ===== ДОДАТКОВІ СТИЛІ ДЛЯ НОВИХ ФУНКЦІЙ ===== */
+
+/* Кнопка інформації про серію */
+.series-info-btn {
+    background: rgba(58, 134, 255, 0.2);
+    border: 1px solid rgba(58, 134, 255, 0.4);
+    color: var(--spectrum-blue);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 8px;
+}
+.series-info-btn:hover {
+    background: var(--spectrum-blue);
+    color: white;
+    border-color: white;
+    transform: scale(1.1);
+}
+
+/* Блок властивостей серії */
+.series-properties {
+    background: rgba(0,0,0,0.3);
+    border-radius: 24px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid rgba(58, 134, 255, 0.3);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+    animation: fadeIn 0.3s ease;
+}
 .series-properties h4 {
     color: white;
     font-size: 18px;
@@ -1271,7 +1304,6 @@ body.theme-organic .paint-count {
     gap: 10px;
     text-shadow: 0 0 5px rgba(58, 134, 255, 0.3);
 }
-
 .series-properties h4 i {
     color: #3a86ff;
     font-size: 20px;
@@ -1290,12 +1322,10 @@ body.theme-organic .paint-count {
     border: 1px solid rgba(58, 134, 255, 0.2);
     transition: all 0.2s;
 }
-
 .property-item:hover {
     border-color: #3a86ff;
     box-shadow: 0 0 12px rgba(58, 134, 255, 0.3);
 }
-
 .property-item strong {
     display: block;
     font-size: 11px;
@@ -1304,50 +1334,40 @@ body.theme-organic .paint-count {
     color: #6a8cff;
     margin-bottom: 6px;
 }
-
 .property-item span {
     color: white;
     font-size: 14px;
 }
 
-.series-paints {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 16px;
-    margin-top: 20px;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
+/* Покращення карток фарб */
 .paint-mini-card {
     background: #0f1215;
-    border-radius: 20px;
+    border-radius: 24px;
     overflow: hidden;
-    transition: all 0.2s;
     cursor: pointer;
-    border: 1px solid rgba(58, 134, 255, 0.2);
-    box-shadow: 0 5px 15px -10px #000;
+    transition: all 0.2s;
+    border: 1px solid rgba(58, 134, 255, 0.15);
+    box-shadow: 0 8px 16px -8px rgba(0,0,0,0.5);
     position: relative;
 }
-
 .paint-mini-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-4px) scale(1.02);
     border-color: #3a86ff;
-    box-shadow: 0 10px 25px -8px #3a86ff;
+    box-shadow: 0 12px 24px -8px #3a86ff80;
 }
-
 .paint-mini-swatch {
-    height: 80px;
-    width: 100%;
-    transition: all 0.2s;
+    height: 90px;
+    background-size: cover;
+    transition: transform 0.2s;
 }
-
 .paint-mini-card:hover .paint-mini-swatch {
-    filter: brightness(1.1);
+    transform: scale(1.05);
 }
-
-.paint-mini-info {
-    padding: 14px;
-}
-
 .paint-mini-name {
     font-weight: 600;
     font-size: 14px;
@@ -1357,35 +1377,82 @@ body.theme-organic .paint-count {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 .paint-mini-article {
-    font-size: 11px;
+    font-size: 12px;
     color: #6a8cff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.toggle-series {
-    background: rgba(58, 134, 255, 0.1);
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
+/* Стилі для модального вікна автентифікації */
+.auth-modal .form-group {
+    margin-bottom: 20px;
+}
+.auth-modal .btn {
+    width: 100%;
+    margin-bottom: 10px;
+}
+.auth-divider {
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    border: 1px solid rgba(58, 134, 255, 0.3);
-    color: #3a86ff;
-    font-size: 18px;
-    cursor: pointer;
+    text-align: center;
+    margin: 20px 0;
+}
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-light);
+}
+.auth-divider span {
+    padding: 0 10px;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+.btn-google {
+    background: #db4437;
+    color: white;
+    border: none;
+}
+.btn-google:hover {
+    background: #c23321;
 }
 
-.toggle-series:hover {
-    background: #3a86ff;
-    border-color: #3a86ff;
-    color: white;
-    box-shadow: 0 0 15px #3a86ff;
+/* Анімація для спливаючого вікна (вже є в utils.js) */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+}
+
+/* Невелике покращення карток серій */
+.series-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elevated);
+    backdrop-filter: blur(4px);
+}
+.series-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+    border-color: var(--border-accent);
 }
 
 /* Адаптація */
@@ -1401,6 +1468,14 @@ body.theme-organic .paint-count {
     }
     .series-paints {
         grid-template-columns: 1fr;
+    }
+    .series-header > div:first-child {
+        flex-wrap: wrap;
+    }
+    .series-info-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
     }
 }
 
@@ -1528,79 +1603,6 @@ body.theme-organic .paint-count {
     }
 }
 
-/* Анімація для спливаючого вікна (вже є в utils.js) */
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translate(-50%, 20px);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, 0);
-    }
-}
-@keyframes slideOut {
-    from {
-        opacity: 1;
-        transform: translate(-50%, 0);
-    }
-    to {
-        opacity: 0;
-        transform: translate(-50%, 20px);
-    }
-}
-
-/* ===== ДОДАТКОВІ СТИЛІ ДЛЯ НОВИХ ФУНКЦІЙ ===== */
-
-/* Кнопка інформації про серію */
-.series-info-btn {
-    background: rgba(58, 134, 255, 0.2);
-    border: 1px solid rgba(58, 134, 255, 0.4);
-    color: var(--spectrum-blue);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition-fast);
-    cursor: pointer;
-    font-size: 16px;
-    margin-left: 8px;
-}
-.series-info-btn:hover {
-    background: var(--spectrum-blue);
-    color: white;
-    border-color: white;
-    transform: scale(1.1);
-}
-
-/* Невелике покращення карток серій */
-.series-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    background: var(--bg-elevated);
-    backdrop-filter: blur(4px);
-}
-.series-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-glow);
-    border-color: var(--border-accent);
-}
-
-/* Покращення для мобільних */
-@media (max-width: 768px) {
-    .series-header > div:first-child {
-        flex-wrap: wrap;
-    }
-    .series-info-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 14px;
-    }
-}
-
 /* Стилі для модального вікна деталей серії */
 #seriesDetailsContent table {
     width: 100%;
@@ -1617,61 +1619,4 @@ body.theme-organic .paint-count {
 #seriesDetailsContent td {
     padding: 8px 0;
     color: var(--text-primary);
-}
-/* Tooltip для інформації про серію (Варіант 1) */
-.info-tooltip-container {
-    position: relative;
-    display: inline-block;
-}
-
-.info-tooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-bottom: 8px;
-    background: var(--bg-elevated);
-    border: 1px solid var(--border-accent);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
-    z-index: 100;
-    min-width: 250px;
-    max-width: 300px;
-    font-size: 12px;
-    line-height: 1.5;
-    animation: fadeIn 0.2s ease;
-}
-
-.info-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: var(--border-accent) transparent transparent transparent;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateX(-50%) translateY(5px); }
-    to { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-
-/* Для мобільних пристроїв */
-@media (max-width: 768px) {
-    .info-tooltip {
-        position: fixed;
-        bottom: auto;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        max-width: 300px;
-        z-index: 2001;
-    }
-    
-    .info-tooltip::after {
-        display: none;
-    }
 }
