@@ -1,4 +1,4 @@
-// ========== МОДУЛЬ ІНТЕРНАЦІОНАЛІЗАЦІЇ (ПОВНІ ПЕРЕКЛАДИ + НОВІ КЛЮЧІ) ==========
+// ========== МОДУЛЬ ІНТЕРНАЦІОНАЛІЗАЦІЇ ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -39,7 +39,7 @@ window.SICOMIX = window.SICOMIX || {};
                 recipe_name_placeholder: "Введіть назву рецепту",
                 category: "Категорія",
                 select_category: "Оберіть категорію",
-                series: "Серія фарб",
+                series: "Серії", // додано
                 select_series: "Оберіть серію",
                 recipe_description: "Опис рецепту",
                 recipe_description_placeholder: "Додайте опис (необов'язково)",
@@ -116,6 +116,7 @@ window.SICOMIX = window.SICOMIX || {};
                 special: "Спеціальне",
                 collapse: "Згорнути",
                 expand: "Розгорнути",
+                no_paints_in_series: "У цій серії немає фарб", // додано
 
                 // Імпорт/Експорт
                 import_desc: "Імпортуйте рецепти та каталог з файлів",
@@ -198,7 +199,6 @@ window.SICOMIX = window.SICOMIX || {};
                 series_mismatch: "Не можна додавати фарбу з іншої серії",
                 select_recipes_to_print: "Оберіть рецепти для друку",
                 
-                // ДОДАНІ КЛЮЧІ
                 theme: "Тема оформлення",
                 theme_spectrum: "Спектр (за замовчуванням)",
                 theme_organic: "Органічна",
@@ -207,7 +207,7 @@ window.SICOMIX = window.SICOMIX || {};
                 unsaved_changes_warning: "У вас є незбережені зміни. Ви впевнені, що хочете покинути сторінку?",
                 csv_parsing_error: "Помилка розбору CSV. Переконайтеся, що файл має правильний формат.",
 
-                // НОВІ КЛЮЧІ ДЛЯ СИНХРОНІЗАЦІЇ
+                // Ключі для синхронізації
                 login: "Увійти",
                 logout: "Вийти",
                 syncing: "Синхронізація...",
@@ -251,7 +251,7 @@ window.SICOMIX = window.SICOMIX || {};
                 recipe_name_placeholder: "Enter recipe name",
                 category: "Category",
                 select_category: "Select category",
-                series: "Paint Series",
+                series: "Series",
                 select_series: "Select series",
                 recipe_description: "Recipe Description",
                 recipe_description_placeholder: "Add description (optional)",
@@ -328,6 +328,7 @@ window.SICOMIX = window.SICOMIX || {};
                 special: "Special",
                 collapse: "Collapse",
                 expand: "Expand",
+                no_paints_in_series: "No paints in this series",
 
                 // Імпорт/Експорт
                 import_desc: "Import recipes and catalog from files",
@@ -410,7 +411,6 @@ window.SICOMIX = window.SICOMIX || {};
                 series_mismatch: "Cannot add paint from another series",
                 select_recipes_to_print: "Select recipes to print",
                 
-                // ДОДАНІ КЛЮЧІ
                 theme: "Theme",
                 theme_spectrum: "Spectrum (default)",
                 theme_organic: "Organic",
@@ -419,7 +419,7 @@ window.SICOMIX = window.SICOMIX || {};
                 unsaved_changes_warning: "You have unsaved changes. Are you sure you want to leave?",
                 csv_parsing_error: "CSV parsing error. Ensure the file has the correct format.",
 
-                // НОВІ КЛЮЧІ ДЛЯ СИНХРОНІЗАЦІЇ
+                // Ключі для синхронізації
                 login: "Login",
                 logout: "Logout",
                 syncing: "Syncing...",
@@ -463,7 +463,7 @@ window.SICOMIX = window.SICOMIX || {};
                 recipe_name_placeholder: "Wprowadź nazwę receptury",
                 category: "Kategoria",
                 select_category: "Wybierz kategorię",
-                series: "Seria farb",
+                series: "Serie",
                 select_series: "Wybierz serię",
                 recipe_description: "Opis receptury",
                 recipe_description_placeholder: "Dodaj opis (opcjonalnie)",
@@ -540,6 +540,7 @@ window.SICOMIX = window.SICOMIX || {};
                 special: "Specjalne",
                 collapse: "Zwiń",
                 expand: "Rozwiń",
+                no_paints_in_series: "Brak farb w tej serii",
 
                 // Імпорт/Експорт
                 import_desc: "Importuj receptury i katalog z plików",
@@ -622,7 +623,6 @@ window.SICOMIX = window.SICOMIX || {};
                 series_mismatch: "Nie można dodać farby z innej serii",
                 select_recipes_to_print: "Wybierz receptury do druku",
                 
-                // ДОДАНІ КЛЮЧІ
                 theme: "Motyw",
                 theme_spectrum: "Spectrum (domyślny)",
                 theme_organic: "Organiczny",
@@ -631,7 +631,7 @@ window.SICOMIX = window.SICOMIX || {};
                 unsaved_changes_warning: "Masz niezapisane zmiany. Czy na pewno chcesz opuścić stronę?",
                 csv_parsing_error: "Błąd parsowania CSV. Upewnij się, że plik ma prawidłowy format.",
 
-                // НОВІ КЛЮЧІ ДЛЯ СИНХРОНІЗАЦІЇ
+                // Ключі для синхронізації
                 login: "Zaloguj",
                 logout: "Wyloguj",
                 syncing: "Synchronizacja...",
