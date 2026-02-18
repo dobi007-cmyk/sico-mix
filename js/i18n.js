@@ -207,6 +207,9 @@ window.SICOMIX = window.SICOMIX || {};
                 unsaved_changes_warning: "У вас є незбережені зміни. Ви впевнені, що хочете покинути сторінку?",
                 csv_parsing_error: "Помилка розбору CSV. Переконайтеся, що файл має правильний формат.",
 
+                // Додаткові ключі для варіанту 6
+                view_paints: "Переглянути фарби",
+
                 // Ключі для синхронізації
                 login: "Увійти",
                 logout: "Вийти",
@@ -419,6 +422,9 @@ window.SICOMIX = window.SICOMIX || {};
                 unsaved_changes_warning: "You have unsaved changes. Are you sure you want to leave?",
                 csv_parsing_error: "CSV parsing error. Ensure the file has the correct format.",
 
+                // Додаткові ключі для варіанту 6
+                view_paints: "View paints",
+
                 // Ключі для синхронізації
                 login: "Login",
                 logout: "Logout",
@@ -630,6 +636,9 @@ window.SICOMIX = window.SICOMIX || {};
                 paint_in_use_message: "Ta farba jest używana w {count} recepturach. Usunąć ją ze wszystkich receptur?",
                 unsaved_changes_warning: "Masz niezapisane zmiany. Czy na pewno chcesz opuścić stronę?",
                 csv_parsing_error: "Błąd parsowania CSV. Upewnij się, że plik ma prawidłowy format.",
+
+                // Додаткові ключі для варіанту 6
+                view_paints: "Zobacz farby",
 
                 // Ключі для синхронізації
                 login: "Zaloguj",
