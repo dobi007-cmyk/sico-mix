@@ -971,7 +971,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- КАТАЛОГ ФАРБ (оновлено з розгортанням властивостей) ----------
+        // ---------- КАТАЛОГ ФАРБ (перероблений, без опису в картках) ----------
         function renderPaintCatalog(append = false) {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -1003,7 +1003,7 @@ window.SICOMIX = window.SICOMIX || {};
                 const hasMore = seriesWithPaints.length > endIndex;
 
                 if (loadMoreCatalogBtn) {
-                    loadMoreCatalogBtn.style.display = hasMore ? 'inline-block' : 'none';
+                    loadMoreCatalogBtn.style.display = hasMore ? 'inline-flex' : 'none';
                 }
 
                 if (paginatedSeries.length === 0 && !append) {
@@ -1026,67 +1026,41 @@ window.SICOMIX = window.SICOMIX || {};
                     
                     const seriesName = series.name[lang] || series.id;
                     const category = series.category || '';
-                    const description = series.description[lang] || series.description['uk'] || '';
-
-                    // Функція для генерації HTML властивостей (використовується в розгорнутому блоці)
-                    const renderProperties = (props) => {
-                        if (!props) return '';
-                        let propHtml = '<div class="properties-grid">';
-                        if (props.type) propHtml += `<div class="property-item"><strong>${SICOMIX.i18n.t('type')}</strong><span>${props.type[lang] || props.type.uk}</span></div>`;
-                        if (props.finish) propHtml += `<div class="property-item"><strong>${SICOMIX.i18n.t('finish')}</strong><span>${props.finish[lang] || props.finish.uk}</span></div>`;
-                        if (props.drying) propHtml += `<div class="property-item"><strong>${SICOMIX.i18n.t('drying')}</strong><span>${props.drying[lang] || props.drying.uk}</span></div>`;
-                        if (props.mesh) propHtml += `<div class="property-item"><strong>${SICOMIX.i18n.t('mesh')}</strong><span>${props.mesh[lang] || props.mesh.uk}</span></div>`;
-                        if (props.cleaning) propHtml += `<div class="property-item"><strong>${SICOMIX.i18n.t('cleaning')}</strong><span>${props.cleaning[lang] || props.cleaning.uk}</span></div>`;
-                        if (props.storage) propHtml += `<div class="property-item"><strong>${SICOMIX.i18n.t('storage')}</strong><span>${props.storage[lang] || props.storage.uk}</span></div>`;
-                        if (props.resistance) propHtml += `<div class="property-item"><strong>${SICOMIX.i18n.t('resistance')}</strong><span>${props.resistance[lang] || props.resistance.uk}</span></div>`;
-                        if (props.thinning) propHtml += `<div class="property-item"><strong>${SICOMIX.i18n.t('thinning')}</strong><span>${props.thinning[lang] || props.thinning.uk}</span></div>`;
-                        if (props.additives) propHtml += `<div class="property-item"><strong>${SICOMIX.i18n.t('additives')}</strong><span>${props.additives[lang] || props.additives.uk}</span></div>`;
-                        if (props.special) propHtml += `<div class="property-item"><strong>${SICOMIX.i18n.t('special')}</strong><span>${props.special[lang] || props.special.uk}</span></div>`;
-                        propHtml += '</div>';
-                        return propHtml;
-                    };
                     
                     html += `
-                        <div class="series-card" data-series="${series.id}">
-                            <div class="series-header">
-                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                                        <h3 style="font-size: 24px; margin: 0;">${SICOMIX.utils.escapeHtml(seriesName)}</h3>
-                                        <button class="btn-icon series-info-btn" title="${SICOMIX.i18n.t('properties')}">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                        <span class="recipe-category">${SICOMIX.i18n.translateCategory(category)}</span>
-                                    </div>
-                                    <button class="btn-icon toggle-series" style="font-size: 20px;">
-                                        <i class="fas fa-chevron-down"></i>
+                        <div class="series-card-modern" data-series="${series.id}">
+                            <div class="series-header-modern">
+                                <div class="series-title-group">
+                                    <h3 class="series-title">${SICOMIX.utils.escapeHtml(seriesName)}</h3>
+                                    <span class="series-category">${SICOMIX.i18n.translateCategory(category)}</span>
+                                    <button class="series-info-btn-modern" title="${SICOMIX.i18n.t('properties')}">
+                                        <i class="fas fa-info-circle"></i>
                                     </button>
                                 </div>
-                                <p style="margin-top: 10px; color: var(--text-secondary);">${SICOMIX.utils.escapeHtml(description)}</p>
+                                <button class="series-toggle-btn">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
                             </div>
                             
-                            <!-- Блок властивостей (прихований) -->
-                            <div class="series-properties" style="display: none;">
-                                <h4><i class="fas fa-cog"></i> ${SICOMIX.i18n.t('properties')}</h4>
-                                ${renderProperties(series.properties)}
-                            </div>
-                            
-                            <div class="series-paints" style="display: none; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
-                                ${seriesPaints.map(p => {
-                                    const paintName = p.displayName?.[lang] || p.name;
-                                    return `
-                                    <div class="paint-mini-card" data-paint-id="${p.id}">
-                                        <div class="paint-mini-swatch" style="background: ${SICOMIX.utils.escapeHtml(p.color)};"></div>
-                                        <div class="paint-mini-info">
-                                            <div class="paint-mini-name">${SICOMIX.utils.escapeHtml(paintName)}</div>
-                                            <div class="paint-mini-article">${SICOMIX.utils.escapeHtml(p.article || '')}</div>
+                            <div class="series-paints-modern" style="display: none;">
+                                <div class="paints-grid-modern">
+                                    ${seriesPaints.map(p => {
+                                        const paintName = p.displayName?.[lang] || p.name;
+                                        return `
+                                        <div class="paint-card-modern" data-paint-id="${p.id}">
+                                            <div class="paint-swatch-modern" style="background: ${SICOMIX.utils.escapeHtml(p.color)};"></div>
+                                            <div class="paint-info-modern">
+                                                <div class="paint-name-modern">${SICOMIX.utils.escapeHtml(paintName)}</div>
+                                                <div class="paint-article-modern">${SICOMIX.utils.escapeHtml(p.article || '')}</div>
+                                            </div>
+                                            ${!p.isDefault ? `
+                                                <button class="paint-delete-btn" data-paint-id="${p.id}" title="${SICOMIX.i18n.t('delete')}">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            ` : ''}
                                         </div>
-                                        ${!p.isDefault ? `
-                                            <button class="btn-icon delete-paint" data-paint-id="${p.id}" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); border-radius: 50%; padding: 5px;">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        ` : ''}
-                                    </div>
-                                `}).join('')}
+                                    `}).join('')}
+                                </div>
                             </div>
                         </div>
                     `;
@@ -1098,16 +1072,17 @@ window.SICOMIX = window.SICOMIX || {};
                     paintCatalogEl.innerHTML = html;
                 }
 
-                // Обробники для згортання/розгортання списку фарб
-                document.querySelectorAll('.toggle-series').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        const seriesCard = this.closest('.series-card');
-                        const paintsDiv = seriesCard.querySelector('.series-paints');
-                        const icon = this.querySelector('i');
-                        
+                // Обробники для розгортання/згортання списку фарб
+                document.querySelectorAll('.series-card-modern').forEach(card => {
+                    const header = card.querySelector('.series-header-modern');
+                    const toggleBtn = card.querySelector('.series-toggle-btn');
+                    const paintsDiv = card.querySelector('.series-paints-modern');
+                    const icon = toggleBtn.querySelector('i');
+
+                    const togglePaints = (e) => {
+                        if (e.target.closest('.series-info-btn-modern')) return;
                         if (paintsDiv.style.display === 'none') {
-                            paintsDiv.style.display = 'grid';
+                            paintsDiv.style.display = 'block';
                             icon.classList.remove('fa-chevron-down');
                             icon.classList.add('fa-chevron-up');
                         } else {
@@ -1115,46 +1090,43 @@ window.SICOMIX = window.SICOMIX || {};
                             icon.classList.remove('fa-chevron-up');
                             icon.classList.add('fa-chevron-down');
                         }
-                    });
-                });
+                    };
 
-                // Обробники для кнопки "info" – розгортання/згортання властивостей
-                document.querySelectorAll('.series-info-btn').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
+                    header.addEventListener('click', togglePaints);
+                    toggleBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        const seriesCard = this.closest('.series-card');
-                        const propsDiv = seriesCard.querySelector('.series-properties');
-                        if (propsDiv.style.display === 'none') {
-                            propsDiv.style.display = 'block';
-                        } else {
-                            propsDiv.style.display = 'none';
+                        togglePaints(e);
+                    });
+                });
+
+                // Обробники для кнопки info – показ деталей серії в модальному вікні
+                document.querySelectorAll('.series-info-btn-modern').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const seriesCard = e.target.closest('.series-card-modern');
+                        const seriesId = seriesCard.dataset.series;
+                        const series = SICOMIX.data.series.find(s => s.id === seriesId);
+                        if (series) {
+                            showSeriesDetails(series);
                         }
                     });
                 });
 
-                document.querySelectorAll('.series-header').forEach(header => {
-                    header.addEventListener('click', function(e) {
-                        // Якщо клік не на кнопках toggle/info, то теж перемикаємо список фарб
-                        if (!e.target.closest('.toggle-series') && !e.target.closest('.series-info-btn')) {
-                            const btn = this.querySelector('.toggle-series');
-                            if (btn) btn.click();
-                        }
-                    });
-                });
-
-                document.querySelectorAll('.paint-mini-card').forEach(card => {
-                    card.addEventListener('click', function(e) {
-                        if (e.target.closest('.delete-paint')) return;
-                        const paintId = this.dataset.paintId;
+                // Обробники для карток фарб
+                document.querySelectorAll('.paint-card-modern').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        if (e.target.closest('.paint-delete-btn')) return;
+                        const paintId = card.dataset.paintId;
                         const paint = paintCatalog.find(p => String(p.id) === paintId);
                         if (paint) showPaintDetails(paint);
                     });
                 });
 
-                document.querySelectorAll('.delete-paint').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
+                // Обробники для видалення фарб
+                document.querySelectorAll('.paint-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        const paintId = this.dataset.paintId;
+                        const paintId = btn.dataset.paintId;
                         if (paintId) {
                             deletePaint(paintId);
                         }
@@ -1172,8 +1144,6 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         function showSeriesDetails(series) {
-            // Ця функція більше не використовується, але залишаємо для сумісності
-            // Можна викликати з інших місць, але тепер ми використовуємо розгортання властивостей
             const lang = SICOMIX.i18n.getLanguage();
             const seriesName = series.name[lang] || series.id;
             seriesDetailsTitle.textContent = `${seriesName} – ${SICOMIX.i18n.t('properties')}`;
