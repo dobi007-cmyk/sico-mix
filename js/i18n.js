@@ -39,7 +39,7 @@ window.SICOMIX = window.SICOMIX || {};
                 recipe_name_placeholder: "Введіть назву рецепту",
                 category: "Категорія",
                 select_category: "Оберіть категорію",
-                series: "Серії", // додано
+                series: "Серії",
                 select_series: "Оберіть серію",
                 recipe_description: "Опис рецепту",
                 recipe_description_placeholder: "Додайте опис (необов'язково)",
@@ -116,7 +116,7 @@ window.SICOMIX = window.SICOMIX || {};
                 special: "Спеціальне",
                 collapse: "Згорнути",
                 expand: "Розгорнути",
-                no_paints_in_series: "У цій серії немає фарб", // додано
+                no_paints_in_series: "У цій серії немає фарб",
 
                 // Імпорт/Експорт
                 import_desc: "Імпортуйте рецепти та каталог з файлів",
