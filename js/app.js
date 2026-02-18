@@ -971,7 +971,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- КАТАЛОГ ФАРБ (перероблений, без опису в картках) ----------
+        // ---------- КАТАЛОГ ФАРБ – ВАРІАНТ 2 (ДВОПАНЕЛЬНИЙ) ----------
         function renderPaintCatalog(append = false) {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -979,159 +979,100 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             try {
-                const search = document.getElementById('catalogSearch')?.value?.toLowerCase() || '';
-                const allSeries = SICOMIX.data.series || [];
                 const lang = SICOMIX.i18n.getLanguage();
+                const allSeries = SICOMIX.data.series || [];
                 
-                // Фільтруємо серії, які мають хоча б одну фарбу після фільтрації
-                let seriesWithPaints = allSeries.filter(series => {
-                    let seriesPaints = paintCatalog.filter(p => p.series === series.id);
-                    if (search) {
-                        seriesPaints = seriesPaints.filter(p => {
-                            const paintName = p.displayName?.[lang] || p.name;
-                            return paintName.toLowerCase().includes(search) ||
-                                   (p.article && p.article.toLowerCase().includes(search));
-                        });
-                    }
-                    return seriesPaints.length > 0;
-                });
+                // Створюємо структуру двопанельного інтерфейсу
+                paintCatalogEl.innerHTML = `
+                <div class="catalog-two-panel">
+                    <div class="series-list-panel">
+                        <h4>${SICOMIX.i18n.t('series')}</h4>
+                        <ul class="series-list" id="series-list">
+                            ${allSeries.map(s => {
+                                const seriesName = s.name[lang] || s.id;
+                                return `
+                                <li class="series-list-item" data-series="${s.id}">
+                                    <span class="series-name">${SICOMIX.utils.escapeHtml(seriesName)}</span>
+                                    <span class="series-cat">${SICOMIX.i18n.translateCategory(s.category)}</span>
+                                </li>
+                                `;
+                            }).join('')}
+                        </ul>
+                    </div>
+                    <div class="paints-panel">
+                        <h4 id="selected-series-title">${SICOMIX.i18n.t('select_series')}</h4>
+                        <div class="paints-grid" id="paints-grid"></div>
+                    </div>
+                </div>
+                `;
 
-                // Пагінація
-                const startIndex = 0;
-                const endIndex = catalogPage * CATALOG_PAGE_SIZE;
-                const paginatedSeries = seriesWithPaints.slice(startIndex, endIndex);
-                const hasMore = seriesWithPaints.length > endIndex;
+                // Функція для рендеру фарб вибраної серії
+                const renderPaintsForSeries = (seriesId) => {
+                    const series = allSeries.find(s => s.id === seriesId);
+                    if (!series) return;
 
-                if (loadMoreCatalogBtn) {
-                    loadMoreCatalogBtn.style.display = hasMore ? 'inline-flex' : 'none';
-                }
-
-                if (paginatedSeries.length === 0 && !append) {
-                    paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('catalog_empty')}</p>`;
-                    return;
-                }
-
-                let html = '';
-                
-                paginatedSeries.forEach(series => {
-                    let seriesPaints = paintCatalog.filter(p => p.series === series.id);
-                    
-                    if (search) {
-                        seriesPaints = seriesPaints.filter(p => {
-                            const paintName = p.displayName?.[lang] || p.name;
-                            return paintName.toLowerCase().includes(search) ||
-                                   (p.article && p.article.toLowerCase().includes(search));
-                        });
-                    }
-                    
                     const seriesName = series.name[lang] || series.id;
-                    const category = series.category || '';
+                    document.getElementById('selected-series-title').textContent = seriesName;
+
+                    const seriesPaints = paintCatalog.filter(p => p.series === seriesId);
+                    const grid = document.getElementById('paints-grid');
                     
-                    html += `
-                        <div class="series-card-modern" data-series="${series.id}">
-                            <div class="series-header-modern">
-                                <div class="series-title-group">
-                                    <h3 class="series-title">${SICOMIX.utils.escapeHtml(seriesName)}</h3>
-                                    <span class="series-category">${SICOMIX.i18n.translateCategory(category)}</span>
-                                    <button class="series-info-btn-modern" title="${SICOMIX.i18n.t('properties')}">
-                                        <i class="fas fa-info-circle"></i>
-                                    </button>
-                                </div>
-                                <button class="series-toggle-btn">
-                                    <i class="fas fa-chevron-down"></i>
+                    if (seriesPaints.length === 0) {
+                        grid.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_paints_in_series')}</p>`;
+                        return;
+                    }
+
+                    grid.innerHTML = seriesPaints.map(p => {
+                        const paintName = p.displayName?.[lang] || p.name;
+                        return `
+                        <div class="paint-card" data-paint-id="${p.id}">
+                            <div class="paint-swatch" style="background: ${SICOMIX.utils.escapeHtml(p.color)};"></div>
+                            <div class="paint-info">
+                                <div class="paint-name">${SICOMIX.utils.escapeHtml(paintName)}</div>
+                                <div class="paint-article">${SICOMIX.utils.escapeHtml(p.article || '')}</div>
+                            </div>
+                            ${!p.isDefault ? `
+                                <button class="paint-delete-btn" data-paint-id="${p.id}" title="${SICOMIX.i18n.t('delete')}">
+                                    <i class="fas fa-trash"></i>
                                 </button>
-                            </div>
-                            
-                            <div class="series-paints-modern" style="display: none;">
-                                <div class="paints-grid-modern">
-                                    ${seriesPaints.map(p => {
-                                        const paintName = p.displayName?.[lang] || p.name;
-                                        return `
-                                        <div class="paint-card-modern" data-paint-id="${p.id}">
-                                            <div class="paint-swatch-modern" style="background: ${SICOMIX.utils.escapeHtml(p.color)};"></div>
-                                            <div class="paint-info-modern">
-                                                <div class="paint-name-modern">${SICOMIX.utils.escapeHtml(paintName)}</div>
-                                                <div class="paint-article-modern">${SICOMIX.utils.escapeHtml(p.article || '')}</div>
-                                            </div>
-                                            ${!p.isDefault ? `
-                                                <button class="paint-delete-btn" data-paint-id="${p.id}" title="${SICOMIX.i18n.t('delete')}">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            ` : ''}
-                                        </div>
-                                    `}).join('')}
-                                </div>
-                            </div>
+                            ` : ''}
                         </div>
-                    `;
+                    `}).join('');
+
+                    // Додаємо обробники для карток фарб
+                    grid.querySelectorAll('.paint-card').forEach(card => {
+                        card.addEventListener('click', (e) => {
+                            if (e.target.closest('.paint-delete-btn')) return;
+                            const paintId = card.dataset.paintId;
+                            showPaintDetails(paintId);
+                        });
+                    });
+
+                    grid.querySelectorAll('.paint-delete-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const paintId = btn.dataset.paintId;
+                            if (paintId) deletePaint(paintId);
+                        });
+                    });
+                };
+
+                // Обробники для вибору серії
+                document.querySelectorAll('.series-list-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        document.querySelectorAll('.series-list-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                        const seriesId = item.dataset.series;
+                        renderPaintsForSeries(seriesId);
+                    });
                 });
 
-                if (append) {
-                    paintCatalogEl.insertAdjacentHTML('beforeend', html);
-                } else {
-                    paintCatalogEl.innerHTML = html;
+                // Автоматично вибираємо першу серію, якщо вона є
+                const firstItem = document.querySelector('.series-list-item');
+                if (firstItem) {
+                    firstItem.classList.add('active');
+                    renderPaintsForSeries(firstItem.dataset.series);
                 }
-
-                // Обробники для розгортання/згортання списку фарб
-                document.querySelectorAll('.series-card-modern').forEach(card => {
-                    const header = card.querySelector('.series-header-modern');
-                    const toggleBtn = card.querySelector('.series-toggle-btn');
-                    const paintsDiv = card.querySelector('.series-paints-modern');
-                    const icon = toggleBtn.querySelector('i');
-
-                    const togglePaints = (e) => {
-                        if (e.target.closest('.series-info-btn-modern')) return;
-                        if (paintsDiv.style.display === 'none') {
-                            paintsDiv.style.display = 'block';
-                            icon.classList.remove('fa-chevron-down');
-                            icon.classList.add('fa-chevron-up');
-                        } else {
-                            paintsDiv.style.display = 'none';
-                            icon.classList.remove('fa-chevron-up');
-                            icon.classList.add('fa-chevron-down');
-                        }
-                    };
-
-                    header.addEventListener('click', togglePaints);
-                    toggleBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        togglePaints(e);
-                    });
-                });
-
-                // Обробники для кнопки info – показ деталей серії в модальному вікні
-                document.querySelectorAll('.series-info-btn-modern').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const seriesCard = e.target.closest('.series-card-modern');
-                        const seriesId = seriesCard.dataset.series;
-                        const series = SICOMIX.data.series.find(s => s.id === seriesId);
-                        if (series) {
-                            showSeriesDetails(series);
-                        }
-                    });
-                });
-
-                // Обробники для карток фарб
-                document.querySelectorAll('.paint-card-modern').forEach(card => {
-                    card.addEventListener('click', (e) => {
-                        if (e.target.closest('.paint-delete-btn')) return;
-                        const paintId = card.dataset.paintId;
-                        const paint = paintCatalog.find(p => String(p.id) === paintId);
-                        if (paint) showPaintDetails(paint);
-                    });
-                });
-
-                // Обробники для видалення фарб
-                document.querySelectorAll('.paint-delete-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const paintId = btn.dataset.paintId;
-                        if (paintId) {
-                            deletePaint(paintId);
-                        }
-                    });
-                });
 
                 SICOMIX.i18n.applyTranslations();
 
