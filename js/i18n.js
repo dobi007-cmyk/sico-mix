@@ -210,7 +210,13 @@ window.SICOMIX = window.SICOMIX || {};
                 // НОВІ КЛЮЧІ ДЛЯ СИНХРОНІЗАЦІЇ
                 login: "Увійти",
                 logout: "Вийти",
-                syncing: "Синхронізація..."
+                syncing: "Синхронізація...",
+                signup: "Зареєструватися",
+                or: "або",
+                signin_google: "Увійти через Google",
+                email: "Email",
+                password: "Пароль",
+                auth_note: "Дані синхронізуються між пристроями"
             },
             en: {
                 // Глобальні
@@ -416,7 +422,13 @@ window.SICOMIX = window.SICOMIX || {};
                 // НОВІ КЛЮЧІ ДЛЯ СИНХРОНІЗАЦІЇ
                 login: "Login",
                 logout: "Logout",
-                syncing: "Syncing..."
+                syncing: "Syncing...",
+                signup: "Sign up",
+                or: "or",
+                signin_google: "Sign in with Google",
+                email: "Email",
+                password: "Password",
+                auth_note: "Data syncs across devices"
             },
             pl: {
                 // Глобальні
@@ -622,7 +634,13 @@ window.SICOMIX = window.SICOMIX || {};
                 // НОВІ КЛЮЧІ ДЛЯ СИНХРОНІЗАЦІЇ
                 login: "Zaloguj",
                 logout: "Wyloguj",
-                syncing: "Synchronizacja..."
+                syncing: "Synchronizacja...",
+                signup: "Zarejestruj się",
+                or: "lub",
+                signin_google: "Zaloguj przez Google",
+                email: "Email",
+                password: "Hasło",
+                auth_note: "Dane synchronizują się między urządzeniami"
             }
         };
 
