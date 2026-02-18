@@ -205,7 +205,12 @@ window.SICOMIX = window.SICOMIX || {};
                 paint_in_use_title: "Фарба використовується",
                 paint_in_use_message: "Ця фарба використовується в {count} рецептах. Видалити її з усіх рецептів?",
                 unsaved_changes_warning: "У вас є незбережені зміни. Ви впевнені, що хочете покинути сторінку?",
-                csv_parsing_error: "Помилка розбору CSV. Переконайтеся, що файл має правильний формат."
+                csv_parsing_error: "Помилка розбору CSV. Переконайтеся, що файл має правильний формат.",
+
+                // НОВІ КЛЮЧІ ДЛЯ СИНХРОНІЗАЦІЇ
+                login: "Увійти",
+                logout: "Вийти",
+                syncing: "Синхронізація..."
             },
             en: {
                 // Глобальні
@@ -406,7 +411,12 @@ window.SICOMIX = window.SICOMIX || {};
                 paint_in_use_title: "Paint in use",
                 paint_in_use_message: "This paint is used in {count} recipes. Remove it from all recipes?",
                 unsaved_changes_warning: "You have unsaved changes. Are you sure you want to leave?",
-                csv_parsing_error: "CSV parsing error. Ensure the file has the correct format."
+                csv_parsing_error: "CSV parsing error. Ensure the file has the correct format.",
+
+                // НОВІ КЛЮЧІ ДЛЯ СИНХРОНІЗАЦІЇ
+                login: "Login",
+                logout: "Logout",
+                syncing: "Syncing..."
             },
             pl: {
                 // Глобальні
@@ -607,7 +617,12 @@ window.SICOMIX = window.SICOMIX || {};
                 paint_in_use_title: "Farba w użyciu",
                 paint_in_use_message: "Ta farba jest używana w {count} recepturach. Usunąć ją ze wszystkich receptur?",
                 unsaved_changes_warning: "Masz niezapisane zmiany. Czy na pewno chcesz opuścić stronę?",
-                csv_parsing_error: "Błąd parsowania CSV. Upewnij się, że plik ma prawidłowy format."
+                csv_parsing_error: "Błąd parsowania CSV. Upewnij się, że plik ma prawidłowy format.",
+
+                // НОВІ КЛЮЧІ ДЛЯ СИНХРОНІЗАЦІЇ
+                login: "Zaloguj",
+                logout: "Wyloguj",
+                syncing: "Synchronizacja..."
             }
         };
 
