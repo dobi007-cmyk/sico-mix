@@ -971,7 +971,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- КАТАЛОГ ФАРБ – ВАРІАНТ 6 (ВЕЛИКІ КОЛЬОРОВІ БЛОКИ) ----------
+        // ---------- КАТАЛОГ ФАРБ – ВАРІАНТ 6 (ВЕЛИКІ КОЛЬОРОВІ БЛОКИ З ІНФО) ----------
         function renderPaintCatalog(append = false) {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -982,7 +982,7 @@ window.SICOMIX = window.SICOMIX || {};
                 const lang = SICOMIX.i18n.getLanguage();
                 const allSeries = SICOMIX.data.series || [];
                 
-                // Пагінація (залишаємо, але для цього варіанту можна і без неї)
+                // Пагінація
                 const startIndex = 0;
                 const endIndex = catalogPage * CATALOG_PAGE_SIZE;
                 const paginatedSeries = allSeries.slice(startIndex, endIndex);
@@ -1015,12 +1015,19 @@ window.SICOMIX = window.SICOMIX || {};
                     }
                     
                     html += `
-                        <div class="series-hero-card" data-series="${series.id}" style="background: linear-gradient(145deg, ${SICOMIX.utils.escapeHtml(gradientStart)}, ${SICOMIX.utils.escapeHtml(gradientEnd)});">
-                            <div class="hero-overlay">
-                                <h3>${SICOMIX.utils.escapeHtml(seriesName)}</h3>
-                                <span class="series-category">${SICOMIX.i18n.translateCategory(category)}</span>
-                                <p class="series-paints-count">${seriesPaints.length} ${SICOMIX.i18n.t('paints')}</p>
-                                <button class="hero-view-btn">${SICOMIX.i18n.t('view')}</button>
+                        <div class="series-hero-card" data-series="${series.id}">
+                            <div class="hero-overlay" style="background: linear-gradient(145deg, ${SICOMIX.utils.escapeHtml(gradientStart)}, ${SICOMIX.utils.escapeHtml(gradientEnd)});">
+                                <div class="hero-content">
+                                    <h3>${SICOMIX.utils.escapeHtml(seriesName)}</h3>
+                                    <span class="series-category">${SICOMIX.i18n.translateCategory(category)}</span>
+                                    <p class="series-paints-count">${seriesPaints.length} ${SICOMIX.i18n.t('paints')}</p>
+                                    <div class="hero-actions">
+                                        <button class="hero-view-btn">${SICOMIX.i18n.t('view_paints')}</button>
+                                        <button class="hero-info-btn" title="${SICOMIX.i18n.t('properties')}">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -1034,13 +1041,27 @@ window.SICOMIX = window.SICOMIX || {};
 
                 // Обробники для карток серій
                 document.querySelectorAll('.series-hero-card').forEach(card => {
-                    card.addEventListener('click', () => {
-                        const seriesId = card.dataset.series;
-                        const series = allSeries.find(s => s.id === seriesId);
-                        if (series) {
-                            // Відкриваємо модальне вікно з усіма фарбами серії
-                            showAllPaintsModal(series);
-                        }
+                    const viewBtn = card.querySelector('.hero-view-btn');
+                    const infoBtn = card.querySelector('.hero-info-btn');
+                    const seriesId = card.dataset.series;
+                    const series = allSeries.find(s => s.id === seriesId);
+
+                    // Кнопка "Переглянути фарби"
+                    viewBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (series) showAllPaintsModal(series);
+                    });
+
+                    // Кнопка інформації про серію
+                    infoBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (series) showSeriesDetails(series);
+                    });
+
+                    // Клік по картці (для зручності) – теж відкриває фарби
+                    card.addEventListener('click', (e) => {
+                        if (e.target.closest('.hero-info-btn')) return;
+                        if (series) showAllPaintsModal(series);
                     });
                 });
 
