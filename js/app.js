@@ -1,4 +1,4 @@
-// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (ВИПРАВЛЕНО + ТЕМИ + ФОТО + СИНХРОНІЗАЦІЯ) ==========
+// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -20,7 +20,6 @@ window.SICOMIX = window.SICOMIX || {};
         let recipePhotoDataUrl = null;
 
         // Для пагінації каталогу
-        let catalogFilteredSeries = [];
         let catalogPage = 1;
         const CATALOG_PAGE_SIZE = 5;
 
@@ -146,18 +145,15 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumSettings', currentSettings);
             updatePaintCount();
 
-            // Якщо є користувач Firebase, синхронізуємо
             if (SICOMIX.sync && SICOMIX.sync.getCurrentUser()) {
                 SICOMIX.sync.saveAll().catch(console.error);
             }
         }
 
-        // Функція для отримання поточних записів (потрібна для sync)
         function getRecords() {
             return { recipes, userPaints };
         }
 
-        // Колбек після завантаження з Firestore
         function onSyncLoaded(firestoreRecipes, firestorePaints) {
             recipes = firestoreRecipes.map(r => ({ ...r, id: String(r.id) }));
             userPaints = firestorePaints.map(p => ({ ...p, id: String(p.id), isDefault: false }));
@@ -390,7 +386,6 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
-            // Кнопка авторизації
             if (authButton) {
                 authButton.addEventListener('click', async () => {
                     if (SICOMIX.sync.getCurrentUser()) {
@@ -405,7 +400,6 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
-            // Закриття модального вікна серії
             if (closeSeriesModal) {
                 closeSeriesModal.addEventListener('click', () => {
                     seriesDetailsModal.classList.remove('active');
@@ -972,7 +966,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- КАТАЛОГ ФАРБ (з пагінацією) ----------
+        // ---------- КАТАЛОГ ФАРБ (оновлено – прибрано дублювання характеристик) ----------
         function renderPaintCatalog(append = false) {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -1028,14 +1022,13 @@ window.SICOMIX = window.SICOMIX || {};
                     const seriesName = series.name[lang] || series.id;
                     const category = series.category || '';
                     const description = series.description[lang] || series.description['uk'] || '';
-                    const properties = series.properties || {};
                     
                     html += `
                         <div class="series-card" data-series="${series.id}">
-                            <div class="series-header" style="background: linear-gradient(145deg, #3a86ff20, #7b2cbf20);">
+                            <div class="series-header">
                                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <h3 style="font-size: 24px; margin-bottom: 5px;">${SICOMIX.utils.escapeHtml(seriesName)}</h3>
+                                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                        <h3 style="font-size: 24px; margin: 0;">${SICOMIX.utils.escapeHtml(seriesName)}</h3>
                                         <button class="btn-icon series-info-btn" title="${SICOMIX.i18n.t('properties')}">
                                             <i class="fas fa-info-circle"></i>
                                         </button>
@@ -1045,23 +1038,7 @@ window.SICOMIX = window.SICOMIX || {};
                                         <i class="fas fa-chevron-down"></i>
                                     </button>
                                 </div>
-                                <p style="margin-top: 15px; color: var(--text-secondary);">${SICOMIX.utils.escapeHtml(description)}</p>
-                            </div>
-                            
-                            <div class="series-properties" style="display: none; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; margin: 15px 0;">
-                                <h4 style="margin-bottom: 10px; color: var(--spectrum-cyan);" data-i18n="properties">Властивості</h4>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
-                                    ${properties.type ? `<div><strong data-i18n="type">Тип:</strong> ${SICOMIX.utils.escapeHtml(properties.type[lang] || properties.type['uk'])}</div>` : ''}
-                                    ${properties.finish ? `<div><strong data-i18n="finish">Поверхня:</strong> ${SICOMIX.utils.escapeHtml(properties.finish[lang] || properties.finish['uk'])}</div>` : ''}
-                                    ${properties.drying ? `<div><strong data-i18n="drying">Сушіння:</strong> ${SICOMIX.utils.escapeHtml(properties.drying[lang] || properties.drying['uk'])}</div>` : ''}
-                                    ${properties.mesh ? `<div><strong data-i18n="mesh">Сітка:</strong> ${SICOMIX.utils.escapeHtml(properties.mesh[lang] || properties.mesh['uk'])}</div>` : ''}
-                                    ${properties.cleaning ? `<div><strong data-i18n="cleaning">Очищення:</strong> ${SICOMIX.utils.escapeHtml(properties.cleaning[lang] || properties.cleaning['uk'])}</div>` : ''}
-                                    ${properties.storage ? `<div><strong data-i18n="storage">Зберігання:</strong> ${SICOMIX.utils.escapeHtml(properties.storage[lang] || properties.storage['uk'])}</div>` : ''}
-                                    ${properties.resistance ? `<div><strong data-i18n="resistance">Стійкість:</strong> ${SICOMIX.utils.escapeHtml(properties.resistance[lang] || properties.resistance['uk'])}</div>` : ''}
-                                    ${properties.thinning ? `<div><strong data-i18n="thinning">Розрідження:</strong> ${SICOMIX.utils.escapeHtml(properties.thinning[lang] || properties.thinning['uk'])}</div>` : ''}
-                                    ${properties.additives ? `<div><strong data-i18n="additives">Добавки:</strong> ${SICOMIX.utils.escapeHtml(properties.additives[lang] || properties.additives['uk'])}</div>` : ''}
-                                    ${properties.special ? `<div><strong data-i18n="special">Спеціальне:</strong> ${SICOMIX.utils.escapeHtml(properties.special[lang] || properties.special['uk'])}</div>` : ''}
-                                </div>
+                                <p style="margin-top: 10px; color: var(--text-secondary);">${SICOMIX.utils.escapeHtml(description)}</p>
                             </div>
                             
                             <div class="series-paints" style="display: none; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
@@ -1092,23 +1069,20 @@ window.SICOMIX = window.SICOMIX || {};
                     paintCatalogEl.innerHTML = html;
                 }
 
-                // Обробники для згортання/розгортання серій
+                // Обробники для згортання/розгортання списку фарб
                 document.querySelectorAll('.toggle-series').forEach(btn => {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
                         const seriesCard = this.closest('.series-card');
                         const paintsDiv = seriesCard.querySelector('.series-paints');
-                        const propertiesDiv = seriesCard.querySelector('.series-properties');
                         const icon = this.querySelector('i');
                         
                         if (paintsDiv.style.display === 'none') {
                             paintsDiv.style.display = 'grid';
-                            propertiesDiv.style.display = 'grid';
                             icon.classList.remove('fa-chevron-down');
                             icon.classList.add('fa-chevron-up');
                         } else {
                             paintsDiv.style.display = 'none';
-                            propertiesDiv.style.display = 'none';
                             icon.classList.remove('fa-chevron-up');
                             icon.classList.add('fa-chevron-down');
                         }
@@ -1117,6 +1091,7 @@ window.SICOMIX = window.SICOMIX || {};
 
                 document.querySelectorAll('.series-header').forEach(header => {
                     header.addEventListener('click', function(e) {
+                        // Якщо клік не на кнопках toggle/info, то теж перемикаємо список
                         if (!e.target.closest('.toggle-series') && !e.target.closest('.series-info-btn')) {
                             const btn = this.querySelector('.toggle-series');
                             if (btn) btn.click();
@@ -1166,7 +1141,6 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // Нова функція – показ деталей серії у модальному вікні
         function showSeriesDetails(series) {
             const lang = SICOMIX.i18n.getLanguage();
             const seriesName = series.name[lang] || series.id;
@@ -1570,10 +1544,8 @@ window.SICOMIX = window.SICOMIX || {};
                 loadRecipeDraft();
             }
 
-            // Ініціалізація синхронізації
             if (SICOMIX.sync) {
                 SICOMIX.sync.initSync();
-                // Оновити текст кнопки, якщо користувач уже авторизований
                 if (SICOMIX.sync.getCurrentUser() && authButton) {
                     authButton.innerHTML = `<i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Вийти</span>`;
                 }
@@ -1588,7 +1560,6 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('welcome_title'), 'success', 2000);
         }
 
-        // Публічні методи для sync
         return {
             init: initApp,
             deleteRecipe,
