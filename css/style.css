@@ -1549,3 +1549,72 @@ body.theme-organic .paint-count {
         transform: translate(-50%, 20px);
     }
 }
+
+/* ===== ДОДАТКОВІ СТИЛІ ДЛЯ НОВИХ ФУНКЦІЙ ===== */
+
+/* Кнопка інформації про серію */
+.series-info-btn {
+    background: rgba(58, 134, 255, 0.2);
+    border: 1px solid rgba(58, 134, 255, 0.4);
+    color: var(--spectrum-blue);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 8px;
+}
+.series-info-btn:hover {
+    background: var(--spectrum-blue);
+    color: white;
+    border-color: white;
+    transform: scale(1.1);
+}
+
+/* Невелике покращення карток серій */
+.series-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elevated);
+    backdrop-filter: blur(4px);
+}
+.series-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+    border-color: var(--border-accent);
+}
+
+/* Покращення для мобільних */
+@media (max-width: 768px) {
+    .series-header > div:first-child {
+        flex-wrap: wrap;
+    }
+    .series-info-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+}
+
+/* Стилі для модального вікна деталей серії */
+#seriesDetailsContent table {
+    width: 100%;
+    border-collapse: collapse;
+}
+#seriesDetailsContent th {
+    width: 30%;
+    padding: 8px 0;
+    text-align: left;
+    vertical-align: top;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+#seriesDetailsContent td {
+    padding: 8px 0;
+    color: var(--text-primary);
+}
