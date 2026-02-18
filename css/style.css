@@ -1015,9 +1015,9 @@ body {
     border-top: 1px solid var(--border-light);
 }
 
-/* ===== СТИЛІ ДЛЯ ВАРІАНТУ 6 (ВЕЛИКІ КОЛЬОРОВІ БЛОКИ) ===== */
+/* ===== СТИЛІ ДЛЯ ВАРІАНТУ 6 (ВЕЛИКІ КОЛЬОРОВІ БЛОКИ З ІНФО) ===== */
 .series-hero-card {
-    height: 220px;
+    height: 240px;
     border-radius: 28px;
     overflow: hidden;
     position: relative;
@@ -1032,6 +1032,13 @@ body {
     border-color: rgba(58, 134, 255, 0.5);
 }
 .hero-overlay {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 28px;
+    overflow: hidden;
+}
+.hero-content {
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.4);
@@ -1045,11 +1052,11 @@ body {
     padding: 20px;
     transition: background 0.3s;
 }
-.series-hero-card:hover .hero-overlay {
+.series-hero-card:hover .hero-content {
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(4px);
 }
-.hero-overlay h3 {
+.hero-content h3 {
     font-size: 32px;
     font-weight: 700;
     margin-bottom: 8px;
@@ -1066,11 +1073,17 @@ body {
     backdrop-filter: blur(2px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
+.hero-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    align-items: center;
+}
 .hero-view-btn {
     background: white;
     color: #0a0c0f;
     border: none;
-    padding: 10px 28px;
+    padding: 10px 24px;
     border-radius: 40px;
     font-weight: 600;
     cursor: pointer;
@@ -1084,13 +1097,34 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 8px 15px rgba(58, 134, 255, 0.4);
 }
+.hero-info-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 18px;
+    backdrop-filter: blur(4px);
+}
+.hero-info-btn:hover {
+    background: white;
+    color: #3a86ff;
+    border-color: white;
+    transform: scale(1.1);
+}
 
 /* Адаптація для мобільних */
 @media (max-width: 768px) {
     .series-hero-card {
-        height: 180px;
+        height: 200px;
     }
-    .hero-overlay h3 {
+    .hero-content h3 {
         font-size: 24px;
     }
     .series-paints-count {
@@ -1100,6 +1134,11 @@ body {
     .hero-view-btn {
         padding: 8px 20px;
         font-size: 13px;
+    }
+    .hero-info-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
     }
 }
 
