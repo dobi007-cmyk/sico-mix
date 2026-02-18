@@ -661,6 +661,35 @@
         </div>
     </div>
 
+    <!-- MODAL: Authentication -->
+    <div class="modal" id="authModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title" data-i18n="login">Увійти</h3>
+                <button class="modal-close" id="closeAuthModal">&times;</button>
+            </div>
+            <div class="auth-modal" style="padding: 20px;">
+                <div class="form-group">
+                    <label class="form-label" data-i18n="email">Email</label>
+                    <input type="email" class="form-input" id="authEmail" placeholder="email@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-i18n="password">Пароль</label>
+                    <input type="password" class="form-input" id="authPassword" placeholder="••••••••">
+                </div>
+                <div class="action-buttons" style="flex-direction: column;">
+                    <button class="btn btn-primary" id="authLoginBtn"><i class="fas fa-sign-in-alt"></i> <span data-i18n="login">Увійти</span></button>
+                    <button class="btn btn-secondary" id="authSignupBtn"><i class="fas fa-user-plus"></i> <span data-i18n="signup">Зареєструватися</span></button>
+                    <div class="auth-divider">
+                        <span data-i18n="or">або</span>
+                    </div>
+                    <button class="btn btn-google" id="authGoogleBtn"><i class="fab fa-google"></i> <span data-i18n="signin_google">Увійти через Google</span></button>
+                </div>
+                <p style="text-align:center; margin-top:15px; color:var(--text-tertiary); font-size:12px;" data-i18n="auth_note">Дані синхронізуються між пристроями</p>
+            </div>
+        </div>
+    </div>
+
     <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ ========== -->
     <script src="./js/firebase-config.js?v=2026.02.13"></script> <!-- новий -->
     <script src="./js/data-colors.js?v=2026.02.13"></script>
@@ -679,6 +708,17 @@
             if (window.SICOMIX?.app?.init) {
                 window.SICOMIX.app.init();
             }
+
+            // Додаткові обробники для модального вікна автентифікації
+            const authModal = document.getElementById('authModal');
+            const closeAuthModal = document.getElementById('closeAuthModal');
+            if (closeAuthModal) {
+                closeAuthModal.addEventListener('click', () => {
+                    authModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            }
+            // Кнопки входу/реєстрації будуть оброблятися в sync.js
         });
     </script>
 </body>
