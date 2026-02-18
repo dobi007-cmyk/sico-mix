@@ -1479,6 +1479,189 @@ body.theme-organic .paint-count {
     }
 }
 
+/* ===== НОВИЙ ДИЗАЙН КАТАЛОГУ (МІНІМАЛІСТИЧНИЙ) ===== */
+.series-card-modern {
+    background: rgba(20, 24, 28, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 24px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.series-card-modern:hover {
+    background: rgba(30, 34, 40, 0.8);
+    border-color: rgba(58, 134, 255, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+.series-header-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.series-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.series-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+    line-height: 1.3;
+}
+.series-category {
+    background: rgba(58, 134, 255, 0.15);
+    padding: 4px 12px;
+    border-radius: 40px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #8ab2ff;
+    letter-spacing: 0.3px;
+}
+.series-info-btn-modern {
+    background: transparent;
+    border: none;
+    color: #5a6c7e;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.series-info-btn-modern:hover {
+    color: #3a86ff;
+    background: rgba(58, 134, 255, 0.1);
+}
+.series-toggle-btn {
+    background: transparent;
+    border: none;
+    color: #8a9bb0;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.series-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+.series-description-modern {
+    color: #a0b0c0;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 15px 0;
+    padding-right: 40px;
+}
+.series-paints-modern {
+    margin-top: 15px;
+    animation: fadeIn 0.3s ease;
+}
+.paints-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+.paint-card-modern {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+.paint-card-modern:hover {
+    transform: translateY(-2px);
+    border-color: rgba(58, 134, 255, 0.5);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+.paint-swatch-modern {
+    height: 80px;
+    width: 100%;
+}
+.paint-info-modern {
+    padding: 12px;
+}
+.paint-name-modern {
+    font-weight: 500;
+    font-size: 13px;
+    color: white;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.paint-article-modern {
+    font-size: 11px;
+    color: #6a7a8a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.paint-delete-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: #ff6b6b;
+    font-size: 12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    backdrop-filter: blur(4px);
+}
+.paint-card-modern:hover .paint-delete-btn {
+    opacity: 1;
+}
+.paint-delete-btn:hover {
+    background: #e63946;
+    color: white;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Адаптація для мобільних */
+@media (max-width: 768px) {
+    .series-title {
+        font-size: 20px;
+    }
+    .series-title-group {
+        gap: 8px;
+    }
+    .paints-grid-modern {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    .paint-swatch-modern {
+        height: 60px;
+    }
+    .paint-info-modern {
+        padding: 8px;
+    }
+}
+
 /* ===== RESPONSIVE – МОБІЛЬНА АДАПТАЦІЯ ===== */
 @media (max-width: 992px) {
     .mobile-nav {
@@ -1566,30 +1749,30 @@ body.theme-organic .paint-count {
     }
     
     /* Каталог на мобільному */
-    .series-card {
+    .series-card-modern {
         padding: 16px;
         margin-bottom: 16px;
     }
-    .series-header h3 {
+    .series-title {
         font-size: 22px;
     }
-    .series-paints {
+    .series-paints-modern {
         grid-template-columns: 1fr !important;
         gap: 12px;
     }
-    .paint-mini-swatch {
+    .paint-swatch-modern {
         height: 50px;
     }
-    .paint-mini-info {
+    .paint-info-modern {
         padding: 12px;
     }
-    .paint-mini-name {
+    .paint-name-modern {
         font-size: 15px;
     }
-    .paint-mini-article {
+    .paint-article-modern {
         font-size: 12px;
     }
-    .toggle-series {
+    .series-toggle-btn {
         width: 48px;
         height: 48px;
     }
