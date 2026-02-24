@@ -1,10 +1,11 @@
-// ========== ДАНІ ПРО ФАРБИ SICO (БАГАТОМОВНА ВЕРСІЯ) ==========
+console.log('[SICOMIX] Завантаження data-colors.js...');
+
 window.SICOMIX = window.SICOMIX || {};
 const SICOMIX = window.SICOMIX;
 
 SICOMIX.data = (function() {
     try {
-        // ---------- СЕРІЇ ФАРБ (категорії тепер рядки) ----------
+        // ---------- СЕРІЇ ФАРБ ----------
         const series = [
             { 
                 id: "EC",
@@ -234,7 +235,7 @@ SICOMIX.data = (function() {
                     pl: "Uniwersalna farba rozpuszczalnikowa do szerokiej gamy materiałów.",
                     en: "Universal solvent-based ink for a wide range of materials."
                 },
-                properties: { ...series.find(s => s.id === "EC").properties } // копіюємо властивості EC
+                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "EC").properties))
             },
             { 
                 id: "SI",
@@ -245,7 +246,7 @@ SICOMIX.data = (function() {
                     pl: "Farba silikonowa do trudnych powierzchni, odporna na wysokie temperatury.",
                     en: "Silicone ink for difficult surfaces, resistant to high temperatures."
                 },
-                properties: { ...series.find(s => s.id === "EC").properties }
+                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "EC").properties))
             },
             { 
                 id: "SN",
@@ -256,7 +257,7 @@ SICOMIX.data = (function() {
                     pl: "Farba do nylonu i tkanin syntetycznych, wysoka elastyczność.",
                     en: "Ink for nylon and synthetic fabrics, high elasticity."
                 },
-                properties: { ...series.find(s => s.id === "NST").properties }
+                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "NST").properties))
             },
             { 
                 id: "QS",
@@ -267,7 +268,7 @@ SICOMIX.data = (function() {
                     pl: "Szybkoschnąca farba do papieru i tektury.",
                     en: "Quick-drying ink for paper and cardboard."
                 },
-                properties: { ...series.find(s => s.id === "CF").properties }
+                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "CF").properties))
             },
             { 
                 id: "PX",
@@ -278,7 +279,7 @@ SICOMIX.data = (function() {
                     pl: "Farba epoksydowa do metali, szkła, ceramiki.",
                     en: "Epoxy ink for metals, glass, ceramics."
                 },
-                properties: { ...series.find(s => s.id === "TPP").properties }
+                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "TPP").properties))
             },
             { 
                 id: "EVS",
@@ -289,7 +290,7 @@ SICOMIX.data = (function() {
                     pl: "Farba do materiałów EVA, doskonała przyczepność.",
                     en: "Ink for EVA materials, excellent adhesion."
                 },
-                properties: { ...series.find(s => s.id === "SX").properties }
+                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "SX").properties))
             },
             { 
                 id: "ECVF",
@@ -300,7 +301,7 @@ SICOMIX.data = (function() {
                     pl: "Farba do części samochodowych, odporna na benzynę i olej.",
                     en: "Ink for automotive parts, resistant to petrol and oil."
                 },
-                properties: { ...series.find(s => s.id === "EC").properties }
+                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "EC").properties))
             },
             { 
                 id: "SB",
@@ -311,11 +312,11 @@ SICOMIX.data = (function() {
                     pl: "Farba zdrapka (scratch-off), stosowana w losach itp.",
                     en: "Scratch-off ink used in lottery tickets, etc."
                 },
-                properties: { ...series.find(s => s.id === "EC").properties }
+                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "EC").properties))
             }
         ];
 
-        // ---------- БАЗОВІ КОЛЬОРИ (вже багатомовні) ----------
+        // ---------- БАЗОВІ КОЛЬОРИ ----------
         const baseColors = [
             { code: "10", name: { uk: "Фіолетовий", pl: "Fioletowy", en: "Violet" }, color: "#800080" },
             { code: "20", name: { uk: "Синій", pl: "Niebieski", en: "Blue" }, color: "#0000FF" },
@@ -368,7 +369,7 @@ SICOMIX.data = (function() {
             { code: "75", name: { uk: "Прозорий рожевий", pl: "Transparent różowy", en: "Transparent Pink" }, color: "#FFC0CB" }
         ];
 
-        // ---------- ДОДАТКИ (Additives) ----------
+        // ---------- ДОДАТКИ ----------
         const additives = [
             {
                 id: "add-1",
@@ -933,7 +934,7 @@ SICOMIX.data = (function() {
             }
         ];
 
-        // ---------- ГЕНЕРАЦІЯ ФАРБ ІЗ БАГАТОМОВНИМИ ПОЛЯМИ ----------
+        // ---------- ГЕНЕРАЦІЯ ФАРБ ІЗ БАЗОВИХ КОЛЬОРІВ ----------
         function generatePaintsFromBaseColors() {
             const paints = [];
             let counter = 1;
@@ -977,7 +978,7 @@ SICOMIX.data = (function() {
                 });
             });
 
-            // ---------- СПЕЦІАЛЬНІ ФАРБИ EC (з перевіркою наявності) ----------
+            // ---------- СПЕЦІАЛЬНІ ФАРБИ EC ----------
             const ecSeries = series.find(s => s.id === "EC");
             if (ecSeries) {
                 // EC60/146
@@ -1125,7 +1126,7 @@ SICOMIX.data = (function() {
                     }
                 });
             }
-
+            
             // Додаємо спеціальні фарби з Excel, які не покриваються комбінаціями
             const specialPaints = [
                 { name: "SP23", series: "SP", baseColorCode: "23", color: "#4169E1", colorNameUk: "Ультрамарин", colorNamePl: "Ultramaryna", colorNameEn: "Ultramarine" },
@@ -1826,7 +1827,7 @@ SICOMIX.data = (function() {
                 { name: "TA91", series: "TA", baseColorCode: "91", color: "#F8F8FF", colorNameUk: "Tampoprint білий", colorNamePl: "Tampoprint biały", colorNameEn: "Tampoprint white" }
             ];
 
-            specialPaints.forEach(sp => {
+          specialPaints.forEach(sp => {
                 const serie = series.find(s => s.id === sp.series) || series[0];
                 paints.push({
                     id: `paint-${counter++}`,
@@ -1866,7 +1867,6 @@ SICOMIX.data = (function() {
             return paints;
         }
 
-        // ---------- ІНШІ СТРУКТУРИ ДАНИХ ----------
         const paints = generatePaintsFromBaseColors();
         const recipes = [];
         const categories = Array.from(new Set(series.map(s => s.category))).sort();
@@ -1935,3 +1935,5 @@ SICOMIX.data = (function() {
         };
     }
 })();
+
+console.log('[SICOMIX] data-colors.js завантажено успішно, SICOMIX.data.paints.length =', SICOMIX.data?.paints?.length);
