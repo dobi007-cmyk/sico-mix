@@ -5,8 +5,8 @@ const SICOMIX = window.SICOMIX;
 
 SICOMIX.data = (function() {
     try {
-        // ---------- СЕРІЇ ФАРБ ----------
-        const series = [
+        // ---------- БАЗОВІ СЕРІЇ (без залежностей) ----------
+        const baseSeries = [
             { 
                 id: "EC",
                 name: { uk: "EC", pl: "EC", en: "EC" },
@@ -224,8 +224,11 @@ SICOMIX.data = (function() {
                     additives: { uk: "HNST SLOW – каталізатор до 5%; NST 150 – прозора база (знижує криття та світлостійкість); MP 3000 – загусник 1-2%", pl: "HNST SLOW – katalizator do 5%; NST 150 – baza przezroczysta (zmniejsza krycie i odporność na światło); MP 3000 – zagęstnik 1-2%", en: "HNST SLOW – catalyst up to 5%; NST 150 – transparent base (reduces opacity and lightfastness); MP 3000 – thickener 1-2%" },
                     special: { uk: "Ультракриючі кольори: 40, 42, 56. Прозорі кольори: 15, 25, 35, 55, 65, 75, 130-136, 140-143. Флуо – нижча світлостійкість. Всі кольори змішуються.", pl: "Ultrakryjące kolory: 40, 42, 56. Przezroczyste kolory: 15, 25, 35, 55, 65, 75, 130-136, 140-143. Fluo – niższa odporność na światło. Wszystkie kolory mieszają się.", en: "Ultra-opaque colors: 40, 42, 56. Transparent colors: 15, 25, 35, 55, 65, 75, 130-136, 140-143. Fluo – lower lightfastness. All colors are mixable." }
                 }
-            },
-            // Нові серії з Excel
+            }
+        ];
+
+        // ---------- ДОДАТКОВІ СЕРІЇ (залежать від baseSeries) ----------
+        const extraSeries = [
             { 
                 id: "SP",
                 name: { uk: "SICOPRINT SP", pl: "SICOPRINT SP", en: "SICOPRINT SP" },
@@ -235,7 +238,7 @@ SICOMIX.data = (function() {
                     pl: "Uniwersalna farba rozpuszczalnikowa do szerokiej gamy materiałów.",
                     en: "Universal solvent-based ink for a wide range of materials."
                 },
-                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "EC").properties))
+                properties: JSON.parse(JSON.stringify(baseSeries.find(s => s.id === "EC").properties))
             },
             { 
                 id: "SI",
@@ -246,7 +249,7 @@ SICOMIX.data = (function() {
                     pl: "Farba silikonowa do trudnych powierzchni, odporna na wysokie temperatury.",
                     en: "Silicone ink for difficult surfaces, resistant to high temperatures."
                 },
-                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "EC").properties))
+                properties: JSON.parse(JSON.stringify(baseSeries.find(s => s.id === "EC").properties))
             },
             { 
                 id: "SN",
@@ -257,7 +260,7 @@ SICOMIX.data = (function() {
                     pl: "Farba do nylonu i tkanin syntetycznych, wysoka elastyczność.",
                     en: "Ink for nylon and synthetic fabrics, high elasticity."
                 },
-                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "NST").properties))
+                properties: JSON.parse(JSON.stringify(baseSeries.find(s => s.id === "NST").properties))
             },
             { 
                 id: "QS",
@@ -268,7 +271,7 @@ SICOMIX.data = (function() {
                     pl: "Szybkoschnąca farba do papieru i tektury.",
                     en: "Quick-drying ink for paper and cardboard."
                 },
-                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "CF").properties))
+                properties: JSON.parse(JSON.stringify(baseSeries.find(s => s.id === "CF").properties))
             },
             { 
                 id: "PX",
@@ -279,7 +282,7 @@ SICOMIX.data = (function() {
                     pl: "Farba epoksydowa do metali, szkła, ceramiki.",
                     en: "Epoxy ink for metals, glass, ceramics."
                 },
-                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "TPP").properties))
+                properties: JSON.parse(JSON.stringify(baseSeries.find(s => s.id === "TPP").properties))
             },
             { 
                 id: "EVS",
@@ -290,7 +293,7 @@ SICOMIX.data = (function() {
                     pl: "Farba do materiałów EVA, doskonała przyczepność.",
                     en: "Ink for EVA materials, excellent adhesion."
                 },
-                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "SX").properties))
+                properties: JSON.parse(JSON.stringify(baseSeries.find(s => s.id === "SX").properties))
             },
             { 
                 id: "ECVF",
@@ -301,7 +304,7 @@ SICOMIX.data = (function() {
                     pl: "Farba do części samochodowych, odporna na benzynę i olej.",
                     en: "Ink for automotive parts, resistant to petrol and oil."
                 },
-                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "EC").properties))
+                properties: JSON.parse(JSON.stringify(baseSeries.find(s => s.id === "EC").properties))
             },
             { 
                 id: "SB",
@@ -312,9 +315,12 @@ SICOMIX.data = (function() {
                     pl: "Farba zdrapka (scratch-off), stosowana w losach itp.",
                     en: "Scratch-off ink used in lottery tickets, etc."
                 },
-                properties: JSON.parse(JSON.stringify(series.find(s => s.id === "EC").properties))
+                properties: JSON.parse(JSON.stringify(baseSeries.find(s => s.id === "EC").properties))
             }
         ];
+
+        // Об'єднуємо серії
+        const series = [...baseSeries, ...extraSeries];
 
         // ---------- БАЗОВІ КОЛЬОРИ ----------
         const baseColors = [
