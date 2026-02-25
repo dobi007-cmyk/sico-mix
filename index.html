@@ -514,61 +514,16 @@
                 </div>
             </div>
 
-            <!-- SETTINGS PAGE -->
-            <div class="page-content" id="settings-page">
-                <h2 class="page-title" data-i18n="settings">Налаштування</h2>
-                <p class="page-description" data-i18n="settings_desc">Налаштуйте систему за вашими потребами</p>
-                <div class="form-section">
-                    <h3 class="section-title"><i class="fas fa-cog"></i> <span data-i18n="general_settings">Загальні налаштування</span></h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="interface_language">Мова інтерфейсу</label>
-                            <select class="form-select" id="languageSelect">
-                                <option value="uk">Українська</option>
-                                <option value="en">English</option>
-                                <option value="pl">Polski</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="measurement_units">Одиниці вимірювання</label>
-                            <select class="form-select" id="unitsSelect">
-                                <option value="grams" data-i18n="grams">Грами (г)</option>
-                                <option value="ml" data-i18n="ml">Мілілітри (мл)</option>
-                                <option value="percent" data-i18n="percent">Відсотки (%)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="theme">Тема оформлення</label>
-                        <select class="form-select" id="themeSelect">
-                            <option value="spectrum" data-i18n="theme_spectrum">Спектр (за замовчуванням)</option>
-                            <option value="organic" data-i18n="theme_organic">Органічна</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="auto_save">Автоматичне збереження</label>
-                        <div>
-                            <label style="display: block; margin-bottom: 10px;">
-                                <input type="checkbox" id="autoSaveCheckbox" checked> <span data-i18n="auto_save_changes">Автоматично зберігати зміни</span>
-                            </label>
-                            <label style="display: block;">
-                                <input type="checkbox" id="backupCheckbox"> <span data-i18n="create_backups">Створювати резервні копії</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-primary" id="saveSettingsBtn">
-                            <i class="fas fa-save"></i> <span data-i18n="save_settings">Зберегти налаштування</span>
-                        </button>
-                        <button class="btn btn-warning" id="resetSettingsBtn">
-                            <i class="fas fa-undo"></i> <span data-i18n="reset_defaults">Скинути до стандартних</span>
-                        </button>
-                        <button class="btn btn-danger" id="clearAllDataBtn">
-                            <i class="fas fa-trash"></i> <span data-i18n="clear_all_data">Очистити всі дані</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+          <!-- MODAL: Series Details -->
+<div class="modal" id="seriesDetailsModal">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="seriesDetailsTitle">Деталі серії</h3>
+            <button class="modal-close" id="closeSeriesModal">&times;</button>
+        </div>
+        <div id="seriesDetailsContent" style="padding: 20px; max-height: 60vh; overflow-y: auto;"></div>
+    </div>
+</div>
         </main>
 
         <footer class="footer">
