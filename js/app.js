@@ -1,4 +1,4 @@
-// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (ДОДАНО БЛОКУВАННЯ СЕРІЙ ТА ІНФО-КНОПКУ) ==========
+// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ (ДОДАНО БЛОКУВАННЯ СЕРІЙ, НОВИЙ ДИЗАЙН КАРТОК) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -39,8 +39,9 @@ window.SICOMIX = window.SICOMIX || {};
         let exportRecipesCheckbox, exportPaintsCheckbox, exportCalculationsCheckbox, includePhotosCheckbox, compressDataCheckbox;
         let loadMoreCatalogBtn;
         let recipePhotoInput, recipePhotoPreview, recipePhotoImg, fileNameSpan;
-        // НОВЕ: модальне вікно для деталей серії
+        // НОВЕ: модальне вікно для деталей серії та вибір компонування каталогу
         let seriesDetailsModal, closeSeriesModal, seriesDetailsTitle, seriesDetailsContent;
+        let catalogLayoutSelect; // для налаштувань
 
         // ---------- КЕШУВАННЯ DOM ----------
         function cacheDOMElements() {
@@ -101,6 +102,7 @@ window.SICOMIX = window.SICOMIX || {};
             closeSeriesModal = document.getElementById('closeSeriesModal');
             seriesDetailsTitle = document.getElementById('seriesDetailsTitle');
             seriesDetailsContent = document.getElementById('seriesDetailsContent');
+            catalogLayoutSelect = document.getElementById('catalogLayoutSelect');
         }
 
         // ---------- ЗАВАНТАЖЕННЯ ТА ЗБЕРЕЖЕННЯ ----------
@@ -243,6 +245,7 @@ window.SICOMIX = window.SICOMIX || {};
             if (backupCheckbox) backupCheckbox.checked = currentSettings.backup === true;
             if (languageSelect) languageSelect.value = SICOMIX.i18n.getLanguage();
             if (themeSelect) themeSelect.value = currentSettings.theme || 'spectrum';
+            if (catalogLayoutSelect) catalogLayoutSelect.value = currentSettings.catalogLayout || 'classic';
             applyTheme(currentSettings.theme || 'spectrum');
         }
 
@@ -375,6 +378,14 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
+            if (catalogLayoutSelect) {
+                catalogLayoutSelect.addEventListener('change', function() {
+                    currentSettings.catalogLayout = this.value;
+                    saveData();
+                    renderPaintCatalog(); // перерендерити з новим класом
+                });
+            }
+
             if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSettings);
             if (resetSettingsBtn) resetSettingsBtn.addEventListener('click', resetSettings);
             if (clearAllDataBtn) clearAllDataBtn.addEventListener('click', clearAllData);
@@ -491,14 +502,15 @@ window.SICOMIX = window.SICOMIX || {};
                 const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId));
                 if (!paint) return;
                 const paintName = paint.displayName?.[SICOMIX.i18n.getLanguage()] || paint.name;
+                const article = paint.article || paint.name; // артикул або назва
                 html += `<tr>
                     <td>
                         <div style="display:flex; align-items:center; gap:10px;">
                             <div style="width:24px; height:24px; background:${SICOMIX.utils.escapeHtml(paint.color)}; border-radius:6px; border:1px solid rgba(255,255,255,0.2);"></div>
                             <div>
-                                <div style="font-weight:600;">${SICOMIX.utils.escapeHtml(paintName)}</div>
+                                <div style="font-weight:600;">${SICOMIX.utils.escapeHtml(article)}</div>
                                 <div style="font-size:12px; color:var(--text-secondary);">
-                                    ${SICOMIX.i18n.translateCategory(paint.category)} 
+                                    ${SICOMIX.utils.escapeHtml(paintName)} 
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:12px; margin-left:6px;">${SICOMIX.utils.escapeHtml(paint.series)}</span>
                                 </div>
                             </div>
@@ -592,11 +604,15 @@ window.SICOMIX = window.SICOMIX || {};
             const list = document.getElementById('paintSelectionList');
             list.innerHTML = paints.map(p => {
                 const paintName = p.displayName?.[SICOMIX.i18n.getLanguage()] || p.name;
+                const article = p.article || p.name;
                 return `
                 <div class="paint-selection-card" data-id="${p.id}">
                     <div style="display:flex; align-items:center; gap:12px;">
-                        <div style="width:32px; height:32px; background:${SICOMIX.utils.escapeHtml(p.color)}; border-radius:8px;"></div>
-                        <div><strong>${SICOMIX.utils.escapeHtml(paintName)}</strong><br><span style="font-size:12px;">${SICOMIX.i18n.translateCategory(p.category)} (${SICOMIX.utils.escapeHtml(p.series)})</span></div>
+                        <div style="width:32px; height:32px; background:${SICOMIX.utils.escapeHtml(p.color)}; border-radius:8px; border:2px solid ${SICOMIX.utils.escapeHtml(p.color)};"></div>
+                        <div>
+                            <strong>${SICOMIX.utils.escapeHtml(article)}</strong><br>
+                            <span style="font-size:12px;">${SICOMIX.utils.escapeHtml(paintName)} (${SICOMIX.i18n.translateCategory(p.category)})</span>
+                        </div>
                     </div>
                 </div>
             `}).join('');
@@ -701,6 +717,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
             clearRecipeForm();
             clearRecipeDraft();
+            lockedSeries = null; // скидаємо блокування після збереження
             switchPage('recipes');
         }
 
@@ -955,9 +972,10 @@ window.SICOMIX = window.SICOMIX || {};
                 recipe.ingredients.forEach(ing => {
                     const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId));
                     const paintName = paint ? (paint.displayName?.[lang] || paint.name) : '?';
+                    const article = paint ? (paint.article || paintName) : '?';
                     html += `
                         <tr>
-                            <td>${SICOMIX.utils.escapeHtml(paintName)}</td>
+                            <td>${SICOMIX.utils.escapeHtml(article)} (${SICOMIX.utils.escapeHtml(paintName)})</td>
                             <td>${ing.amount} ${ing.unit}</td>
                             <td>${ing.percentage || 0}%</td>
                         </tr>
@@ -985,7 +1003,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- КАТАЛОГ ФАРБ (покращена версія з інфо-кнопкою) ----------
+        // ---------- КАТАЛОГ ФАРБ (покращена версія з номером як головним) ----------
         function renderPaintCatalog(append = false) {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -997,7 +1015,9 @@ window.SICOMIX = window.SICOMIX || {};
                 const allSeries = SICOMIX.data.series || [];
                 const lang = SICOMIX.i18n.getLanguage();
 
-                // Фільтруємо серії, які мають фарби після пошуку
+                // Вибір варіанту компонування з налаштувань
+                const layoutClass = currentSettings.catalogLayout || 'classic';
+
                 let seriesWithPaints = allSeries.filter(series => {
                     let seriesPaints = paintCatalog.filter(p => p.series === series.id);
                     if (search) {
@@ -1010,7 +1030,6 @@ window.SICOMIX = window.SICOMIX || {};
                     return seriesPaints.length > 0;
                 });
 
-                // Пагінація
                 const startIndex = 0;
                 const endIndex = catalogPage * CATALOG_PAGE_SIZE;
                 const paginatedSeries = seriesWithPaints.slice(startIndex, endIndex);
@@ -1041,10 +1060,9 @@ window.SICOMIX = window.SICOMIX || {};
 
                     const seriesName = series.name[lang] || series.id;
                     const category = series.category || '';
-                    // НОВЕ: прибираємо опис і властивості з основної картки
 
                     html += `
-                        <div class="series-card" data-series="${series.id}">
+                        <div class="series-card catalog-layout-${layoutClass}" data-series="${series.id}">
                             <div class="series-header">
                                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                     <div>
@@ -1055,7 +1073,6 @@ window.SICOMIX = window.SICOMIX || {};
                                         <span class="recipe-category">${SICOMIX.i18n.translateCategory(category)}</span>
                                     </div>
                                     <div style="display: flex; gap: 8px;">
-                                        <!-- НОВЕ: інфо-кнопка для деталей серії -->
                                         <button class="btn-icon series-info-btn" title="${SICOMIX.i18n.t('properties')}">
                                             <i class="fas fa-info-circle"></i>
                                         </button>
@@ -1064,18 +1081,18 @@ window.SICOMIX = window.SICOMIX || {};
                                         </button>
                                     </div>
                                 </div>
-                                <!-- Прибираємо опис звідси -->
                             </div>
 
                             <div class="series-paints" style="display: none;">
                                 ${seriesPaints.map(p => {
                                     const paintName = p.displayName?.[lang] || p.name;
+                                    const article = p.article || p.name;
                                     return `
                                     <div class="paint-mini-card" data-paint-id="${p.id}" data-paint-series="${p.series}">
-                                        <div class="paint-mini-swatch" style="background: ${SICOMIX.utils.escapeHtml(p.color)};"></div>
+                                        <div class="paint-mini-swatch" style="border-color: ${SICOMIX.utils.escapeHtml(p.color)};"></div>
                                         <div class="paint-mini-info">
+                                            <div class="paint-mini-article">${SICOMIX.utils.escapeHtml(article)}</div>
                                             <div class="paint-mini-name">${SICOMIX.utils.escapeHtml(paintName)}</div>
-                                            <div class="paint-mini-article">${SICOMIX.utils.escapeHtml(p.article || '')}</div>
                                         </div>
                                         ${!p.isDefault ? `
                                             <button class="btn-icon delete-paint" data-paint-id="${p.id}" title="${SICOMIX.i18n.t('delete')}"><i class="fas fa-trash"></i></button>
@@ -1135,7 +1152,7 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 });
 
-                // НОВЕ: обробник для кнопки інфо (показує деталі серії)
+                // Обробник для кнопки інфо
                 document.querySelectorAll('.series-info-btn').forEach(btn => {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
@@ -1164,7 +1181,6 @@ window.SICOMIX = window.SICOMIX || {};
                         if (e.target.closest('.delete-paint') || e.target.closest('.paint-add-btn')) return;
 
                         const paintId = this.dataset.paintId;
-                        const paintSeries = this.dataset.paintSeries;
                         const paint = paintCatalog.find(p => String(p.id) === paintId);
                         if (paint) {
                             addPaintToRecipeFromCatalog(paint);
@@ -1172,7 +1188,7 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 });
 
-                // Кнопка "+" на картці фарби – теж додає
+                // Кнопка "+" на картці фарби
                 document.querySelectorAll('.paint-add-btn').forEach(btn => {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
@@ -1260,6 +1276,7 @@ window.SICOMIX = window.SICOMIX || {};
             const list = document.getElementById('paintSelectionList');
             const lang = SICOMIX.i18n.getLanguage();
             const paintName = paint.displayName?.[lang] || paint.name;
+            const article = paint.article || paint.name;
             
             const modalTitle = modal.querySelector('.modal-title');
             if (modalTitle) modalTitle.textContent = paintName;
@@ -1267,10 +1284,10 @@ window.SICOMIX = window.SICOMIX || {};
             list.innerHTML = `
                 <div style="padding: 20px;">
                     <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
-                        <div style="width: 80px; height: 80px; background: ${SICOMIX.utils.escapeHtml(paint.color)}; border-radius: 12px; border: 2px solid rgba(255,255,255,0.2);"></div>
+                        <div style="width: 80px; height: 80px; background: ${SICOMIX.utils.escapeHtml(paint.color)}; border-radius: 12px; border: 2px solid ${SICOMIX.utils.escapeHtml(paint.color)};"></div>
                         <div>
-                            <h2 style="font-size: 24px; margin-bottom: 5px;">${SICOMIX.utils.escapeHtml(paintName)}</h2>
-                            <p style="color: var(--text-secondary);">${SICOMIX.utils.escapeHtml(paint.article || '')}</p>
+                            <h2 style="font-size: 24px; margin-bottom: 5px;">${SICOMIX.utils.escapeHtml(article)}</h2>
+                            <p style="color: var(--text-secondary);">${SICOMIX.utils.escapeHtml(paintName)}</p>
                         </div>
                     </div>
                     <table style="width: 100%; border-collapse: collapse;">
@@ -1426,6 +1443,7 @@ window.SICOMIX = window.SICOMIX || {};
                 autoSave: autoSaveCheckbox.checked,
                 backup: backupCheckbox.checked,
                 theme: themeSelect.value,
+                catalogLayout: catalogLayoutSelect.value,
                 notifications: true,
                 defaultCategory: 'Standard',
                 defaultUnit: 'г',
