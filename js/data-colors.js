@@ -1867,7 +1867,7 @@ SICOMIX.data = (function() {
             return { uk: "", pl: "", en: "" };
         }
 
-        // Генерація масиву фарб
+               // Генерація масиву фарб
         const paints = [];
         const usedKeys = new Set();
 
@@ -1875,14 +1875,12 @@ SICOMIX.data = (function() {
             const seriesId = getSeriesFromCode(row.code);
             const serie = series.find(s => s.id === seriesId) || series[0];
             const colorName = getColorNameFromCode(row.code);
-            // Спроба витягти код кольору з назви (наприклад, "SX22" -> "22")
             let colorCode = "";
             const match = row.name.match(/[A-Z]+(\d+[\-\d]*)/);
             if (match) colorCode = match[1];
             else colorCode = row.code.split('/')[0];
 
             const displayNamePl = row.name;
-            // Дуже спрощений переклад: замінюємо ключові слова
             let displayNameUk = displayNamePl
                 .replace(/FARBA SICO /g, "Фарба SICO ")
                 .replace(/ BIAŁA /g, " БІЛА ")
@@ -1966,14 +1964,15 @@ SICOMIX.data = (function() {
                     en: colorName.en || (colorCode ? `Color ${colorCode}` : "")
                 }
             };
-            const key = `${paint.series}_${paint.fullCode}`;
-    if (!usedKeys.has(key)) {
-        usedKeys.add(key);
-        paints.push(paint);
-    } else {
-        console.log(`Дублікат пропущено: ${key}`);
-    }
-});
+            // ВИПРАВЛЕНО: використовуємо повний код як ключ
+            const key = paint.fullCode; // або paint.series + '_' + paint.fullCode
+            if (!usedKeys.has(key)) {
+                usedKeys.add(key);
+                paints.push(paint);
+            } else {
+                console.log(`Дублікат пропущено: ${key}`);
+            }
+        });
         
         // ---------- ДОДАТКИ (з попереднього файлу, якщо не увійшли до Excel) ----------
         // Тут можна додати additives, але вони вже є в paints, тому пропустимо.
@@ -2029,12 +2028,12 @@ SICOMIX.data = (function() {
         console.log(`[SICOMIX] Згенеровано ${paints.length} унікальних фарб`);
         console.log(`[SICOMIX] Серій: ${series.length}`);
 
-        return {
+      return {
             paints,
             recipes: [],
             series,
             baseColors,
-            additives: [], // можна додати пізніше, якщо потрібно
+            additives: [],
             categories,
             units,
             fileFormats,
