@@ -1966,15 +1966,13 @@ SICOMIX.data = (function() {
                     en: colorName.en || (colorCode ? `Color ${colorCode}` : "")
                 }
             };
-            const key = `${paint.series}_${paint.code}`;
-            if (!usedKeys.has(key)) {
-                usedKeys.add(key);
-                paints.push(paint);
-            } else {
-                // Якщо дублікат, можна вирішити, що робити – тут просто пропускаємо
-                console.log(`Дублікат пропущено: ${key}`);
-            }
-        });
+          const key = `${paint.series}_${paint.fullCode}`; // або просто paint.fullCode
+if (!usedKeys.has(key)) {
+    usedKeys.add(key);
+    paints.push(paint);
+} else {
+    console.log(`Дублікат пропущено: ${key}`);
+}
 
         // ---------- ДОДАТКИ (з попереднього файлу, якщо не увійшли до Excel) ----------
         // Тут можна додати additives, але вони вже є в paints, тому пропустимо.
