@@ -13,11 +13,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="./css/style.css?v=2026.02.13">
-    <link rel="manifest" href="./manifest.json?v=2026.02.13">
+    <link rel="stylesheet" href="./css/style.css?v=2026.02.27">
+    <link rel="manifest" href="./manifest.json?v=2026.02.27">
     <!-- SVG-фавікон (data URI) -->
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='2' y1='16' x2='30' y2='16' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%237b2cbf'/%3E%3Cstop offset='0.5' stop-color='%233a86ff'/%3E%3Cstop offset='1' stop-color='%234cc9f0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M16 2 L30 12 L30 22 L16 30 L2 22 L2 12 L16 2Z' fill='url(%23grad)' /%3E%3C/svg%3E" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.13">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.27">
 
     <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ (ВИПРАВЛЕНО) ========== -->
     <script>
@@ -91,7 +91,7 @@
         })();
     </script>
 
-    <!-- Firebase SDK (додано) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -111,7 +111,6 @@
             <i class="fas fa-bars"></i>
         </button>
         <div class="mobile-nav-title">
-            <!-- Логотип SVG для мобільної версії -->
             <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
                 <path d="M16 2 L30 12 L30 22 L16 30 L2 22 L2 12 L16 2Z" fill="url(#grad_mobile)" />
                 <defs>
@@ -130,7 +129,6 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-container">
-                <!-- Логотип SVG для сайдбару -->
                 <h1 style="display: flex; align-items: center; gap: 10px;">
                     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M16 2 L30 12 L30 22 L16 30 L2 22 L2 12 L16 2Z" fill="url(#grad_sidebar)" />
@@ -210,7 +208,6 @@
                 <i class="fas fa-palette"></i>
                 <span id="totalPaints">0</span> <span data-i18n="paints_in_catalog">фарб у каталозі</span>
             </div>
-            <!-- Індикатор синхронізації (додано) -->
             <div id="syncStatus" style="font-size:12px; margin-top:10px; color:var(--text-tertiary); display:flex; align-items:center; gap:5px;">
                 <i class="fas fa-cloud"></i> <span data-i18n="syncing">Синхронізація...</span>
             </div>
@@ -219,14 +216,12 @@
 
     <!-- Main Content -->
     <div class="container" id="mainContainer">
-        <!-- Header -->
         <header class="header">
             <div class="desktop-nav">
                 <button class="menu-toggle" id="desktopMenuToggle" aria-label="Menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo-container">
-                    <!-- Логотип SVG для десктопного хедера -->
                     <h1 style="display: flex; align-items: center; gap: 10px;">
                         <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M16 2 L30 12 L30 22 L16 30 L2 22 L2 12 L16 2Z" fill="url(#grad_header)" />
@@ -243,7 +238,6 @@
                 </div>
             </div>
             <div style="display: flex; gap:15px; align-items:center;">
-                <!-- Кнопка входу/виходу (додано) -->
                 <button id="authButton" class="btn" style="padding:8px 16px;"><i class="fas fa-sign-in-alt"></i> <span data-i18n="login">Увійти</span></button>
                 <div class="paint-count">
                     <i class="fas fa-palette"></i>
@@ -252,7 +246,6 @@
             </div>
         </header>
 
-        <!-- Page Content -->
         <main id="page-content">
             <!-- HOME PAGE -->
             <div class="page-content active" id="home-page">
@@ -263,30 +256,22 @@
                 </div>
                 <div class="quick-actions-grid">
                     <a class="action-card" href="#" data-page="new-recipe">
-                        <div class="action-icon">
-                            <i class="fas fa-plus"></i>
-                        </div>
+                        <div class="action-icon"><i class="fas fa-plus"></i></div>
                         <h3 class="action-title" data-i18n="new_recipe">Новий рецепт</h3>
                         <p class="action-description" data-i18n="new_recipe_desc">Створіть новий рецепт фарби</p>
                     </a>
                     <a class="action-card" href="#" data-page="recipes">
-                        <div class="action-icon">
-                            <i class="fas fa-book"></i>
-                        </div>
+                        <div class="action-icon"><i class="fas fa-book"></i></div>
                         <h3 class="action-title" data-i18n="my_recipes">Мої рецепти</h3>
                         <p class="action-description" data-i18n="my_recipes_desc">Переглядайте та керуйте рецептами</p>
                     </a>
                     <a class="action-card" href="#" data-page="catalog">
-                        <div class="action-icon">
-                            <i class="fas fa-layer-group"></i>
-                        </div>
+                        <div class="action-icon"><i class="fas fa-layer-group"></i></div>
                         <h3 class="action-title" data-i18n="paint_catalog">Каталог фарб</h3>
                         <p class="action-description" data-i18n="catalog_desc">База всіх доступних фарб</p>
                     </a>
                     <a class="action-card" href="#" data-page="export">
-                        <div class="action-icon">
-                            <i class="fas fa-file-export"></i>
-                        </div>
+                        <div class="action-icon"><i class="fas fa-file-export"></i></div>
                         <h3 class="action-title" data-i18n="export_data">Експорт даних</h3>
                         <p class="action-description" data-i18n="export_desc">Експортуйте рецепти у різних форматах</p>
                     </a>
@@ -299,10 +284,7 @@
                 <p class="page-description" data-i18n="new_recipe_desc_long">Створіть новий рецепт фарби, додаючи інгредієнти</p>
 
                 <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-info-circle"></i>
-                        <span data-i18n="basic_info">Основна інформація</span>
-                    </h3>
+                    <h3 class="section-title"><i class="fas fa-info-circle"></i> <span data-i18n="basic_info">Основна інформація</span></h3>
                     <div class="form-group">
                         <label class="form-label required" data-i18n="recipe_name">Назва рецепту</label>
                         <input type="text" class="form-input" id="recipeName" placeholder="" data-i18n-placeholder="recipe_name_placeholder" required>
@@ -341,10 +323,7 @@
                 </div>
 
                 <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-flask"></i>
-                        <span data-i18n="recipe_ingredients">Інгредієнти рецепту</span>
-                    </h3>
+                    <h3 class="section-title"><i class="fas fa-flask"></i> <span data-i18n="recipe_ingredients">Інгредієнти рецепту</span></h3>
                     <div class="search-filter-container">
                         <div class="search-box">
                             <input type="text" class="search-input" id="paintSearch" placeholder="" data-i18n-placeholder="search_paints">
@@ -367,19 +346,16 @@
                         <tbody id="ingredientsList"></tbody>
                     </table>
                     <button class="btn-add" id="addIngredientBtn">
-                        <i class="fas fa-plus"></i>
-                        <span data-i18n="add_ingredient">Додати інгредієнт</span>
+                        <i class="fas fa-plus"></i> <span data-i18n="add_ingredient">Додати інгредієнт</span>
                     </button>
                 </div>
 
                 <div class="action-buttons">
                     <button class="btn btn-primary" id="saveRecipeBtn">
-                        <i class="fas fa-save"></i>
-                        <span data-i18n="save_recipe">Зберегти рецепт</span>
+                        <i class="fas fa-save"></i> <span data-i18n="save_recipe">Зберегти рецепт</span>
                     </button>
                     <button class="btn btn-warning" id="clearRecipeBtn">
-                        <i class="fas fa-trash"></i>
-                        <span data-i18n="clear_form">Очистити форму</span>
+                        <i class="fas fa-trash"></i> <span data-i18n="clear_form">Очистити форму</span>
                     </button>
                 </div>
             </div>
@@ -398,18 +374,10 @@
                     </select>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn btn-success" id="importRecipesBtn">
-                        <i class="fas fa-file-import"></i> <span data-i18n="import">Імпорт</span>
-                    </button>
-                    <button class="btn btn-primary" id="exportRecipesBtn">
-                        <i class="fas fa-file-export"></i> <span data-i18n="export">Експорт</span>
-                    </button>
-                    <button class="btn btn-warning" id="printRecipesBtn">
-                        <i class="fas fa-print"></i> <span data-i18n="print">Друк</span>
-                    </button>
-                    <button class="btn btn-danger" id="deleteSelectedRecipesBtn">
-                        <i class="fas fa-trash"></i> <span data-i18n="delete_selected">Видалити обрані</span>
-                    </button>
+                    <button class="btn btn-success" id="importRecipesBtn"><i class="fas fa-file-import"></i> <span data-i18n="import">Імпорт</span></button>
+                    <button class="btn btn-primary" id="exportRecipesBtn"><i class="fas fa-file-export"></i> <span data-i18n="export">Експорт</span></button>
+                    <button class="btn btn-warning" id="printRecipesBtn"><i class="fas fa-print"></i> <span data-i18n="print">Друк</span></button>
+                    <button class="btn btn-danger" id="deleteSelectedRecipesBtn"><i class="fas fa-trash"></i> <span data-i18n="delete_selected">Видалити обрані</span></button>
                 </div>
                 <div class="recipe-cards" id="recipesContainer"></div>
             </div>
@@ -423,12 +391,9 @@
                         <input type="text" class="search-input" id="catalogSearch" placeholder="" data-i18n-placeholder="search_catalog">
                         <i class="fas fa-search search-icon"></i>
                     </div>
-                    <button class="btn btn-primary" id="addNewPaintBtn">
-                        <i class="fas fa-plus"></i> <span data-i18n="add_new_paint">Додати нову фарбу</span>
-                    </button>
+                    <button class="btn btn-primary" id="addNewPaintBtn"><i class="fas fa-plus"></i> <span data-i18n="add_new_paint">Додати нову фарбу</span></button>
                 </div>
                 <div class="recipe-cards" id="paintCatalog"></div>
-                <!-- Пагінація для каталогу -->
                 <div class="pagination-container">
                     <button class="load-more-btn" id="loadMoreCatalogBtn" style="display: none;" data-i18n="load_more">Завантажити ще</button>
                 </div>
@@ -445,7 +410,6 @@
                         <select class="form-select" id="importFormat">
                             <option value="json">JSON (.json)</option>
                             <option value="csv">CSV (.csv)</option>
-                            <!-- <option value="excel">Excel (.xlsx)</option> -->
                         </select>
                     </div>
                     <div class="form-group">
@@ -470,9 +434,7 @@
                         </div>
                     </div>
                     <div class="action-buttons">
-                        <button class="btn btn-success" id="startImportBtn">
-                            <i class="fas fa-play"></i> <span data-i18n="start_import">Почати імпорт</span>
-                        </button>
+                        <button class="btn btn-success" id="startImportBtn"><i class="fas fa-play"></i> <span data-i18n="start_import">Почати імпорт</span></button>
                     </div>
                 </div>
             </div>
@@ -488,8 +450,6 @@
                         <select class="form-select" id="exportFormat">
                             <option value="json">JSON (.json)</option>
                             <option value="csv">CSV (.csv)</option>
-                            <!-- <option value="excel">Excel (.xlsx)</option> -->
-                            <!-- <option value="pdf">PDF (.pdf)</option> -->
                         </select>
                     </div>
                     <div class="form-group">
@@ -518,14 +478,12 @@
                         </div>
                     </div>
                     <div class="action-buttons">
-                        <button class="btn btn-primary" id="startExportBtn">
-                            <i class="fas fa-download"></i> <span data-i18n="start_export">Почати експорт</span>
-                        </button>
+                        <button class="btn btn-primary" id="startExportBtn"><i class="fas fa-download"></i> <span data-i18n="start_export">Почати експорт</span></button>
                     </div>
                 </div>
             </div>
 
-            <!-- MODAL: Series Details (ОДИН) -->
+            <!-- MODAL: Series Details -->
             <div class="modal" id="seriesDetailsModal">
                 <div class="modal-content" style="max-width: 700px;">
                     <div class="modal-header">
@@ -645,13 +603,13 @@
         </div>
     </div>
 
-    <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ ========== -->
-    <script src="./js/firebase-config.js?v=2026.02.13"></script>
-    <script src="./js/data-colors.js?v=2026.02.13"></script>
-    <script src="./js/i18n.js?v=2026.02.13"></script>
-    <script src="./js/utils.js?v=2026.02.13"></script>
-    <script src="./js/sync.js?v=2026.02.13"></script>
-    <script src="./js/app.js?v=2026.02.13"></script>
+    <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ (оновлена версія) ========== -->
+    <script src="./js/firebase-config.js?v=2026.02.27"></script>
+    <script src="./js/data-colors.js?v=2026.02.27"></script>
+    <script src="./js/i18n.js?v=2026.02.27"></script>
+    <script src="./js/utils.js?v=2026.02.27"></script>
+    <script src="./js/sync.js?v=2026.02.27"></script>
+    <script src="./js/app.js?v=2026.02.27"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -664,7 +622,6 @@
                 window.SICOMIX.app.init();
             }
 
-            // Додаткові обробники для модального вікна автентифікації
             const authModal = document.getElementById('authModal');
             const closeAuthModal = document.getElementById('closeAuthModal');
             if (closeAuthModal) {
@@ -673,7 +630,6 @@
                     document.body.style.overflow = 'auto';
                 });
             }
-            // Кнопки входу/реєстрації будуть оброблятися в sync.js
         });
     </script>
 </body>
