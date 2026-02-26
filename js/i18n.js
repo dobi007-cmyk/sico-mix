@@ -215,7 +215,13 @@ window.SICOMIX = window.SICOMIX || {};
                 signup: "Зареєструватися",
                 or: "або",
                 signin_google: "Увійти через Google",
-                auth_note: "Дані синхронізуються між пристроями"
+                auth_note: "Дані синхронізуються між пристроями",
+
+                // ДОДАТКОВІ КЛЮЧІ (для групування категорій)
+                other: "Інші",
+                photo_uploaded: "Фото завантажено",
+                found_paints: "Знайдено фарб: {count}",
+                select_data_to_export: "Оберіть дані для експорту"
             },
             en: {
                 // Глобальні
@@ -426,7 +432,13 @@ window.SICOMIX = window.SICOMIX || {};
                 signup: "Sign up",
                 or: "or",
                 signin_google: "Sign in with Google",
-                auth_note: "Data synchronizes between devices"
+                auth_note: "Data synchronizes between devices",
+
+                // ADDITIONAL KEYS
+                other: "Other",
+                photo_uploaded: "Photo uploaded",
+                found_paints: "Found paints: {count}",
+                select_data_to_export: "Select data to export"
             },
             pl: {
                 // Глобальні
@@ -637,7 +649,13 @@ window.SICOMIX = window.SICOMIX || {};
                 signup: "Zarejestruj się",
                 or: "lub",
                 signin_google: "Zaloguj przez Google",
-                auth_note: "Dane synchronizują się między urządzeniami"
+                auth_note: "Dane synchronizują się między urządzeniami",
+
+                // DODATKOWE KLUCZE
+                other: "Inne",
+                photo_uploaded: "Zdjęcie przesłane",
+                found_paints: "Znaleziono farby: {count}",
+                select_data_to_export: "Wybierz dane do eksportu"
             }
         };
 
