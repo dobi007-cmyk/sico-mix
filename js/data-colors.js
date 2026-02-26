@@ -5,7 +5,227 @@ const SICOMIX = window.SICOMIX;
 
 SICOMIX.data = (function() {
     try {
-        // ---------- БАЗОВІ СЕРІЇ (з PDF) ----------
+        // ---------- БАЗОВІ ВЛАСТИВОСТІ ДЛЯ СЕРІЙ ----------
+        const EC_PROPERTIES = {
+            type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
+            finish: { uk: "Високий глянець", pl: "Bardzo błyszczący", en: "Very glossy" },
+            drying: { uk: "6 хв на повітрі, миттєво в тунелі", pl: "6 minut na powietrzu, natychmiastowo w tunelu", en: "6 min open air, instantly in tunnel" },
+            mesh: { uk: "P77-120", pl: "P77-120", en: "P77-120" },
+            cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
+            storage: { uk: "Необмежений", pl: "Nieograniczona", en: "Unlimited" },
+            resistance: { uk: "Відмінна стійкість до світла та атмосферних умов для всіх кольорів", pl: "Doskonała odporność na światło i warunki atmosferyczne dla wszystkich kolorów", en: "Excellent light and weather resistance for all colors" },
+            thinning: { uk: "EC 1000 (швидкий), EC 2000 (нормальний), EC 3000/4000 (легке сповільнення), EC 5000 (сповільнювач), EC 8000 (дуже повільний). Для флуо: EC 1300, EC 1301. Середнє розрідження: +/-15%", pl: "EC 1000 (szybki), EC 2000 (normalny), EC 3000/4000 (lekkie spowolnienie), EC 5000 (opóźniacz), EC 8000 (bardzo wolny). Dla fluo: EC 1300, EC 1301. Średnie rozrzedzenie: +/-15%", en: "EC 1000 (fast), EC 2000 (normal), EC 3000/4000 (mild retarder), EC 5000 (retarder), EC 8000 (very slow). For fluo: EC 1300, EC 1301. Average thinning: +/-15%" },
+            additives: { uk: "EC 160 – криюча паста (20-50%); EC 150 – прозора база; EC 1501 HG – захисний лак; AS 1000 – антистатик до 5%; EC 170/1702 – сповільнювач у гелі; MP 1000 – матуючий порошок; EC 150/10 – матуюча паста; MP 3000 – загусник; HEC – затверджувач 3-5% для проблемних поверхонь", pl: "EC 160 – pasta kryjąca (20-50%); EC 150 – baza przezroczysta; EC 1501 HG – lakier ochronny; AS 1000 – antystatyk do 5%; EC 170/1702 – opóźniacz w żelu; MP 1000 – proszek matujący; EC 150/10 – pasta matująca; MP 3000 – zagęstnik; HEC – utwardzacz 3-5% do problematycznych powierzchni", en: "EC 160 – opaque paste (20-50%); EC 150 – transparent base; EC 1501 HG – protective varnish; AS 1000 – antistatic up to 5%; EC 170/1702 – gel retarder; MP 1000 – matting powder; EC 150/10 – matting paste; MP 3000 – thickener; HEC – hardener 3-5% for problem surfaces" },
+            special: { uk: "EC 91 Q – напівматова біла з вищою в'язкістю для паперу та картону; EC 60/146, EC 61/163 – вогненно-червоні з екстремальною світлостійкістю; ECRG 120 – золота фарба готового використання", pl: "EC 91 Q – biała półmatowa o wyższej lepkości do papieru i tektury; EC 60/146, EC 61/163 – ogniste czerwienie z ekstremalną odpornością na światło; ECRG 120 – złota farba gotowa do użycia", en: "EC 91 Q – semi-matte white with higher viscosity for paper and cardboard; EC 60/146, EC 61/163 – fire reds with extreme lightfastness; ECRG 120 – gold ink ready to use" }
+        };
+
+        const CF_PROPERTIES = {
+            type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
+            finish: { uk: "Напівмат", pl: "Półmat", en: "Semi-matte" },
+            drying: { uk: "4 хв на повітрі, миттєво в тунелі", pl: "4 min na powietrzu, natychmiastowo w tunelu", en: "4 min open air, instantly in tunnel" },
+            mesh: { uk: "P77-P120", pl: "P77-P120", en: "P77-P120" },
+            cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
+            storage: { uk: "Необмежений", pl: "Nieograniczona", en: "Unlimited" },
+            resistance: { uk: "Відмінна стійкість до світла та атмосферних умов", pl: "Doskonała odporność na światło i warunki atmosferyczne", en: "Excellent light and weather resistance" },
+            thinning: { uk: "CF 1000 (швидкий), CF 2000 (нормальний), CF 3000/4000 (легке сповільнення), CF 5000 (сповільнювач), CF 8000 (дуже повільний). +-20%", pl: "CF 1000 (szybki), CF 2000 (normalny), CF 3000/4000 (lekkie spowolnienie), CF 5000 (opóźniacz), CF 8000 (bardzo wolny). +-20%", en: "CF 1000 (fast), CF 2000 (normal), CF 3000/4000 (mild retarder), CF 5000 (retarder), CF 8000 (very slow). +-20%" },
+            additives: { uk: "CF 150 – прозора база; CF 1501 HG – фінішний лак (високий глянець, стійкість до стирання); CF 160 – викривлююча добавка для деталей (до 10%); CF 1702 – сильний сповільнювач у гелі (до 10%); AS 1000 – антистатик до 5%; HCF – повільний затверджувач 5% для покращення адгезії", pl: "CF 150 – baza przezroczysta; CF 1501 HG – lakier wykończeniowy (wysoki połysk, odporność na ścieranie); CF 160 – dodatek wykrzywiający do detali (do 10%); CF 1702 – silny opóźniacz w żelu (do 10%); AS 1000 – antystatyk do 5%; HCF – wolny utwardzacz 5% dla poprawy przyczepności", en: "CF 150 – transparent base; CF 1501 HG – finishing varnish (high gloss, abrasion resistance); CF 160 – distorting additive for details (up to 10%); CF 1702 – strong gel retarder (up to 10%); AS 1000 – antistatic up to 5%; HCF – slow hardener 5% for improved adhesion" }
+        };
+
+        const PLUV_PROPERTIES = {
+            type: { uk: "УФ-фарба", pl: "Farba UV", en: "UV ink" },
+            finish: { uk: "Високий глянець", pl: "Wysoki połysk", en: "High gloss" },
+            drying: { uk: "УФ-промені: 1-2 лампи 80-100 Вт, швидкість 25-30 м/хв", pl: "Promienie UV: 1-2 lampy 80-100 W, prędkość 25-30 m/min", en: "UV rays: 1-2 lamps 80-100 W, speed 25-30 m/min" },
+            mesh: { uk: "P140-P185T (флуо: P90, алюміній/золото: P120)", pl: "P140-P185T (fluoro: P90, aluminium/złoto: P120)", en: "P140-P185T (fluo: P90, aluminum/gold: P120)" },
+            cleaning: { uk: "CT 1000/20 (UV cleaner), CT 1000, CT 1000/1", pl: "CT 1000/20 (UV cleaner), CT 1000, CT 1000/1", en: "CT 1000/20 (UV cleaner), CT 1000, CT 1000/1" },
+            storage: { uk: "1-2 роки у темних контейнерах при 5-25°C", pl: "1-2 lata w ciemnych pojemnikach w temp. 5-25°C", en: "1-2 years in dark containers at 5-25°C" },
+            resistance: { uk: "Дуже хороша для всіх кольорів, можливе легке пожовтіння лаку через рік", pl: "Bardzo dobra dla wszystkich kolorów, możliwe lekkie żółknięcie lakieru po roku", en: "Very good for all colors, possible slight yellowing of varnish after one year" },
+            thinning: { uk: "PLUV 2000 – стандартний розчинник", pl: "PLUV 2000 – standardowy rozcieńczalnik", en: "PLUV 2000 – standard thinner" },
+            additives: { uk: "HPLUV – каталізатор до 5% для складних поверхонь; не додавати більше 20% PLUV 91 до кольору – знижує адгезію", pl: "HPLUV – katalizator do 5% dla trudnych powierzchni; nie dodawać więcej niż 20% PLUV 91 do koloru – zmniejsza przyczepność", en: "HPLUV – catalyst up to 5% for difficult surfaces; do not add more than 20% PLUV 91 to color – reduces adhesion" },
+            special: { uk: "Відмінна еластичність, можливість бігування. Завжди тестувати перед виробництвом.", pl: "Doskonała elastyczność, możliwość bigowania. Zawsze testować przed produkcją.", en: "Excellent elasticity, possibility of creasing. Always test before production." }
+        };
+
+        const PLUV_LED_PROPERTIES = {
+            type: { uk: "УФ-LED фарба", pl: "Farba UV-LED", en: "UV-LED ink" },
+            finish: { uk: "Високий глянець", pl: "Wysoki połysk", en: "High gloss" },
+            drying: { uk: "LED UV: 395 нм, потужність 70%, швидкість стрічки 10 м/хв", pl: "LED UV: 395 nm, moc 70%, prędkość taśmy 10 m/min", en: "LED UV: 395 nm, power 70%, belt speed 10 m/min" },
+            mesh: { uk: "Алюміній: P120; золото: P120; флуо: P90; інші кольори: 140-185", pl: "Aluminium: P120; złoto: P120; fluo: P90; inne kolory: 140-185", en: "Aluminum: P120; gold: P120; fluo: P90; other colors: 140-185" },
+            cleaning: { uk: "CT 1000/20 (UV cleaner), CT 1000, CT 1000/1", pl: "CT 1000/20 (UV cleaner), CT 1000, CT 1000/1", en: "CT 1000/20 (UV cleaner), CT 1000, CT 1000/1" },
+            storage: { uk: "1-2 роки у темних контейнерах при 5-25°C", pl: "1-2 lata w ciemnych pojemnikach w temp. 5-25°C", en: "1-2 years in dark containers at 5-25°C" },
+            resistance: { uk: "Дуже хороша для всіх кольорів, крім флуо", pl: "Bardzo dobra dla wszystkich kolorów, z wyjątkiem fluo", en: "Very good for all colors, except fluo" },
+            thinning: { uk: "PLUV 2000 – стандартний розчинник, 5-10%", pl: "PLUV 2000 – standardowy rozcieńczalnik, 5-10%", en: "PLUV 2000 – standard thinner, 5-10%" },
+            additives: { uk: "HPLUV – каталізатор до 5% для складних поверхонь", pl: "HPLUV – katalizator do 5% dla trudnych powierzchni", en: "HPLUV – catalyst up to 5% for difficult surfaces" },
+            special: { uk: "Не додавати більше 20% PLUV 91 до кольору – знижує адгезію.", pl: "Nie dodawać więcej niż 20% PLUV 91 do koloru – zmniejsza przyczepność.", en: "Do not add more than 20% PLUV 91 to color – reduces adhesion." }
+        };
+
+        const SX_PROPERTIES = {
+            type: { uk: "Водна фарба", pl: "Farba wodna", en: "Water-based ink" },
+            finish: { uk: "Сатиновий", pl: "Satyna", en: "Satin" },
+            drying: { uk: "3 хв при 150°C (з 3% HSX – затверджувача – термофіксація не потрібна)", pl: "3 min w 150°C (z 3% HSX – utwardzacza – nie wymaga termofiksacji)", en: "3 min at 150°C (with 3% HSX hardener – no heat fixation needed)" },
+            mesh: { uk: "P34-P90, P90 для CMYK", pl: "P34-P90, P90 dla CMYK", en: "P34-P90, P90 for CMYK" },
+            cleaning: { uk: "Тепла вода або мийний засіб, можна під високим тиском", pl: "Ciepła woda lub środek czyszczący, można pod wysokim ciśnieniem", en: "Warm water or cleaning agent, can be high pressure" },
+            storage: { uk: "1-2 роки при температурі вище нуля", pl: "1-2 lata w temperaturze powyżej zera", en: "1-2 years at above zero temperature" },
+            resistance: { uk: "Відмінна стійкість до прання та світла після 24 год фіксації", pl: "Doskonała odporność na pranie i światło po 24 h utrwalania", en: "Excellent wash and light resistance after 24 h fixation" },
+            thinning: { uk: "Max 10% води або сповільнювач SX 5000", pl: "Max 10% wody lub opóźniacz SX 5000", en: "Max 10% water or retarder SX 5000" },
+            additives: { uk: "HSX – затверджувач (3%, після додавання використати за 24 год); SX 150 + 11 паст – самостійне приготування кольорів", pl: "HSX – utwardzacz (3%, po dodaniu zużyć w ciągu 24 h); SX 150 + 11 past – samodzielne przygotowanie kolorów", en: "HSX – hardener (3%, use within 24 h after addition); SX 150 + 11 pastes – self-mixing of colors" },
+            special: { uk: "Концентровані, прозорі, живі кольори. Доступні CMYK та флуо. Дуже еластична, не тріскається.", pl: "Skoncentrowane, przezroczyste, żywe kolory. Dostępne CMYK i fluo. Bardzo elastyczna, nie pęka.", en: "Concentrated, transparent, vivid colors. CMYK and fluo available. Very elastic, does not crack." }
+        };
+
+        const SPTN_PROPERTIES = {
+            type: { uk: "Пластизолева фарба", pl: "Farba plastizolowa", en: "Plastisol ink" },
+            finish: { uk: "Сатиновий, м'який, дуже еластичний", pl: "Satyna, miękki, bardzo elastyczny", en: "Satin, soft, very elastic" },
+            drying: { uk: "150-170°C ~2 хв", pl: "150-170°C ~2 min", en: "150-170°C ~2 min" },
+            mesh: { uk: "Стандартні: 34-90 н/см; тріадні: 77-120; блискучі: 15", pl: "Standardowe: 34-90 n/cm; triadowe: 77-120; błyszczące: 15", en: "Standard: 34-90 n/cm; process: 77-120; glitter: 15" },
+            cleaning: { uk: "CT 1000/1", pl: "CT 1000/1", en: "CT 1000/1" },
+            storage: { uk: "5-20°C, до 5 років", pl: "5-20°C, do 5 lat", en: "5-20°C, up to 5 years" },
+            resistance: { uk: "Відмінна стійкість до прання при дотриманні технології. Світлостійкість 2-3 роки (крім флуо).", pl: "Doskonała odporność na pranie przy przestrzeganiu technologii. Odporność na światło 2-3 lata (oprócz fluo).", en: "Excellent wash resistance when technology is followed. Lightfastness 2-3 years (except fluo)." },
+            thinning: { uk: "SPT nr 1/SPTN 1000 – до 5%; SPTNCR – без обмежень", pl: "SPT nr 1/SPTN 1000 – do 5%; SPTNCR – bez ograniczeń", en: "SPT nr 1/SPTN 1000 – up to 5%; SPTNCR – unlimited" },
+            additives: { uk: "SPTHNYL – до 10% для адгезії (суміш придатна 24 год); Nyloncoat – 5% для нейлону (суміш 24 год); база пучення; клей трансферний SPT nr 2", pl: "SPTHNYL – do 10% dla przyczepności (mieszanka ważna 24 h); Nyloncoat – 5% do nylonu (mieszanka 24 h); baza pęczniejąca; klej transferowy SPT nr 2", en: "SPTHNYL – up to 10% for adhesion (mix usable 24 h); Nyloncoat – 5% for nylon (mix 24 h); puff base; transfer adhesive SPT nr 2" },
+            special: { uk: "Flash white SPTN91 – швидковисихаюча біла для бази; Opaque white SPTN91/l – дуже криюча та еластична", pl: "Flash white SPTN91 – szybkoschnąca biała do bazy; Opaque white SPTN91/l – bardzo kryjąca i elastyczna", en: "Flash white SPTN91 – fast drying white for base; Opaque white SPTN91/l – very opaque and elastic" }
+        };
+
+        const AS_PROPERTIES = {
+            type: { uk: "Водна фарба", pl: "Farba wodna", en: "Water-based ink" },
+            finish: { uk: "Сатиновий (блискуча версія AQUAGLOSS AG)", pl: "Satyna (błyszcząca wersja AQUAGLOSS AG)", en: "Satin (glossy version AQUAGLOSS AG)" },
+            drying: { uk: "~1 год на відкритому повітрі, після тунелю можна складати в стоси", pl: "~1 godz. na otwartym powietrzu, po tunelu można układać w stosy", en: "~1 hour open air, after tunnel can be stacked" },
+            mesh: { uk: "P77-P140", pl: "P77-P140", en: "P77-P140" },
+            cleaning: { uk: "Вода (краще під високим тиском) або Aquaclean", pl: "Woda (lepiej pod wysokim ciśnieniem) lub Aquaclean", en: "Water (preferably high pressure) or Aquaclean" },
+            storage: { uk: "4 роки при 5-25°C у добре закритій тарі", pl: "4 lata w temp. 5-25°C w szczelnie zamkniętym pojemniku", en: "4 years at 5-25°C in tightly closed container" },
+            resistance: { uk: "Екологічна, без важких металів. Для зовнішнього застосування – додати 1% затверджувача (використати за 12 год)", pl: "Ekologiczna, bez metali ciężkich. Do zastosowań zewnętrznych – dodać 1% utwardzacza (zużyć w ciągu 12 h)", en: "Eco-friendly, heavy metal free. For outdoor use – add 1% hardener (use within 12 h)" },
+            thinning: { uk: "Вода або сповільнювач AS 5000", pl: "Woda lub opóźniacz AS 5000", en: "Water or retarder AS 5000" },
+            additives: { uk: "Затверджувач для водостійкості", pl: "Utwardzacz do wodoodporności", en: "Hardener for water resistance" }
+        };
+
+        const OTF_PROPERTIES = {
+            type: { uk: "Суперкриюча водна фарба", pl: "Superkryjąca farba wodna", en: "Super opaque water-based ink" },
+            finish: { uk: "Криючий, м'який, без гумового ефекту", pl: "Kryjący, miękki, bez efektu gumy", en: "Opaque, soft, no rubber effect" },
+            drying: { uk: "3 хв при 150°C без затверджувача; з 3% HOT – термофіксація не потрібна", pl: "3 min w 150°C bez utwardzacza; z 3% HOT – nie wymaga termofiksacji", en: "3 min at 150°C without hardener; with 3% HOT – no heat fixation needed" },
+            mesh: { uk: "P34T до P77T", pl: "P34T do P77T", en: "P34T to P77T" },
+            cleaning: { uk: "Холодна вода + мийний засіб (Aquaclean), під високим тиском; для емульсій водостійких – CT 1000/63", pl: "Zimna woda + środek czyszczący (Aquaclean), pod wysokim ciśnieniem; dla emulsji wodoodpornych – CT 1000/63", en: "Cold water + cleaning agent (Aquaclean), high pressure; for water-resistant emulsions – CT 1000/63" },
+            storage: { uk: "1-2 роки при 10-25°C, берегти від морозу", pl: "1-2 lata w temp. 10-25°C, chronić przed mrozem", en: "1-2 years at 10-25°C, protect from frost" },
+            resistance: { uk: "Відмінна після додавання HOT. Для нейлону – HOT обов'язково.", pl: "Doskonała po dodaniu HOT. Do nylonu – HOT obowiązkowo.", en: "Excellent after adding HOT. For nylon – HOT mandatory." },
+            thinning: { uk: "Max 10% води, або OTF 5000 (повільний), або OTF 7000 (еластичний). Сумарно не більше 10%.", pl: "Max 10% wody, lub OTF 5000 (wolny), lub OTF 7000 (elastyczny). Łącznie nie więcej niż 10%.", en: "Max 10% water, or OTF 5000 (slow), or OTF 7000 (elastic). Total not more than 10%." },
+            additives: { uk: "HOT – затверджувач 3%; OTF 150/14 – лак для трансферу (стійкість до прання, еластичність); OTF 150/18 – повільна версія; OTF 100/101 – чорний блокатор міграції для поліестеру; База пучення OTF – змішувати з пастами PPT (100г бази + 5г пасти)", pl: "HOT – utwardzacz 3%; OTF 150/14 – lakier do transferu (odporność na pranie, elastyczność); OTF 150/18 – wolna wersja; OTF 100/101 – czarny blokator migracji do poliestru; Baza pęczniejąca OTF – mieszać z pastami PPT (100g bazy + 5g pasty)", en: "HOT – hardener 3%; OTF 150/14 – transfer varnish (wash resistance, elasticity); OTF 150/18 – slow version; OTF 100/101 – black migration blocker for polyester; OTF puff base – mix with PPT pastes (100g base + 5g paste)" },
+            special: { uk: "Дуже криюча, еластична, незважаючи на високі криючі властивості. Трансфер: протокол для 1-кольорових та багатокольорових; Transferglue OTF nr 2 – клей із порошком усередині; порошки Soft nr 3, nr 12, nr 4, nr 13; Cold peel.", pl: "Bardzo kryjąca, elastyczna, pomimo wysokich właściwości kryjących. Transfer: protokół dla 1-kolorowych i wielokolorowych; Transferglue OTF nr 2 – klej z proszkiem w środku; proszki Soft nr 3, nr 12, nr 4, nr 13; Cold peel.", en: "Very opaque, elastic, despite high opacity. Transfer: protocol for 1-color and multicolor; Transferglue OTF nr 2 – adhesive with powder inside; Soft powders nr 3, nr 12, nr 4, nr 13; Cold peel." }
+        };
+
+        const TPP_PROPERTIES = {
+            type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
+            finish: { uk: "Сатиновий", pl: "Satyna", en: "Satin" },
+            drying: { uk: "10 хв на повітрі, миттєво в тунелі", pl: "10 min na powietrzu, natychmiastowo w tunelu", en: "10 min open air, instantly in tunnel" },
+            mesh: { uk: "P90-120", pl: "P90-120", en: "P90-120" },
+            cleaning: { uk: "ST 1000", pl: "ST 1000", en: "ST 1000" },
+            storage: { uk: "Необмежений", pl: "Nieograniczona", en: "Unlimited" },
+            resistance: { uk: "Відмінна стійкість до світла та атмосферних умов", pl: "Doskonała odporność na światło i warunki atmosferyczne", en: "Excellent light and weather resistance" },
+            thinning: { uk: "TPP 1000 (швидкий), TPP 2000 (нормальний), TPP 3000/4000 (легке сповільнення), TPP 5000 (повільний), TPP 8000 (дуже повільний). Середнє: +/-15%", pl: "TPP 1000 (szybki), TPP 2000 (normalny), TPP 3000/4000 (lekkie spowolnienie), TPP 5000 (wolny), TPP 8000 (bardzo wolny). Średnio: +/-15%", en: "TPP 1000 (fast), TPP 2000 (normal), TPP 3000/4000 (mild retarder), TPP 5000 (slow), TPP 8000 (very slow). Average: +/-15%" },
+            additives: { uk: "HTPP SLOW – затверджувач для стійкості до подряпин та адгезії (придатність 1 день); TPP 160 – високотиксотропна викривлююча добавка (10%); TPP 150 – прозора база / лак; AS 1000 – антистатик 5%; TPP 1702 – сповільнювач у гелі проти засихання", pl: "HTPP SLOW – utwardzacz do odporności na zarysowania i przyczepności (ważność 1 dzień); TPP 160 – dodatek wysokotiksotropowy wykrzywiający (10%); TPP 150 – baza przezroczysta / lakier; AS 1000 – antystatyk 5%; TPP 1702 – opóźniacz w żelu przeciw zasychaniu", en: "HTPP SLOW – hardener for scratch resistance and adhesion (usable 1 day); TPP 160 – highly thixotropic distorting additive (10%); TPP 150 – transparent base / varnish; AS 1000 – antistatic 5%; TPP 1702 – gel retarder against drying" },
+            special: { uk: "Не додавати матуючий порошок – знижує адгезію. Для проблемних поверхонь – матеріал має бути активований.", pl: "Nie dodawać proszku matującego – zmniejsza przyczepność. Do problematycznych powierzchni – materiał musi być aktywowany.", en: "Do not add matting powder – reduces adhesion. For problem surfaces – material must be activated." }
+        };
+
+        const UV_PROPERTIES = {
+            type: { uk: "УФ-фарба", pl: "Farba UV", en: "UV ink" },
+            finish: { uk: "Високий глянець", pl: "Wysoki połysk", en: "High gloss" },
+            drying: { uk: "УФ-промені: 1-2 лампи 80-100 Вт, швидкість 25-30 м/хв", pl: "Promienie UV: 1-2 lampy 80-100 W, prędkość 25-30 m/min", en: "UV rays: 1-2 lamps 80-100 W, speed 25-30 m/min" },
+            mesh: { uk: "P140-P185T (алюміній/золото: P120, флуо: P90)", pl: "P140-P185T (aluminium/złoto: P120, fluo: P90)", en: "P140-P185T (aluminum/gold: P120, fluo: P90)" },
+            cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
+            storage: { uk: "1-2 роки у темних контейнерах при 5-25°C", pl: "1-2 lata w ciemnych pojemnikach w temp. 5-25°C", en: "1-2 years in dark containers at 5-25°C" },
+            resistance: { uk: "Для внутрішнього застосування", pl: "Do zastosowań wewnętrznych", en: "For indoor use" },
+            thinning: { uk: "UV 2000 – стандартний розчинник, 5-10%", pl: "UV 2000 – standardowy rozcieńczalnik, 5-10%", en: "UV 2000 – standard thinner, 5-10%" },
+            additives: { uk: "—", pl: "—", en: "—" },
+            special: { uk: "Висока еластичність – можна згинати/складати (важливо для POS-матеріалів).", pl: "Wysoka elastyczność – można zginać/składać (ważne dla materiałów POS).", en: "High elasticity – can be bent/folded (important for POS materials)." }
+        };
+
+        const NST_PROPERTIES = {
+            type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
+            finish: { uk: "Сатиновий", pl: "Satyna", en: "Satin" },
+            drying: { uk: "5 хв на повітрі, миттєво в тунелі", pl: "5 min na powietrzu, natychmiastowo w tunelu", en: "5 min open air, instantly in tunnel" },
+            mesh: { uk: "P45-P90", pl: "P45-P90", en: "P45-P90" },
+            cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
+            storage: { uk: "Понад 24 місяці", pl: "Ponad 24 miesiące", en: "Over 24 months" },
+            resistance: { uk: "Висока стійкість до прання (з HNST SLOW) та атмосферних умов", pl: "Wysoka odporność na pranie (z HNST SLOW) i warunki atmosferyczne", en: "High wash (with HNST SLOW) and weather resistance" },
+            thinning: { uk: "До 15% сповільнювача NST 1702", pl: "Do 15% opóźniacza NST 1702", en: "Up to 15% retarder NST 1702" },
+            additives: { uk: "HNST SLOW – каталізатор до 5%; NST 150 – прозора база (знижує криття та світлостійкість); MP 3000 – загусник 1-2%", pl: "HNST SLOW – katalizator do 5%; NST 150 – baza przezroczysta (zmniejsza krycie i odporność na światło); MP 3000 – zagęstnik 1-2%", en: "HNST SLOW – catalyst up to 5%; NST 150 – transparent base (reduces opacity and lightfastness); MP 3000 – thickener 1-2%" },
+            special: { uk: "Ультракриючі кольори: 40, 42, 56. Прозорі кольори: 15, 25, 35, 55, 65, 75, 130-136, 140-143. Флуо – нижча світлостійкість. Всі кольори змішуються.", pl: "Ultrakryjące kolory: 40, 42, 56. Przezroczyste kolory: 15, 25, 35, 55, 65, 75, 130-136, 140-143. Fluo – niższa odporność na światło. Wszystkie kolory mieszają się.", en: "Ultra-opaque colors: 40, 42, 56. Transparent colors: 15, 25, 35, 55, 65, 75, 130-136, 140-143. Fluo – lower lightfastness. All colors are mixable." }
+        };
+
+        const SP_PROPERTIES = {
+            type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
+            finish: { uk: "Матовий", pl: "Matowy", en: "Matte" },
+            drying: { uk: "6 хв на повітрі, миттєво в тунелі", pl: "6 min na powietrzu, natychmiastowo w tunelu", en: "6 min open air, instantly in tunnel" },
+            mesh: { uk: "P77-120", pl: "P77-120", en: "P77-120" },
+            cleaning: { uk: "ST 1000", pl: "ST 1000", en: "ST 1000" },
+            storage: { uk: "Кілька років", pl: "Kilka lat", en: "Several years" },
+            resistance: { uk: "Відмінна для всіх кольорів", pl: "Doskonała dla wszystkich kolorów", en: "Excellent for all colors" },
+            thinning: { uk: "SP 1000 (швидкий), SP 2000 (нормальний), SP 3000 (повільний). Середнє: +/-15%", pl: "SP 1000 (szybki), SP 2000 (normalny), SP 3000 (wolny). Średnio: +/-15%", en: "SP 1000 (fast), SP 2000 (normal), SP 3000 (slow). Average: +/-15%" },
+            additives: { uk: "SP 160 – викривлююча паста (10%); SP 150 – прозора база; AS 1000 – антистатик 5%", pl: "SP 160 – pasta wykrzywiająca (10%); SP 150 – baza przezroczysta; AS 1000 – antystatyk 5%", en: "SP 160 – distorting paste (10%); SP 150 – transparent base; AS 1000 – antistatic 5%" },
+            special: { uk: "Серія стійка до адгезивів.", pl: "Seria odporna na kleje.", en: "Series resistant to adhesives." }
+        };
+
+        const SI_PROPERTIES = {
+            type: { uk: "Силіконова фарба", pl: "Farba silikonowa", en: "Silicone ink" },
+            finish: { uk: "Сатиновий", pl: "Satyna", en: "Satin" },
+            drying: { uk: "Прямий друк: 150°C, 2 хв; трансфер: 125-140°C, 60-90 сек", pl: "Druk bezpośredni: 150°C, 2 min; transfer: 125-140°C, 60-90 sek", en: "Direct: 150°C, 2 min; transfer: 125-140°C, 60-90 sec" },
+            mesh: { uk: "P62", pl: "P62", en: "P62" },
+            cleaning: { uk: "CT 1000/78", pl: "CT 1000/78", en: "CT 1000/78" },
+            storage: { uk: "Мінімум 12 місяців", pl: "Minimum 12 miesięcy", en: "Minimum 12 months" },
+            resistance: { uk: "Відмінна стійкість до прання", pl: "Doskonała odporność na pranie", en: "Excellent wash resistance" },
+            thinning: { uk: "SI 2000 (нормальний) до 5%; SI 5000/4 (сповільнювач) 1-5%", pl: "SI 2000 (normalny) do 5%; SI 5000/4 (opóźniacz) 1-5%", en: "SI 2000 (normal) up to 5%; SI 5000/4 (retarder) 1-5%" },
+            additives: { uk: "CSI – каталізатор 3-5%; Fixator SI – 1% (обмежений час життя)", pl: "CSI – katalizator 3-5%; Fixator SI – 1% (ograniczona przydatność)", en: "CSI – catalyst 3-5%; Fixator SI – 1% (limited pot life)" },
+            special: { uk: "Не потребує додаткового шару проти міграції. Трансферний порошок nr 18. Сертифіковано Oekotex 100.", pl: "Nie wymaga dodatkowej warstwy przeciw migracji. Proszek transferowy nr 18. Certyfikat Oekotex 100.", en: "No extra anti-bleeding layer needed. Transfer powder nr 18. Oekotex 100 certified." }
+        };
+
+        const SN_PROPERTIES = {
+            type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
+            finish: { uk: "Сатиновий", pl: "Satyna", en: "Satin" },
+            drying: { uk: "4 хв на повітрі, миттєво в тунелі", pl: "4 min na powietrzu, natychmiastowo w tunelu", en: "4 min open air, instantly in tunnel" },
+            mesh: { uk: "P77-120", pl: "P77-120", en: "P77-120" },
+            cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
+            storage: { uk: "Необмежений", pl: "Nieograniczona", en: "Unlimited" },
+            resistance: { uk: "Відмінна стійкість до світла, але не до прання", pl: "Doskonała odporność na światło, ale nie na pranie", en: "Excellent light resistance, but not wash resistant" },
+            thinning: { uk: "SN 1000 (швидкий), SN 2000 (нормальний), SN 3000/4000 (повільний), SN 5000 (повільний). Середнє: +/-10%", pl: "SN 1000 (szybki), SN 2000 (normalny), SN 3000/4000 (wolny), SN 5000 (wolny). Średnio: +/-10%", en: "SN 1000 (fast), SN 2000 (normal), SN 3000/4000 (slow), SN 5000 (slow). Average: +/-10%" },
+            additives: { uk: "SN 150 – прозора база; SN 160 – викривлююча паста (10%); AS 1000 – антистатик 5%; SN 1702 – сповільнювач у гелі (+/-10%)", pl: "SN 150 – baza przezroczysta; SN 160 – pasta wykrzywiająca (10%); AS 1000 – antystatyk 5%; SN 1702 – opóźniacz w żelu (+/-10%)", en: "SN 150 – transparent base; SN 160 – distorting paste (10%); AS 1000 – antistatic 5%; SN 1702 – gel retarder (+/-10%)" },
+            special: { uk: "Тільки водостійкість, не для прання.", pl: "Tylko odporność na wodę, nie na pranie.", en: "Water resistance only, not wash resistant." }
+        };
+
+        const QS_PROPERTIES = {
+            type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
+            finish: { uk: "Глянцевий", pl: "Błyszczący", en: "Glossy" },
+            drying: { uk: "6 хв на повітрі, миттєво в тунелі", pl: "6 min na powietrzu, natychmiastowo w tunelu", en: "6 min open air, instantly in tunnel" },
+            mesh: { uk: "P77-120", pl: "P77-120", en: "P77-120" },
+            cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
+            storage: { uk: "Необмежений", pl: "Nieograniczona", en: "Unlimited" },
+            resistance: { uk: "Відмінна для всіх кольорів", pl: "Doskonała dla wszystkich kolorów", en: "Excellent for all colors" },
+            thinning: { uk: "QS 1000 (швидкий), QS 2000 (нормальний), QS 3000/4000 (повільний), QS 5000 (повільний), QS 8000 (дуже повільний). Середнє: +/-15%", pl: "QS 1000 (szybki), QS 2000 (normalny), QS 3000/4000 (wolny), QS 5000 (wolny), QS 8000 (bardzo wolny). Średnio: +/-15%", en: "QS 1000 (fast), QS 2000 (normal), QS 3000/4000 (slow), QS 5000 (slow), QS 8000 (very slow). Average: +/-15%" },
+            additives: { uk: "QS 160 – викривлююча паста (10-20%); QS 150 – прозора база; AS 1000 – антистатик 5%; QS 170/1702 – сповільнювач у гелі; HQS – затверджувач 5% для адгезії; Weekmaker nr 2000 – 3% для PETG", pl: "QS 160 – pasta wykrzywiająca (10-20%); QS 150 – baza przezroczysta; AS 1000 – antystatyk 5%; QS 170/1702 – opóźniacz w żelu; HQS – utwardzacz 5% dla przyczepności; Weekmaker nr 2000 – 3% dla PETG", en: "QS 160 – distorting paste (10-20%); QS 150 – transparent base; AS 1000 – antistatic 5%; QS 170/1702 – gel retarder; HQS – hardener 5% for adhesion; Weekmaker nr 2000 – 3% for PETG" },
+            special: { uk: "Для PETG додавати Weekmaker nr 2000, щоб уникнути тріщин.", pl: "Do PETG dodawać Weekmaker nr 2000, aby uniknąć pęknięć.", en: "For PETG add Weekmaker nr 2000 to avoid cracks." }
+        };
+
+        const PX_PROPERTIES = {
+            type: { uk: "Епоксидна фарба", pl: "Farba epoksydowa", en: "Epoxy ink" },
+            finish: { uk: "Високий глянець", pl: "Wysoki połysk", en: "High gloss" },
+            drying: { uk: "Пилонепроникний: 60 хв, складання: 3 год, повне твердіння: 24-48 год", pl: "Pyłosuchość: 60 min, układanie: 3 h, pełne utwardzenie: 24-48 h", en: "Dust-free: 60 min, stackable: 3 h, full cure: 24-48 h" },
+            mesh: { uk: "P77-120", pl: "P77-120", en: "P77-120" },
+            cleaning: { uk: "CT 1000/1 або CT 1000", pl: "CT 1000/1 lub CT 1000", en: "CT 1000/1 or CT 1000" },
+            storage: { uk: "Без затверджувача: кілька років; із затверджувачем: 8 год", pl: "Bez utwardzacza: kilka lat; z utwardzaczem: 8 h", en: "Without hardener: several years; with hardener: 8 h" },
+            resistance: { uk: "Відмінна для стандартних кольорів", pl: "Doskonała dla standardowych kolorów", en: "Excellent for standard colors" },
+            thinning: { uk: "Не потребує розрідження", pl: "Nie wymaga rozcieńczania", en: "No dilution needed" },
+            additives: { uk: "PXHPX – затверджувач (15-17% в залежності від кольору)", pl: "PXHPX – utwardzacz (15-17% w zależności od koloru)", en: "PXHPX – hardener (15-17% depending on color)" },
+            special: { uk: "Поверхні повинні бути знежирені. Після затвердіння фарбу неможливо видалити з сітки.", pl: "Powierzchnie muszą być odtłuszczone. Po utwardzeniu farby nie można usunąć z sita.", en: "Surfaces must be degreased. After curing, ink cannot be removed from screen." }
+        };
+
+        const ECVF_PROPERTIES = {
+            type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
+            finish: { uk: "Глянцевий", pl: "Błyszczący", en: "Glossy" },
+            drying: { uk: "При 20°C: валкове нанесення 1-2 год, трафаретний друк P45: 15 хв", pl: "W 20°C: nakładanie walcowe 1-2 h, sitodruk P45: 15 min", en: "At 20°C: roller coating 1-2 h, screen printing P45: 15 min" },
+            mesh: { uk: "P45 для трафаретного друку", pl: "P45 dla sitodruku", en: "P45 for screen printing" },
+            cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
+            storage: { uk: "Необмежений", pl: "Nieograniczona", en: "Unlimited" },
+            resistance: { uk: "Відмінна для всіх кольорів, крім флуо", pl: "Doskonała dla wszystkich kolorów, z wyjątkiem fluo", en: "Excellent for all colors, except fluo" },
+            thinning: { uk: "ECVF 1000 – швидкий розчинник: 5% для P45, 30% для валкового нанесення", pl: "ECVF 1000 – szybki reduktor: 5% dla P45, 30% dla nakładania walcowego", en: "ECVF 1000 – quick reducer: 5% for P45, 30% for roller coating" },
+            additives: { uk: "—", pl: "—", en: "—" },
+            special: { uk: "Можна наносити валками або трафаретним друком. Іноді потрібне знежирення IPA.", pl: "Można nakładać walcami lub sitodrukiem. Czasami wymagane odtłuszczenie IPA.", en: "Can be applied by roller or screen printing. Sometimes degreasing with IPA needed." }
+        };
+
+        // ---------- ОСНОВНІ СЕРІЇ ----------
         const series = {
             EC: {
                 id: "EC",
@@ -16,18 +236,7 @@ SICOMIX.data = (function() {
                     pl: "Uniwersalna farba rozpuszczalnikowa do naklejek, elastycznego i twardego PVC, ABS, forexu, papieru, tektury, metali wstępnie lakierowanych, banerów, płótna. Po dodaniu 5% utwardzacza przylega również do polipropylenu, priplacku, biprintu.",
                     en: "Universal solvent-based ink for stickers, flexible and rigid PVC, ABS, Forex, paper, cardboard, pre-lacquered metals, banners, canvas. With 5% hardener also adheres to polypropylene, Priplack, Biprint."
                 },
-                properties: {
-                    type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
-                    finish: { uk: "Високий глянець", pl: "Bardzo błyszczący", en: "Very glossy" },
-                    drying: { uk: "6 хв на повітрі, миттєво в тунелі", pl: "6 minut na powietrzu, natychmiastowo w tunelu", en: "6 min open air, instantly in tunnel" },
-                    mesh: { uk: "P77-120", pl: "P77-120", en: "P77-120" },
-                    cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
-                    storage: { uk: "Необмежений", pl: "Nieograniczona", en: "Unlimited" },
-                    resistance: { uk: "Відмінна стійкість до світла та атмосферних умов для всіх кольорів", pl: "Doskonała odporność na światło i warunki atmosferyczne dla wszystkich kolorów", en: "Excellent light and weather resistance for all colors" },
-                    thinning: { uk: "EC 1000 (швидкий), EC 2000 (нормальний), EC 3000/4000 (легке сповільнення), EC 5000 (сповільнювач), EC 8000 (дуже повільний). Для флуо: EC 1300, EC 1301. Середнє розрідження: +/-15%", pl: "EC 1000 (szybki), EC 2000 (normalny), EC 3000/4000 (lekkie spowolnienie), EC 5000 (opóźniacz), EC 8000 (bardzo wolny). Dla fluo: EC 1300, EC 1301. Średnie rozrzedzenie: +/-15%", en: "EC 1000 (fast), EC 2000 (normal), EC 3000/4000 (mild retarder), EC 5000 (retarder), EC 8000 (very slow). For fluo: EC 1300, EC 1301. Average thinning: +/-15%" },
-                    additives: { uk: "EC 160 – криюча паста (20-50%); EC 150 – прозора база; EC 1501 HG – захисний лак; AS 1000 – антистатик до 5%; EC 170/1702 – сповільнювач у гелі; MP 1000 – матуючий порошок; EC 150/10 – матуюча паста; MP 3000 – загусник; HEC – затверджувач 3-5% для проблемних поверхонь", pl: "EC 160 – pasta kryjąca (20-50%); EC 150 – baza przezroczysta; EC 1501 HG – lakier ochronny; AS 1000 – antystatyk do 5%; EC 170/1702 – opóźniacz w żelu; MP 1000 – proszek matujący; EC 150/10 – pasta matująca; MP 3000 – zagęstnik; HEC – utwardzacz 3-5% do problematycznych powierzchni", en: "EC 160 – opaque paste (20-50%); EC 150 – transparent base; EC 1501 HG – protective varnish; AS 1000 – antistatic up to 5%; EC 170/1702 – gel retarder; MP 1000 – matting powder; EC 150/10 – matting paste; MP 3000 – thickener; HEC – hardener 3-5% for problem surfaces" },
-                    special: { uk: "EC 91 Q – напівматова біла з вищою в'язкістю для паперу та картону; EC 60/146, EC 61/163 – вогненно-червоні з екстремальною світлостійкістю; ECRG 120 – золота фарба готового використання", pl: "EC 91 Q – biała półmatowa o wyższej lepkości do papieru i tektury; EC 60/146, EC 61/163 – ogniste czerwienie z ekstremalną odpornością na światło; ECRG 120 – złota farba gotowa do użycia", en: "EC 91 Q – semi-matte white with higher viscosity for paper and cardboard; EC 60/146, EC 61/163 – fire reds with extreme lightfastness; ECRG 120 – gold ink ready to use" }
-                }
+                properties: EC_PROPERTIES
             },
             CF: {
                 id: "CF",
@@ -38,17 +247,7 @@ SICOMIX.data = (function() {
                     pl: "Farba rozpuszczalnikowa do papieru, tektury, papierów samoprzylepnych, metali lakierowanych, druku przemysłowego (beczki stalowe, gaśnice, korki). Do folii Penstick z powłoką poliestrową, poliestru, PET, poliuretanu – seria CF A&S.",
                     en: "Solvent-based ink for paper, cardboard, self-adhesive paper, lacquered metals, industrial printing (steel drums, fire extinguishers, caps). For Penstick films with polyester coating, polyester, PET, polyurethane – CF A&S series."
                 },
-                properties: {
-                    type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
-                    finish: { uk: "Напівмат", pl: "Półmat", en: "Semi-matte" },
-                    drying: { uk: "4 хв на повітрі, миттєво в тунелі", pl: "4 min na powietrzu, natychmiastowo w tunelu", en: "4 min open air, instantly in tunnel" },
-                    mesh: { uk: "P77-P120", pl: "P77-P120", en: "P77-P120" },
-                    cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
-                    storage: { uk: "Необмежений", pl: "Nieograniczona", en: "Unlimited" },
-                    resistance: { uk: "Відмінна стійкість до світла та атмосферних умов", pl: "Doskonała odporność na światło i warunki atmosferyczne", en: "Excellent light and weather resistance" },
-                    thinning: { uk: "CF 1000 (швидкий), CF 2000 (нормальний), CF 3000/4000 (легке сповільнення), CF 5000 (сповільнювач), CF 8000 (дуже повільний). +-20%", pl: "CF 1000 (szybki), CF 2000 (normalny), CF 3000/4000 (lekkie spowolnienie), CF 5000 (opóźniacz), CF 8000 (bardzo wolny). +-20%", en: "CF 1000 (fast), CF 2000 (normal), CF 3000/4000 (mild retarder), CF 5000 (retarder), CF 8000 (very slow). +-20%" },
-                    additives: { uk: "CF 150 – прозора база; CF 1501 HG – фінішний лак (високий глянець, стійкість до стирання); CF 160 – викривлююча добавка для деталей (до 10%); CF 1702 – сильний сповільнювач у гелі (до 10%); AS 1000 – антистатик до 5%; HCF – повільний затверджувач 5% для покращення адгезії", pl: "CF 150 – baza przezroczysta; CF 1501 HG – lakier wykończeniowy (wysoki połysk, odporność na ścieranie); CF 160 – dodatek wykrzywiający do detali (do 10%); CF 1702 – silny opóźniacz w żelu (do 10%); AS 1000 – antystatyk do 5%; HCF – wolny utwardzacz 5% dla poprawy przyczepności", en: "CF 150 – transparent base; CF 1501 HG – finishing varnish (high gloss, abrasion resistance); CF 160 – distorting additive for details (up to 10%); CF 1702 – strong gel retarder (up to 10%); AS 1000 – antistatic up to 5%; HCF – slow hardener 5% for improved adhesion" }
-                }
+                properties: CF_PROPERTIES
             },
             PLUV: {
                 id: "PLUV",
@@ -59,18 +258,7 @@ SICOMIX.data = (function() {
                     pl: "Farba UV do materiałów samoprzylepnych, banerów, metalu lakierowanego, PP, styropianu, wstępnie aktywowanego polietylenu, poliwęglanu, papieru, PCV. Lakier PLUV 150 – wysoki połysk do offsetu i druku sitowego.",
                     en: "UV ink for self-adhesive materials, banners, lacquered metal, PP, styrofoam, pre-activated polyethylene, polycarbonate, paper, PVC. PLUV 150 varnish – high gloss for offset and screen printing."
                 },
-                properties: {
-                    type: { uk: "УФ-фарба", pl: "Farba UV", en: "UV ink" },
-                    finish: { uk: "Високий глянець", pl: "Wysoki połysk", en: "High gloss" },
-                    drying: { uk: "УФ-промені: 1-2 лампи 80-100 Вт, швидкість 25-30 м/хв", pl: "Promienie UV: 1-2 lampy 80-100 W, prędkość 25-30 m/min", en: "UV rays: 1-2 lamps 80-100 W, speed 25-30 m/min" },
-                    mesh: { uk: "P140-P185T (флуо: P90, алюміній/золото: P120)", pl: "P140-P185T (fluoro: P90, aluminium/złoto: P120)", en: "P140-P185T (fluo: P90, aluminum/gold: P120)" },
-                    cleaning: { uk: "CT 1000/20 (UV cleaner), CT 1000, CT 1000/1", pl: "CT 1000/20 (UV cleaner), CT 1000, CT 1000/1", en: "CT 1000/20 (UV cleaner), CT 1000, CT 1000/1" },
-                    storage: { uk: "1-2 роки у темних контейнерах при 5-25°C", pl: "1-2 lata w ciemnych pojemnikach w temp. 5-25°C", en: "1-2 years in dark containers at 5-25°C" },
-                    resistance: { uk: "Дуже хороша для всіх кольорів, можливе легке пожовтіння лаку через рік", pl: "Bardzo dobra dla wszystkich kolorów, możliwe lekkie żółknięcie lakieru po roku", en: "Very good for all colors, possible slight yellowing of varnish after one year" },
-                    thinning: { uk: "PLUV 2000 – стандартний розчинник", pl: "PLUV 2000 – standardowy rozcieńczalnik", en: "PLUV 2000 – standard thinner" },
-                    additives: { uk: "HPLUV – каталізатор до 5% для складних поверхонь; не додавати більше 20% PLUV 91 до кольору – знижує адгезію", pl: "HPLUV – katalizator do 5% dla trudnych powierzchni; nie dodawać więcej niż 20% PLUV 91 do koloru – zmniejsza przyczepność", en: "HPLUV – catalyst up to 5% for difficult surfaces; do not add more than 20% PLUV 91 to color – reduces adhesion" },
-                    special: { uk: "Відмінна еластичність, можливість бігування. Завжди тестувати перед виробництвом.", pl: "Doskonała elastyczność, możliwość bigowania. Zawsze testować przed produkcją.", en: "Excellent elasticity, possibility of creasing. Always test before production." }
-                }
+                properties: PLUV_PROPERTIES
             },
             PLUV_LED: {
                 id: "PLUV_LED",
@@ -81,18 +269,7 @@ SICOMIX.data = (function() {
                     pl: "Farba UV-LED do materiałów samoprzylepnych, banerów, metalu lakierowanego, polipropylenu poddanego obróbce koronowej, wstępnie aktywowanego polietylenu, poliwęglanu, papieru, PCV.",
                     en: "UV-LED ink for self-adhesive materials, banners, lacquered metal, corona-treated polypropylene, pre-activated polyethylene, polycarbonate, paper, PVC."
                 },
-                properties: {
-                    type: { uk: "УФ-LED фарба", pl: "Farba UV-LED", en: "UV-LED ink" },
-                    finish: { uk: "Високий глянець", pl: "Wysoki połysk", en: "High gloss" },
-                    drying: { uk: "LED UV: 395 нм, потужність 70%, швидкість стрічки 10 м/хв", pl: "LED UV: 395 nm, moc 70%, prędkość taśmy 10 m/min", en: "LED UV: 395 nm, power 70%, belt speed 10 m/min" },
-                    mesh: { uk: "Алюміній: P120; золото: P120; флуо: P90; інші кольори: 140-185", pl: "Aluminium: P120; złoto: P120; fluo: P90; inne kolory: 140-185", en: "Aluminum: P120; gold: P120; fluo: P90; other colors: 140-185" },
-                    cleaning: { uk: "CT 1000/20 (UV cleaner), CT 1000, CT 1000/1", pl: "CT 1000/20 (UV cleaner), CT 1000, CT 1000/1", en: "CT 1000/20 (UV cleaner), CT 1000, CT 1000/1" },
-                    storage: { uk: "1-2 роки у темних контейнерах при 5-25°C", pl: "1-2 lata w ciemnych pojemnikach w temp. 5-25°C", en: "1-2 years in dark containers at 5-25°C" },
-                    resistance: { uk: "Дуже хороша для всіх кольорів, крім флуо", pl: "Bardzo dobra dla wszystkich kolorów, z wyjątkiem fluo", en: "Very good for all colors, except fluo" },
-                    thinning: { uk: "PLUV 2000 – стандартний розчинник, 5-10%", pl: "PLUV 2000 – standardowy rozcieńczalnik, 5-10%", en: "PLUV 2000 – standard thinner, 5-10%" },
-                    additives: { uk: "HPLUV – каталізатор до 5% для складних поверхонь", pl: "HPLUV – katalizator do 5% dla trudnych powierzchni", en: "HPLUV – catalyst up to 5% for difficult surfaces" },
-                    special: { uk: "Не додавати більше 20% PLUV 91 до кольору – знижує адгезію.", pl: "Nie dodawać więcej niż 20% PLUV 91 do koloru – zmniejsza przyczepność.", en: "Do not add more than 20% PLUV 91 to color – reduces adhesion." }
-                }
+                properties: PLUV_LED_PROPERTIES
             },
             SX: {
                 id: "SX",
@@ -103,18 +280,7 @@ SICOMIX.data = (function() {
                     pl: "Farba wodna do bawełny, tkanin syntetycznych i ich mieszanek. Ekologiczna, certyfikat Oeko-Tex 100 klasa I-IV. Bez rozpuszczalników, metali ciężkich, szkodliwych pigmentów, PVC.",
                     en: "Water-based ink for cotton, synthetic fabrics and their blends. Eco-friendly, Oeko-Tex 100 class I-IV certified. Free from solvents, heavy metals, harmful pigments, PVC."
                 },
-                properties: {
-                    type: { uk: "Водна фарба", pl: "Farba wodna", en: "Water-based ink" },
-                    finish: { uk: "Сатиновий", pl: "Satyna", en: "Satin" },
-                    drying: { uk: "3 хв при 150°C (з 3% HSX – затверджувача – термофіксація не потрібна)", pl: "3 min w 150°C (z 3% HSX – utwardzacza – nie wymaga termofiksacji)", en: "3 min at 150°C (with 3% HSX hardener – no heat fixation needed)" },
-                    mesh: { uk: "P34-P90, P90 для CMYK", pl: "P34-P90, P90 dla CMYK", en: "P34-P90, P90 for CMYK" },
-                    cleaning: { uk: "Тепла вода або мийний засіб, можна під високим тиском", pl: "Ciepła woda lub środek czyszczący, można pod wysokim ciśnieniem", en: "Warm water or cleaning agent, can be high pressure" },
-                    storage: { uk: "1-2 роки при температурі вище нуля", pl: "1-2 lata w temperaturze powyżej zera", en: "1-2 years at above zero temperature" },
-                    resistance: { uk: "Відмінна стійкість до прання та світла після 24 год фіксації", pl: "Doskonała odporność na pranie i światło po 24 h utrwalania", en: "Excellent wash and light resistance after 24 h fixation" },
-                    thinning: { uk: "Max 10% води або сповільнювач SX 5000", pl: "Max 10% wody lub opóźniacz SX 5000", en: "Max 10% water or retarder SX 5000" },
-                    additives: { uk: "HSX – затверджувач (3%, після додавання використати за 24 год); SX 150 + 11 паст – самостійне приготування кольорів", pl: "HSX – utwardzacz (3%, po dodaniu zużyć w ciągu 24 h); SX 150 + 11 past – samodzielne przygotowanie kolorów", en: "HSX – hardener (3%, use within 24 h after addition); SX 150 + 11 pastes – self-mixing of colors" },
-                    special: { uk: "Концентровані, прозорі, живі кольори. Доступні CMYK та флуо. Дуже еластична, не тріскається.", pl: "Skoncentrowane, przezroczyste, żywe kolory. Dostępne CMYK i fluo. Bardzo elastyczna, nie pęka.", en: "Concentrated, transparent, vivid colors. CMYK and fluo available. Very elastic, does not crack." }
-                }
+                properties: SX_PROPERTIES
             },
             SPTN: {
                 id: "SPTN",
@@ -125,18 +291,7 @@ SICOMIX.data = (function() {
                     pl: "Farba plastizolowa do wszystkich materiałów tekstylnych – naturalnych i syntetycznych. Druk bezpośredni i transferowy.",
                     en: "Plastisol ink for all textile materials – natural and synthetic. Direct and transfer printing."
                 },
-                properties: {
-                    type: { uk: "Пластизолева фарба", pl: "Farba plastizolowa", en: "Plastisol ink" },
-                    finish: { uk: "Сатиновий, м'який, дуже еластичний", pl: "Satyna, miękki, bardzo elastyczny", en: "Satin, soft, very elastic" },
-                    drying: { uk: "150-170°C ~2 хв", pl: "150-170°C ~2 min", en: "150-170°C ~2 min" },
-                    mesh: { uk: "Стандартні: 34-90 н/см; тріадні: 77-120; блискучі: 15", pl: "Standardowe: 34-90 n/cm; triadowe: 77-120; błyszczące: 15", en: "Standard: 34-90 n/cm; process: 77-120; glitter: 15" },
-                    cleaning: { uk: "CT 1000/1", pl: "CT 1000/1", en: "CT 1000/1" },
-                    storage: { uk: "5-20°C, до 5 років", pl: "5-20°C, do 5 lat", en: "5-20°C, up to 5 years" },
-                    resistance: { uk: "Відмінна стійкість до прання при дотриманні технології. Світлостійкість 2-3 роки (крім флуо).", pl: "Doskonała odporność na pranie przy przestrzeganiu technologii. Odporność na światło 2-3 lata (oprócz fluo).", en: "Excellent wash resistance when technology is followed. Lightfastness 2-3 years (except fluo)." },
-                    thinning: { uk: "SPT nr 1/SPTN 1000 – до 5%; SPTNCR – без обмежень", pl: "SPT nr 1/SPTN 1000 – do 5%; SPTNCR – bez ograniczeń", en: "SPT nr 1/SPTN 1000 – up to 5%; SPTNCR – unlimited" },
-                    additives: { uk: "SPTHNYL – до 10% для адгезії (суміш придатна 24 год); Nyloncoat – 5% для нейлону (суміш 24 год); база пучення; клей трансферний SPT nr 2", pl: "SPTHNYL – do 10% dla przyczepności (mieszanka ważna 24 h); Nyloncoat – 5% do nylonu (mieszanka 24 h); baza pęczniejąca; klej transferowy SPT nr 2", en: "SPTHNYL – up to 10% for adhesion (mix usable 24 h); Nyloncoat – 5% for nylon (mix 24 h); puff base; transfer adhesive SPT nr 2" },
-                    special: { uk: "Flash white SPTN91 – швидковисихаюча біла для бази; Opaque white SPTN91/l – дуже криюча та еластична", pl: "Flash white SPTN91 – szybkoschnąca biała do bazy; Opaque white SPTN91/l – bardzo kryjąca i elastyczna", en: "Flash white SPTN91 – fast drying white for base; Opaque white SPTN91/l – very opaque and elastic" }
-                }
+                properties: SPTN_PROPERTIES
             },
             AS: {
                 id: "AS",
@@ -147,17 +302,7 @@ SICOMIX.data = (function() {
                     pl: "Farba wodna do tektury, grubego papieru (min. 130 g/m²), drewna, tektury falistej. Ekologiczna, bez metali ciężkich, odpowiednia do zabawek dla dzieci i opakowań spożywczych.",
                     en: "Water-based ink for cardboard, thick paper (min. 130 g/m²), wood, corrugated cardboard. Eco-friendly, heavy metal free, suitable for children's toys and food packaging."
                 },
-                properties: {
-                    type: { uk: "Водна фарба", pl: "Farba wodna", en: "Water-based ink" },
-                    finish: { uk: "Сатиновий (блискуча версія AQUAGLOSS AG)", pl: "Satyna (błyszcząca wersja AQUAGLOSS AG)", en: "Satin (glossy version AQUAGLOSS AG)" },
-                    drying: { uk: "~1 год на відкритому повітрі, після тунелю можна складати в стоси", pl: "~1 godz. na otwartym powietrzu, po tunelu można układać w stosy", en: "~1 hour open air, after tunnel can be stacked" },
-                    mesh: { uk: "P77-P140", pl: "P77-P140", en: "P77-P140" },
-                    cleaning: { uk: "Вода (краще під високим тиском) або Aquaclean", pl: "Woda (lepiej pod wysokim ciśnieniem) lub Aquaclean", en: "Water (preferably high pressure) or Aquaclean" },
-                    storage: { uk: "4 роки при 5-25°C у добре закритій тарі", pl: "4 lata w temp. 5-25°C w szczelnie zamkniętym pojemniku", en: "4 years at 5-25°C in tightly closed container" },
-                    resistance: { uk: "Екологічна, без важких металів. Для зовнішнього застосування – додати 1% затверджувача (використати за 12 год)", pl: "Ekologiczna, bez metali ciężkich. Do zastosowań zewnętrznych – dodać 1% utwardzacza (zużyć w ciągu 12 h)", en: "Eco-friendly, heavy metal free. For outdoor use – add 1% hardener (use within 12 h)" },
-                    thinning: { uk: "Вода або сповільнювач AS 5000", pl: "Woda lub opóźniacz AS 5000", en: "Water or retarder AS 5000" },
-                    additives: { uk: "Затверджувач для водостійкості", pl: "Utwardzacz do wodoodporności", en: "Hardener for water resistance" }
-                }
+                properties: AS_PROPERTIES
             },
             OTF: {
                 id: "OTF",
@@ -168,18 +313,7 @@ SICOMIX.data = (function() {
                     pl: "Superkryjąca farba wodna do druku bezpośredniego i transferowego na ciemnych tkaninach (naturalnych i większości syntetycznych).",
                     en: "Super opaque water-based ink for direct and transfer printing on dark fabrics (natural and most synthetic)."
                 },
-                properties: {
-                    type: { uk: "Суперкриюча водна фарба", pl: "Superkryjąca farba wodna", en: "Super opaque water-based ink" },
-                    finish: { uk: "Криючий, м'який, без гумового ефекту", pl: "Kryjący, miękki, bez efektu gumy", en: "Opaque, soft, no rubber effect" },
-                    drying: { uk: "3 хв при 150°C без затверджувача; з 3% HOT – термофіксація не потрібна", pl: "3 min w 150°C bez utwardzacza; z 3% HOT – nie wymaga termofiksacji", en: "3 min at 150°C without hardener; with 3% HOT – no heat fixation needed" },
-                    mesh: { uk: "P34T до P77T", pl: "P34T do P77T", en: "P34T to P77T" },
-                    cleaning: { uk: "Холодна вода + мийний засіб (Aquaclean), під високим тиском; для емульсій водостійких – CT 1000/63", pl: "Zimna woda + środek czyszczący (Aquaclean), pod wysokim ciśnieniem; dla emulsji wodoodpornych – CT 1000/63", en: "Cold water + cleaning agent (Aquaclean), high pressure; for water-resistant emulsions – CT 1000/63" },
-                    storage: { uk: "1-2 роки при 10-25°C, берегти від морозу", pl: "1-2 lata w temp. 10-25°C, chronić przed mrozem", en: "1-2 years at 10-25°C, protect from frost" },
-                    resistance: { uk: "Відмінна після додавання HOT. Для нейлону – HOT обов'язково.", pl: "Doskonała po dodaniu HOT. Do nylonu – HOT obowiązkowo.", en: "Excellent after adding HOT. For nylon – HOT mandatory." },
-                    thinning: { uk: "Max 10% води, або OTF 5000 (повільний), або OTF 7000 (еластичний). Сумарно не більше 10%.", pl: "Max 10% wody, lub OTF 5000 (wolny), lub OTF 7000 (elastyczny). Łącznie nie więcej niż 10%.", en: "Max 10% water, or OTF 5000 (slow), or OTF 7000 (elastic). Total not more than 10%." },
-                    additives: { uk: "HOT – затверджувач 3%; OTF 150/14 – лак для трансферу (стійкість до прання, еластичність); OTF 150/18 – повільна версія; OTF 100/101 – чорний блокатор міграції для поліестеру; База пучення OTF – змішувати з пастами PPT (100г бази + 5г пасти)", pl: "HOT – utwardzacz 3%; OTF 150/14 – lakier do transferu (odporność na pranie, elastyczność); OTF 150/18 – wolna wersja; OTF 100/101 – czarny blokator migracji do poliestru; Baza pęczniejąca OTF – mieszać z pastami PPT (100g bazy + 5g pasty)", en: "HOT – hardener 3%; OTF 150/14 – transfer varnish (wash resistance, elasticity); OTF 150/18 – slow version; OTF 100/101 – black migration blocker for polyester; OTF puff base – mix with PPT pastes (100g base + 5g paste)" },
-                    special: { uk: "Дуже криюча, еластична, незважаючи на високі криючі властивості. Трансфер: протокол для 1-кольорових та багатокольорових; Transferglue OTF nr 2 – клей із порошком усередині; порошки Soft nr 3, nr 12, nr 4, nr 13; Cold peel.", pl: "Bardzo kryjąca, elastyczna, pomimo wysokich właściwości kryjących. Transfer: protokół dla 1-kolorowych i wielokolorowych; Transferglue OTF nr 2 – klej z proszkiem w środku; proszki Soft nr 3, nr 12, nr 4, nr 13; Cold peel.", en: "Very opaque, elastic, despite high opacity. Transfer: protocol for 1-color and multicolor; Transferglue OTF nr 2 – adhesive with powder inside; Soft powders nr 3, nr 12, nr 4, nr 13; Cold peel." }
-                }
+                properties: OTF_PROPERTIES
             },
             TPP: {
                 id: "TPP",
@@ -190,18 +324,7 @@ SICOMIX.data = (function() {
                     pl: "Farba rozpuszczalnikowa do wstępnie obrobionego polipropylenu (priplack, akylux, duoprop). Do wstępnie aktywowanego polietylenu – dodać 5% HTPP SLOW.",
                     en: "Solvent-based ink for pre-treated polypropylene (priplack, akylux, duoprop). For pre-activated polyethylene – add 5% HTPP SLOW."
                 },
-                properties: {
-                    type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
-                    finish: { uk: "Сатиновий", pl: "Satyna", en: "Satin" },
-                    drying: { uk: "10 хв на повітрі, миттєво в тунелі", pl: "10 min na powietrzu, natychmiastowo w tunelu", en: "10 min open air, instantly in tunnel" },
-                    mesh: { uk: "P90-120", pl: "P90-120", en: "P90-120" },
-                    cleaning: { uk: "ST 1000", pl: "ST 1000", en: "ST 1000" },
-                    storage: { uk: "Необмежений", pl: "Nieograniczona", en: "Unlimited" },
-                    resistance: { uk: "Відмінна стійкість до світла та атмосферних умов", pl: "Doskonała odporność na światło i warunki atmosferyczne", en: "Excellent light and weather resistance" },
-                    thinning: { uk: "TPP 1000 (швидкий), TPP 2000 (нормальний), TPP 3000/4000 (легке сповільнення), TPP 5000 (повільний), TPP 8000 (дуже повільний). Середнє: +/-15%", pl: "TPP 1000 (szybki), TPP 2000 (normalny), TPP 3000/4000 (lekkie spowolnienie), TPP 5000 (wolny), TPP 8000 (bardzo wolny). Średnio: +/-15%", en: "TPP 1000 (fast), TPP 2000 (normal), TPP 3000/4000 (mild retarder), TPP 5000 (slow), TPP 8000 (very slow). Average: +/-15%" },
-                    additives: { uk: "HTPP SLOW – затверджувач для стійкості до подряпин та адгезії (придатність 1 день); TPP 160 – високотиксотропна викривлююча добавка (10%); TPP 150 – прозора база / лак; AS 1000 – антистатик 5%; TPP 1702 – сповільнювач у гелі проти засихання", pl: "HTPP SLOW – utwardzacz do odporności na zarysowania i przyczepności (ważność 1 dzień); TPP 160 – dodatek wysokotiksotropowy wykrzywiający (10%); TPP 150 – baza przezroczysta / lakier; AS 1000 – antystatyk 5%; TPP 1702 – opóźniacz w żelu przeciw zasychaniu", en: "HTPP SLOW – hardener for scratch resistance and adhesion (usable 1 day); TPP 160 – highly thixotropic distorting additive (10%); TPP 150 – transparent base / varnish; AS 1000 – antistatic 5%; TPP 1702 – gel retarder against drying" },
-                    special: { uk: "Не додавати матуючий порошок – знижує адгезію. Для проблемних поверхонь – матеріал має бути активований.", pl: "Nie dodawać proszku matującego – zmniejsza przyczepność. Do problematycznych powierzchni – materiał musi być aktywowany.", en: "Do not add matting powder – reduces adhesion. For problem surfaces – material must be activated." }
-                }
+                properties: TPP_PROPERTIES
             },
             UV: {
                 id: "UV",
@@ -212,18 +335,7 @@ SICOMIX.data = (function() {
                     pl: "Farba UV do papieru i tektury. Wysoki połysk, doskonała elastyczność, możliwość składania. Lakier UV 150 – do offsetu i druku sitowego.",
                     en: "UV ink for paper and cardboard. High gloss, excellent flexibility, can be folded. UV 150 varnish – for offset and screen printing."
                 },
-                properties: {
-                    type: { uk: "УФ-фарба", pl: "Farba UV", en: "UV ink" },
-                    finish: { uk: "Високий глянець", pl: "Wysoki połysk", en: "High gloss" },
-                    drying: { uk: "УФ-промені: 1-2 лампи 80-100 Вт, швидкість 25-30 м/хв", pl: "Promienie UV: 1-2 lampy 80-100 W, prędkość 25-30 m/min", en: "UV rays: 1-2 lamps 80-100 W, speed 25-30 m/min" },
-                    mesh: { uk: "P140-P185T (алюміній/золото: P120, флуо: P90)", pl: "P140-P185T (aluminium/złoto: P120, fluo: P90)", en: "P140-P185T (aluminum/gold: P120, fluo: P90)" },
-                    cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
-                    storage: { uk: "1-2 роки у темних контейнерах при 5-25°C", pl: "1-2 lata w ciemnych pojemnikach w temp. 5-25°C", en: "1-2 years in dark containers at 5-25°C" },
-                    resistance: { uk: "Для внутрішнього застосування", pl: "Do zastosowań wewnętrznych", en: "For indoor use" },
-                    thinning: { uk: "UV 2000 – стандартний розчинник, 5-10%", pl: "UV 2000 – standardowy rozcieńczalnik, 5-10%", en: "UV 2000 – standard thinner, 5-10%" },
-                    additives: { uk: "—", pl: "—", en: "—" },
-                    special: { uk: "Висока еластичність – можна згинати/складати (важливо для POS-матеріалів).", pl: "Wysoka elastyczność – można zginać/składać (ważne dla materiałów POS).", en: "High elasticity – can be bent/folded (important for POS materials)." }
-                }
+                properties: UV_PROPERTIES
             },
             NST: {
                 id: "NST",
@@ -234,18 +346,7 @@ SICOMIX.data = (function() {
                     pl: "Farba rozpuszczalnikowa do poliamidu (nylon) i toreb non-woven. Wysoka elastyczność, odporność na ścieranie, warunki atmosferyczne i pranie (z dodatkiem HNST SLOW).",
                     en: "Solvent-based ink for polyamide (nylon) and non-woven bags. High elasticity, abrasion resistance, weather and wash resistance (with HNST SLOW addition)."
                 },
-                properties: {
-                    type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
-                    finish: { uk: "Сатиновий", pl: "Satyna", en: "Satin" },
-                    drying: { uk: "5 хв на повітрі, миттєво в тунелі", pl: "5 min na powietrzu, natychmiastowo w tunelu", en: "5 min open air, instantly in tunnel" },
-                    mesh: { uk: "P45-P90", pl: "P45-P90", en: "P45-P90" },
-                    cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
-                    storage: { uk: "Понад 24 місяці", pl: "Ponad 24 miesiące", en: "Over 24 months" },
-                    resistance: { uk: "Висока стійкість до прання (з HNST SLOW) та атмосферних умов", pl: "Wysoka odporność na pranie (z HNST SLOW) i warunki atmosferyczne", en: "High wash (with HNST SLOW) and weather resistance" },
-                    thinning: { uk: "До 15% сповільнювача NST 1702", pl: "Do 15% opóźniacza NST 1702", en: "Up to 15% retarder NST 1702" },
-                    additives: { uk: "HNST SLOW – каталізатор до 5%; NST 150 – прозора база (знижує криття та світлостійкість); MP 3000 – загусник 1-2%", pl: "HNST SLOW – katalizator do 5%; NST 150 – baza przezroczysta (zmniejsza krycie i odporność na światło); MP 3000 – zagęstnik 1-2%", en: "HNST SLOW – catalyst up to 5%; NST 150 – transparent base (reduces opacity and lightfastness); MP 3000 – thickener 1-2%" },
-                    special: { uk: "Ультракриючі кольори: 40, 42, 56. Прозорі кольори: 15, 25, 35, 55, 65, 75, 130-136, 140-143. Флуо – нижча світлостійкість. Всі кольори змішуються.", pl: "Ultrakryjące kolory: 40, 42, 56. Przezroczyste kolory: 15, 25, 35, 55, 65, 75, 130-136, 140-143. Fluo – niższa odporność na światło. Wszystkie kolory mieszają się.", en: "Ultra-opaque colors: 40, 42, 56. Transparent colors: 15, 25, 35, 55, 65, 75, 130-136, 140-143. Fluo – lower lightfastness. All colors are mixable." }
-                }
+                properties: NST_PROPERTIES
             },
             SP: {
                 id: "SP",
@@ -256,18 +357,7 @@ SICOMIX.data = (function() {
                     pl: "Farba rozpuszczalnikowa do papieru, tektury, papieru samoprzylepnego, metali lakierowanych, milmar, syntape. Aspekt matowy, szybkie schnięcie.",
                     en: "Solvent-based ink for paper, cardboard, self-adhesive paper, lacquered metals, milmar, syntape. Matte aspect, fast drying."
                 },
-                properties: {
-                    type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
-                    finish: { uk: "Матовий", pl: "Matowy", en: "Matte" },
-                    drying: { uk: "6 хв на повітрі, миттєво в тунелі", pl: "6 min na powietrzu, natychmiastowo w tunelu", en: "6 min open air, instantly in tunnel" },
-                    mesh: { uk: "P77-120", pl: "P77-120", en: "P77-120" },
-                    cleaning: { uk: "ST 1000", pl: "ST 1000", en: "ST 1000" },
-                    storage: { uk: "Кілька років", pl: "Kilka lat", en: "Several years" },
-                    resistance: { uk: "Відмінна для всіх кольорів", pl: "Doskonała dla wszystkich kolorów", en: "Excellent for all colors" },
-                    thinning: { uk: "SP 1000 (швидкий), SP 2000 (нормальний), SP 3000 (повільний). Середнє: +/-15%", pl: "SP 1000 (szybki), SP 2000 (normalny), SP 3000 (wolny). Średnio: +/-15%", en: "SP 1000 (fast), SP 2000 (normal), SP 3000 (slow). Average: +/-15%" },
-                    additives: { uk: "SP 160 – викривлююча паста (10%); SP 150 – прозора база; AS 1000 – антистатик 5%", pl: "SP 160 – pasta wykrzywiająca (10%); SP 150 – baza przezroczysta; AS 1000 – antystatyk 5%", en: "SP 160 – distorting paste (10%); SP 150 – transparent base; AS 1000 – antistatic 5%" },
-                    special: { uk: "Серія стійка до адгезивів.", pl: "Seria odporna na kleje.", en: "Series resistant to adhesives." }
-                }
+                properties: SP_PROPERTIES
             },
             SI: {
                 id: "SI",
@@ -278,18 +368,7 @@ SICOMIX.data = (function() {
                     pl: "Farba silikonowa do koszulek poliestrowych i kurtek softshell. Wysoka kryjącość, doskonała odporność na migrację barwnika. Do druku bezpośredniego i transferowego.",
                     en: "Silicone ink for polyester shirts and softshell jackets. High opacity, excellent dye migration resistance. For direct and transfer printing."
                 },
-                properties: {
-                    type: { uk: "Силіконова фарба", pl: "Farba silikonowa", en: "Silicone ink" },
-                    finish: { uk: "Сатиновий", pl: "Satyna", en: "Satin" },
-                    drying: { uk: "Прямий друк: 150°C, 2 хв; трансфер: 125-140°C, 60-90 сек", pl: "Druk bezpośredni: 150°C, 2 min; transfer: 125-140°C, 60-90 sek", en: "Direct: 150°C, 2 min; transfer: 125-140°C, 60-90 sec" },
-                    mesh: { uk: "P62", pl: "P62", en: "P62" },
-                    cleaning: { uk: "CT 1000/78", pl: "CT 1000/78", en: "CT 1000/78" },
-                    storage: { uk: "Мінімум 12 місяців", pl: "Minimum 12 miesięcy", en: "Minimum 12 months" },
-                    resistance: { uk: "Відмінна стійкість до прання", pl: "Doskonała odporność na pranie", en: "Excellent wash resistance" },
-                    thinning: { uk: "SI 2000 (нормальний) до 5%; SI 5000/4 (сповільнювач) 1-5%", pl: "SI 2000 (normalny) do 5%; SI 5000/4 (opóźniacz) 1-5%", en: "SI 2000 (normal) up to 5%; SI 5000/4 (retarder) 1-5%" },
-                    additives: { uk: "CSI – каталізатор 3-5%; Fixator SI – 1% (обмежений час життя)", pl: "CSI – katalizator 3-5%; Fixator SI – 1% (ograniczona przydatność)", en: "CSI – catalyst 3-5%; Fixator SI – 1% (limited pot life)" },
-                    special: { uk: "Не потребує додаткового шару проти міграції. Трансферний порошок nr 18. Сертифіковано Oekotex 100.", pl: "Nie wymaga dodatkowej warstwy przeciw migracji. Proszek transferowy nr 18. Certyfikat Oekotex 100.", en: "No extra anti-bleeding layer needed. Transfer powder nr 18. Oekotex 100 certified." }
-                }
+                properties: SI_PROPERTIES
             },
             SN: {
                 id: "SN",
@@ -300,18 +379,7 @@ SICOMIX.data = (function() {
                     pl: "Farba rozpuszczalnikowa do nylonu (parasole, torby sportowe). Dobra przyczepność, elastyczność, odporność na wodę (nie na pranie).",
                     en: "Solvent-based ink for nylon (umbrellas, sports bags). Good adhesion, flexibility, water resistance (not wash resistant)."
                 },
-                properties: {
-                    type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
-                    finish: { uk: "Сатиновий", pl: "Satyna", en: "Satin" },
-                    drying: { uk: "4 хв на повітрі, миттєво в тунелі", pl: "4 min na powietrzu, natychmiastowo w tunelu", en: "4 min open air, instantly in tunnel" },
-                    mesh: { uk: "P77-120", pl: "P77-120", en: "P77-120" },
-                    cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
-                    storage: { uk: "Необмежений", pl: "Nieograniczona", en: "Unlimited" },
-                    resistance: { uk: "Відмінна стійкість до світла, але не до прання", pl: "Doskonała odporność na światło, ale nie na pranie", en: "Excellent light resistance, but not wash resistant" },
-                    thinning: { uk: "SN 1000 (швидкий), SN 2000 (нормальний), SN 3000/4000 (повільний), SN 5000 (повільний). Середнє: +/-10%", pl: "SN 1000 (szybki), SN 2000 (normalny), SN 3000/4000 (wolny), SN 5000 (wolny). Średnio: +/-10%", en: "SN 1000 (fast), SN 2000 (normal), SN 3000/4000 (slow), SN 5000 (slow). Average: +/-10%" },
-                    additives: { uk: "SN 150 – прозора база; SN 160 – викривлююча паста (10%); AS 1000 – антистатик 5%; SN 1702 – сповільнювач у гелі (+/-10%)", pl: "SN 150 – baza przezroczysta; SN 160 – pasta wykrzywiająca (10%); AS 1000 – antystatyk 5%; SN 1702 – opóźniacz w żelu (+/-10%)", en: "SN 150 – transparent base; SN 160 – distorting paste (10%); AS 1000 – antistatic 5%; SN 1702 – gel retarder (+/-10%)" },
-                    special: { uk: "Тільки водостійкість, не для прання.", pl: "Tylko odporność na wodę, nie na pranie.", en: "Water resistance only, not wash resistant." }
-                }
+                properties: SN_PROPERTIES
             },
             QS: {
                 id: "QS",
@@ -322,18 +390,7 @@ SICOMIX.data = (function() {
                     pl: "Szybkoschnąca farba rozpuszczalnikowa do twardego PVC, polistyrenu, plexi, elastycznego PVC, naklejek. Natychmiastowe schnięcie w tunelu.",
                     en: "Quick-drying solvent-based ink for hard PVC, polystyrene, plexi, flexible PVC, stickers. Instant drying in tunnel."
                 },
-                properties: {
-                    type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
-                    finish: { uk: "Глянцевий", pl: "Błyszczący", en: "Glossy" },
-                    drying: { uk: "6 хв на повітрі, миттєво в тунелі", pl: "6 min na powietrzu, natychmiastowo w tunelu", en: "6 min open air, instantly in tunnel" },
-                    mesh: { uk: "P77-120", pl: "P77-120", en: "P77-120" },
-                    cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
-                    storage: { uk: "Необмежений", pl: "Nieograniczona", en: "Unlimited" },
-                    resistance: { uk: "Відмінна для всіх кольорів", pl: "Doskonała dla wszystkich kolorów", en: "Excellent for all colors" },
-                    thinning: { uk: "QS 1000 (швидкий), QS 2000 (нормальний), QS 3000/4000 (повільний), QS 5000 (повільний), QS 8000 (дуже повільний). Середнє: +/-15%", pl: "QS 1000 (szybki), QS 2000 (normalny), QS 3000/4000 (wolny), QS 5000 (wolny), QS 8000 (bardzo wolny). Średnio: +/-15%", en: "QS 1000 (fast), QS 2000 (normal), QS 3000/4000 (slow), QS 5000 (slow), QS 8000 (very slow). Average: +/-15%" },
-                    additives: { uk: "QS 160 – викривлююча паста (10-20%); QS 150 – прозора база; AS 1000 – антистатик 5%; QS 170/1702 – сповільнювач у гелі; HQS – затверджувач 5% для адгезії; Weekmaker nr 2000 – 3% для PETG", pl: "QS 160 – pasta wykrzywiająca (10-20%); QS 150 – baza przezroczysta; AS 1000 – antystatyk 5%; QS 170/1702 – opóźniacz w żelu; HQS – utwardzacz 5% dla przyczepności; Weekmaker nr 2000 – 3% dla PETG", en: "QS 160 – distorting paste (10-20%); QS 150 – transparent base; AS 1000 – antistatic 5%; QS 170/1702 – gel retarder; HQS – hardener 5% for adhesion; Weekmaker nr 2000 – 3% for PETG" },
-                    special: { uk: "Для PETG додавати Weekmaker nr 2000, щоб уникнути тріщин.", pl: "Do PETG dodawać Weekmaker nr 2000, aby uniknąć pęknięć.", en: "For PETG add Weekmaker nr 2000 to avoid cracks." }
-                }
+                properties: QS_PROPERTIES
             },
             PX: {
                 id: "PX",
@@ -344,18 +401,7 @@ SICOMIX.data = (function() {
                     pl: "Dwuskładnikowa farba epoksydowa do szkła, płytek, metali. Wysoki połysk, doskonała przyczepność do twardych powierzchni.",
                     en: "Two-component epoxy ink for glass, tiles, metals. High gloss, excellent adhesion to tough surfaces."
                 },
-                properties: {
-                    type: { uk: "Епоксидна фарба", pl: "Farba epoksydowa", en: "Epoxy ink" },
-                    finish: { uk: "Високий глянець", pl: "Wysoki połysk", en: "High gloss" },
-                    drying: { uk: "Пилонепроникний: 60 хв, складання: 3 год, повне твердіння: 24-48 год", pl: "Pyłosuchość: 60 min, układanie: 3 h, pełne utwardzenie: 24-48 h", en: "Dust-free: 60 min, stackable: 3 h, full cure: 24-48 h" },
-                    mesh: { uk: "P77-120", pl: "P77-120", en: "P77-120" },
-                    cleaning: { uk: "CT 1000/1 або CT 1000", pl: "CT 1000/1 lub CT 1000", en: "CT 1000/1 or CT 1000" },
-                    storage: { uk: "Без затверджувача: кілька років; із затверджувачем: 8 год", pl: "Bez utwardzacza: kilka lat; z utwardzaczem: 8 h", en: "Without hardener: several years; with hardener: 8 h" },
-                    resistance: { uk: "Відмінна для стандартних кольорів", pl: "Doskonała dla standardowych kolorów", en: "Excellent for standard colors" },
-                    thinning: { uk: "Не потребує розрідження", pl: "Nie wymaga rozcieńczania", en: "No dilution needed" },
-                    additives: { uk: "PXHPX – затверджувач (15-17% в залежності від кольору)", pl: "PXHPX – utwardzacz (15-17% w zależności od koloru)", en: "PXHPX – hardener (15-17% depending on color)" },
-                    special: { uk: "Поверхні повинні бути знежирені. Після затвердіння фарбу неможливо видалити з сітки.", pl: "Powierzchnie muszą być odtłuszczone. Po utwardzeniu farby nie można usunąć z sita.", en: "Surfaces must be degreased. After curing, ink cannot be removed from screen." }
-                }
+                properties: PX_PROPERTIES
             },
             ECVF: {
                 id: "ECVF",
@@ -366,20 +412,8 @@ SICOMIX.data = (function() {
                     pl: "Elastyczna farba do banerów PVC i płótna. Do sitodruku i nakładania walcowego. Doskonała odporność na warunki atmosferyczne.",
                     en: "Flexible ink for PVC banners and canvas. For screen printing and roller coating. Excellent weather resistance."
                 },
-                properties: {
-                    type: { uk: "Розчинникова фарба", pl: "Farba rozpuszczalnikowa", en: "Solvent-based ink" },
-                    finish: { uk: "Глянцевий", pl: "Błyszczący", en: "Glossy" },
-                    drying: { uk: "При 20°C: валкове нанесення 1-2 год, трафаретний друк P45: 15 хв", pl: "W 20°C: nakładanie walcowe 1-2 h, sitodruk P45: 15 min", en: "At 20°C: roller coating 1-2 h, screen printing P45: 15 min" },
-                    mesh: { uk: "P45 для трафаретного друку", pl: "P45 dla sitodruku", en: "P45 for screen printing" },
-                    cleaning: { uk: "CT 1000 або CT 1000/1", pl: "CT 1000 lub CT 1000/1", en: "CT 1000 or CT 1000/1" },
-                    storage: { uk: "Необмежений", pl: "Nieograniczona", en: "Unlimited" },
-                    resistance: { uk: "Відмінна для всіх кольорів, крім флуо", pl: "Doskonała dla wszystkich kolorów, z wyjątkiem fluo", en: "Excellent for all colors, except fluo" },
-                    thinning: { uk: "ECVF 1000 – швидкий розчинник: 5% для P45, 30% для валкового нанесення", pl: "ECVF 1000 – szybki reduktor: 5% dla P45, 30% dla nakładania walcowego", en: "ECVF 1000 – quick reducer: 5% for P45, 30% for roller coating" },
-                    additives: { uk: "—", pl: "—", en: "—" },
-                    special: { uk: "Можна наносити валками або трафаретним друком. Іноді потрібне знежирення IPA.", pl: "Można nakładać walcami lub sitodrukiem. Czasami wymagane odtłuszczenie IPA.", en: "Can be applied by roller or screen printing. Sometimes degreasing with IPA needed." }
-                }
+                properties: ECVF_PROPERTIES
             },
-            // Додаткові серії, яких немає в PDF, але є в Excel (EVS, TA, MTR, SB) – використовуємо наявні описи з коду або приблизні
             EVS: {
                 id: "EVS",
                 name: { uk: "EVASTAR EVS", pl: "EVASTAR EVS", en: "EVASTAR EVS" },
@@ -389,7 +423,7 @@ SICOMIX.data = (function() {
                     pl: "Farba do materiałów EVA, doskonała przyczepność.",
                     en: "Ink for EVA materials, excellent adhesion."
                 },
-                properties: JSON.parse(JSON.stringify(series.SX.properties)) // копіюємо властивості SX
+                properties: JSON.parse(JSON.stringify(SX_PROPERTIES))
             },
             TA: {
                 id: "TA",
@@ -400,7 +434,7 @@ SICOMIX.data = (function() {
                     pl: "Farba do tampodruku, wysoka kryjącość.",
                     en: "Ink for tampon printing, high opacity."
                 },
-                properties: JSON.parse(JSON.stringify(series.EC.properties)) // копіюємо властивості EC
+                properties: JSON.parse(JSON.stringify(EC_PROPERTIES))
             },
             MTR: {
                 id: "MTR",
@@ -411,7 +445,7 @@ SICOMIX.data = (function() {
                     pl: "Specjalna farba do zastosowań przemysłowych.",
                     en: "Special ink for industrial applications."
                 },
-                properties: JSON.parse(JSON.stringify(series.EC.properties))
+                properties: JSON.parse(JSON.stringify(EC_PROPERTIES))
             },
             SB: {
                 id: "SB",
@@ -422,9 +456,19 @@ SICOMIX.data = (function() {
                     pl: "Farba zdrapka (scratch-off), stosowana w losach itp.",
                     en: "Scratch-off ink used in lottery tickets, etc."
                 },
-                properties: JSON.parse(JSON.stringify(series.EC.properties))
+                properties: JSON.parse(JSON.stringify(EC_PROPERTIES))
             },
-            // Для SXP, ECP, ECG, CFP, PPUV – відносимо до відповідних серій, тому окремо не створюємо
+            OTHER: {
+                id: "OTHER",
+                name: { uk: "Інші", pl: "Inne", en: "Other" },
+                category: "Інші",
+                description: {
+                    uk: "Інші фарби, що не належать до стандартних категорій.",
+                    pl: "Inne farby, nie należące do standardowych kategorii.",
+                    en: "Other inks not belonging to standard categories."
+                },
+                properties: JSON.parse(JSON.stringify(EC_PROPERTIES))
+            }
         };
 
         // ---------- КАТЕГОРІЇ З ОПИСАМИ ----------
@@ -474,11 +518,6 @@ SICOMIX.data = (function() {
                 pl: "Dwuskładnikowe farby epoksydowe do szkła, ceramiki, metalu. Wysoka odporność chemiczna i przyczepność.",
                 en: "Two-component epoxy inks for glass, ceramics, metal. High chemical resistance and adhesion."
             },
-            "Автомобільні": {
-                uk: "Фарби для автомобільних деталей, стійкі до бензину, оливи та атмосферних впливів.",
-                pl: "Farby do części samochodowych, odporne na benzynę, olej i warunki atmosferyczne.",
-                en: "Inks for automotive parts, resistant to petrol, oil and weather conditions."
-            },
             "Інші": {
                 uk: "Інші фарби, що не належать до стандартних категорій.",
                 pl: "Inne farby, nie należące do standardowych kategorii.",
@@ -491,7 +530,7 @@ SICOMIX.data = (function() {
             }
         };
 
-        // ---------- БАЗОВІ КОЛЬОРИ (для стандартних кодів) ----------
+        // ---------- БАЗОВІ КОЛЬОРИ ----------
         const baseColors = [
             { code: "10", name: { uk: "Фіолетовий", pl: "Fioletowy", en: "Violet" }, color: "#800080" },
             { code: "20", name: { uk: "Синій", pl: "Niebieski", en: "Blue" }, color: "#0000FF" },
@@ -544,7 +583,7 @@ SICOMIX.data = (function() {
             { code: "75", name: { uk: "Прозорий рожевий", pl: "Transparent różowy", en: "Transparent Pink" }, color: "#FFC0CB" }
         ];
 
-        // ---------- СПЕЦІАЛЬНІ КОЛЬОРИ (для нестандартних кодів) ----------
+        // ---------- СПЕЦІАЛЬНІ КОЛЬОРИ ----------
         const specialColors = {
             "60/146": { uk: "Вогненно-червоний", pl: "Ognista czerwień", en: "Fire red", color: "#E34234" },
             "61/163": { uk: "Темно-вогненно-червоний", pl: "Ciemna ognista czerwień", en: "Dark fire red", color: "#C41E3A" },
@@ -565,15 +604,17 @@ SICOMIX.data = (function() {
             "91/W1": { uk: "Білий криючий", pl: "Biały kryjący", en: "Opaque White", color: "#F8F8FF" },
             "91 LED": { uk: "Білий криючий LED", pl: "Biały kryjący LED", en: "Opaque White LED", color: "#F8F8FF" },
             "90 LED": { uk: "Білий LED", pl: "Biały LED", en: "White LED", color: "#FFFFFF" },
-            // ... можна додати всі спеціальні коди з Excel
+            "110 LED": { uk: "Срібло LED", pl: "Srebro LED", en: "Silver LED", color: "#C0C0C0" },
+            "150/56": { uk: "UV Bright", pl: "UV Bright", en: "UV Bright", color: "#FFFFFF" },
+            "91 TV": { uk: "Білий густий", pl: "Biały gęsty", en: "Thick White", color: "#F8F8FF" },
+            "91 MO": { uk: "Білий суперкриючий", pl: "Biały super kryjący", en: "Super opaque White", color: "#F8F8FF" },
+            "110 MO": { uk: "Срібло криюче", pl: "Srebro kryjące", en: "Opaque Silver", color: "#C0C0C0" },
+            "110/2": { uk: "Перламутрова біла", pl: "Biała perlista", en: "Pearlescent White", color: "#FFFFFF" },
+            "120/48": { uk: "Золото Pantone 871 C", pl: "Złoto Pantone 871 C", en: "Gold Pantone 871 C", color: "#FFD700" },
+            // Додаткові спеціальні коди можна додавати за потреби
         };
 
-        // ---------- МАСИВ КОДІВ ФАРБ З EXCEL (реальний асортимент) ----------
-        // Тут перелічені всі коди з Excel, які мають бути в каталозі.
-        // Кожен елемент – це об'єкт з полями:
-        // - code: повний код фарби (наприклад "SP23")
-        // - seriesId: ідентифікатор серії (наприклад "SP")
-        // - colorCode: код кольору (наприклад "23") для стандартних, або спеціальний ключ
+        // ---------- МАСИВ КОДІВ ФАРБ З EXCEL ----------
         const excelPaintCodes = [
             // SP
             { code: "SP23", seriesId: "SP", colorCode: "23" },
@@ -674,7 +715,6 @@ SICOMIX.data = (function() {
             { code: "SX100", seriesId: "SX", colorCode: "100" },
             { code: "SX81/22", seriesId: "SX", colorCode: "81/22" },
             { code: "SX150", seriesId: "SX", colorCode: "150" },
-            // Додати SXP COOL GRAY 11 (серія SX)
             { code: "SXP COOL GRAY 11", seriesId: "SX", colorCode: "COOL GRAY 11" },
             // SI
             { code: "SI91", seriesId: "SI", colorCode: "91" },
@@ -796,7 +836,7 @@ SICOMIX.data = (function() {
             { code: "AS10", seriesId: "AS", colorCode: "10" },
             { code: "AS100", seriesId: "AS", colorCode: "100" },
             // PLUV
-            { code: "PPUV91/W1", seriesId: "PLUV", colorCode: "91/W1" }, // віднесено до PLUV
+            { code: "PPUV91/W1", seriesId: "PLUV", colorCode: "91/W1" },
             { code: "PLUV91", seriesId: "PLUV", colorCode: "91" },
             { code: "PLUV91/53", seriesId: "PLUV", colorCode: "91/53" },
             { code: "PLUV90", seriesId: "PLUV", colorCode: "90" },
@@ -863,7 +903,7 @@ SICOMIX.data = (function() {
             { code: "PLUV110", seriesId: "PLUV", colorCode: "110" },
             { code: "PLUV10", seriesId: "PLUV", colorCode: "10" },
             { code: "PLUV100", seriesId: "PLUV", colorCode: "100" },
-            // PLUV LED (окрема серія PLUV_LED)
+            // PLUV LED
             { code: "PLUV91 LED", seriesId: "PLUV_LED", colorCode: "91 LED" },
             { code: "PLUV90 LED", seriesId: "PLUV_LED", colorCode: "90 LED" },
             { code: "PLUV82 LED", seriesId: "PLUV_LED", colorCode: "82 LED" },
@@ -1270,58 +1310,36 @@ SICOMIX.data = (function() {
             { code: "FARBA BIAŁA HYDRA WHITE 120 CLZ", seriesId: "OTHER", colorCode: "HYDRA", seriesName: { uk: "Hydra White", pl: "Hydra White", en: "Hydra White" }, category: "Інші" },
         ];
 
-        // ---------- ФУНКЦІЯ ГЕНЕРАЦІЇ ФАРБ ----------
+        // Функція генерації фарб
         function generatePaints() {
             const paints = [];
             let idCounter = 1;
 
             excelPaintCodes.forEach(item => {
-                // Визначаємо серію
-                let serie;
-                if (item.seriesId === "OTHER") {
-                    // Створюємо тимчасову серію для "Інші"
-                    serie = {
-                        id: "OTHER",
-                        name: item.seriesName || { uk: "Інші", pl: "Inne", en: "Other" },
-                        category: item.category || "Інші",
-                        description: {
-                            uk: "Фарба з категорії 'Інші'.",
-                            pl: "Farba z kategorii 'Inne'.",
-                            en: "Ink from the 'Other' category."
-                        },
-                        properties: series.EC.properties // базові властивості
-                    };
-                } else {
-                    serie = series[item.seriesId];
-                    if (!serie) {
-                        console.warn(`Серія ${item.seriesId} не знайдена, пропускаємо ${item.code}`);
-                        return;
-                    }
+                let serie = series[item.seriesId];
+                if (!serie) {
+                    // Якщо серія не знайдена, використовуємо OTHER
+                    serie = series.OTHER;
                 }
 
-                // Визначаємо назву кольору та hex
-                let colorName = { uk: "", pl: "", en: "" };
+                let colorName = { uk: item.colorCode, pl: item.colorCode, en: item.colorCode };
                 let colorHex = "#000000";
 
-                // Спочатку шукаємо в baseColors
+                // Спочатку шукаємо в базових кольорах
                 const baseColor = baseColors.find(bc => bc.code === item.colorCode);
                 if (baseColor) {
                     colorName = baseColor.name;
                     colorHex = baseColor.color;
                 } else {
-                    // Шукаємо в specialColors
+                    // Шукаємо в спеціальних кольорах
                     const special = specialColors[item.colorCode];
                     if (special) {
                         colorName = { uk: special.uk, pl: special.pl, en: special.en };
                         colorHex = special.color;
-                    } else {
-                        // Якщо не знайдено, використовуємо код як назву
-                        colorName = { uk: item.colorCode, pl: item.colorCode, en: item.colorCode };
                     }
                 }
 
-                // Формуємо об'єкт фарби
-                const paint = {
+                paints.push({
                     id: `paint-${idCounter++}`,
                     name: item.code,
                     series: item.seriesId,
@@ -1349,8 +1367,7 @@ SICOMIX.data = (function() {
                         en: `Series: ${serie.name.en}, Color: ${item.code} - ${colorName.en}, Category: ${serie.category}`
                     },
                     colorName: colorName
-                };
-                paints.push(paint);
+                });
             });
 
             return paints;
@@ -1358,7 +1375,7 @@ SICOMIX.data = (function() {
 
         const paints = generatePaints();
 
-        // ---------- ДОДАТКИ (additives) ----------
+        // ---------- ДОДАТКИ ----------
         const additives = [
             // Трансферні порошки
             {
@@ -2083,7 +2100,7 @@ SICOMIX.data = (function() {
         // ---------- КАТЕГОРІЇ (список) ----------
         const categories = Object.keys(categoryDescriptions);
 
-        // ---------- ІНШІ ДАНІ (без змін) ----------
+        // ---------- ІНШІ ДАНІ ----------
         const units = [
             { value: "г", label: { uk: "Грами", pl: "Gramy", en: "Grams" } },
             { value: "кг", label: { uk: "Кілограми", pl: "Kilogramy", en: "Kilograms" } },
@@ -2123,15 +2140,7 @@ SICOMIX.data = (function() {
         return {
             paints,
             recipes: [],
-            series: Object.values(series).concat([
-                // Додаємо серії, які використовуються в "Інші"
-                { id: "OTHER", name: { uk: "Інші", pl: "Inne", en: "Other" }, category: "Інші", description: { uk: "Інші фарби", pl: "Inne farby", en: "Other inks" }, properties: series.EC.properties },
-                { id: "MTR", name: { uk: "MTR", pl: "MTR", en: "MTR" }, category: "Інші", description: { uk: "Спеціальна фарба для промислового застосування.", pl: "Specjalna farba do zastosowań przemysłowych.", en: "Special ink for industrial applications." }, properties: series.EC.properties },
-                { id: "EVS", name: { uk: "EVASTAR EVS", pl: "EVASTAR EVS", en: "EVASTAR EVS" }, category: "Спеціальні", description: { uk: "Фарба для EVA-матеріалів, відмінна адгезія.", pl: "Farba do materiałów EVA, doskonała przyczepność.", en: "Ink for EVA materials, excellent adhesion." }, properties: series.SX.properties },
-                { id: "TA", name: { uk: "TAMPOPRINT TA", pl: "TAMPOPRINT TA", en: "TAMPOPRINT TA" }, category: "Спеціальні", description: { uk: "Фарба для тамподруку, висока криюча здатність.", pl: "Farba do tampodruku, wysoka kryjącość.", en: "Ink for tampon printing, high opacity." }, properties: series.EC.properties },
-                { id: "SB", name: { uk: "SCRATCH SB", pl: "SCRATCH SB", en: "SCRATCH SB" }, category: "Спеціальні", description: { uk: "Фарба для дряпок (scratch-off).", pl: "Farba zdrapka (scratch-off).", en: "Scratch-off ink." }, properties: series.EC.properties },
-                { id: "PLUV_LED", ...series.PLUV_LED }
-            ]),
+            series: Object.values(series),
             baseColors,
             additives,
             categories,
