@@ -149,6 +149,14 @@ window.SICOMIX = window.SICOMIX || {};
             updatePaintCount();
         }
 
+        // Додаємо метод для отримання даних (потрібен для sync.js)
+        function getRecords() {
+            return {
+                recipes: recipes,
+                userPaints: userPaints
+            };
+        }
+
         // ---------- АВТОЗБЕРЕЖЕННЯ ЧЕРНЕТКИ РЕЦЕПТУ ----------
         function autoSaveRecipeDraft() {
             if (!currentSettings.autoSave) return;
@@ -987,7 +995,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- КАТАЛОГ ФАРБ ----------
+        // ---------- КАТАЛОГ ФАРБ (ВИПРАВЛЕНО: ГРУПУВАННЯ ЗА КАТЕГОРІЯМИ) ----------
         function renderPaintCatalog(append = false) {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -998,9 +1006,9 @@ window.SICOMIX = window.SICOMIX || {};
                 const search = document.getElementById('catalogSearch')?.value?.toLowerCase() || '';
                 const allSeries = SICOMIX.data.series || [];
                 const lang = SICOMIX.i18n.getLanguage();
-
                 const layoutClass = currentSettings.catalogLayout || 'classic';
 
+                // Знаходимо серії, які мають фарби з урахуванням пошуку
                 let seriesWithPaints = allSeries.filter(series => {
                     let seriesPaints = paintCatalog.filter(p => p.series === series.id);
                     if (search) {
@@ -1013,13 +1021,14 @@ window.SICOMIX = window.SICOMIX || {};
                     return seriesPaints.length > 0;
                 });
 
-                const startIndex = 0;
+                const startIndex = (catalogPage - 1) * CATALOG_PAGE_SIZE;
                 const endIndex = catalogPage * CATALOG_PAGE_SIZE;
                 const paginatedSeries = seriesWithPaints.slice(startIndex, endIndex);
                 const hasMore = seriesWithPaints.length > endIndex;
 
                 if (loadMoreCatalogBtn) {
                     loadMoreCatalogBtn.style.display = hasMore ? 'inline-block' : 'none';
+                    loadMoreCatalogBtn.textContent = SICOMIX.i18n.t('load_more');
                 }
 
                 if (paginatedSeries.length === 0 && !append) {
@@ -1027,71 +1036,102 @@ window.SICOMIX = window.SICOMIX || {};
                     return;
                 }
 
-                let html = '';
-                let totalFoundPaints = 0;
-
+                // Групуємо пагіновані серії за категоріями
+                const seriesByCategory = {};
                 paginatedSeries.forEach(series => {
-                    let seriesPaints = paintCatalog.filter(p => p.series === series.id);
-                    if (search) {
-                        seriesPaints = seriesPaints.filter(p => {
-                            const paintName = p.displayName?.[lang] || p.name;
-                            return paintName.toLowerCase().includes(search) ||
-                                   (p.article && p.article.toLowerCase().includes(search));
-                        });
+                    const category = series.category || SICOMIX.i18n.t('other');
+                    if (!seriesByCategory[category]) {
+                        seriesByCategory[category] = [];
                     }
-                    totalFoundPaints += seriesPaints.length;
-
-                    const seriesName = series.name[lang] || series.id;
-                    const category = series.category || '';
-
-                    html += `
-                        <div class="series-card catalog-layout-${layoutClass}" data-series="${series.id}">
-                            <div class="series-header">
-                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                    <div>
-                                        <h3>
-                                            ${SICOMIX.utils.escapeHtml(seriesName)}
-                                            <span class="series-count">(${seriesPaints.length})</span>
-                                        </h3>
-                                        <span class="recipe-category">${SICOMIX.i18n.translateCategory(category)}</span>
-                                    </div>
-                                    <div style="display: flex; gap: 8px;">
-                                        <button class="btn-icon series-info-btn" title="${SICOMIX.i18n.t('properties')}">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                        <button class="btn-icon toggle-series" title="${SICOMIX.i18n.t('expand')}">
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="series-paints" style="display: none;">
-                                ${seriesPaints.map(p => {
-                                    const paintName = p.displayName?.[lang] || p.name;
-                                    const article = p.article || p.name;
-                                    return `
-                                    <div class="paint-mini-card" data-paint-id="${p.id}" data-paint-series="${p.series}">
-                                        <div class="paint-mini-swatch" style="border-color: ${SICOMIX.utils.escapeHtml(p.color)};"></div>
-                                        <div class="paint-mini-info">
-                                            <div class="paint-mini-article">${SICOMIX.utils.escapeHtml(article)}</div>
-                                            <div class="paint-mini-name">${SICOMIX.utils.escapeHtml(paintName)}</div>
-                                        </div>
-                                        ${!p.isDefault ? `
-                                            <button class="btn-icon delete-paint" data-paint-id="${p.id}" title="${SICOMIX.i18n.t('delete')}"><i class="fas fa-trash"></i></button>
-                                        ` : ''}
-                                        <button class="btn-icon paint-add-btn" data-paint-id="${p.id}" title="${SICOMIX.i18n.t('add_ingredient')}"><i class="fas fa-plus"></i></button>
-                                    </div>
-                                `}).join('')}
-                            </div>
-                        </div>
-                    `;
+                    seriesByCategory[category].push(series);
                 });
 
+                // Сортуємо категорії (наприклад, за алфавітом)
+                const sortedCategories = Object.keys(seriesByCategory).sort();
+
+                let html = '';
+
+                // Якщо є пошук, показуємо статистику
                 if (search && !append) {
-                    const statsHtml = `<div class="search-stats"><i class="fas fa-search"></i> Знайдено фарб: ${totalFoundPaints} у ${paginatedSeries.length} серіях</div>`;
-                    html = statsHtml + html;
+                    const totalFoundPaints = paginatedSeries.reduce((acc, series) => {
+                        let seriesPaints = paintCatalog.filter(p => p.series === series.id);
+                        if (search) {
+                            seriesPaints = seriesPaints.filter(p => {
+                                const paintName = p.displayName?.[lang] || p.name;
+                                return paintName.toLowerCase().includes(search) ||
+                                       (p.article && p.article.toLowerCase().includes(search));
+                            });
+                        }
+                        return acc + seriesPaints.length;
+                    }, 0);
+                    html += `<div class="search-stats"><i class="fas fa-search"></i> ${SICOMIX.i18n.t('found_paints', { count: totalFoundPaints })}</div>`;
                 }
+
+                // Для кожної категорії виводимо заголовок і всі її серії
+                sortedCategories.forEach(category => {
+                    const seriesInCategory = seriesByCategory[category];
+                    html += `<div class="category-group">`;
+                    html += `<h2 class="category-title">${SICOMIX.i18n.translateCategory(category)}</h2>`;
+
+                    seriesInCategory.forEach(series => {
+                        let seriesPaints = paintCatalog.filter(p => p.series === series.id);
+                        if (search) {
+                            seriesPaints = seriesPaints.filter(p => {
+                                const paintName = p.displayName?.[lang] || p.name;
+                                return paintName.toLowerCase().includes(search) ||
+                                       (p.article && p.article.toLowerCase().includes(search));
+                            });
+                        }
+                        // Якщо після фільтрації фарб немає, пропускаємо серію (хоча ми вже відфільтрували на початку)
+                        if (seriesPaints.length === 0) return;
+
+                        const seriesName = series.name[lang] || series.id;
+                        html += `
+                            <div class="series-card catalog-layout-${layoutClass}" data-series="${series.id}">
+                                <div class="series-header">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                        <div>
+                                            <h3>
+                                                ${SICOMIX.utils.escapeHtml(seriesName)}
+                                                <span class="series-count">(${seriesPaints.length})</span>
+                                            </h3>
+                                            <!-- Категорія тепер винесена в заголовок групи, тому тут не показуємо -->
+                                        </div>
+                                        <div style="display: flex; gap: 8px;">
+                                            <button class="btn-icon series-info-btn" title="${SICOMIX.i18n.t('properties')}">
+                                                <i class="fas fa-info-circle"></i>
+                                            </button>
+                                            <button class="btn-icon toggle-series" title="${SICOMIX.i18n.t('expand')}">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="series-paints" style="display: none;">
+                                    ${seriesPaints.map(p => {
+                                        const paintName = p.displayName?.[lang] || p.name;
+                                        const article = p.article || p.name;
+                                        return `
+                                        <div class="paint-mini-card" data-paint-id="${p.id}" data-paint-series="${p.series}">
+                                            <div class="paint-mini-swatch" style="border-color: ${SICOMIX.utils.escapeHtml(p.color)};"></div>
+                                            <div class="paint-mini-info">
+                                                <div class="paint-mini-article">${SICOMIX.utils.escapeHtml(article)}</div>
+                                                <div class="paint-mini-name">${SICOMIX.utils.escapeHtml(paintName)}</div>
+                                            </div>
+                                            ${!p.isDefault ? `
+                                                <button class="btn-icon delete-paint" data-paint-id="${p.id}" title="${SICOMIX.i18n.t('delete')}"><i class="fas fa-trash"></i></button>
+                                            ` : ''}
+                                            <button class="btn-icon paint-add-btn" data-paint-id="${p.id}" title="${SICOMIX.i18n.t('add_ingredient')}"><i class="fas fa-plus"></i></button>
+                                        </div>
+                                    `}).join('')}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`; // Закриваємо category-group
+                });
 
                 if (append) {
                     paintCatalogEl.insertAdjacentHTML('beforeend', html);
@@ -1099,6 +1139,7 @@ window.SICOMIX = window.SICOMIX || {};
                     paintCatalogEl.innerHTML = html;
                 }
 
+                // Розгортаємо всі серії, якщо є пошук
                 if (search) {
                     document.querySelectorAll('.series-card').forEach(card => {
                         const paintsDiv = card.querySelector('.series-paints');
@@ -1113,6 +1154,7 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 }
 
+                // Додаємо обробники подій для кнопок
                 document.querySelectorAll('.toggle-series').forEach(btn => {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
@@ -1531,7 +1573,7 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('exported') + '!', 'success');
         }
 
-        // ---------- ДОПОМІЖНІ ФУНКЦІЇ (ВИПРАВЛЕНО) ----------
+        // ---------- ДОПОМІЖНІ ФУНКЦІЇ ----------
         function populateCategoryFilters() {
             const uniqueCategories = [...new Set(
                 paintCatalog
@@ -1611,7 +1653,7 @@ window.SICOMIX = window.SICOMIX || {};
             if (!recipePhotoPreview || !recipePhotoImg) return;
             recipePhotoPreview.style.display = 'block';
             recipePhotoImg.src = dataUrl;
-            if (fileNameSpan) fileNameSpan.textContent = 'Фото завантажено';
+            if (fileNameSpan) fileNameSpan.textContent = SICOMIX.i18n.t('photo_uploaded');
         }
 
         function resetPhotoPreview() {
@@ -1653,12 +1695,14 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('welcome_title'), 'success', 2000);
         }
 
+        // Публічний API
         return {
             init: initApp,
             deleteRecipe,
             exportRecipe,
             editRecipe,
             deletePaint,
+            getRecords,          // додано для sync.js
             showNotification: SICOMIX.utils.showNotification
         };
     })();
