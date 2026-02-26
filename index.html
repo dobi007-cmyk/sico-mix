@@ -19,7 +19,7 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='2' y1='16' x2='30' y2='16' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%237b2cbf'/%3E%3Cstop offset='0.5' stop-color='%233a86ff'/%3E%3Cstop offset='1' stop-color='%234cc9f0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M16 2 L30 12 L30 22 L16 30 L2 22 L2 12 L16 2Z' fill='url(%23grad)' /%3E%3C/svg%3E" type="image/svg+xml">
     <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.13">
 
-    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ ========== -->
+    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ (ВИПРАВЛЕНО) ========== -->
     <script>
         (function() {
             console.log('🛡️ Антикризовий захист активовано');
@@ -46,21 +46,32 @@
                 return false;
             };
 
-            let currentHref = window.location.href;
-            Object.defineProperty(window.location, 'href', {
-                set: function(value) {
-                    console.warn('⚠️ Спроба змінити location.href на', value, '– ЗАБЛОКОВАНО');
-                },
-                get: function() {
-                    return currentHref;
-                },
-                configurable: false
-            });
-
+            // Блокуємо зміну location.href через перевизначення методів assign/replace (безпечніше)
+            const originalAssign = window.location.assign;
             const originalReplace = window.location.replace;
-            window.location.replace = function() {
-                console.warn('⚠️ Спроба викликати location.replace() – ЗАБЛОКОВАНО');
+            
+            window.location.assign = function(url) {
+                console.warn('⚠️ Спроба викликати location.assign() на', url, '– ЗАБЛОКОВАНО');
             };
+            window.location.replace = function(url) {
+                console.warn('⚠️ Спроба викликати location.replace() на', url, '– ЗАБЛОКОВАНО');
+            };
+
+            // Спроба перевизначити href (може викинути помилку, тому обгортаємо)
+            try {
+                let currentHref = window.location.href;
+                Object.defineProperty(window.location, 'href', {
+                    set: function(value) {
+                        console.warn('⚠️ Спроба змінити location.href на', value, '– ЗАБЛОКОВАНО');
+                    },
+                    get: function() {
+                        return currentHref;
+                    },
+                    configurable: false
+                });
+            } catch (e) {
+                console.warn('⚠️ Не вдалося перевизначити location.href (пропускаємо)');
+            }
 
             window.addEventListener('error', function(e) {
                 console.error('❌ Помилка перехоплена:', e.error || e.message);
@@ -514,16 +525,16 @@
                 </div>
             </div>
 
-          <!-- MODAL: Series Details -->
-<div class="modal" id="seriesDetailsModal">
-    <div class="modal-content" style="max-width: 700px;">
-        <div class="modal-header">
-            <h3 class="modal-title" id="seriesDetailsTitle">Деталі серії</h3>
-            <button class="modal-close" id="closeSeriesModal">&times;</button>
-        </div>
-        <div id="seriesDetailsContent" style="padding: 20px; max-height: 60vh; overflow-y: auto;"></div>
-    </div>
-</div>
+            <!-- MODAL: Series Details (ОДИН) -->
+            <div class="modal" id="seriesDetailsModal">
+                <div class="modal-content" style="max-width: 700px;">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="seriesDetailsTitle">Деталі серії</h3>
+                        <button class="modal-close" id="closeSeriesModal">&times;</button>
+                    </div>
+                    <div id="seriesDetailsContent" style="padding: 20px; max-height: 60vh; overflow-y: auto;"></div>
+                </div>
+            </div>
         </main>
 
         <footer class="footer">
@@ -605,17 +616,6 @@
         </div>
     </div>
 
-     <!-- MODAL: Series Details -->
-    <div class="modal" id="seriesDetailsModal">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">
-                <h3 class="modal-title" id="seriesDetailsTitle">Деталі серії</h3>
-                <button class="modal-close" id="closeSeriesModal">&times;</button>
-            </div>
-            <div id="seriesDetailsContent" style="padding: 20px; max-height: 60vh; overflow-y: auto;"></div>
-        </div>
-    </div>
-
     <!-- MODAL: Authentication -->
     <div class="modal" id="authModal">
         <div class="modal-content" style="max-width: 400px;">
@@ -646,11 +646,11 @@
     </div>
 
     <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ ========== -->
-    <script src="./js/firebase-config.js?v=2026.02.13"></script> <!-- новий -->
+    <script src="./js/firebase-config.js?v=2026.02.13"></script>
     <script src="./js/data-colors.js?v=2026.02.13"></script>
     <script src="./js/i18n.js?v=2026.02.13"></script>
     <script src="./js/utils.js?v=2026.02.13"></script>
-    <script src="./js/sync.js?v=2026.02.13"></script> <!-- новий -->
+    <script src="./js/sync.js?v=2026.02.13"></script>
     <script src="./js/app.js?v=2026.02.13"></script>
 
     <script>
