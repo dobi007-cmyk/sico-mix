@@ -13,17 +13,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="./css/style.css?v=2026.02.27">
-    <link rel="manifest" href="./manifest.json?v=2026.02.27">
-    <!-- SVG-фавікон (data URI) -->
+    <link rel="stylesheet" href="./css/style.css?v=2026.02.28">
+    <link rel="manifest" href="./manifest.json?v=2026.02.28">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='2' y1='16' x2='30' y2='16' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%237b2cbf'/%3E%3Cstop offset='0.5' stop-color='%233a86ff'/%3E%3Cstop offset='1' stop-color='%234cc9f0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M16 2 L30 12 L30 22 L16 30 L2 22 L2 12 L16 2Z' fill='url(%23grad)' /%3E%3C/svg%3E" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.27">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png?v=2026.02.28">
 
-    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ (ВИПРАВЛЕНО) ========== -->
+    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ ========== -->
     <script>
         (function() {
             console.log('🛡️ Антикризовий захист активовано');
-
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
                     for (let registration of registrations) {
@@ -32,32 +30,25 @@
                         }).catch(e => console.error('Помилка видалення SW:', e));
                     }
                 }).catch(console.error);
-                
                 const originalRegister = navigator.serviceWorker.register;
                 navigator.serviceWorker.register = function() {
                     console.warn('⚠️ Спроба реєстрації SW – ЗАБЛОКОВАНО');
                     return Promise.reject(new Error('Service Worker disabled'));
                 };
             }
-
             const originalReload = window.location.reload;
             window.location.reload = function() {
                 console.warn('⚠️ Спроба викликати location.reload() – ЗАБЛОКОВАНО');
                 return false;
             };
-
-            // Блокуємо зміну location.href через перевизначення методів assign/replace (безпечніше)
             const originalAssign = window.location.assign;
             const originalReplace = window.location.replace;
-            
             window.location.assign = function(url) {
                 console.warn('⚠️ Спроба викликати location.assign() на', url, '– ЗАБЛОКОВАНО');
             };
             window.location.replace = function(url) {
                 console.warn('⚠️ Спроба викликати location.replace() на', url, '– ЗАБЛОКОВАНО');
             };
-
-            // Спроба перевизначити href (може викинути помилку, тому обгортаємо)
             try {
                 let currentHref = window.location.href;
                 Object.defineProperty(window.location, 'href', {
@@ -72,21 +63,17 @@
             } catch (e) {
                 console.warn('⚠️ Не вдалося перевизначити location.href (пропускаємо)');
             }
-
             window.addEventListener('error', function(e) {
                 console.error('❌ Помилка перехоплена:', e.error || e.message);
                 e.preventDefault();
                 return true;
             });
-
             window.addEventListener('unhandledrejection', function(e) {
                 console.error('❌ Unhandled Promise Rejection:', e.reason);
                 e.preventDefault();
             });
-
             window.SICOMIX = window.SICOMIX || {};
             window.SICOMIX.data = window.SICOMIX.data || {};
-
             console.log('🛡️ Захист завершено');
         })();
     </script>
@@ -97,12 +84,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <!-- Preloader -->
     <div id="preloader">
         <div class="spectrum-spinner"></div>
     </div>
-
-    <!-- Декоративна абстрактна пляма фарби -->
     <div class="paint-blob"></div>
 
     <!-- Mobile Navigation -->
@@ -125,7 +109,7 @@
         </div>
     </div>
 
-    <!-- Sidebar (Glass) -->
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-container">
@@ -193,6 +177,7 @@
             </li>
         </ul>
 
+        <!-- Тільки один пункт "Налаштування" (виправлено) -->
         <h3 class="nav-title" data-i18n="settings">Налаштування</h3>
         <ul class="nav-menu">
             <li class="nav-item">
@@ -483,6 +468,71 @@
                 </div>
             </div>
 
+            <!-- SETTINGS PAGE (НОВА) -->
+            <div class="page-content" id="settings-page">
+                <h2 class="page-title" data-i18n="settings">Налаштування</h2>
+                <p class="page-description" data-i18n="settings_desc">Налаштуйте систему за вашими потребами</p>
+
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-sliders-h"></i> <span data-i18n="general_settings">Загальні налаштування</span></h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="interface_language">Мова інтерфейсу</label>
+                        <select class="form-select" id="languageSelect">
+                            <option value="uk">Українська 🇺🇦</option>
+                            <option value="en">English 🇬🇧</option>
+                            <option value="pl">Polski 🇵🇱</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="measurement_units">Одиниці вимірювання</label>
+                        <select class="form-select" id="unitsSelect">
+                            <option value="grams" data-i18n="grams">Грами (г)</option>
+                            <option value="ml" data-i18n="ml">Мілілітри (мл)</option>
+                            <option value="percent" data-i18n="percent">Відсотки (%)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="theme">Тема оформлення</label>
+                        <select class="form-select" id="themeSelect">
+                            <option value="spectrum" data-i18n="theme_spectrum">Спектр (за замовчуванням)</option>
+                            <option value="organic" data-i18n="theme_organic">Органічна</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="catalog_layout">Компонування каталогу</label>
+                        <select class="form-select" id="catalogLayoutSelect">
+                            <option value="classic">Classic</option>
+                            <option value="compact">Compact</option>
+                            <option value="list">List</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 12px;">
+                            <input type="checkbox" id="autoSaveCheckbox" checked>
+                            <span data-i18n="auto_save_changes">Автоматично зберігати зміни</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 12px;">
+                            <input type="checkbox" id="backupCheckbox">
+                            <span data-i18n="create_backups">Створювати резервні копії</span>
+                        </label>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="saveSettingsBtn"><i class="fas fa-save"></i> <span data-i18n="save_settings">Зберегти налаштування</span></button>
+                        <button class="btn btn-warning" id="resetSettingsBtn"><i class="fas fa-undo"></i> <span data-i18n="reset_defaults">Скинути до стандартних</span></button>
+                        <button class="btn btn-danger" id="clearAllDataBtn"><i class="fas fa-trash"></i> <span data-i18n="clear_all_data">Очистити всі дані</span></button>
+                    </div>
+                </div>
+            </div>
+
             <!-- MODAL: Series Details -->
             <div class="modal" id="seriesDetailsModal">
                 <div class="modal-content" style="max-width: 700px;">
@@ -603,25 +653,22 @@
         </div>
     </div>
 
-    <!-- ========== ПІДКЛЮЧЕННЯ СКРИПТІВ (оновлена версія) ========== -->
-    <script src="./js/firebase-config.js?v=2026.02.27"></script>
-    <script src="./js/data-colors.js?v=2026.02.27"></script>
-    <script src="./js/i18n.js?v=2026.02.27"></script>
-    <script src="./js/utils.js?v=2026.02.27"></script>
-    <script src="./js/sync.js?v=2026.02.27"></script>
-    <script src="./js/app.js?v=2026.02.27"></script>
+    <script src="./js/firebase-config.js?v=2026.02.28"></script>
+    <script src="./js/data-colors.js?v=2026.02.28"></script>
+    <script src="./js/i18n.js?v=2026.02.28"></script>
+    <script src="./js/utils.js?v=2026.02.28"></script>
+    <script src="./js/sync.js?v=2026.02.28"></script>
+    <script src="./js/app.js?v=2026.02.28"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 DOM готовий, ініціалізація...');
-            
             if (window.SICOMIX?.i18n?.init) {
                 window.SICOMIX.i18n.init();
             }
             if (window.SICOMIX?.app?.init) {
                 window.SICOMIX.app.init();
             }
-
             const authModal = document.getElementById('authModal');
             const closeAuthModal = document.getElementById('closeAuthModal');
             if (closeAuthModal) {
