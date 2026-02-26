@@ -207,7 +207,7 @@ window.SICOMIX = window.SICOMIX || {};
                 unsaved_changes_warning: "У вас є незбережені зміни. Ви впевнені, що хочете покинути сторінку?",
                 csv_parsing_error: "Помилка розбору CSV. Переконайтеся, що файл має правильний формат.",
 
-                // *** АВТЕНТИФІКАЦІЯ ***
+                // АВТЕНТИФІКАЦІЯ
                 syncing: "Синхронізація...",
                 login: "Увійти",
                 email: "Email",
@@ -418,7 +418,7 @@ window.SICOMIX = window.SICOMIX || {};
                 unsaved_changes_warning: "You have unsaved changes. Are you sure you want to leave?",
                 csv_parsing_error: "CSV parsing error. Ensure the file has the correct format.",
 
-                // *** AUTHENTICATION ***
+                // AUTHENTICATION
                 syncing: "Syncing...",
                 login: "Login",
                 email: "Email",
@@ -629,7 +629,7 @@ window.SICOMIX = window.SICOMIX || {};
                 unsaved_changes_warning: "Masz niezapisane zmiany. Czy na pewno chcesz opuścić stronę?",
                 csv_parsing_error: "Błąd parsowania CSV. Upewnij się, że plik ma prawidłowy format.",
 
-                // *** AUTENTYKACJA ***
+                // AUTENTYKACJA
                 syncing: "Synchronizacja...",
                 login: "Zaloguj się",
                 email: "Email",
