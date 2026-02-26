@@ -179,10 +179,10 @@ window.SICOMIX = window.SICOMIX || {};
         // Функція для примусового збереження всього
         async function saveAll() {
             if (!currentUser) return;
-            const recipes = window.SICOMIX.app?.getRecords?.().recipes || [];
-            const userPaints = window.SICOMIX.app?.getRecords?.().userPaints || [];
-            await saveRecipesToFirestore(recipes);
-            await saveUserPaintsToFirestore(userPaints);
+            // Використовуємо getRecords, який тепер є в app
+            const data = window.SICOMIX.app?.getRecords?.() || { recipes: [], userPaints: [] };
+            await saveRecipesToFirestore(data.recipes);
+            await saveUserPaintsToFirestore(data.userPaints);
         }
 
         return {
