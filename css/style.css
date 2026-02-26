@@ -131,8 +131,6 @@ body.theme-organic {
     background: #f8f3ec url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="1" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.02"/></svg>');
 }
 
-/* ... (інші стилі теми органік залишаються без змін) ... */
-
 /* ===== PRELOADER ===== */
 #preloader {
     position: fixed;
@@ -1337,6 +1335,37 @@ body.theme-organic {
 /* Анімація розгортання */
 .series-paints {
     transition: all 0.3s ease;
+}
+
+/* ===== ГРУПУВАННЯ ЗА КАТЕГОРІЯМИ ===== */
+.category-group {
+    margin-bottom: 40px;
+}
+.category-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--spectrum-blue);
+    text-shadow: 0 0 10px rgba(58,134,255,0.3);
+    letter-spacing: -0.5px;
+}
+.theme-organic .category-title {
+    border-bottom-color: var(--spectrum-green);
+}
+
+/* Стилі для статистики пошуку */
+.search-stats {
+    margin-bottom: 30px;
+    padding: 12px 24px;
+    background: rgba(58,134,255,0.1);
+    border-radius: var(--radius-full);
+    display: inline-block;
+    color: var(--text-secondary);
+    font-size: 15px;
+    border: 1px solid rgba(58,134,255,0.3);
+    backdrop-filter: blur(8px);
 }
 
 /* ===== RESPONSIVE – МОБІЛЬНА АДАПТАЦІЯ ===== */
