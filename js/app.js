@@ -652,6 +652,17 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
+        // НОВА ФУНКЦІЯ: видалити фарбу з рецепту за її ID
+        function removeIngredientByPaintId(paintId) {
+            const index = selectedIngredients.findIndex(ing => String(ing.paintId) === String(paintId));
+            if (index !== -1) {
+                deleteIngredient(index);
+                // Після видалення оновлюємо каталог, щоб кнопка змінилася
+                renderPaintCatalog();
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_removed_from_recipe'), 'success');
+            }
+        }
+
         function calculatePercentages() {
             selectedIngredients = SICOMIX.utils.calculateIngredientPercentages(selectedIngredients);
             renderIngredientsList();
@@ -985,7 +996,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- КАТАЛОГ ФАРБ (оновлений з новими glass-картками) ----------
+        // ---------- КАТАЛОГ ФАРБ (оновлений з glass-картками та динамічною кнопкою) ----------
         function renderPaintCatalog(append = false) {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -1042,16 +1053,24 @@ window.SICOMIX = window.SICOMIX || {};
                     const seriesName = series.name[lang] || series.id;
                     const category = series.category || '';
 
-                    // Генерація карток фарб у стилі Glass
+                    // Генерація карток фарб у стилі Glass з динамічною кнопкою
                     const paintsHtml = seriesPaints.map(p => {
                         const paintName = p.displayName?.[lang] || p.name;
+                        // Перевіряємо, чи є ця фарба в поточному рецепті
+                        const isInRecipe = selectedIngredients.some(ing => String(ing.paintId) === String(p.id));
+                        // Визначаємо іконку, текст та дію для кнопки
+                        const buttonIcon = isInRecipe ? 'fa-trash' : 'fa-plus';
+                        const buttonTitle = isInRecipe ? SICOMIX.i18n.t('remove_from_recipe') : SICOMIX.i18n.t('add_ingredient');
+                        const buttonClass = isInRecipe ? 'glass-remove-btn' : 'glass-add-btn';
+                        
                         return `
                         <div class="paint-card-glass" data-paint-id="${p.id}" data-paint-series="${p.series}" style="color: ${p.color};">
                             <div class="glass-swatch" style="background: ${SICOMIX.utils.escapeHtml(p.color)};"></div>
                             <div class="glass-name">${SICOMIX.utils.escapeHtml(paintName)}</div>
                             <div class="glass-article">${SICOMIX.utils.escapeHtml(p.article || '')}</div>
-                            <button class="glass-add-btn" data-paint-id="${p.id}" title="${SICOMIX.i18n.t('add_ingredient')}"><i class="fas fa-plus"></i></button>
-                            <button class="glass-copy-btn" data-hex="${p.color}" title="${SICOMIX.i18n.t('copy_hex')}"><i class="fas fa-copy"></i></button>
+                            <button class="${buttonClass}" data-paint-id="${p.id}" title="${buttonTitle}">
+                                <i class="fas ${buttonIcon}"></i>
+                            </button>
                             ${!p.isDefault ? `
                                 <button class="delete-paint" data-paint-id="${p.id}" title="${SICOMIX.i18n.t('delete')}">
                                     <i class="fas fa-trash"></i>
@@ -1158,20 +1177,7 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 });
 
-                // ===== НОВІ ОБРОБНИКИ ДЛЯ GLASS-КАРТОК =====
-                // Копіювання HEX
-                document.querySelectorAll('.glass-copy-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const hex = btn.dataset.hex;
-                        navigator.clipboard.writeText(hex).then(() => {
-                            SICOMIX.utils.showNotification(`HEX ${hex} ${SICOMIX.i18n.t('copied')}`, 'success');
-                        }).catch(() => {
-                            SICOMIX.utils.showNotification(`HEX: ${hex}`, 'info');
-                        });
-                    });
-                });
-
+                // ===== НОВІ ОБРОБНИКИ ДЛЯ ДИНАМІЧНИХ КНОПОК =====
                 // Додавання до рецепту
                 document.querySelectorAll('.glass-add-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -1179,6 +1185,18 @@ window.SICOMIX = window.SICOMIX || {};
                         const paintId = btn.dataset.paintId;
                         const paint = paintCatalog.find(p => String(p.id) === paintId);
                         if (paint) addPaintToRecipeFromCatalog(paint);
+                        // Після додавання оновлюємо каталог, щоб кнопка змінилася на видалення
+                        renderPaintCatalog();
+                    });
+                });
+
+                // Видалення з рецепту
+                document.querySelectorAll('.glass-remove-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const paintId = btn.dataset.paintId;
+                        removeIngredientByPaintId(paintId);
+                        // Оновлення каталогу вже є всередині removeIngredientByPaintId
                     });
                 });
 
