@@ -430,6 +430,30 @@ window.SICOMIX = window.SICOMIX || {};
                     }
                 }
             });
+
+            // ДЕЛЕГОВАНИЙ ОБРОБНИК ДЛЯ КНОПОК ДОДАВАННЯ/ВИДАЛЕННЯ
+            if (paintCatalogEl) {
+                paintCatalogEl.addEventListener('click', function(e) {
+                    const btn = e.target.closest('.glass-add-btn, .glass-remove-btn');
+                    if (!btn) return;
+                    e.stopPropagation();
+                    const paintId = btn.dataset.paintId;
+                    const paint = paintCatalog.find(p => String(p.id) === paintId);
+                    if (!paint) return;
+
+                    if (btn.classList.contains('glass-add-btn')) {
+                        // Додати фарбу
+                        if (checkSeriesLock(paint.series)) {
+                            addPaintToRecipeFromCatalog(paint);
+                            updatePaintButton(paintId, true);
+                        }
+                    } else if (btn.classList.contains('glass-remove-btn')) {
+                        // Видалити фарбу
+                        removeIngredientByPaintId(paintId);
+                        updatePaintButton(paintId, false);
+                    }
+                });
+            }
         }
 
         // ---------- НАВІГАЦІЯ ----------
@@ -1169,28 +1193,7 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 });
 
-                // ===== ОБРОБНИКИ ДЛЯ КНОПОК =====
-                document.querySelectorAll('.glass-add-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const paintId = btn.dataset.paintId;
-                        const paint = paintCatalog.find(p => String(p.id) === paintId);
-                        if (paint) {
-                            addPaintToRecipeFromCatalog(paint);
-                            updatePaintButton(paintId, true);
-                        }
-                    });
-                });
-
-                document.querySelectorAll('.glass-remove-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const paintId = btn.dataset.paintId;
-                        removeIngredientByPaintId(paintId);
-                        updatePaintButton(paintId, false);
-                    });
-                });
-
+                // ===== ОБРОБНИКИ ДЛЯ ІНШИХ КНОПОК (видалення користувацьких фарб) =====
                 document.querySelectorAll('.delete-paint').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -1199,6 +1202,7 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 });
 
+                // Клік на саму картку – показ деталей
                 document.querySelectorAll('.paint-card-glass').forEach(card => {
                     card.addEventListener('click', function(e) {
                         if (e.target.closest('button')) return;
