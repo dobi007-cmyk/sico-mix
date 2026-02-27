@@ -171,6 +171,7 @@ window.SICOMIX = window.SICOMIX || {};
                 paints_not_found: "Фарб не знайдено",
                 paint_already_added: "Ця фарба вже додана",
                 paint_added_to_recipe: "Фарбу додано до рецепту",
+                paint_removed_from_recipe: "Фарбу видалено з рецепту",
                 fill_required_fields: "Заповніть обов'язкові поля та додайте хоча б один інгредієнт",
                 recipe_saved: "Рецепт успішно збережено!",
                 invalid_file_format: "Невірний формат файлу",
@@ -221,7 +222,10 @@ window.SICOMIX = window.SICOMIX || {};
                 other: "Інші",
                 photo_uploaded: "Фото завантажено",
                 found_paints: "Знайдено фарб: {count}",
-                select_data_to_export: "Оберіть дані для експорту"
+                select_data_to_export: "Оберіть дані для експорту",
+
+                // НОВІ КЛЮЧІ ДЛЯ ПІДКАЗОК КНОПОК
+                remove_from_recipe: "Видалити з рецепту"
             },
             en: {
                 // Глобальні
@@ -388,6 +392,7 @@ window.SICOMIX = window.SICOMIX || {};
                 paints_not_found: "No paints found",
                 paint_already_added: "This paint is already added",
                 paint_added_to_recipe: "Paint added to recipe",
+                paint_removed_from_recipe: "Paint removed from recipe",
                 fill_required_fields: "Fill required fields and add at least one ingredient",
                 recipe_saved: "Recipe saved successfully!",
                 invalid_file_format: "Invalid file format",
@@ -438,7 +443,10 @@ window.SICOMIX = window.SICOMIX || {};
                 other: "Other",
                 photo_uploaded: "Photo uploaded",
                 found_paints: "Found paints: {count}",
-                select_data_to_export: "Select data to export"
+                select_data_to_export: "Select data to export",
+
+                // NEW KEYS FOR BUTTON TOOLTIPS
+                remove_from_recipe: "Remove from recipe"
             },
             pl: {
                 // Глобальні
@@ -605,6 +613,7 @@ window.SICOMIX = window.SICOMIX || {};
                 paints_not_found: "Nie znaleziono farb",
                 paint_already_added: "Ta farba została już dodana",
                 paint_added_to_recipe: "Farba dodana do receptury",
+                paint_removed_from_recipe: "Farba usunięta z receptury",
                 fill_required_fields: "Wypełnij wymagane pola i dodaj co najmniej jeden składnik",
                 recipe_saved: "Receptura zapisana pomyślnie!",
                 invalid_file_format: "Nieprawidłowy format pliku",
@@ -655,7 +664,10 @@ window.SICOMIX = window.SICOMIX || {};
                 other: "Inne",
                 photo_uploaded: "Zdjęcie przesłane",
                 found_paints: "Znaleziono farby: {count}",
-                select_data_to_export: "Wybierz dane do eksportu"
+                select_data_to_export: "Wybierz dane do eksportu",
+
+                // NOWE KLUCZE DLA PODPOWIEDZI PRZYCISKÓW
+                remove_from_recipe: "Usuń z receptury"
             }
         };
 
