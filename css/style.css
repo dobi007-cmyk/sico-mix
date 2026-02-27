@@ -1171,7 +1171,6 @@ body.theme-organic .paint-count {
 }
 
 /* ===== SERIES CATALOG – МІНІМАЛІСТИЧНИЙ ЕСТЕТИЧНИЙ ДИЗАЙН ===== */
-/* ===== ВАРІАНТ 2: НЕОН (яскравий, контрастний) ===== */
 .series-card {
     background: #0b0d10;
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -1317,7 +1316,7 @@ body.theme-organic .paint-count {
     margin-top: 20px;
 }
 
-/* ===== НОВИЙ СТИЛЬ КАРТОК – НЕО-МОРФІЗМ (GLASS) ===== */
+/* ===== НЕО-МОРФІЗМ (GLASS) – КАРТКИ ФАРБ ===== */
 .paint-card-glass {
     background: rgba(20, 25, 30, 0.8);
     backdrop-filter: blur(10px);
@@ -1369,7 +1368,8 @@ body.theme-organic .paint-count {
     margin-bottom: 8px;
 }
 
-.paint-card-glass .glass-add-btn {
+/* Стилі для кнопок додавання/видалення (однакові) */
+.glass-add-btn, .glass-remove-btn {
     position: absolute;
     bottom: 16px;
     right: 16px;
@@ -1389,49 +1389,25 @@ body.theme-organic .paint-count {
     z-index: 3;
 }
 
-.paint-card-glass:hover .glass-add-btn {
+.paint-card-glass:hover .glass-add-btn,
+.paint-card-glass:hover .glass-remove-btn {
     opacity: 1;
     transform: scale(1);
 }
 
-.paint-card-glass .glass-add-btn:hover {
+.glass-add-btn:hover {
     background: var(--spectrum-blue);
     border-color: transparent;
     box-shadow: 0 0 15px var(--spectrum-blue);
 }
 
-.paint-card-glass .glass-copy-btn {
-    position: absolute;
-    bottom: 16px;
-    left: 16px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    transition: all 0.2s;
-    opacity: 0;
-    transform: scale(0.8);
-    cursor: pointer;
-    z-index: 3;
-}
-
-.paint-card-glass:hover .glass-copy-btn {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.paint-card-glass .glass-copy-btn:hover {
-    background: var(--spectrum-cyan);
+.glass-remove-btn:hover {
+    background: var(--spectrum-red);
     border-color: transparent;
-    color: black;
+    box-shadow: 0 0 15px var(--spectrum-red);
 }
 
-/* Кнопка видалення для користувацьких фарб (залишаємо сумісною) */
+/* Кнопка видалення користувацької фарби (залишається) */
 .paint-card-glass .delete-paint {
     position: absolute;
     top: 8px;
@@ -1723,42 +1699,4 @@ body.theme-organic .paint-count {
         opacity: 0;
         transform: translate(-50%, 20px);
     }
-    /* Стилі для кнопок додавання/видалення (однакові) */
-.glass-add-btn, .glass-remove-btn {
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
-    background: rgba(58, 134, 255, 0.2);
-    border: 1px solid rgba(58, 134, 255, 0.4);
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    transition: all 0.2s;
-    opacity: 0;
-    transform: scale(0.8);
-    cursor: pointer;
-    z-index: 3;
-}
-
-.paint-card-glass:hover .glass-add-btn,
-.paint-card-glass:hover .glass-remove-btn {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.glass-add-btn:hover {
-    background: var(--spectrum-blue);
-    border-color: transparent;
-    box-shadow: 0 0 15px var(--spectrum-blue);
-}
-
-.glass-remove-btn:hover {
-    background: var(--spectrum-red);
-    border-color: transparent;
-    box-shadow: 0 0 15px var(--spectrum-red);
-}
 }
