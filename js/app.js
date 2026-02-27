@@ -1177,7 +1177,7 @@ window.SICOMIX = window.SICOMIX || {};
                         const paint = paintCatalog.find(p => String(p.id) === paintId);
                         if (paint) {
                             addPaintToRecipeFromCatalog(paint);
-                            updatePaintButton(paintId, true); // оновлюємо тільки цю кнопку
+                            updatePaintButton(paintId, true);
                         }
                     });
                 });
@@ -1187,7 +1187,7 @@ window.SICOMIX = window.SICOMIX || {};
                         e.stopPropagation();
                         const paintId = btn.dataset.paintId;
                         removeIngredientByPaintId(paintId);
-                        updatePaintButton(paintId, false); // оновлюємо тільки цю кнопку
+                        updatePaintButton(paintId, false);
                     });
                 });
 
