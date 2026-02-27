@@ -1723,4 +1723,42 @@ body.theme-organic .paint-count {
         opacity: 0;
         transform: translate(-50%, 20px);
     }
+    /* Стилі для кнопок додавання/видалення (однакові) */
+.glass-add-btn, .glass-remove-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    background: rgba(58, 134, 255, 0.2);
+    border: 1px solid rgba(58, 134, 255, 0.4);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.2s;
+    opacity: 0;
+    transform: scale(0.8);
+    cursor: pointer;
+    z-index: 3;
+}
+
+.paint-card-glass:hover .glass-add-btn,
+.paint-card-glass:hover .glass-remove-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.glass-add-btn:hover {
+    background: var(--spectrum-blue);
+    border-color: transparent;
+    box-shadow: 0 0 15px var(--spectrum-blue);
+}
+
+.glass-remove-btn:hover {
+    background: var(--spectrum-red);
+    border-color: transparent;
+    box-shadow: 0 0 15px var(--spectrum-red);
+}
 }
