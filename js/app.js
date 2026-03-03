@@ -1022,7 +1022,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ---------- КАТАЛОГ ФАРБ ----------
+        // ---------- КАТАЛОГ ФАРБ (ВИПРАВЛЕНО) ----------
         function renderPaintCatalog(append = false) {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -1034,7 +1034,18 @@ window.SICOMIX = window.SICOMIX || {};
                 const allSeries = SICOMIX.data.series || [];
                 const lang = SICOMIX.i18n.getLanguage();
 
-                let seriesWithPaints = allSeries.filter(series => {
+                // Унікалізуємо серії за id (на випадок дублікатів у даних)
+                const seriesMap = new Map();
+                allSeries.forEach(series => {
+                    if (!seriesMap.has(series.id)) {
+                        seriesMap.set(series.id, series);
+                    } else {
+                        console.warn(`⚠️ Дублікат серії з id "${series.id}" ігнорується.`);
+                    }
+                });
+                const uniqueSeries = Array.from(seriesMap.values());
+
+                let seriesWithPaints = uniqueSeries.filter(series => {
                     let seriesPaints = paintCatalog.filter(p => p.series === series.id);
                     if (search) {
                         seriesPaints = seriesPaints.filter(p => {
@@ -1134,7 +1145,20 @@ window.SICOMIX = window.SICOMIX || {};
                 }
 
                 if (append) {
-                    paintCatalogEl.insertAdjacentHTML('beforeend', html);
+                    // При довантаженні перевіряємо, чи вже є така серія в DOM, щоб уникнути дублікатів
+                    const existingSeriesIds = new Set(Array.from(document.querySelectorAll('.series-card')).map(card => card.dataset.series));
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    const newSeries = Array.from(tempDiv.children).filter(el => {
+                        if (el.classList.contains('series-card')) {
+                            const seriesId = el.dataset.series;
+                            return !existingSeriesIds.has(seriesId);
+                        }
+                        return true;
+                    });
+                    if (newSeries.length > 0) {
+                        paintCatalogEl.insertAdjacentHTML('beforeend', newSeries.map(el => el.outerHTML).join(''));
+                    }
                 } else {
                     paintCatalogEl.innerHTML = html;
                 }
@@ -1193,7 +1217,6 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 });
 
-                // ===== ОБРОБНИКИ ДЛЯ ІНШИХ КНОПОК (видалення користувацьких фарб) =====
                 document.querySelectorAll('.delete-paint').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -1202,7 +1225,6 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 });
 
-                // Клік на саму картку – показ деталей
                 document.querySelectorAll('.paint-card-glass').forEach(card => {
                     card.addEventListener('click', function(e) {
                         if (e.target.closest('button')) return;
@@ -1627,6 +1649,20 @@ window.SICOMIX = window.SICOMIX || {};
             }
             
             SICOMIX.i18n.applyTranslations();
+        }
+
+        function showPhotoPreview(dataUrl) {
+            if (!recipePhotoPreview || !recipePhotoImg || !fileNameSpan) return;
+            recipePhotoPreview.style.display = 'block';
+            recipePhotoImg.src = dataUrl;
+            fileNameSpan.textContent = 'Фото завантажено';
+        }
+
+        function resetPhotoPreview() {
+            if (!recipePhotoPreview || !recipePhotoImg || !fileNameSpan) return;
+            recipePhotoPreview.style.display = 'none';
+            recipePhotoImg.src = '';
+            fileNameSpan.textContent = SICOMIX.i18n.t('no_file_chosen');
         }
 
         // ---------- ІНІЦІАЛІЗАЦІЯ ----------
