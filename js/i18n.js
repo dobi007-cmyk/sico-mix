@@ -43,8 +43,8 @@ window.SICOMIX = window.SICOMIX || {};
                 select_series: "Оберіть серію",
                 recipe_description: "Опис рецепту",
                 recipe_description_placeholder: "Додайте опис (необов'язково)",
-                recipe_photo: "Фото рецепту",
-                upload_photo: "Завантажити фото",
+                recipe_photo: "Фото готового кольору",
+                upload_photo: "Завантажити фото кольору",
                 recipe_ingredients: "Інгредієнти рецепту",
                 paint: "Фарба",
                 quantity: "Кількість",
@@ -57,6 +57,7 @@ window.SICOMIX = window.SICOMIX || {};
                 save_recipe: "Зберегти рецепт",
                 clear_form: "Очистити форму",
                 update_recipe: "Оновити рецепт",
+                scan_recipe: "Сканувати рецепт з фото",
 
                 // Рецепти
                 my_recipes_desc_long: "Переглядайте, редагуйте та керуйте рецептами",
@@ -225,7 +226,14 @@ window.SICOMIX = window.SICOMIX || {};
                 select_data_to_export: "Оберіть дані для експорту",
 
                 // НОВІ КЛЮЧІ ДЛЯ ПІДКАЗОК КНОПОК
-                remove_from_recipe: "Видалити з рецепту"
+                remove_from_recipe: "Видалити з рецепту",
+
+                // НОВІ КЛЮЧІ ДЛЯ OCR
+                scanning_recipe: "Сканування рецепту...",
+                scan_success: "Знайдено {count} інгредієнтів. Додати?",
+                scan_no_paints: "Не вдалося розпізнати жодної фарби",
+                scan_error: "Помилка сканування. Спробуйте ще раз.",
+                select_paint_for_line: "Виберіть фарбу для рядка: {text}"
             },
             en: {
                 // Глобальні
@@ -264,8 +272,8 @@ window.SICOMIX = window.SICOMIX || {};
                 select_series: "Select series",
                 recipe_description: "Recipe Description",
                 recipe_description_placeholder: "Add description (optional)",
-                recipe_photo: "Recipe Photo",
-                upload_photo: "Upload Photo",
+                recipe_photo: "Final color photo",
+                upload_photo: "Upload color photo",
                 recipe_ingredients: "Recipe Ingredients",
                 paint: "Paint",
                 quantity: "Quantity",
@@ -278,6 +286,7 @@ window.SICOMIX = window.SICOMIX || {};
                 save_recipe: "Save recipe",
                 clear_form: "Clear form",
                 update_recipe: "Update recipe",
+                scan_recipe: "Scan recipe from photo",
 
                 // Рецепти
                 my_recipes_desc_long: "View, edit and manage recipes",
@@ -446,7 +455,14 @@ window.SICOMIX = window.SICOMIX || {};
                 select_data_to_export: "Select data to export",
 
                 // NEW KEYS FOR BUTTON TOOLTIPS
-                remove_from_recipe: "Remove from recipe"
+                remove_from_recipe: "Remove from recipe",
+
+                // NEW KEYS FOR OCR
+                scanning_recipe: "Scanning recipe...",
+                scan_success: "Found {count} ingredients. Add?",
+                scan_no_paints: "Could not recognize any paints",
+                scan_error: "Scan error. Please try again.",
+                select_paint_for_line: "Select paint for line: {text}"
             },
             pl: {
                 // Глобальні
@@ -485,8 +501,8 @@ window.SICOMIX = window.SICOMIX || {};
                 select_series: "Wybierz serię",
                 recipe_description: "Opis receptury",
                 recipe_description_placeholder: "Dodaj opis (opcjonalnie)",
-                recipe_photo: "Zdjęcie receptury",
-                upload_photo: "Prześlij zdjęcie",
+                recipe_photo: "Zdjęcie gotowego koloru",
+                upload_photo: "Prześlij zdjęcie koloru",
                 recipe_ingredients: "Składniki receptury",
                 paint: "Farba",
                 quantity: "Ilość",
@@ -499,6 +515,7 @@ window.SICOMIX = window.SICOMIX || {};
                 save_recipe: "Zapisz recepturę",
                 clear_form: "Wyczyść formularz",
                 update_recipe: "Aktualizuj recepturę",
+                scan_recipe: "Skanuj recepturę ze zdjęcia",
 
                 // Рецепти
                 my_recipes_desc_long: "Przeglądaj, edytuj i zarządzaj recepturami",
@@ -667,7 +684,14 @@ window.SICOMIX = window.SICOMIX || {};
                 select_data_to_export: "Wybierz dane do eksportu",
 
                 // NOWE KLUCZE DLA PODPOWIEDZI PRZYCISKÓW
-                remove_from_recipe: "Usuń z receptury"
+                remove_from_recipe: "Usuń z receptury",
+
+                // NOWE KLUCZE DLA OCR
+                scanning_recipe: "Skanowanie receptury...",
+                scan_success: "Znaleziono {count} składników. Dodać?",
+                scan_no_paints: "Nie udało się rozpoznać żadnej farby",
+                scan_error: "Błąd skanowania. Spróbuj ponownie.",
+                select_paint_for_line: "Wybierz farbę dla linii: {text}"
             }
         };
 
