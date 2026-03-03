@@ -13,6 +13,7 @@ window.SICOMIX = window.SICOMIX || {};
                 new_recipe: "Новий рецепт",
                 recipes: "Рецепти",
                 catalog: "Каталог фарб",
+                pantone: "Pantone",
                 import: "Імпорт",
                 export: "Експорт",
                 settings: "Налаштування",
@@ -91,7 +92,7 @@ window.SICOMIX = window.SICOMIX || {};
                 unknown: "Невідомо",
                 deleted: "Видалено",
 
-                // Каталог
+                // Каталог фарб
                 catalog_desc_long: "База всіх доступних фарб",
                 search_catalog: "Пошук фарб...",
                 add_new_paint: "Додати нову фарбу",
@@ -117,6 +118,17 @@ window.SICOMIX = window.SICOMIX || {};
                 special: "Спеціальне",
                 collapse: "Згорнути",
                 expand: "Розгорнути",
+
+                // Pantone
+                pantone_desc: "Кольори Pantone з каталогів Formula Guide",
+                coated: "Глянцеві (Coated)",
+                uncoated: "Матові (Uncoated)",
+                plus_series: "Plus Series",
+                special_editions: "Спеціальні видання",
+                pantone_number: "Номер Pantone",
+                search_pantone: "Пошук Pantone...",
+                no_pantone: "Кольорів Pantone не знайдено",
+                pantone_categories: "Категорії Pantone",
 
                 // Імпорт/Експорт
                 import_desc: "Імпортуйте рецепти та каталог з файлів",
@@ -242,6 +254,7 @@ window.SICOMIX = window.SICOMIX || {};
                 new_recipe: "New Recipe",
                 recipes: "Recipes",
                 catalog: "Paint Catalog",
+                pantone: "Pantone",
                 import: "Import",
                 export: "Export",
                 settings: "Settings",
@@ -320,7 +333,7 @@ window.SICOMIX = window.SICOMIX || {};
                 unknown: "Unknown",
                 deleted: "Deleted",
 
-                // Каталог
+                // Каталог фарб
                 catalog_desc_long: "Database of all available paints",
                 search_catalog: "Search paints...",
                 add_new_paint: "Add new paint",
@@ -346,6 +359,17 @@ window.SICOMIX = window.SICOMIX || {};
                 special: "Special",
                 collapse: "Collapse",
                 expand: "Expand",
+
+                // Pantone
+                pantone_desc: "Pantone colors from Formula Guides",
+                coated: "Coated",
+                uncoated: "Uncoated",
+                plus_series: "Plus Series",
+                special_editions: "Special Editions",
+                pantone_number: "Pantone Number",
+                search_pantone: "Search Pantone...",
+                no_pantone: "No Pantone colors found",
+                pantone_categories: "Pantone Categories",
 
                 // Імпорт/Експорт
                 import_desc: "Import recipes and catalog from files",
@@ -471,6 +495,7 @@ window.SICOMIX = window.SICOMIX || {};
                 new_recipe: "Nowa receptura",
                 recipes: "Receptury",
                 catalog: "Katalog farb",
+                pantone: "Pantone",
                 import: "Import",
                 export: "Eksport",
                 settings: "Ustawienia",
@@ -549,7 +574,7 @@ window.SICOMIX = window.SICOMIX || {};
                 unknown: "Nieznana",
                 deleted: "Usunięto",
 
-                // Каталог
+                // Каталог фарб
                 catalog_desc_long: "Baza wszystkich dostępnych farb",
                 search_catalog: "Szukaj farb...",
                 add_new_paint: "Dodaj nową farbę",
@@ -575,6 +600,17 @@ window.SICOMIX = window.SICOMIX || {};
                 special: "Specjalne",
                 collapse: "Zwiń",
                 expand: "Rozwiń",
+
+                // Pantone
+                pantone_desc: "Kolory Pantone z katalogów Formula Guide",
+                coated: "Powlekany (Coated)",
+                uncoated: "Niepowlekany (Uncoated)",
+                plus_series: "Plus Series",
+                special_editions: "Wydania specjalne",
+                pantone_number: "Numer Pantone",
+                search_pantone: "Szukaj Pantone...",
+                no_pantone: "Nie znaleziono kolorów Pantone",
+                pantone_categories: "Kategorie Pantone",
 
                 // Імпорт/Експорт
                 import_desc: "Importuj receptury i katalog z plików",
