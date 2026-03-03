@@ -29,7 +29,7 @@ window.SICOMIX = window.SICOMIX || {};
         let sidebar, menuToggle, desktopMenuToggle, closeSidebar, mainContainer;
         let navLinks, pageContents, totalPaintsEl, headerPaintCount;
         let ingredientsList, paintSearch, categoryFilter;
-        let addIngredientBtn, saveRecipeBtn, clearRecipeBtn;
+        let addIngredientBtn, saveRecipeBtn, clearRecipeBtn, scanRecipeBtn;
         let recipesContainer, exportRecipesBtn, importRecipesBtn, printRecipesBtn, deleteSelectedRecipesBtn;
         let paintCatalogEl, addNewPaintBtn, addPaintModal, closePaintModal, savePaintBtn, cancelPaintBtn;
         let languageSelect, unitsSelect, themeSelect, autoSaveCheckbox, backupCheckbox, saveSettingsBtn, resetSettingsBtn, clearAllDataBtn;
@@ -57,6 +57,7 @@ window.SICOMIX = window.SICOMIX || {};
             addIngredientBtn = document.getElementById('addIngredientBtn');
             saveRecipeBtn = document.getElementById('saveRecipeBtn');
             clearRecipeBtn = document.getElementById('clearRecipeBtn');
+            scanRecipeBtn = document.getElementById('scanRecipeBtn');
             recipesContainer = document.getElementById('recipesContainer');
             exportRecipesBtn = document.getElementById('exportRecipesBtn');
             importRecipesBtn = document.getElementById('importRecipesBtn');
@@ -307,6 +308,7 @@ window.SICOMIX = window.SICOMIX || {};
             if (addIngredientBtn) addIngredientBtn.addEventListener('click', addIngredient);
             if (saveRecipeBtn) saveRecipeBtn.addEventListener('click', saveRecipe);
             if (clearRecipeBtn) clearRecipeBtn.addEventListener('click', clearRecipeForm);
+            if (scanRecipeBtn) scanRecipeBtn.addEventListener('click', scanRecipeFromPhoto);
 
             if (exportRecipesBtn) exportRecipesBtn.addEventListener('click', exportAllRecipes);
             if (importRecipesBtn) importRecipesBtn.addEventListener('click', importRecipes);
@@ -922,7 +924,6 @@ window.SICOMIX = window.SICOMIX || {};
             input.click();
         }
 
-        // ОНОВЛЕНА ФУНКЦІЯ ДРУКУ З ВІДОБРАЖЕННЯМ ФОТО
         function printRecipes() {
             if (selectedRecipes.length === 0) {
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_recipes_to_print'), 'warning');
@@ -1045,7 +1046,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ---------- КАТАЛОГ ФАРБ (ВИПРАВЛЕНО) ----------
+        // ---------- КАТАЛОГ ФАРБ ----------
         function renderPaintCatalog(append = false) {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -1686,6 +1687,117 @@ window.SICOMIX = window.SICOMIX || {};
             recipePhotoPreview.style.display = 'none';
             recipePhotoImg.src = '';
             fileNameSpan.textContent = SICOMIX.i18n.t('upload_photo');
+        }
+
+        // ---------- НОВА ФУНКЦІЯ СКАНУВАННЯ РЕЦЕПТУ З ФОТО ----------
+        function scanRecipeFromPhoto() {
+            // Перевіряємо, чи вибрана серія
+            const seriesSelect = document.getElementById('recipeSeries');
+            if (!seriesSelect || !seriesSelect.value) {
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_series_first'), 'warning');
+                return;
+            }
+
+            // Створюємо прихований input для вибору файлу
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'environment'; // Для мобільних пристроїв – використовувати камеру
+
+            input.onchange = async function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Показуємо сповіщення про початок сканування
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('scanning_recipe'), 'info', 0); // 0 означає без автозакриття
+
+                try {
+                    // Використовуємо Tesseract.js для розпізнавання тексту
+                    const { data: { text } } = await Tesseract.recognize(
+                        file,
+                        'ukr+eng', // мови: українська та англійська
+                        {
+                            logger: m => console.log(m) // для відстеження прогресу
+                        }
+                    );
+
+                    console.log('Розпізнаний текст:', text);
+
+                    // Парсимо текст – шукаємо рядки, які можуть містити назву фарби та кількість
+                    const lines = text.split('\n').filter(line => line.trim().length > 0);
+                    const foundIngredients = [];
+
+                    // Простий алгоритм: для кожного рядка намагаємося знайти фарбу з каталогу, яка міститься в рядку
+                    // і число (кількість) поруч
+                    const targetSeries = lockedSeries || seriesSelect.value;
+
+                    lines.forEach(line => {
+                        // Шукаємо всі числа в рядку
+                        const numbers = line.match(/\d+(?:[.,]\d+)?/g);
+                        if (!numbers) return;
+
+                        // Перевіряємо, чи є в рядку назва якоїсь фарби з вибраної серії
+                        const possiblePaints = paintCatalog.filter(p => 
+                            p.series === targetSeries && 
+                            line.toLowerCase().includes(p.name.toLowerCase())
+                        );
+
+                        if (possiblePaints.length > 0) {
+                            // Беремо першу знайдену фарбу
+                            const paint = possiblePaints[0];
+                            // Беремо перше число як кількість
+                            const amount = parseFloat(numbers[0].replace(',', '.'));
+                            if (!isNaN(amount) && amount > 0) {
+                                foundIngredients.push({
+                                    paintId: paint.id,
+                                    amount: amount,
+                                    unit: 'г', // за замовчуванням грами
+                                    percentage: 0
+                                });
+                            }
+                        } else {
+                            // Якщо не знайшли точного збігу, пропонуємо вибрати вручну (пізніше)
+                            console.log('Не вдалося знайти фарбу для рядка:', line);
+                        }
+                    });
+
+                    if (foundIngredients.length === 0) {
+                        SICOMIX.utils.hideNotification();
+                        SICOMIX.utils.showNotification(SICOMIX.i18n.t('scan_no_paints'), 'warning');
+                        return;
+                    }
+
+                    // Питаємо користувача, чи додати знайдені інгредієнти
+                    SICOMIX.utils.hideNotification();
+                    SICOMIX.utils.showConfirmation(
+                        SICOMIX.i18n.t('scan_success', { count: foundIngredients.length }),
+                        '',
+                        () => {
+                            // Додаємо всі знайдені інгредієнти, перевіряючи дублікати
+                            foundIngredients.forEach(ing => {
+                                if (!selectedIngredients.some(ex => String(ex.paintId) === String(ing.paintId))) {
+                                    selectedIngredients.push(ing);
+                                }
+                            });
+                            calculatePercentages();
+                            renderIngredientsList();
+                            updateSeriesLockUI();
+                            debouncedAutoSave();
+                            SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
+                        },
+                        () => {
+                            // Відміна – нічого не робимо
+                        }
+                    );
+
+                } catch (error) {
+                    console.error('Помилка сканування:', error);
+                    SICOMIX.utils.hideNotification();
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('scan_error'), 'error');
+                }
+            };
+
+            input.click();
         }
 
         // ---------- ІНІЦІАЛІЗАЦІЯ ----------
