@@ -135,7 +135,7 @@ SICOMIX.data = (function() {
             special: { uk: "Можна наносити валками або трафаретним друком. Іноді потрібне знежирення IPA.", pl: "Można nakładać walcami lub sitodrukiem. Czasami wymagane odtłuszczenie IPA.", en: "Can be applied by roller or screen printing. Sometimes degreasing with IPA needed." }
         };
 
-        // ---------- ОСНОВНІ СЕРІЇ ----------
+        // ---------- ОСНОВНІ СЕРІЇ (БЕЗ OTHER) ----------
         const series = {
             EC: {
                 id: "EC",
@@ -246,21 +246,10 @@ SICOMIX.data = (function() {
                     en: "Flexible ink for PVC banners and canvas. For screen printing and roller coating. Excellent weather resistance."
                 },
                 properties: ECVF_PROPERTIES
-            },
-            OTHER: {
-                id: "OTHER",
-                name: { uk: "Інші", pl: "Inne", en: "Other" },
-                category: "Інші",
-                description: {
-                    uk: "Інші фарби, що не належать до стандартних категорій.",
-                    pl: "Inne farby, nie należące do standardowych kategorii.",
-                    en: "Other inks not belonging to standard categories."
-                },
-                properties: EC_PROPERTIES
             }
         };
 
-        // ---------- КАТЕГОРІЇ З ОПИСАМИ ----------
+        // ---------- КАТЕГОРІЇ З ОПИСАМИ (БЕЗ "ІНШІ") ----------
         const categoryDescriptions = {
             "Універсальні": {
                 uk: "Фарби для широкого спектру матеріалів: ПВХ, полістирол, папір, картон, метали тощо. Підходять для більшості завдань трафаретного друку.",
@@ -291,11 +280,6 @@ SICOMIX.data = (function() {
                 uk: "Фарби для важких пластиків: поліпропілен, поліетилен, полікарбонат, АБС. Часто вимагають попередньої обробки поверхні.",
                 pl: "Farby do trudnych tworzyw sztucznych: polipropylen, polietylen, poliwęglan, ABS. Często wymagają wstępnej obróbki powierzchni.",
                 en: "Inks for difficult plastics: polypropylene, polyethylene, polycarbonate, ABS. Often require surface pretreatment."
-            },
-            "Інші": {
-                uk: "Інші фарби, що не належать до стандартних категорій.",
-                pl: "Inne farby, nie należące do standardowych kategorii.",
-                en: "Other inks not belonging to standard categories."
             },
             "Additives": {
                 uk: "Додатки для фарб: розчинники, сповільнювачі, затверджувачі, пасти, порошки, лаки тощо.",
@@ -475,7 +459,7 @@ SICOMIX.data = (function() {
             "91/61": { uk: "FARBA SICO SICOPLAST AMAZING WHITE", pl: "FARBA SICO SICOPLAST AMAZING WHITE", en: "FARBA SICO SICOPLAST AMAZING WHITE", color: "#FFFFFF" }
         };
 
-        // ---------- МАСИВ КОДІВ ФАРБ ----------
+        // ---------- МАСИВ КОДІВ ФАРБ (БЕЗ OTHER) ----------
         const excelPaintCodes = [
             // ==================== EC ====================
             { code: "EC10", seriesId: "EC", colorCode: "10" },
@@ -816,7 +800,6 @@ SICOMIX.data = (function() {
             { code: "SPTN141", seriesId: "SPTN", colorCode: "141" },
             { code: "SPTN142", seriesId: "SPTN", colorCode: "142" },
             { code: "SPTN143", seriesId: "SPTN", colorCode: "143" },
-            // SPTN150/17 видалено
 
             // ==================== OTF ====================
             { code: "OTF10", seriesId: "OTF", colorCode: "10" },
@@ -850,7 +833,6 @@ SICOMIX.data = (function() {
             { code: "OTF80", seriesId: "OTF", colorCode: "80" },
             { code: "OTF81", seriesId: "OTF", colorCode: "81" },
             { code: "OTF91", seriesId: "OTF", colorCode: "91" },
-            // OTF91/37 видалено
             { code: "OTF100", seriesId: "OTF", colorCode: "100" },
             { code: "OTF110", seriesId: "OTF", colorCode: "110" },
             { code: "OTF110/14", seriesId: "OTF", colorCode: "110/14" },
@@ -864,7 +846,7 @@ SICOMIX.data = (function() {
             { code: "OTF150", seriesId: "OTF", colorCode: "150" },
             { code: "OTF150/15", seriesId: "OTF", colorCode: "150/15" },
 
-            // ==================== TPP (без видалених) ====================
+            // ==================== TPP ====================
             { code: "TPP10", seriesId: "TPP", colorCode: "10" },
             { code: "TPP15", seriesId: "TPP", colorCode: "15" },
             { code: "TPP20", seriesId: "TPP", colorCode: "20" },
@@ -930,12 +912,7 @@ SICOMIX.data = (function() {
             { code: "ECVF20", seriesId: "ECVF", colorCode: "20" },
             { code: "ECVF120", seriesId: "ECVF", colorCode: "120" },
             { code: "ECVF110", seriesId: "ECVF", colorCode: "110" },
-            { code: "ECVF100", seriesId: "ECVF", colorCode: "100" },
-
-            // ==================== OTHER ====================
-            { code: "S20 WHITE", seriesId: "OTHER", colorCode: "WHITE" },
-            { code: "PL5 VARNISH", seriesId: "OTHER", colorCode: "VARNISH" },
-            { code: "FARBA BIAŁA HYDRA WHITE 120 CLZ", seriesId: "OTHER", colorCode: "HYDRA" }
+            { code: "ECVF100", seriesId: "ECVF", colorCode: "100" }
         ];
 
         // Функція natural sort (оновлена)
@@ -984,7 +961,9 @@ SICOMIX.data = (function() {
             excelPaintCodes.forEach(item => {
                 let serie = series[item.seriesId];
                 if (!serie) {
-                    serie = series.OTHER;
+                    // Якщо серія не знайдена, пропускаємо (таке не повинно статися)
+                    console.warn(`Серія ${item.seriesId} не знайдена, пропускаємо ${item.code}`);
+                    return;
                 }
 
                 let colorName = { uk: item.colorCode, pl: item.colorCode, en: item.colorCode };
