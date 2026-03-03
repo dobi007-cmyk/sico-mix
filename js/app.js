@@ -1,243 +1,4 @@
-// ---------- ПОКРАЩЕНА ФУНКЦІЯ СКАНУВАННЯ РЕЦЕПТУ З ФОТО ----------
-function scanRecipeFromPhoto() {
-    const seriesSelect = document.getElementById('recipeSeries');
-    if (!seriesSelect || !seriesSelect.value) {
-        SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_series_first'), 'warning');
-        return;
-    }
-
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment';
-
-    input.onchange = async function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        SICOMIX.utils.showNotification(SICOMIX.i18n.t('scanning_recipe'), 'info', 0);
-
-        try {
-            const { data: { text } } = await Tesseract.recognize(
-                file,
-                'ukr+eng',
-                { 
-                    logger: m => console.log(m),
-                    // Додаткові параметри для кращого розпізнавання
-                    tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгдеєжзиіїйклмнопрстуфхцчшщьюя -+.,'
-                }
-            );
-
-            console.log('Розпізнаний текст:', text);
-
-            const lines = text.split('\n').filter(line => line.trim().length > 0);
-            const targetSeries = lockedSeries || seriesSelect.value;
-            const seriesPaints = paintCatalog.filter(p => p.series === targetSeries);
-
-            // Визначаємо префікс серії з першого рядка, якщо можливо
-            let seriesPrefix = '';
-            if (lines.length > 0) {
-                const firstLine = lines[0].toUpperCase();
-                const prefixMatch = firstLine.match(/\b([A-Z]{2})[A-Z0-9]*\b/);
-                if (prefixMatch) {
-                    seriesPrefix = prefixMatch[1];
-                }
-            }
-
-            // Об'єкт для накопичення сум за (paintId + unit)
-            const ingredientSums = {};
-
-            // Функція нормалізації назви фарби (додає префікс, якщо потрібно)
-            function normalizePaintIdentifier(identifier, prefix) {
-                if (prefix && /^\d+$/.test(identifier)) {
-                    return prefix + identifier;
-                }
-                return identifier;
-            }
-
-            // Функція нормалізації одиниць
-            function normalizeUnit(unitStr) {
-                const unit = unitStr.toLowerCase();
-                if (unit === 'g' || unit === 'г' || unit === '') return 'г';
-                if (unit === 'kg' || unit === 'кг') return 'кг';
-                if (unit === 'ml' || unit === 'мл') return 'мл';
-                if (unit === 'l' || unit === 'л') return 'л';
-                return 'г';
-            }
-
-            // Функція пошуку фарби за ідентифікатором або назвою
-            function findPaint(identifier, paints, prefix) {
-                // Спершу точний збіг артикула
-                let paint = paints.find(p => p.article && p.article === identifier);
-                if (paint) return paint;
-
-                // Нормалізований ідентифікатор з префіксом
-                const normalized = normalizePaintIdentifier(identifier, prefix);
-                paint = paints.find(p => p.name.toUpperCase() === normalized.toUpperCase());
-                if (paint) return paint;
-
-                // Частковий збіг назви (якщо ідентифікатор міститься в назві)
-                paint = paints.find(p => p.name.toUpperCase().includes(identifier.toUpperCase()));
-                if (paint) return paint;
-
-                // Частковий збіг артикула
-                paint = paints.find(p => p.article && p.article.toUpperCase().includes(identifier.toUpperCase()));
-                if (paint) return paint;
-
-                return null;
-            }
-
-            // Функція пошуку фарби за повним рядком (якщо немає тире)
-            function findPaintByLine(line, paints) {
-                // Розбиваємо на токени (слова та числа)
-                const tokens = line.split(/[\s\-_]+/).filter(t => t.length > 0);
-                let bestMatch = null;
-                let bestScore = 0;
-
-                for (let paint of paints) {
-                    let score = 0;
-                    const paintName = paint.name.toLowerCase();
-                    for (let token of tokens) {
-                        const tokenLower = token.toLowerCase();
-                        if (paintName.includes(tokenLower)) {
-                            score += 2; // збіг у назві
-                        }
-                        if (paint.article && paint.article.toLowerCase() === tokenLower) {
-                            score += 5; // точний збіг артикула
-                        }
-                    }
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestMatch = paint;
-                    }
-                }
-                return bestMatch;
-            }
-
-            // Проходимо по рядках
-            lines.forEach(line => {
-                // Шукаємо патерн "ідентифікатор - числа з плюсами"
-                const dashMatch = line.match(/([A-Za-z0-9]+)\s*[-–]\s*(.+)/);
-                if (dashMatch) {
-                    const identifier = dashMatch[1].trim();
-                    const rightPart = dashMatch[2].trim();
-
-                    // Розбиваємо праву частину по '+'
-                    const amountParts = rightPart.split('+').map(p => p.trim()).filter(p => p.length > 0);
-
-                    amountParts.forEach(part => {
-                        // Шукаємо число та можливі одиниці
-                        const amountMatch = part.match(/(\d+(?:[.,]\d+)?)\s*([a-zA-Zа-яА-Я]*)/);
-                        if (amountMatch) {
-                            const amount = parseFloat(amountMatch[1].replace(',', '.'));
-                            if (isNaN(amount) || amount <= 0) return;
-
-                            const unit = normalizeUnit(amountMatch[2] || 'г');
-
-                            // Знаходимо фарбу
-                            const paint = findPaint(identifier, seriesPaints, seriesPrefix);
-                            if (paint) {
-                                const key = paint.id + '_' + unit;
-                                if (!ingredientSums[key]) {
-                                    ingredientSums[key] = {
-                                        paintId: paint.id,
-                                        unit: unit,
-                                        amount: 0
-                                    };
-                                }
-                                ingredientSums[key].amount += amount;
-                            } else {
-                                console.log('Не вдалося знайти фарбу для ідентифікатора:', identifier);
-                                // Можна додати логіку для ручного вибору, але поки просто ігноруємо
-                            }
-                        }
-                    });
-                } else {
-                    // Якщо немає тире, спробуємо знайти фарбу за назвою в рядку
-                    const paint = findPaintByLine(line, seriesPaints);
-                    if (paint) {
-                        // Шукаємо число в рядку
-                        const amountMatch = line.match(/(\d+(?:[.,]\d+)?)\s*([a-zA-Zа-яА-Я]*)/);
-                        if (amountMatch) {
-                            const amount = parseFloat(amountMatch[1].replace(',', '.'));
-                            if (!isNaN(amount) && amount > 0) {
-                                const unit = normalizeUnit(amountMatch[2] || 'г');
-                                const key = paint.id + '_' + unit;
-                                if (!ingredientSums[key]) {
-                                    ingredientSums[key] = {
-                                        paintId: paint.id,
-                                        unit: unit,
-                                        amount: 0
-                                    };
-                                }
-                                ingredientSums[key].amount += amount;
-                            }
-                        }
-                    } else {
-                        // Нічого не знайшли – пропускаємо рядок
-                        console.log('Нерозпізнаний рядок:', line);
-                    }
-                }
-            });
-
-            // Перетворюємо накопичені суми в масив
-            const foundIngredients = Object.values(ingredientSums).map(item => ({
-                paintId: item.paintId,
-                amount: item.amount,
-                unit: item.unit,
-                percentage: 0
-            }));
-
-            SICOMIX.utils.hideNotification();
-
-            if (foundIngredients.length === 0) {
-                SICOMIX.utils.showNotification(SICOMIX.i18n.t('scan_no_paints'), 'warning');
-                return;
-            }
-
-            // Показуємо список знайдених інгредієнтів для підтвердження
-            let message = '';
-            foundIngredients.forEach(ing => {
-                const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId));
-                if (paint) {
-                    message += `\n• ${paint.name} – ${ing.amount} ${ing.unit}`;
-                }
-            });
-
-            SICOMIX.utils.showConfirmation(
-                SICOMIX.i18n.t('scan_success', { count: foundIngredients.length }),
-                message,
-                () => {
-                    // Додаємо знайдені інгредієнти, перевіряючи дублікати (за paintId + unit)
-                    foundIngredients.forEach(ing => {
-                        const existing = selectedIngredients.find(
-                            ex => String(ex.paintId) === String(ing.paintId) && ex.unit === ing.unit
-                        );
-                        if (existing) {
-                            // Якщо вже є така фарба з такими одиницями, можна об'єднати
-                            existing.amount += ing.amount;
-                        } else {
-                            selectedIngredients.push(ing);
-                        }
-                    });
-                    calculatePercentages();
-                    renderIngredientsList();
-                    updateSeriesLockUI();
-                    debouncedAutoSave();
-                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
-                },
-                () => {}
-            );
-
-        } catch (error) {
-            console.error('Помилка сканування:', error);
-            SICOMIX.utils.hideNotification();
-            SICOMIX.utils.showNotification(SICOMIX.i18n.t('scan_error'), 'error');
-        }
-    };
-
-    input.click();
-}// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ ==========
+// ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -1928,8 +1689,8 @@ window.SICOMIX = window.SICOMIX || {};
             fileNameSpan.textContent = SICOMIX.i18n.t('upload_photo');
         }
 
-        // ---------- ПОКРАЩЕНА ФУНКЦІЯ СКАНУВАННЯ РЕЦЕПТУ З ФОТО (ДЛЯ ФОРМАТУ SICO) ----------
-        function scanRecipeFromPhoto() {
+        // ---------- ПОКРАЩЕНА ФУНКЦІЯ СКАНУВАННЯ РЕЦЕПТУ З ФОТО ----------
+        async function scanRecipeFromPhoto() {
             const seriesSelect = document.getElementById('recipeSeries');
             if (!seriesSelect || !seriesSelect.value) {
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_series_first'), 'warning');
@@ -1951,96 +1712,121 @@ window.SICOMIX = window.SICOMIX || {};
                     const { data: { text } } = await Tesseract.recognize(
                         file,
                         'ukr+eng',
-                        { logger: m => console.log(m) }
+                        { 
+                            logger: m => console.log(m),
+                            tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгдеєжзиіїйклмнопрстуфхцчшщьюя -+.,'
+                        }
                     );
 
                     console.log('Розпізнаний текст:', text);
 
                     const lines = text.split('\n').filter(line => line.trim().length > 0);
-                    // Використовуємо об'єкт для накопичення сум за ідентифікатором
-                    const ingredientSums = {};
                     const targetSeries = lockedSeries || seriesSelect.value;
-
-                    // Всі фарби з вибраної серії
                     const seriesPaints = paintCatalog.filter(p => p.series === targetSeries);
 
                     // Визначаємо префікс серії з першого рядка, якщо можливо
                     let seriesPrefix = '';
                     if (lines.length > 0) {
                         const firstLine = lines[0].toUpperCase();
-                        // Шукаємо префікс з двох літер (наприклад, "EC", "UV" тощо)
                         const prefixMatch = firstLine.match(/\b([A-Z]{2})[A-Z0-9]*\b/);
                         if (prefixMatch) {
                             seriesPrefix = prefixMatch[1];
                         }
                     }
 
-                    // Функція для нормалізації назви фарби (додає префікс, якщо потрібно)
+                    // Об'єкт для накопичення сум за (paintId + unit)
+                    const ingredientSums = {};
+
+                    // Функція нормалізації назви фарби (додає префікс, якщо потрібно)
                     function normalizePaintIdentifier(identifier, prefix) {
-                        // Якщо ідентифікатор починається з цифри і префікс відомий, додаємо його
                         if (prefix && /^\d+$/.test(identifier)) {
                             return prefix + identifier;
                         }
                         return identifier;
                     }
 
-                    // Функція для пошуку фарби за ідентифікатором (назва, артикул, код)
-                    function findPaint(identifier, paints, prefix) {
-                        // Спочатку шукаємо точний збіг з артикулом
-                        let paint = paints.find(p => p.article && p.article === identifier);
-                        if (paint) return paint;
-
-                        // Шукаємо за назвою (з урахуванням префікса)
-                        const normalized = normalizePaintIdentifier(identifier, prefix);
-                        paint = paints.find(p => p.name.toUpperCase() === normalized.toUpperCase());
-                        if (paint) return paint;
-
-                        // Шукаємо за частковим збігом назви
-                        paint = paints.find(p => p.name.toUpperCase().includes(identifier.toUpperCase()));
-                        if (paint) return paint;
-
-                        // Шукаємо за частковим збігом артикула
-                        paint = paints.find(p => p.article && p.article.toUpperCase().includes(identifier.toUpperCase()));
-                        if (paint) return paint;
-
-                        return null;
-                    }
-
-                    // Функція для нормалізації одиниць виміру
+                    // Функція нормалізації одиниць
                     function normalizeUnit(unitStr) {
                         const unit = unitStr.toLowerCase();
                         if (unit === 'g' || unit === 'г' || unit === '') return 'г';
                         if (unit === 'kg' || unit === 'кг') return 'кг';
                         if (unit === 'ml' || unit === 'мл') return 'мл';
                         if (unit === 'l' || unit === 'л') return 'л';
-                        return 'г'; // за замовчуванням
+                        return 'г';
+                    }
+
+                    // Функція пошуку фарби за ідентифікатором або назвою
+                    function findPaint(identifier, paints, prefix) {
+                        // Спершу точний збіг артикула
+                        let paint = paints.find(p => p.article && p.article === identifier);
+                        if (paint) return paint;
+
+                        // Нормалізований ідентифікатор з префіксом
+                        const normalized = normalizePaintIdentifier(identifier, prefix);
+                        paint = paints.find(p => p.name.toUpperCase() === normalized.toUpperCase());
+                        if (paint) return paint;
+
+                        // Частковий збіг назви (якщо ідентифікатор міститься в назві)
+                        paint = paints.find(p => p.name.toUpperCase().includes(identifier.toUpperCase()));
+                        if (paint) return paint;
+
+                        // Частковий збіг артикула
+                        paint = paints.find(p => p.article && p.article.toUpperCase().includes(identifier.toUpperCase()));
+                        if (paint) return paint;
+
+                        return null;
+                    }
+
+                    // Функція пошуку фарби за повним рядком (якщо немає тире)
+                    function findPaintByLine(line, paints) {
+                        // Розбиваємо на токени (слова та числа)
+                        const tokens = line.split(/[\s\-_]+/).filter(t => t.length > 0);
+                        let bestMatch = null;
+                        let bestScore = 0;
+
+                        for (let paint of paints) {
+                            let score = 0;
+                            const paintName = paint.name.toLowerCase();
+                            for (let token of tokens) {
+                                const tokenLower = token.toLowerCase();
+                                if (paintName.includes(tokenLower)) {
+                                    score += 2; // збіг у назві
+                                }
+                                if (paint.article && paint.article.toLowerCase() === tokenLower) {
+                                    score += 5; // точний збіг артикула
+                                }
+                            }
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestMatch = paint;
+                            }
+                        }
+                        return bestMatch;
                     }
 
                     // Проходимо по рядках
                     lines.forEach(line => {
-                        // Шукаємо патерн "число - число + число + число" (з можливими одиницями)
+                        // Шукаємо патерн "ідентифікатор - числа з плюсами"
                         const dashMatch = line.match(/([A-Za-z0-9]+)\s*[-–]\s*(.+)/);
                         if (dashMatch) {
-                            const identifier = dashMatch[1].trim(); // ліва частина (наприклад, "15" або "ECP")
-                            const rightPart = dashMatch[2].trim(); // права частина (наприклад, "40 +40 +60" або "200")
-                            
-                            // Розбиваємо праву частину по '+' (можуть бути пробіли навколо)
+                            const identifier = dashMatch[1].trim();
+                            const rightPart = dashMatch[2].trim();
+
+                            // Розбиваємо праву частину по '+'
                             const amountParts = rightPart.split('+').map(p => p.trim()).filter(p => p.length > 0);
-                            
-                            // Для кожного ідентифікатора збираємо суму
+
                             amountParts.forEach(part => {
+                                // Шукаємо число та можливі одиниці
                                 const amountMatch = part.match(/(\d+(?:[.,]\d+)?)\s*([a-zA-Zа-яА-Я]*)/);
                                 if (amountMatch) {
                                     const amount = parseFloat(amountMatch[1].replace(',', '.'));
                                     if (isNaN(amount) || amount <= 0) return;
-                                    
+
                                     const unit = normalizeUnit(amountMatch[2] || 'г');
-                                    
-                                    // Знаходимо фарбу (один раз для ідентифікатора)
+
+                                    // Знаходимо фарбу
                                     const paint = findPaint(identifier, seriesPaints, seriesPrefix);
                                     if (paint) {
-                                        // Створюємо унікальний ключ для комбінації фарба+одиниці
-                                        // (якщо одиниці різні, вони будуть окремими рядками)
                                         const key = paint.id + '_' + unit;
                                         if (!ingredientSums[key]) {
                                             ingredientSums[key] = {
@@ -2056,70 +1842,34 @@ window.SICOMIX = window.SICOMIX || {};
                                 }
                             });
                         } else {
-                            // Якщо немає тире, використовуємо стару логіку (пошук чисел та одиниць)
-                            const amountInfo = extractAmountAndUnit(line);
-                            if (!amountInfo) return;
-
-                            const { amount, unit } = amountInfo;
-                            if (isNaN(amount) || amount <= 0) return;
-
-                            // Шукаємо фарбу за всім рядком
-                            const paint = findBestPaint(line, seriesPaints);
+                            // Якщо немає тире, спробуємо знайти фарбу за назвою в рядку
+                            const paint = findPaintByLine(line, seriesPaints);
                             if (paint) {
-                                const key = paint.id + '_' + unit;
-                                if (!ingredientSums[key]) {
-                                    ingredientSums[key] = {
-                                        paintId: paint.id,
-                                        unit: unit,
-                                        amount: 0
-                                    };
+                                // Шукаємо число в рядку
+                                const amountMatch = line.match(/(\d+(?:[.,]\d+)?)\s*([a-zA-Zа-яА-Я]*)/);
+                                if (amountMatch) {
+                                    const amount = parseFloat(amountMatch[1].replace(',', '.'));
+                                    if (!isNaN(amount) && amount > 0) {
+                                        const unit = normalizeUnit(amountMatch[2] || 'г');
+                                        const key = paint.id + '_' + unit;
+                                        if (!ingredientSums[key]) {
+                                            ingredientSums[key] = {
+                                                paintId: paint.id,
+                                                unit: unit,
+                                                amount: 0
+                                            };
+                                        }
+                                        ingredientSums[key].amount += amount;
+                                    }
                                 }
-                                ingredientSums[key].amount += amount;
+                            } else {
+                                // Нічого не знайшли – пропускаємо рядок
+                                console.log('Нерозпізнаний рядок:', line);
                             }
                         }
                     });
 
-                    // Допоміжна функція для вилучення кількості та одиниць (запасний варіант)
-                    function extractAmountAndUnit(line) {
-                        const match = line.match(/(\d+(?:[.,]\d+)?)\s*(g|kg|ml|l|г|кг|мл|л)?/i);
-                        if (match) {
-                            const amount = parseFloat(match[1].replace(',', '.'));
-                            let unit = match[2] ? match[2].toLowerCase() : 'г';
-                            return { amount, unit: normalizeUnit(unit) };
-                        }
-                        return null;
-                    }
-
-                    // Функція для пошуку найкращої фарби за рядком (запасний варіант)
-                    function findBestPaint(line, paints) {
-                        const tokens = line.split(/[\s\-_]+/).filter(t => t.length > 1);
-                        let bestMatch = null;
-                        let bestScore = 0;
-
-                        for (let paint of paints) {
-                            let score = 0;
-                            const nameTokens = paint.name.toLowerCase().split(/\s+/);
-                            for (let token of tokens) {
-                                const tokenLower = token.toLowerCase();
-                                if (nameTokens.some(nt => nt.includes(tokenLower) || tokenLower.includes(nt))) {
-                                    score += 1;
-                                }
-                            }
-                            if (paint.article && tokens.some(t => t === paint.article)) {
-                                score += 5;
-                            }
-                            if (paint.colorCode && tokens.some(t => t.toLowerCase() === paint.colorCode.toLowerCase())) {
-                                score += 3;
-                            }
-                            if (score > bestScore) {
-                                bestScore = score;
-                                bestMatch = paint;
-                            }
-                        }
-                        return bestMatch;
-                    }
-
-                    // Перетворюємо накопичені суми в масив інгредієнтів
+                    // Перетворюємо накопичені суми в масив
                     const foundIngredients = Object.values(ingredientSums).map(item => ({
                         paintId: item.paintId,
                         amount: item.amount,
@@ -2134,16 +1884,29 @@ window.SICOMIX = window.SICOMIX || {};
                         return;
                     }
 
+                    // Показуємо список знайдених інгредієнтів для підтвердження
+                    let message = '';
+                    foundIngredients.forEach(ing => {
+                        const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId));
+                        if (paint) {
+                            message += `\n• ${paint.name} – ${ing.amount} ${ing.unit}`;
+                        }
+                    });
+
                     SICOMIX.utils.showConfirmation(
                         SICOMIX.i18n.t('scan_success', { count: foundIngredients.length }),
-                        '',
+                        message,
                         () => {
+                            // Додаємо знайдені інгредієнти, перевіряючи дублікати (за paintId + unit)
                             foundIngredients.forEach(ing => {
-                                if (!selectedIngredients.some(ex => String(ex.paintId) === String(ing.paintId) && ex.unit === ing.unit)) {
-                                    selectedIngredients.push(ing);
+                                const existing = selectedIngredients.find(
+                                    ex => String(ex.paintId) === String(ing.paintId) && ex.unit === ing.unit
+                                );
+                                if (existing) {
+                                    // Якщо вже є така фарба з такими одиницями, об'єднуємо
+                                    existing.amount += ing.amount;
                                 } else {
-                                    // Якщо така фарба з такими одиницями вже є, можна об'єднати або проігнорувати
-                                    // Тут просто ігноруємо дублікати (але зазвичай не має бути)
+                                    selectedIngredients.push(ing);
                                 }
                             });
                             calculatePercentages();
