@@ -162,6 +162,12 @@
                     <span data-i18n="catalog">Каталог фарб</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-page="pantone">
+                    <i class="fas fa-swatchbook"></i>
+                    <span data-i18n="pantone">Pantone</span>
+                </a>
+            </li>
         </ul>
 
         <h3 class="nav-title" data-i18n="import_export">Імпорт/Експорт</h3>
@@ -257,6 +263,11 @@
                         <div class="action-icon"><i class="fas fa-layer-group"></i></div>
                         <h3 class="action-title" data-i18n="paint_catalog">Каталог фарб</h3>
                         <p class="action-description" data-i18n="catalog_desc">База всіх доступних фарб</p>
+                    </a>
+                    <a class="action-card" href="#" data-page="pantone">
+                        <div class="action-icon"><i class="fas fa-swatchbook"></i></div>
+                        <h3 class="action-title" data-i18n="pantone">Pantone</h3>
+                        <p class="action-description" data-i18n="pantone_desc">Кольори Pantone з каталогів Formula Guide</p>
                     </a>
                     <a class="action-card" href="#" data-page="export">
                         <div class="action-icon"><i class="fas fa-file-export"></i></div>
@@ -390,6 +401,26 @@
                 <div class="pagination-container">
                     <button class="load-more-btn" id="loadMoreCatalogBtn" style="display: none;" data-i18n="load_more">Завантажити ще</button>
                 </div>
+            </div>
+
+            <!-- PANTONE PAGE (НОВА) -->
+            <div class="page-content" id="pantone-page">
+                <h2 class="page-title" data-i18n="pantone">Pantone</h2>
+                <p class="page-description" data-i18n="pantone_desc">Кольори Pantone з каталогів Formula Guide</p>
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="pantoneSearch" placeholder="" data-i18n-placeholder="search_pantone">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                    <select class="filter-select" id="pantoneCategoryFilter">
+                        <option value="all" data-i18n="all_categories">Всі категорії</option>
+                        <option value="coated" data-i18n="coated">Глянцеві (Coated)</option>
+                        <option value="uncoated" data-i18n="uncoated">Матові (Uncoated)</option>
+                        <option value="plus" data-i18n="plus_series">Plus Series</option>
+                        <option value="special" data-i18n="special_editions">Спеціальні видання</option>
+                    </select>
+                </div>
+                <div class="pantone-cards" id="pantoneCatalog" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; margin-top: 30px;"></div>
             </div>
 
             <!-- IMPORT PAGE -->
