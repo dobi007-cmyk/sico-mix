@@ -1,4 +1,4 @@
-// ========== УТИЛІТИ (ВИПРАВЛЕНО) ==========
+// ========== УТИЛІТИ (ОНОВЛЕНО) ==========
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -16,9 +16,10 @@ window.SICOMIX = window.SICOMIX || {};
                 .replace(/'/g, '&#039;');
         }
 
+        // Показує сповіщення. Якщо duration = 0, сповіщення не зникає автоматично.
         function showNotification(message, type = 'success', duration = 3000) {
-            const existing = document.querySelectorAll('.notification');
-            existing.forEach(n => n.remove());
+            // Спочатку видаляємо попередні сповіщення
+            hideNotification();
 
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
@@ -51,12 +52,27 @@ window.SICOMIX = window.SICOMIX || {};
             notification.innerHTML = `<i class="fas ${icon}"></i><span>${escapeHtml(message)}</span>`;
             document.body.appendChild(notification);
 
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, duration);
+            if (duration > 0) {
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.style.animation = 'slideOut 0.3s ease';
+                        setTimeout(() => notification.remove(), 300);
+                    }
+                }, duration);
+            }
+            // Якщо duration === 0, сповіщення залишається до виклику hideNotification
         }
 
+        // Приховує всі активні сповіщення
+        function hideNotification() {
+            const existing = document.querySelectorAll('.notification');
+            existing.forEach(n => {
+                n.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => n.remove(), 300);
+            });
+        }
+
+        // Показує модальне вікно підтвердження
         function showConfirmation(title, message, onConfirm, onCancel) {
             const modal = document.getElementById('confirmationModal');
             const titleEl = document.getElementById('confirmationTitle');
@@ -83,21 +99,23 @@ window.SICOMIX = window.SICOMIX || {};
                 confirmBtn.onclick = null;
                 cancelBtn.onclick = null;
                 closeBtn.onclick = null;
+                document.removeEventListener('keydown', escHandler);
             };
+            const escHandler = (e) => { if (e.key === 'Escape') handleCancel(); };
 
             confirmBtn.onclick = handleConfirm;
             cancelBtn.onclick = handleCancel;
             closeBtn.onclick = handleCancel;
-
-            const escHandler = (e) => { if (e.key === 'Escape') handleCancel(); };
             document.addEventListener('keydown', escHandler);
-            modal._escHandler = escHandler;
+            modal._escHandler = escHandler; // для можливого зовнішнього доступу
         }
 
+        // Генерує унікальний ідентифікатор
         function generateId() {
             return Date.now() + '-' + Math.random().toString(36).substring(2, 9);
         }
 
+        // Розраховує відсотки для інгредієнтів на основі кількості
         function calculateIngredientPercentages(ingredients) {
             const total = ingredients.reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0);
             if (total === 0) return ingredients;
@@ -107,6 +125,7 @@ window.SICOMIX = window.SICOMIX || {};
             }));
         }
 
+        // Експортує дані у файл
         function exportToFile(data, filename, type = 'application/json') {
             let content;
             if (type === 'application/json') {
@@ -125,6 +144,7 @@ window.SICOMIX = window.SICOMIX || {};
             URL.revokeObjectURL(url);
         }
 
+        // Конвертує масив об'єктів у CSV
         function convertToCSV(data) {
             if (!Array.isArray(data) || data.length === 0) return '';
             const headers = Object.keys(data[0]);
@@ -159,6 +179,7 @@ window.SICOMIX = window.SICOMIX || {};
             return result;
         }
 
+        // Дебаунс для оптимізації частих викликів
         function debounce(fn, delay) {
             let timer;
             return function(...args) {
@@ -167,6 +188,7 @@ window.SICOMIX = window.SICOMIX || {};
             };
         }
 
+        // Збереження в localStorage
         function saveToLocalStorage(key, value) {
             try {
                 localStorage.setItem(key, JSON.stringify(value));
@@ -178,6 +200,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
+        // Завантаження з localStorage
         function loadFromLocalStorage(key, defaultValue = null) {
             try {
                 const item = localStorage.getItem(key);
@@ -191,6 +214,7 @@ window.SICOMIX = window.SICOMIX || {};
         return {
             escapeHtml,
             showNotification,
+            hideNotification,
             showConfirmation,
             generateId,
             calculateIngredientPercentages,
