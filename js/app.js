@@ -371,6 +371,17 @@ window.SICOMIX = window.SICOMIX || {};
                     renderPantoneCatalog();
                 });
             }
+            // Делегування подій для кнопок додавання Pantone
+            if (pantoneCatalog) {
+                pantoneCatalog.addEventListener('click', function(e) {
+                    const btn = e.target.closest('.pantone-add-btn');
+                    if (!btn) return;
+                    const pantoneNumber = btn.dataset.pantoneNumber;
+                    if (pantoneNumber) {
+                        addPantoneToRecipe(pantoneNumber);
+                    }
+                });
+            }
 
             if (startImportBtn) startImportBtn.addEventListener('click', startImport);
             if (startExportBtn) startExportBtn.addEventListener('click', startExport);
@@ -1757,9 +1768,7 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
-            const lang = SICOMIX.i18n.getLanguage();
             const html = filtered.map(p => {
-                // Визначаємо переклад назви категорії для показу (якщо потрібно)
                 let categoryLabel = '';
                 switch(p.category) {
                     case 'coated': categoryLabel = SICOMIX.i18n.t('coated'); break;
@@ -1777,37 +1786,31 @@ window.SICOMIX = window.SICOMIX || {};
                     <div style="font-size: 11px; margin-top: 5px; color: var(--text-tertiary);">${categoryLabel}</div>
                     <div style="font-size: 10px; margin-top: 3px;">${p.rgb}</div>
                     <div style="font-size: 10px;">CMYK: ${p.cmyk}</div>
-                    <button class="glass-add-btn" style="opacity: 1; transform: scale(1);" title="${SICOMIX.i18n.t('add_ingredient')}" onclick="SICOMIX.app.addPantoneToRecipe('${p.number}')">
+                    <button class="glass-add-btn pantone-add-btn" data-pantone-number="${p.number}" title="${SICOMIX.i18n.t('add_ingredient')}">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
             `}).join('');
 
             pantoneCatalog.innerHTML = html;
-
-            // Додаємо обробники для кнопок (хоча використовуємо onclick, але для динаміки можна і через делегування)
-            // Зараз використовуємо глобальну функцію addPantoneToRecipe, яку треба реалізувати
         }
 
-        // Глобальна функція для додавання пантона до рецепту (якщо потрібно)
-        window.SICOMIX.app.addPantoneToRecipe = function(pantoneNumber) {
+        // Функція додавання Pantone до рецепту
+        function addPantoneToRecipe(pantoneNumber) {
             const pantone = pantoneColors.find(p => p.number === pantoneNumber);
             if (!pantone) return;
 
-            // Перевіряємо, чи вибрана серія в рецепті
             const seriesSelect = document.getElementById('recipeSeries');
             if (!seriesSelect || !seriesSelect.value) {
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_series_first'), 'warning');
                 return;
             }
 
-            // Тут можна створити нову фарбу в каталозі на основі пантона або просто додати як інгредієнт
-            // Для простоти створимо нову фарбу в userPaints
             const newPaint = {
                 id: SICOMIX.utils.generateId(),
                 name: pantone.number,
                 category: 'Pantone',
-                series: seriesSelect.value, // використовуємо поточну серію
+                series: seriesSelect.value,
                 color: pantone.hex,
                 description: pantone.name,
                 manufacturer: 'Pantone',
@@ -1816,31 +1819,25 @@ window.SICOMIX = window.SICOMIX || {};
                 displayName: { uk: pantone.number, en: pantone.number, pl: pantone.number }
             };
 
-            // Перевіряємо, чи така фарба вже є в каталозі
             const existing = paintCatalog.find(p => p.article === pantone.number && p.series === seriesSelect.value);
             if (existing) {
-                // Якщо вже є, додаємо до рецепту
                 if (checkSeriesLock(existing.series)) {
                     addPaintToRecipeFromCatalog(existing);
                 }
             } else {
-                // Додаємо нову фарбу в каталог
                 userPaints.push(newPaint);
                 paintCatalog = [...basePaints, ...userPaints];
                 saveData();
-                // Додаємо до рецепту
                 if (checkSeriesLock(newPaint.series)) {
                     addPaintToRecipeFromCatalog(newPaint);
                 }
-                // Оновлюємо відображення каталогу фарб (якщо потрібно)
-                renderPaintCatalog();
+                renderPaintCatalog(); // оновлюємо каталог, щоб нова фарба з'явилася
             }
 
-            // Перемикаємося на сторінку нового рецепту, якщо ми не там
             if (!document.getElementById('new-recipe-page').classList.contains('active')) {
                 switchPage('new-recipe');
             }
-        };
+        }
 
         // ---------- ПОКРАЩЕНА ФУНКЦІЯ СКАНУВАННЯ РЕЦЕПТУ З ФОТО ----------
         async function scanRecipeFromPhoto() {
@@ -2094,7 +2091,7 @@ window.SICOMIX = window.SICOMIX || {};
             editRecipe,
             deletePaint,
             showNotification: SICOMIX.utils.showNotification,
-            addPantoneToRecipe: window.SICOMIX.app?.addPantoneToRecipe // експортуємо для зовнішнього використання
+            addPantoneToRecipe: addPantoneToRecipe
         };
     })();
 
