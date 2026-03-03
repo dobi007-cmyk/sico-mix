@@ -816,7 +816,7 @@ SICOMIX.data = (function() {
             { code: "SPTN141", seriesId: "SPTN", colorCode: "141" },
             { code: "SPTN142", seriesId: "SPTN", colorCode: "142" },
             { code: "SPTN143", seriesId: "SPTN", colorCode: "143" },
-            { code: "SPTN150/17", seriesId: "SPTN", colorCode: "150/17" },
+            // SPTN150/17 видалено
 
             // ==================== OTF ====================
             { code: "OTF10", seriesId: "OTF", colorCode: "10" },
@@ -850,7 +850,7 @@ SICOMIX.data = (function() {
             { code: "OTF80", seriesId: "OTF", colorCode: "80" },
             { code: "OTF81", seriesId: "OTF", colorCode: "81" },
             { code: "OTF91", seriesId: "OTF", colorCode: "91" },
-            { code: "OTF91/37", seriesId: "OTF", colorCode: "91/37" },
+            // OTF91/37 видалено
             { code: "OTF100", seriesId: "OTF", colorCode: "100" },
             { code: "OTF110", seriesId: "OTF", colorCode: "110" },
             { code: "OTF110/14", seriesId: "OTF", colorCode: "110/14" },
