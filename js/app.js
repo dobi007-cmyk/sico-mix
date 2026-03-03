@@ -343,6 +343,15 @@ window.SICOMIX = window.SICOMIX || {};
                     SICOMIX.i18n.setLanguage(newLang);
                     SICOMIX.i18n.applyTranslations();
                     
+                    // Оновлення тексту підпису фото, якщо ми на сторінці нового рецепту
+                    if (document.getElementById('new-recipe-page')?.classList.contains('active')) {
+                        if (recipePhotoDataUrl) {
+                            fileNameSpan.textContent = SICOMIX.i18n.t('photo_uploaded');
+                        } else {
+                            fileNameSpan.textContent = SICOMIX.i18n.t('upload_photo');
+                        }
+                    }
+                    
                     populateCategoryFilters();
                     populateStandardCategorySelect();
                     populateSeriesSelect();
@@ -485,6 +494,10 @@ window.SICOMIX = window.SICOMIX || {};
             } else if (pageId === 'new-recipe') {
                 if (!isEditingRecipe) {
                     loadRecipeDraft();
+                    // Якщо чернетки немає і фото не встановлено – показуємо стандартний підпис
+                    if (!recipeDraft && !recipePhotoDataUrl) {
+                        resetPhotoPreview();
+                    }
                 }
                 updateSeriesLockUI();
             }
@@ -909,6 +922,7 @@ window.SICOMIX = window.SICOMIX || {};
             input.click();
         }
 
+        // ОНОВЛЕНА ФУНКЦІЯ ДРУКУ З ВІДОБРАЖЕННЯМ ФОТО
         function printRecipes() {
             if (selectedRecipes.length === 0) {
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_recipes_to_print'), 'warning');
@@ -932,11 +946,19 @@ window.SICOMIX = window.SICOMIX || {};
                     .recipe-card { background: rgba(20, 24, 28, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; margin-bottom: 30px; page-break-inside: avoid; }
                     .recipe-title { font-size: 28px; font-weight: 700; color: white; margin-bottom: 10px; }
                     .recipe-meta { display: flex; gap: 20px; margin-bottom: 20px; color: #b0c0ce; }
+                    .recipe-photo { max-width: 200px; border-radius: 12px; margin: 15px 0; border: 2px solid rgba(255,255,255,0.1); }
                     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
                     th { background: rgba(58, 134, 255, 0.2); padding: 12px; text-align: left; color: white; }
                     td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
                     .footer { text-align: center; margin-top: 50px; color: #b0c0ce; font-size: 12px; }
-                    @media print { body { background: white; color: black; } .recipe-card { background: #f5f5f5; border: 1px solid #ccc; } th { background: #ddd; color: black; } .company-name { -webkit-text-fill-color: #333; } .print-date { color: #666; } }
+                    @media print { 
+                        body { background: white; color: black; } 
+                        .recipe-card { background: #f5f5f5; border: 1px solid #ccc; } 
+                        th { background: #ddd; color: black; } 
+                        .company-name { -webkit-text-fill-color: #333; } 
+                        .print-date { color: #666; } 
+                        .recipe-photo { border: 1px solid #ccc; }
+                    }
                 </style>
             </head>
             <body>
@@ -957,6 +979,7 @@ window.SICOMIX = window.SICOMIX || {};
                         <span><strong>${SICOMIX.i18n.t('date')}:</strong> ${SICOMIX.utils.escapeHtml(recipe.date || SICOMIX.i18n.t('unknown'))}</span>
                         <span><strong>${SICOMIX.i18n.t('total_weight')}:</strong> ${total} г</span>
                     </div>
+                    ${recipe.photo ? `<img src="${SICOMIX.utils.escapeHtml(recipe.photo)}" alt="Color sample" class="recipe-photo">` : ''}
                     <p>${SICOMIX.utils.escapeHtml(recipe.description || SICOMIX.i18n.t('no_description'))}</p>
                     <h3>${SICOMIX.i18n.t('recipe_ingredients')}</h3>
                     <table>
@@ -1655,14 +1678,14 @@ window.SICOMIX = window.SICOMIX || {};
             if (!recipePhotoPreview || !recipePhotoImg || !fileNameSpan) return;
             recipePhotoPreview.style.display = 'block';
             recipePhotoImg.src = dataUrl;
-            fileNameSpan.textContent = 'Фото завантажено';
+            fileNameSpan.textContent = SICOMIX.i18n.t('photo_uploaded');
         }
 
         function resetPhotoPreview() {
             if (!recipePhotoPreview || !recipePhotoImg || !fileNameSpan) return;
             recipePhotoPreview.style.display = 'none';
             recipePhotoImg.src = '';
-            fileNameSpan.textContent = SICOMIX.i18n.t('no_file_chosen');
+            fileNameSpan.textContent = SICOMIX.i18n.t('upload_photo');
         }
 
         // ---------- ІНІЦІАЛІЗАЦІЯ ----------
