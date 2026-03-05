@@ -403,7 +403,7 @@
                 </div>
             </div>
 
-            <!-- PANTONE PAGE (НОВА) -->
+            <!-- PANTONE PAGE -->
             <div class="page-content" id="pantone-page">
                 <h2 class="page-title" data-i18n="pantone">Pantone</h2>
                 <p class="page-description" data-i18n="pantone_desc">Кольори Pantone з каталогів Formula Guide</p>
@@ -507,7 +507,7 @@
                 </div>
             </div>
 
-            <!-- SETTINGS PAGE (НОВА) -->
+            <!-- SETTINGS PAGE -->
             <div class="page-content" id="settings-page">
                 <h2 class="page-title" data-i18n="settings">Налаштування</h2>
                 <p class="page-description" data-i18n="settings_desc">Налаштуйте систему за вашими потребами</p>
@@ -580,6 +580,22 @@
                         <button class="modal-close" id="closeSeriesModal">&times;</button>
                     </div>
                     <div id="seriesDetailsContent" style="padding: 20px; max-height: 60vh; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <!-- MODAL: Pantone Recipe -->
+            <div class="modal" id="pantoneRecipeModal">
+                <div class="modal-content" style="max-width: 600px;">
+                    <div class="modal-header">
+                        <h3 class="modal-title" data-i18n="pantone_recipe">Рецепт Pantone</h3>
+                        <button class="modal-close close-pantone-recipe">&times;</button>
+                    </div>
+                    <div id="pantoneRecipeContent" style="padding: 20px; max-height: 60vh; overflow-y: auto;"></div>
+                    <div class="action-buttons" style="justify-content: flex-end; margin-top: 0; padding: 0 20px 20px;">
+                        <button class="btn btn-primary" id="addPantoneFromRecipeBtn">
+                            <i class="fas fa-plus"></i> <span data-i18n="add_ingredient">Додати до рецепту</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </main>
