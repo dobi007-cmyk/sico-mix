@@ -41,6 +41,7 @@ window.SICOMIX = window.SICOMIX || {};
         let seriesDetailsModal, closeSeriesModal, seriesDetailsTitle, seriesDetailsContent;
         // Pantone елементи
         let pantoneSearch, pantoneCategoryFilter, pantoneCatalog;
+        let pantoneRecipeModal, closePantoneRecipe, pantoneRecipeContent, addPantoneFromRecipeBtn;
 
         // ---------- КЕШУВАННЯ DOM ----------
         function cacheDOMElements() {
@@ -105,6 +106,10 @@ window.SICOMIX = window.SICOMIX || {};
             pantoneSearch = document.getElementById('pantoneSearch');
             pantoneCategoryFilter = document.getElementById('pantoneCategoryFilter');
             pantoneCatalog = document.getElementById('pantoneCatalog');
+            pantoneRecipeModal = document.getElementById('pantoneRecipeModal');
+            closePantoneRecipe = document.querySelector('.close-pantone-recipe');
+            pantoneRecipeContent = document.getElementById('pantoneRecipeContent');
+            addPantoneFromRecipeBtn = document.getElementById('addPantoneFromRecipeBtn');
         }
 
         // ---------- ЗАВАНТАЖЕННЯ ТА ЗБЕРЕЖЕННЯ ----------
@@ -364,6 +369,26 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
+            // Закриття модального вікна Pantone
+            if (closePantoneRecipe) {
+                closePantoneRecipe.addEventListener('click', () => {
+                    pantoneRecipeModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            }
+
+            // Кнопка додавання з модального вікна рецепту
+            if (addPantoneFromRecipeBtn) {
+                addPantoneFromRecipeBtn.addEventListener('click', function() {
+                    const pantoneNumber = this.dataset.pantoneNumber;
+                    if (pantoneNumber) {
+                        addPantoneToRecipe(pantoneNumber);
+                        pantoneRecipeModal.classList.remove('active');
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            }
+
             if (startImportBtn) startImportBtn.addEventListener('click', startImport);
             if (startExportBtn) startExportBtn.addEventListener('click', startExport);
 
@@ -444,6 +469,10 @@ window.SICOMIX = window.SICOMIX || {};
                     }
                     if (seriesDetailsModal?.classList.contains('active')) {
                         seriesDetailsModal.classList.remove('active');
+                        document.body.style.overflow = 'auto';
+                    }
+                    if (pantoneRecipeModal?.classList.contains('active')) {
+                        pantoneRecipeModal.classList.remove('active');
                         document.body.style.overflow = 'auto';
                     }
                 }
@@ -1740,8 +1769,7 @@ window.SICOMIX = window.SICOMIX || {};
             let filtered = SICOMIX.pantone.colors;
 
             if (category !== 'all') {
-                // Тут можна додати фільтрацію за категорією, якщо в даних є поле category
-                // Поки що просто ігноруємо
+                filtered = filtered.filter(p => p.category === category);
             }
 
             if (search) {
@@ -1757,12 +1785,13 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             const html = filtered.map(p => {
-                // Для відображення використовуємо перший інгредієнт або заглушку
                 const firstIngredient = p.ingredients && p.ingredients.length > 0 ? p.ingredients[0].name : '';
                 const firstAmount = p.ingredients && p.ingredients.length > 0 ? p.ingredients[0].amount : '';
+                const hex = p.hex && p.hex !== '#CCCCCC' ? p.hex : '#CCCCCC';
+                
                 return `
-                <div class="paint-card-glass" data-pantone-number="${p.number}" style="color: #000;">
-                    <div class="glass-swatch" style="background: #ccc;"></div>
+                <div class="paint-card-glass pantone-card" data-pantone-number="${p.number}" style="color: #000;">
+                    <div class="glass-swatch" style="background: ${hex};"></div>
                     <div class="glass-name">${SICOMIX.utils.escapeHtml(p.number)}</div>
                     <div class="glass-article">${SICOMIX.utils.escapeHtml(p.name || '')}</div>
                     <div style="font-size: 11px; margin-top: 5px; color: var(--text-tertiary);">${firstIngredient} ${firstAmount}</div>
@@ -1773,6 +1802,48 @@ window.SICOMIX = window.SICOMIX || {};
             `}).join('');
 
             pantoneCatalog.innerHTML = html;
+
+            // Додаємо обробник кліку на картку для відкриття рецепту
+            document.querySelectorAll('.pantone-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Не відкриваємо рецепт, якщо клікнули на кнопку додавання
+                    if (e.target.closest('.pantone-add-btn')) return;
+                    
+                    const pantoneNumber = this.dataset.pantoneNumber;
+                    if (pantoneNumber) {
+                        showPantoneRecipeModal(pantoneNumber);
+                    }
+                });
+            });
+        }
+
+        // Функція для показу модального вікна з рецептом Pantone
+        function showPantoneRecipeModal(pantoneNumber) {
+            if (!SICOMIX.pantone) return;
+            
+            const modal = document.getElementById('pantoneRecipeModal');
+            const modalTitle = modal.querySelector('.modal-title');
+            const modalContent = document.getElementById('pantoneRecipeContent');
+            const addBtn = document.getElementById('addPantoneFromRecipeBtn');
+            
+            if (!modal || !modalContent) return;
+            
+            const html = SICOMIX.pantone.getRecipeHTML(pantoneNumber);
+            
+            if (modalTitle) {
+                modalTitle.textContent = `${SICOMIX.i18n.t('pantone_recipe')}: ${pantoneNumber}`;
+            }
+            modalContent.innerHTML = html;
+            
+            // Зберігаємо номер для кнопки додавання
+            if (addBtn) {
+                addBtn.dataset.pantoneNumber = pantoneNumber;
+            }
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Додаємо обробник для закриття по Escape (вже є глобальний)
         }
 
         // Функція додавання Pantone до рецепту
