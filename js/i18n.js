@@ -129,6 +129,11 @@ window.SICOMIX = window.SICOMIX || {};
                 search_pantone: "Пошук Pantone...",
                 no_pantone: "Кольорів Pantone не знайдено",
                 pantone_categories: "Категорії Pantone",
+                // Нові ключі для рецептів Pantone
+                pantone_recipe: "Рецепт Pantone",
+                ingredient: "Інгредієнт",
+                amount: "Кількість",
+                no_recipe_data: "Немає даних про інгредієнти",
 
                 // Імпорт/Експорт
                 import_desc: "Імпортуйте рецепти та каталог з файлів",
@@ -370,6 +375,11 @@ window.SICOMIX = window.SICOMIX || {};
                 search_pantone: "Search Pantone...",
                 no_pantone: "No Pantone colors found",
                 pantone_categories: "Pantone Categories",
+                // New keys for Pantone recipes
+                pantone_recipe: "Pantone Recipe",
+                ingredient: "Ingredient",
+                amount: "Amount",
+                no_recipe_data: "No ingredient data",
 
                 // Імпорт/Експорт
                 import_desc: "Import recipes and catalog from files",
@@ -611,6 +621,11 @@ window.SICOMIX = window.SICOMIX || {};
                 search_pantone: "Szukaj Pantone...",
                 no_pantone: "Nie znaleziono kolorów Pantone",
                 pantone_categories: "Kategorie Pantone",
+                // Nowe klucze dla receptur Pantone
+                pantone_recipe: "Receptura Pantone",
+                ingredient: "Składnik",
+                amount: "Ilość",
+                no_recipe_data: "Brak danych składników",
 
                 // Імпорт/Експорт
                 import_desc: "Importuj receptury i katalog z plików",
