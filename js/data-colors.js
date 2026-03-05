@@ -1,9 +1,8 @@
 console.log('[SICOMIX] Завантаження data-colors.js...');
 
 window.SICOMIX = window.SICOMIX || {};
-const SICOMIX = window.SICOMIX;
-
-SICOMIX.data = (function() {
+// Не використовуємо const, а просто присвоюємо
+window.SICOMIX.data = (function() {
     try {
         // ---------- БАЗОВІ ВЛАСТИВОСТІ ДЛЯ СЕРІЙ ----------
         const EC_PROPERTIES = {
@@ -1274,4 +1273,4 @@ SICOMIX.data = (function() {
     }
 })();
 
-console.log('[SICOMIX] data-colors.js завантажено успішно, SICOMIX.data.paints.length =', SICOMIX.data?.paints?.length);
+console.log('[SICOMIX] data-colors.js завантажено успішно, SICOMIX.data.paints.length =', window.SICOMIX.data?.paints?.length);
