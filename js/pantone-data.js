@@ -1404,21 +1404,22 @@ window.SICOMIX = window.SICOMIX || {};
         // Функція для отримання рецепту (інгредієнтів) для показу в модальному вікні
         getRecipeHTML: function(pantoneNumber) {
             const color = this.findByNumber(pantoneNumber);
-            if (!color) return `<p>${SICOMIX.i18n.t('no_pantone')}</p>`;
+            if (!color) return `<p>${SICOMIX.i18n ? SICOMIX.i18n.t('no_pantone') : 'No Pantone color found'}</p>`;
             
             let html = `<h3>${color.number}</h3>`;
             if (color.name && color.name !== color.number) {
-                html += `<p><em>${SICOMIX.utils.escapeHtml(color.name)}</em></p>`;
+                html += `<p><em>${SICOMIX.utils ? SICOMIX.utils.escapeHtml(color.name) : color.name}</em></p>`;
             }
             html += '<table style="width:100%; border-collapse:collapse; margin-top:15px;">';
-            html += `<tr><th style="text-align:left; padding:8px; background:rgba(58,134,255,0.2);">${SICOMIX.i18n.t('ingredient')}</th><th style="text-align:right; padding:8px; background:rgba(58,134,255,0.2);">${SICOMIX.i18n.t('amount')}</th></tr>`;
+            html += `<tr><th style="text-align:left; padding:8px; background:rgba(58,134,255,0.2);">${SICOMIX.i18n ? SICOMIX.i18n.t('ingredient') : 'Ingredient'}</th><th style="text-align:right; padding:8px; background:rgba(58,134,255,0.2);">${SICOMIX.i18n ? SICOMIX.i18n.t('amount') : 'Amount'}</th></tr>`;
             
             if (color.ingredients && color.ingredients.length > 0) {
                 color.ingredients.forEach(ing => {
-                    html += `<tr><td style="padding:8px; border-bottom:1px solid rgba(255,255,255,0.1);">${SICOMIX.utils.escapeHtml(ing.name)}</td><td style="padding:8px; border-bottom:1px solid rgba(255,255,255,0.1); text-align:right;">${ing.amount}%</td></tr>`;
+                    const name = SICOMIX.utils ? SICOMIX.utils.escapeHtml(ing.name) : ing.name;
+                    html += `<tr><td style="padding:8px; border-bottom:1px solid rgba(255,255,255,0.1);">${name}</td><td style="padding:8px; border-bottom:1px solid rgba(255,255,255,0.1); text-align:right;">${ing.amount}%</td></tr>`;
                 });
             } else {
-                html += `<tr><td colspan="2" style="padding:20px; text-align:center;">${SICOMIX.i18n.t('no_recipe_data')}</td></tr>`;
+                html += `<tr><td colspan="2" style="padding:20px; text-align:center;">${SICOMIX.i18n ? SICOMIX.i18n.t('no_recipe_data') : 'No ingredient data'}</td></tr>`;
             }
             
             html += '</table>';
