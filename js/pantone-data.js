@@ -1,5 +1,5 @@
 // ========== ДАНІ ПАНТОН ==========
-// Зібрано зі сканів та фотографій, доповнено кольорами з відкритих джерел
+// Зібрано зі сканів та фотографій
 window.SICOMIX = window.SICOMIX || {};
 
 (function(global) {
@@ -1361,72 +1361,39 @@ window.SICOMIX = window.SICOMIX || {};
         ]}
     ];
 
-    // Функція для завантаження зовнішніх кольорів з JSON
-    // Ви можете завантажити JSON з https://github.com/jake74/Pantone-CMYK-RGB-Hex/blob/main/pantone_CMYK_RGB_Hex.json
-    // і розкоментувати код нижче після додавання файлу
-    function loadExternalColorData() {
-        // Цей код буде виконано, якщо ви додасте файл з даними
-        // Наприклад, створивши файл js/pantone-external-colors.js зі змінною window.PANTONE_EXTERNAL_COLORS
-        if (window.PANTONE_EXTERNAL_COLORS && Array.isArray(window.PANTONE_EXTERNAL_COLORS)) {
-            return window.PANTONE_EXTERNAL_COLORS;
-        }
-        return [];
+    // Функція для визначення категорії за номером
+    function getCategoryFromNumber(number) {
+        const num = String(number).toUpperCase();
+        if (num.includes('U')) return 'uncoated';
+        if (num.includes('C')) return 'coated';
+        // За замовчуванням – uncoated, оскільки більшість ваших мають U
+        return 'uncoated';
     }
 
-    const externalColors = loadExternalColorData();
-
-    // Функція для нормалізації номера Pantone (наприклад, "PANTONE 2022 U" -> "2022 U")
-    function normalizePantoneNumber(raw) {
-        if (!raw) return '';
-        let str = String(raw).toUpperCase().trim();
-        // Видаляємо "PANTONE " на початку
-        str = str.replace(/^PANTONE\s+/i, '');
-        // Видаляємо зайві пробіли
-        str = str.replace(/\s+/g, ' ');
-        return str;
-    }
-
-    // Створюємо мапу зовнішніх кольорів для швидкого пошуку
-    const externalColorMap = new Map();
-    externalColors.forEach(ext => {
-        const normalized = normalizePantoneNumber(ext.pantone || ext.number || ext.code || '');
-        if (normalized) {
-            externalColorMap.set(normalized, {
-                hex: ext.hex || ext.hexadecimal || ext.Hex || '',
-                rgb: ext.rgb || ext.RGB || '',
-                cmyk: ext.cmyk || ext.CMYK || ''
-            });
-        }
-    });
-
-    // Доповнюємо базові кольори зовнішніми даними
+    // Доповнюємо кольори категорією та базовим кольором
     const colors = basePantoneColors.map(color => {
-        const normalized = normalizePantoneNumber(color.number);
-        const ext = externalColorMap.get(normalized) || {};
-        
-        // Якщо немає зовнішніх даних, спробуємо згенерувати приблизний колір на основі назви (для демо)
-        let hex = ext.hex || '#CCCCCC';
-        let rgb = ext.rgb || '';
-        let cmyk = ext.cmyk || '';
-
-        // Якщо є ingredients, додаємо їх до об'єкта
         return {
             ...color,
-            hex: hex,
-            rgb: rgb,
-            cmyk: cmyk,
-            // Можна також додати категорію для фільтрації (coated/uncoated)
-            category: color.number.includes('U') ? 'uncoated' : 'coated'
+            category: getCategoryFromNumber(color.number),
+            hex: '#CCCCCC', // Тимчасово, доки не додамо зовнішні дані
+            rgb: '',
+            cmyk: ''
         };
     });
 
     SICOMIX.pantone = {
         colors: colors,
 
+        // Допоміжна функція для нормалізації номера
+        normalizeNumber: function(number) {
+            if (!number) return '';
+            return String(number).trim().replace(/\s+/g, ' ').toUpperCase();
+        },
+
         // Допоміжна функція для пошуку кольору за номером
         findByNumber: function(number) {
-            const normalized = normalizePantoneNumber(number);
-            return this.colors.find(c => normalizePantoneNumber(c.number) === normalized);
+            const normalized = this.normalizeNumber(number);
+            return this.colors.find(c => this.normalizeNumber(c.number) === normalized);
         },
 
         // Функція для отримання всіх номерів (для списків)
@@ -1437,21 +1404,21 @@ window.SICOMIX = window.SICOMIX || {};
         // Функція для отримання рецепту (інгредієнтів) для показу в модальному вікні
         getRecipeHTML: function(pantoneNumber) {
             const color = this.findByNumber(pantoneNumber);
-            if (!color) return '<p>Рецепт не знайдено</p>';
+            if (!color) return `<p>${SICOMIX.i18n.t('no_pantone')}</p>`;
             
             let html = `<h3>${color.number}</h3>`;
             if (color.name && color.name !== color.number) {
-                html += `<p><em>${color.name}</em></p>`;
+                html += `<p><em>${SICOMIX.utils.escapeHtml(color.name)}</em></p>`;
             }
             html += '<table style="width:100%; border-collapse:collapse; margin-top:15px;">';
-            html += '<tr><th style="text-align:left; padding:8px; background:rgba(58,134,255,0.2);">Інгредієнт</th><th style="text-align:right; padding:8px; background:rgba(58,134,255,0.2);">Кількість</th></tr>';
+            html += `<tr><th style="text-align:left; padding:8px; background:rgba(58,134,255,0.2);">${SICOMIX.i18n.t('ingredient')}</th><th style="text-align:right; padding:8px; background:rgba(58,134,255,0.2);">${SICOMIX.i18n.t('amount')}</th></tr>`;
             
             if (color.ingredients && color.ingredients.length > 0) {
                 color.ingredients.forEach(ing => {
-                    html += `<tr><td style="padding:8px; border-bottom:1px solid rgba(255,255,255,0.1);">${ing.name}</td><td style="padding:8px; border-bottom:1px solid rgba(255,255,255,0.1); text-align:right;">${ing.amount}%</td></tr>`;
+                    html += `<tr><td style="padding:8px; border-bottom:1px solid rgba(255,255,255,0.1);">${SICOMIX.utils.escapeHtml(ing.name)}</td><td style="padding:8px; border-bottom:1px solid rgba(255,255,255,0.1); text-align:right;">${ing.amount}%</td></tr>`;
                 });
             } else {
-                html += '<tr><td colspan="2" style="padding:20px; text-align:center;">Немає даних про інгредієнти</td></tr>';
+                html += `<tr><td colspan="2" style="padding:20px; text-align:center;">${SICOMIX.i18n.t('no_recipe_data')}</td></tr>`;
             }
             
             html += '</table>';
