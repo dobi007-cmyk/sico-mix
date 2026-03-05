@@ -1371,7 +1371,7 @@ window.SICOMIX = window.SICOMIX || {};
     }
 
     // Доповнюємо кольори категорією та базовим кольором
-    const colors = basePantoneColors.map(color => {
+    let colors = basePantoneColors.map(color => {
         return {
             ...color,
             category: getCategoryFromNumber(color.number),
@@ -1380,6 +1380,34 @@ window.SICOMIX = window.SICOMIX || {};
             cmyk: ''
         };
     });
+
+    // ===== Інтеграція з pantone-external-colors.js =====
+    if (global.pantoneExternalColors && Array.isArray(global.pantoneExternalColors)) {
+        global.pantoneExternalColors.forEach(ext => {
+            // Нормалізуємо код із зовнішнього файлу (прибираємо зайві пробіли)
+            const extCode = ext.Code.trim();
+            
+            // Шукаємо відповідний колір у масиві colors
+            const match = colors.find(c => {
+                // Видаляємо " U" в кінці номера (наприклад, "7521 U" -> "7521")
+                const cNum = c.number.replace(/\s+U$/i, '').trim();
+                return cNum === extCode || c.number === extCode;
+            });
+            
+            if (match) {
+                // Заповнюємо hex (якщо є)
+                if (ext.Hex) match.hex = ext.Hex;
+                // Можна також додати RGB та CMYK для відображення в деталях
+                if (ext.R && ext.G && ext.B) {
+                    match.rgb = `${ext.R}, ${ext.G}, ${ext.B}`;
+                }
+                if (ext.C && ext.M && ext.Y && ext.K) {
+                    match.cmyk = `${ext.C}%, ${ext.M}%, ${ext.Y}%, ${ext.K}%`;
+                }
+            }
+        });
+    }
+    // ====================================================
 
     SICOMIX.pantone = {
         colors: colors,
