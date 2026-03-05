@@ -357,7 +357,8 @@ window.SICOMIX = window.SICOMIX || {};
                     renderPantoneCatalog();
                 });
             }
-            // Делегування подій для кнопок додавання Pantone
+
+            // Делегування подій для кнопок додавання Pantone (окремо)
             if (pantoneCatalog) {
                 pantoneCatalog.addEventListener('click', function(e) {
                     const btn = e.target.closest('.pantone-add-btn');
@@ -501,7 +502,7 @@ window.SICOMIX = window.SICOMIX || {};
                 }
             });
 
-            // ДЕЛЕГОВАНИЙ ОБРОБНИК ДЛЯ КНОПОК ДОДАВАННЯ/ВИДАЛЕННЯ
+            // ДЕЛЕГОВАНИЙ ОБРОБНИК ДЛЯ КНОПОК ДОДАВАННЯ/ВИДАЛЕННЯ (для каталогу фарб)
             if (paintCatalogEl) {
                 paintCatalogEl.addEventListener('click', function(e) {
                     const btn = e.target.closest('.glass-add-btn, .glass-remove-btn');
@@ -1803,17 +1804,17 @@ window.SICOMIX = window.SICOMIX || {};
 
             pantoneCatalog.innerHTML = html;
 
-            // Додаємо обробник кліку на картку для відкриття рецепту
-            document.querySelectorAll('.pantone-card').forEach(card => {
-                card.addEventListener('click', function(e) {
-                    // Не відкриваємо рецепт, якщо клікнули на кнопку додавання
-                    if (e.target.closest('.pantone-add-btn')) return;
-                    
-                    const pantoneNumber = this.dataset.pantoneNumber;
-                    if (pantoneNumber) {
-                        showPantoneRecipeModal(pantoneNumber);
-                    }
-                });
+            // Делегування подій для відкриття модального вікна при кліку на картку Pantone (але не на кнопку)
+            pantoneCatalog.addEventListener('click', function(e) {
+                const card = e.target.closest('.pantone-card');
+                if (!card) return;
+                // Якщо клікнули на кнопку додавання – не відкриваємо модальне вікно
+                if (e.target.closest('.pantone-add-btn')) return;
+                
+                const pantoneNumber = card.dataset.pantoneNumber;
+                if (pantoneNumber) {
+                    showPantoneRecipeModal(pantoneNumber);
+                }
             });
         }
 
@@ -1842,8 +1843,6 @@ window.SICOMIX = window.SICOMIX || {};
             
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            
-            // Додаємо обробник для закриття по Escape (вже є глобальний)
         }
 
         // Функція додавання Pantone до рецепту
