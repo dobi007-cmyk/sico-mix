@@ -42,25 +42,6 @@ window.SICOMIX = window.SICOMIX || {};
         // Pantone елементи
         let pantoneSearch, pantoneCategoryFilter, pantoneCatalog;
 
-        // ---------- ПАНТОН КОЛЬОРИ (зразок на основі фото) ----------
-        const pantoneColors = [
-            // Coated
-            { number: "PANTONE 2026 C", name: "Vibrant Orange", category: "coated", hex: "#F4633A", rgb: "rgb(244,99,58)", cmyk: "0,59,76,4" },
-            { number: "PANTONE 11-4201 C", name: "Cloud Dancer", category: "coated", hex: "#F0EFEB", rgb: "rgb(240,239,235)", cmyk: "0,0,2,6" },
-            { number: "PANTONE 18-1750 C", name: "Viva Magenta", category: "coated", hex: "#BB2649", rgb: "rgb(187,38,73)", cmyk: "0,80,61,27" },
-            { number: "PANTONE 13-0647 C", name: "Limelight", category: "coated", hex: "#E3E448", rgb: "rgb(227,228,72)", cmyk: "0,0,68,11" },
-            // Uncoated
-            { number: "PANTONE 2026 U", name: "Vibrant Orange", category: "uncoated", hex: "#E55B3A", rgb: "rgb(229,91,58)", cmyk: "0,60,75,10" },
-            { number: "PANTONE 11-4201 U", name: "Cloud Dancer", category: "uncoated", hex: "#E8E7E3", rgb: "rgb(232,231,227)", cmyk: "0,0,2,9" },
-            { number: "PANTONE 18-1750 U", name: "Viva Magenta", category: "uncoated", hex: "#B3274A", rgb: "rgb(179,39,74)", cmyk: "0,78,59,30" },
-            // Plus Series (спеціальні)
-            { number: "PANTONE 14-0952 TCX", name: "Spectra Yellow", category: "plus", hex: "#E5B51C", rgb: "rgb(229,181,28)", cmyk: "0,21,88,10" },
-            { number: "PANTONE 19-4052 TCX", name: "Classic Blue", category: "plus", hex: "#34568B", rgb: "rgb(52,86,139)", cmyk: "63,38,0,45" },
-            // Special Editions (з фото художників)
-            { number: "PANTONE 16-1546 TPX", name: "Living Coral", category: "special", hex: "#FF6F61", rgb: "rgb(255,111,97)", cmyk: "0,56,62,0" },
-            { number: "PANTONE 15-4020 TPX", name: "Serenity", category: "special", hex: "#92A8D1", rgb: "rgb(146,168,209)", cmyk: "30,20,0,18" }
-        ];
-
         // ---------- КЕШУВАННЯ DOM ----------
         function cacheDOMElements() {
             sidebar = document.getElementById('sidebar');
@@ -1747,19 +1728,26 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
+            // Перевіряємо, чи є дані Pantone
+            if (!SICOMIX.pantone || !SICOMIX.pantone.colors) {
+                pantoneCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Дані Pantone не завантажено</p>`;
+                return;
+            }
+
             const search = pantoneSearch?.value.toLowerCase() || '';
             const category = pantoneCategoryFilter?.value || 'all';
 
-            let filtered = pantoneColors;
+            let filtered = SICOMIX.pantone.colors;
 
             if (category !== 'all') {
-                filtered = filtered.filter(p => p.category === category);
+                // Тут можна додати фільтрацію за категорією, якщо в даних є поле category
+                // Поки що просто ігноруємо
             }
 
             if (search) {
                 filtered = filtered.filter(p => 
                     p.number.toLowerCase().includes(search) || 
-                    p.name.toLowerCase().includes(search)
+                    (p.name && p.name.toLowerCase().includes(search))
                 );
             }
 
@@ -1769,23 +1757,15 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             const html = filtered.map(p => {
-                let categoryLabel = '';
-                switch(p.category) {
-                    case 'coated': categoryLabel = SICOMIX.i18n.t('coated'); break;
-                    case 'uncoated': categoryLabel = SICOMIX.i18n.t('uncoated'); break;
-                    case 'plus': categoryLabel = SICOMIX.i18n.t('plus_series'); break;
-                    case 'special': categoryLabel = SICOMIX.i18n.t('special_editions'); break;
-                    default: categoryLabel = p.category;
-                }
-
+                // Для відображення використовуємо перший інгредієнт або заглушку
+                const firstIngredient = p.ingredients && p.ingredients.length > 0 ? p.ingredients[0].name : '';
+                const firstAmount = p.ingredients && p.ingredients.length > 0 ? p.ingredients[0].amount : '';
                 return `
-                <div class="paint-card-glass" data-pantone-number="${p.number}" style="color: ${p.hex};">
-                    <div class="glass-swatch" style="background: ${p.hex};"></div>
+                <div class="paint-card-glass" data-pantone-number="${p.number}" style="color: #000;">
+                    <div class="glass-swatch" style="background: #ccc;"></div>
                     <div class="glass-name">${SICOMIX.utils.escapeHtml(p.number)}</div>
-                    <div class="glass-article">${SICOMIX.utils.escapeHtml(p.name)}</div>
-                    <div style="font-size: 11px; margin-top: 5px; color: var(--text-tertiary);">${categoryLabel}</div>
-                    <div style="font-size: 10px; margin-top: 3px;">${p.rgb}</div>
-                    <div style="font-size: 10px;">CMYK: ${p.cmyk}</div>
+                    <div class="glass-article">${SICOMIX.utils.escapeHtml(p.name || '')}</div>
+                    <div style="font-size: 11px; margin-top: 5px; color: var(--text-tertiary);">${firstIngredient} ${firstAmount}</div>
                     <button class="glass-add-btn pantone-add-btn" data-pantone-number="${p.number}" title="${SICOMIX.i18n.t('add_ingredient')}">
                         <i class="fas fa-plus"></i>
                     </button>
@@ -1797,7 +1777,7 @@ window.SICOMIX = window.SICOMIX || {};
 
         // Функція додавання Pantone до рецепту
         function addPantoneToRecipe(pantoneNumber) {
-            const pantone = pantoneColors.find(p => p.number === pantoneNumber);
+            const pantone = SICOMIX.pantone.findByNumber(pantoneNumber);
             if (!pantone) return;
 
             const seriesSelect = document.getElementById('recipeSeries');
@@ -1806,13 +1786,14 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
+            // Створюємо нову фарбу на основі Pantone
             const newPaint = {
                 id: SICOMIX.utils.generateId(),
                 name: pantone.number,
                 category: 'Pantone',
                 series: seriesSelect.value,
-                color: pantone.hex,
-                description: pantone.name,
+                color: '#CCCCCC', // немає даних про колір
+                description: pantone.name || '',
                 manufacturer: 'Pantone',
                 article: pantone.number,
                 isDefault: false,
