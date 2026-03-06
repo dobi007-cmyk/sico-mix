@@ -168,6 +168,12 @@
                     <span data-i18n="pantone">Pantone</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-page="ral">
+                    <i class="fas fa-palette"></i>
+                    <span data-i18n="ral">RAL</span>
+                </a>
+            </li>
         </ul>
 
         <h3 class="nav-title" data-i18n="import_export">Імпорт/Експорт</h3>
@@ -268,6 +274,11 @@
                         <div class="action-icon"><i class="fas fa-swatchbook"></i></div>
                         <h3 class="action-title" data-i18n="pantone">Pantone</h3>
                         <p class="action-description" data-i18n="pantone_desc">Кольори Pantone з каталогів Formula Guide</p>
+                    </a>
+                    <a class="action-card" href="#" data-page="ral">
+                        <div class="action-icon"><i class="fas fa-palette"></i></div>
+                        <h3 class="action-title" data-i18n="ral">RAL</h3>
+                        <p class="action-description" data-i18n="ral_desc">Кольори RAL Classic</p>
                     </a>
                     <a class="action-card" href="#" data-page="export">
                         <div class="action-icon"><i class="fas fa-file-export"></i></div>
@@ -421,6 +432,30 @@
                     </select>
                 </div>
                 <div class="pantone-cards" id="pantoneCatalog" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; margin-top: 30px;"></div>
+            </div>
+
+            <!-- RAL PAGE -->
+            <div class="page-content" id="ral-page">
+                <h2 class="page-title" data-i18n="ral">RAL</h2>
+                <p class="page-description" data-i18n="ral_desc">Кольори RAL Classic</p>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="btn btn-primary" id="openRalPdf">
+                        <i class="fas fa-file-pdf"></i> Відкрити веер RAL
+                    </button>
+                    <button class="btn btn-primary" id="openPantonePdf">
+                        <i class="fas fa-file-pdf"></i> Відкрити веер Pantone
+                    </button>
+                </div>
+                
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="ralSearch" placeholder="Пошук RAL..." data-i18n-placeholder="search_ral">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="ral-cards" id="ralCatalog" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; margin-top: 30px;"></div>
             </div>
 
             <!-- IMPORT PAGE -->
@@ -712,7 +747,8 @@
     <script src="./js/data-colors.js?v=2026.02.28"></script>
     <script src="./js/i18n.js?v=2026.02.28"></script>
     <script src="./js/utils.js?v=2026.02.28"></script>
-    <script src="./js/pantone-external-colors.js?v=2026.03.04"></script>   <!-- ДОДАНО -->
+    <script src="./js/pantone-external-colors.js?v=2026.03.04"></script>
+    <script src="./js/ral-data.js?v=2026.03.06"></script>   <!-- НОВИЙ ФАЙЛ -->
     <script src="./js/pantone-data.js?v=2026.03.04"></script>
     <script src="./js/sync.js?v=2026.02.28"></script>
     <script src="./js/app.js?v=2026.02.28"></script>
