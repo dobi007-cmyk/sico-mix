@@ -42,6 +42,8 @@ window.SICOMIX = window.SICOMIX || {};
         // Pantone елементи
         let pantoneSearch, pantoneCategoryFilter, pantoneCatalog;
         let pantoneRecipeModal, closePantoneRecipe, pantoneRecipeContent, addPantoneFromRecipeBtn;
+        // RAL елементи
+        let ralSearch, ralCatalog;
 
         // ---------- КЕШУВАННЯ DOM ----------
         function cacheDOMElements() {
@@ -110,6 +112,9 @@ window.SICOMIX = window.SICOMIX || {};
             closePantoneRecipe = document.querySelector('.close-pantone-recipe');
             pantoneRecipeContent = document.getElementById('pantoneRecipeContent');
             addPantoneFromRecipeBtn = document.getElementById('addPantoneFromRecipeBtn');
+            // RAL
+            ralSearch = document.getElementById('ralSearch');
+            ralCatalog = document.getElementById('ralCatalog');
         }
 
         // ---------- ЗАВАНТАЖЕННЯ ТА ЗБЕРЕЖЕННЯ ----------
@@ -390,6 +395,28 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
+            // RAL події
+            if (ralSearch) {
+                ralSearch.addEventListener('input', SICOMIX.utils.debounce(() => {
+                    renderRalCatalog();
+                }, 300));
+            }
+
+            // Відкриття PDF
+            const openRalPdf = document.getElementById('openRalPdf');
+            if (openRalPdf) {
+                openRalPdf.addEventListener('click', () => {
+                    window.open('./files/Wzornik RAL.PDF', '_blank');
+                });
+            }
+
+            const openPantonePdf = document.getElementById('openPantonePdf');
+            if (openPantonePdf) {
+                openPantonePdf.addEventListener('click', () => {
+                    window.open('./files/60-vzornik-pantone.pdf', '_blank');
+                });
+            }
+
             if (startImportBtn) startImportBtn.addEventListener('click', startImport);
             if (startExportBtn) startExportBtn.addEventListener('click', startExport);
 
@@ -420,6 +447,7 @@ window.SICOMIX = window.SICOMIX || {};
                         if (pageId === 'catalog') renderPaintCatalog();
                         if (pageId === 'new-recipe') renderIngredientsList();
                         if (pageId === 'pantone') renderPantoneCatalog();
+                        if (pageId === 'ral') renderRalCatalog();
                     }
                     
                     saveData();
@@ -564,6 +592,8 @@ window.SICOMIX = window.SICOMIX || {};
                 updateSeriesLockUI();
             } else if (pageId === 'pantone') {
                 renderPantoneCatalog();
+            } else if (pageId === 'ral') {
+                renderRalCatalog();
             }
         }
 
@@ -1890,6 +1920,102 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
+        // ---------- НОВА ФУНКЦІЯ ДЛЯ ВІДОБРАЖЕННЯ RAL ----------
+        function renderRalCatalog() {
+            if (!ralCatalog) {
+                console.warn('ralCatalog element not found');
+                return;
+            }
+
+            // Перевіряємо, чи є дані RAL
+            if (!window.ralColors || !Array.isArray(window.ralColors)) {
+                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Дані RAL не завантажено</p>`;
+                return;
+            }
+
+            const search = ralSearch?.value.toLowerCase() || '';
+
+            let filtered = window.ralColors;
+
+            if (search) {
+                filtered = filtered.filter(c => 
+                    c.code.toLowerCase().includes(search) || 
+                    c.name.toLowerCase().includes(search)
+                );
+            }
+
+            if (filtered.length === 0) {
+                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_ral') || 'RAL не знайдено'}</p>`;
+                return;
+            }
+
+            const html = filtered.map(c => `
+                <div class="paint-card-glass ral-card" data-ral-code="${c.code}" style="color: #000;">
+                    <div class="glass-swatch" style="background: ${c.hex};"></div>
+                    <div class="glass-name">${SICOMIX.utils.escapeHtml(c.code)}</div>
+                    <div class="glass-article">${SICOMIX.utils.escapeHtml(c.name)}</div>
+                    <button class="glass-add-btn ral-add-btn" data-ral-code="${c.code}" data-ral-hex="${c.hex}" title="${SICOMIX.i18n.t('add_ingredient')}">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            ralCatalog.innerHTML = html;
+
+            // Обробник для кнопок додавання
+            ralCatalog.querySelectorAll('.ral-add-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const code = this.dataset.ralCode;
+                    const hex = this.dataset.ralHex;
+                    addRalToRecipe(code, hex);
+                });
+            });
+        }
+
+        // Функція додавання RAL до рецепту (створює нову фарбу)
+        function addRalToRecipe(code, hex) {
+            const seriesSelect = document.getElementById('recipeSeries');
+            if (!seriesSelect || !seriesSelect.value) {
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_series_first'), 'warning');
+                return;
+            }
+
+            // Створюємо нову фарбу на основі RAL
+            const newPaint = {
+                id: SICOMIX.utils.generateId(),
+                name: code,
+                category: 'RAL',
+                series: seriesSelect.value,
+                color: hex || '#CCCCCC',
+                description: '',
+                manufacturer: 'RAL',
+                article: code,
+                isDefault: false,
+                displayName: { uk: code, en: code, pl: code }
+            };
+
+            // Перевіряємо, чи вже є така фарба в каталозі
+            const existing = paintCatalog.find(p => p.article === code && p.series === seriesSelect.value);
+            if (existing) {
+                if (checkSeriesLock(existing.series)) {
+                    addPaintToRecipeFromCatalog(existing);
+                }
+            } else {
+                userPaints.push(newPaint);
+                paintCatalog = [...basePaints, ...userPaints];
+                saveData();
+                if (checkSeriesLock(newPaint.series)) {
+                    addPaintToRecipeFromCatalog(newPaint);
+                }
+                renderPaintCatalog(); // оновлюємо каталог
+            }
+
+            if (!document.getElementById('new-recipe-page').classList.contains('active')) {
+                switchPage('new-recipe');
+            }
+        }
+
         // ---------- ПОКРАЩЕНА ФУНКЦІЯ СКАНУВАННЯ РЕЦЕПТУ З ФОТО ----------
         async function scanRecipeFromPhoto() {
             const seriesSelect = document.getElementById('recipeSeries');
@@ -2142,7 +2268,8 @@ window.SICOMIX = window.SICOMIX || {};
             editRecipe,
             deletePaint,
             showNotification: SICOMIX.utils.showNotification,
-            addPantoneToRecipe: addPantoneToRecipe
+            addPantoneToRecipe: addPantoneToRecipe,
+            addRalToRecipe: addRalToRecipe
         };
     })();
 
