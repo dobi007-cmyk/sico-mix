@@ -225,6 +225,10 @@ window.SICOMIX = window.SICOMIX || {};
             "no_ral": "RAL не знайдено",
             "add_ral_to_recipe": "Додати RAL до рецепту",
             
+            // PDF кнопки (НОВІ КЛЮЧІ)
+            "open_ral_pdf": "Відкрити веер RAL",
+            "open_pantone_pdf": "Відкрити веер Pantone",
+            
             // Імпорт/Експорт
             "import_desc": "Імпортуйте рецепти та каталог з файлів",
             "export_desc_long": "Експортуйте ваші дані у різних форматах",
@@ -570,6 +574,10 @@ window.SICOMIX = window.SICOMIX || {};
             "no_ral": "No RAL found",
             "add_ral_to_recipe": "Add RAL to recipe",
             
+            // PDF buttons (NEW KEYS)
+            "open_ral_pdf": "Open RAL fan deck",
+            "open_pantone_pdf": "Open Pantone fan deck",
+            
             // Import/Export
             "import_desc": "Import recipes and catalog from files",
             "export_desc_long": "Export your data in various formats",
@@ -914,6 +922,10 @@ window.SICOMIX = window.SICOMIX || {};
             "search_ral": "Szukaj RAL...",
             "no_ral": "Nie znaleziono RAL",
             "add_ral_to_recipe": "Dodaj RAL do receptury",
+            
+            // Przyciski PDF (NOWE KLUCZE)
+            "open_ral_pdf": "Otwórz wachlarz RAL",
+            "open_pantone_pdf": "Otwórz wachlarz Pantone",
             
             // Import/Eksport
             "import_desc": "Importuj receptury i katalog z plików",
