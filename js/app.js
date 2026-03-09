@@ -609,12 +609,10 @@ window.SICOMIX = window.SICOMIX || {};
                 catalogPage = 1;
                 renderPaintCatalog();
             } else if (pageId === 'new-recipe') {
-                // Важливо: не завантажуємо чернетку, якщо вже є інгредієнти
                 if (!isEditingRecipe) {
                     if (selectedIngredients.length === 0) {
                         loadRecipeDraft();
                     }
-                    // Оновлюємо фото, якщо воно є
                     if (recipePhotoDataUrl) {
                         showPhotoPreview(recipePhotoDataUrl);
                     } else {
@@ -622,7 +620,6 @@ window.SICOMIX = window.SICOMIX || {};
                     }
                 }
                 updateSeriesLockUI();
-                // Оновлюємо список інгредієнтів (на всяк випадок)
                 renderIngredientsList();
             } else if (pageId === 'pantone') {
                 renderPantoneCatalog();
@@ -763,7 +760,6 @@ window.SICOMIX = window.SICOMIX || {};
                     calculatePercentages();
                     renderIngredientsList();
                     updateSeriesLockUI();
-                    // Негайне збереження чернетки (без debounce)
                     autoSaveRecipeDraft();
                     SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
                 }
@@ -792,7 +788,7 @@ window.SICOMIX = window.SICOMIX || {};
                 }
                 renderIngredientsList();
                 updateSeriesLockUI();
-                autoSaveRecipeDraft(); // Негайне збереження
+                autoSaveRecipeDraft();
             }
         }
 
@@ -1410,7 +1406,7 @@ window.SICOMIX = window.SICOMIX || {};
             document.body.style.overflow = 'hidden';
         }
 
-        // ========== ВИПРАВЛЕНО: ДОДАВАННЯ ФАРБИ З КАТАЛОГУ ==========
+        // ---------- ДОДАВАННЯ ФАРБИ З КАТАЛОГУ ----------
         function addPaintToRecipeFromCatalog(paint) {
             const validation = validatePaintAddition(paint);
             if (!validation.valid) {
@@ -1434,7 +1430,6 @@ window.SICOMIX = window.SICOMIX || {};
             calculatePercentages();
             renderIngredientsList();
             updateSeriesLockUI();
-            // Негайне збереження чернетки
             autoSaveRecipeDraft();
 
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
@@ -1907,22 +1902,24 @@ window.SICOMIX = window.SICOMIX || {};
             document.body.style.overflow = 'hidden';
         }
 
-        // ========== ВИПРАВЛЕНО: ДОДАВАННЯ PANTONE ==========
+        // ========== ВИПРАВЛЕНО: ДОДАВАННЯ PANTONE (БЕЗ АВТОПЕРЕХОДУ) ==========
         function addPantoneToRecipe(pantoneNumber) {
             const pantone = SICOMIX.pantone.findByNumber(pantoneNumber);
             if (!pantone) return;
 
+            // Спочатку створюємо/знаходимо фарбу в каталозі
             const seriesSelect = document.getElementById('recipeSeries');
-            if (!seriesSelect || !seriesSelect.value) {
-                SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_series_first'), 'warning');
-                return;
-            }
+            let targetSeries = seriesSelect?.value || null;
 
+            // Якщо ми не на сторінці нового рецепту, серія може бути не вибрана – тоді просто додаємо до каталогу
+            const isOnNewRecipe = document.getElementById('new-recipe-page')?.classList.contains('active');
+
+            // Створюємо об'єкт нової фарби
             const newPaint = {
                 id: SICOMIX.utils.generateId(),
                 name: pantone.number,
                 category: 'Pantone',
-                series: seriesSelect.value,
+                series: targetSeries || 'Pantone', // Якщо серія не вибрана, використовуємо запасну
                 color: pantone.hex && pantone.hex !== '#CCCCCC' ? pantone.hex : '#CCCCCC',
                 description: pantone.name || '',
                 manufacturer: 'Pantone',
@@ -1931,33 +1928,42 @@ window.SICOMIX = window.SICOMIX || {};
                 displayName: { uk: pantone.number, en: pantone.number, pl: pantone.number }
             };
 
-            const existing = paintCatalog.find(p => p.article === pantone.number && p.series === seriesSelect.value);
-            if (existing) {
-                const validation = validatePaintAddition(existing);
-                if (validation.valid) {
-                    addPaintToRecipeFromCatalog(existing);
-                } else {
-                    SICOMIX.utils.showNotification(validation.message, 'error');
-                }
-            } else {
-                const validation = validatePaintAddition(newPaint);
-                if (validation.valid) {
-                    userPaints.push(newPaint);
-                    paintCatalog = [...basePaints, ...userPaints];
-                    saveData();
-                    addPaintToRecipeFromCatalog(newPaint);
-                    renderPaintCatalog();
-                } else {
-                    SICOMIX.utils.showNotification(validation.message, 'error');
-                }
+            // Перевіряємо, чи вже є така фарба в каталозі (за артикулом)
+            let existingPaint = paintCatalog.find(p => p.article === pantone.number);
+            
+            if (!existingPaint) {
+                // Додаємо нову фарбу до каталогу
+                userPaints.push(newPaint);
+                paintCatalog = [...basePaints, ...userPaints];
+                saveData();
+                renderPaintCatalog();
+                existingPaint = newPaint;
             }
 
-            if (!document.getElementById('new-recipe-page').classList.contains('active')) {
-                switchPage('new-recipe');
+            // Якщо ми на сторінці нового рецепту – пробуємо додати до рецепту
+            if (isOnNewRecipe) {
+                // Перевіряємо, чи вибрана серія
+                if (!seriesSelect || !seriesSelect.value) {
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_series_first'), 'warning');
+                    return;
+                }
+
+                // Перевіряємо сумісність (серія/категорія)
+                const validation = validatePaintAddition(existingPaint);
+                if (!validation.valid) {
+                    SICOMIX.utils.showNotification(validation.message, 'error');
+                    return;
+                }
+
+                // Додаємо до рецепту
+                addPaintToRecipeFromCatalog(existingPaint);
+            } else {
+                // Якщо не на сторінці нового рецепту – просто повідомляємо про додавання до каталогу
+                SICOMIX.utils.showNotification(`Pantone ${pantone.number} додано до каталогу`, 'success');
             }
         }
 
-        // ========== ВИПРАВЛЕНО: ДОДАВАННЯ RAL ==========
+        // ========== ВИПРАВЛЕНО: ДОДАВАННЯ RAL (БЕЗ АВТОПЕРЕХОДУ) ==========
         function renderRalCatalog() {
             if (!ralCatalog) {
                 console.warn('ralCatalog element not found');
@@ -2009,17 +2015,17 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         function addRalToRecipe(code, hex) {
+            // Спочатку створюємо/знаходимо фарбу в каталозі
             const seriesSelect = document.getElementById('recipeSeries');
-            if (!seriesSelect || !seriesSelect.value) {
-                SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_series_first'), 'warning');
-                return;
-            }
+            let targetSeries = seriesSelect?.value || null;
+
+            const isOnNewRecipe = document.getElementById('new-recipe-page')?.classList.contains('active');
 
             const newPaint = {
                 id: SICOMIX.utils.generateId(),
                 name: code,
                 category: 'RAL',
-                series: seriesSelect.value,
+                series: targetSeries || 'RAL',
                 color: hex || '#CCCCCC',
                 description: '',
                 manufacturer: 'RAL',
@@ -2028,29 +2034,31 @@ window.SICOMIX = window.SICOMIX || {};
                 displayName: { uk: code, en: code, pl: code }
             };
 
-            const existing = paintCatalog.find(p => p.article === code && p.series === seriesSelect.value);
-            if (existing) {
-                const validation = validatePaintAddition(existing);
-                if (validation.valid) {
-                    addPaintToRecipeFromCatalog(existing);
-                } else {
-                    SICOMIX.utils.showNotification(validation.message, 'error');
-                }
-            } else {
-                const validation = validatePaintAddition(newPaint);
-                if (validation.valid) {
-                    userPaints.push(newPaint);
-                    paintCatalog = [...basePaints, ...userPaints];
-                    saveData();
-                    addPaintToRecipeFromCatalog(newPaint);
-                    renderPaintCatalog();
-                } else {
-                    SICOMIX.utils.showNotification(validation.message, 'error');
-                }
+            let existingPaint = paintCatalog.find(p => p.article === code);
+
+            if (!existingPaint) {
+                userPaints.push(newPaint);
+                paintCatalog = [...basePaints, ...userPaints];
+                saveData();
+                renderPaintCatalog();
+                existingPaint = newPaint;
             }
 
-            if (!document.getElementById('new-recipe-page').classList.contains('active')) {
-                switchPage('new-recipe');
+            if (isOnNewRecipe) {
+                if (!seriesSelect || !seriesSelect.value) {
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_series_first'), 'warning');
+                    return;
+                }
+
+                const validation = validatePaintAddition(existingPaint);
+                if (!validation.valid) {
+                    SICOMIX.utils.showNotification(validation.message, 'error');
+                    return;
+                }
+
+                addPaintToRecipeFromCatalog(existingPaint);
+            } else {
+                SICOMIX.utils.showNotification(`RAL ${code} додано до каталогу`, 'success');
             }
         }
 
@@ -2234,7 +2242,7 @@ window.SICOMIX = window.SICOMIX || {};
                             calculatePercentages();
                             renderIngredientsList();
                             updateSeriesLockUI();
-                            autoSaveRecipeDraft(); // Негайне збереження
+                            autoSaveRecipeDraft();
                             SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
                         },
                         () => {}
