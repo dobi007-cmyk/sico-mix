@@ -19,6 +19,7 @@ window.SICOMIX = window.SICOMIX || {};
         let selectedSeries = '';
         let recipePhotoDataUrl = null;
         let lockedSeries = null;
+        let lockedCategory = null; // НОВЕ: категорія, яка заблокована в рецепті
 
         // Для пагінації каталогу
         let catalogFilteredSeries = [];
@@ -152,9 +153,13 @@ window.SICOMIX = window.SICOMIX || {};
             }
             if (recipeDraft && recipeDraft.ingredients && recipeDraft.ingredients.length > 0) {
                 const firstPaint = paintCatalog.find(p => String(p.id) === String(recipeDraft.ingredients[0].paintId));
-                if (firstPaint) lockedSeries = firstPaint.series;
+                if (firstPaint) {
+                    lockedSeries = firstPaint.series;
+                    lockedCategory = firstPaint.category; // НОВЕ
+                }
             } else {
                 lockedSeries = null;
+                lockedCategory = null; // НОВЕ
             }
         }
 
@@ -213,9 +218,13 @@ window.SICOMIX = window.SICOMIX || {};
             }
             if (selectedIngredients.length > 0) {
                 const firstPaint = paintCatalog.find(p => String(p.id) === String(selectedIngredients[0].paintId));
-                if (firstPaint) lockedSeries = firstPaint.series;
+                if (firstPaint) {
+                    lockedSeries = firstPaint.series;
+                    lockedCategory = firstPaint.category; // НОВЕ
+                }
             } else {
                 lockedSeries = null;
+                lockedCategory = null; // НОВЕ
             }
             renderIngredientsList();
             calculatePercentages();
@@ -228,6 +237,7 @@ window.SICOMIX = window.SICOMIX || {};
             recipePhotoDataUrl = null;
             resetPhotoPreview();
             lockedSeries = null;
+            lockedCategory = null; // НОВЕ
             updateSeriesLockUI();
         }
 
@@ -243,6 +253,29 @@ window.SICOMIX = window.SICOMIX || {};
                     selectedSeries = seriesSelect.value;
                 }
             }
+        }
+
+        // ---------- НОВА ФУНКЦІЯ ПЕРЕВІРКИ СУМІСНОСТІ ФАРБИ ----------
+        function validatePaintAddition(paint) {
+            // Якщо це перший інгредієнт – дозволяємо
+            if (selectedIngredients.length === 0) {
+                lockedSeries = paint.series;
+                lockedCategory = paint.category;
+                updateSeriesLockUI();
+                return { valid: true, message: '' };
+            }
+
+            // Перевіряємо серію
+            if (paint.series !== lockedSeries) {
+                return { valid: false, message: SICOMIX.i18n.t('series_mismatch') };
+            }
+
+            // Перевіряємо категорію
+            if (paint.category !== lockedCategory) {
+                return { valid: false, message: SICOMIX.i18n.t('category_mismatch') };
+            }
+
+            return { valid: true, message: '' };
         }
 
         // ---------- НАЛАШТУВАННЯ ----------
@@ -542,9 +575,12 @@ window.SICOMIX = window.SICOMIX || {};
 
                     if (btn.classList.contains('glass-add-btn')) {
                         // Додати фарбу
-                        if (checkSeriesLock(paint.series)) {
+                        const validation = validatePaintAddition(paint);
+                        if (validation.valid) {
                             addPaintToRecipeFromCatalog(paint);
                             updatePaintButton(paintId, true);
+                        } else {
+                            SICOMIX.utils.showNotification(validation.message, 'error');
                         }
                     } else if (btn.classList.contains('glass-remove-btn')) {
                         // Видалити фарбу
@@ -665,20 +701,6 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        function checkSeriesLock(paintSeries) {
-            if (selectedIngredients.length === 0) {
-                lockedSeries = paintSeries;
-                updateSeriesLockUI();
-                return true;
-            } else {
-                if (paintSeries !== lockedSeries) {
-                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('series_mismatch'), 'error');
-                    return false;
-                }
-                return true;
-            }
-        }
-
         function addIngredient() {
             const seriesSelect = document.getElementById('recipeSeries');
             if (!seriesSelect || !seriesSelect.value) {
@@ -727,7 +749,12 @@ window.SICOMIX = window.SICOMIX || {};
                 const paint = paintCatalog.find(p => String(p.id) === pid);
                 if (!paint) return;
                 
-                if (!checkSeriesLock(paint.series)) {
+                const validation = validatePaintAddition(paint);
+                if (!validation.valid) {
+                    SICOMIX.utils.showNotification(validation.message, 'error');
+                    modal.classList.remove('active');
+                    list.removeEventListener('click', clickHandler);
+                    closeBtn?.removeEventListener('click', closeHandler);
                     return;
                 }
                 
@@ -762,6 +789,7 @@ window.SICOMIX = window.SICOMIX || {};
                 selectedIngredients.splice(index, 1);
                 if (selectedIngredients.length === 0) {
                     lockedSeries = null;
+                    lockedCategory = null; // НОВЕ
                 }
                 renderIngredientsList();
                 updateSeriesLockUI();
@@ -838,6 +866,7 @@ window.SICOMIX = window.SICOMIX || {};
             recipePhotoDataUrl = null;
             resetPhotoPreview();
             lockedSeries = null;
+            lockedCategory = null; // НОВЕ
             updateSeriesLockUI();
             renderIngredientsList();
             resetEditMode();
@@ -1386,7 +1415,10 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         function addPaintToRecipeFromCatalog(paint) {
-            if (!checkSeriesLock(paint.series)) {
+            // Перевірка вже виконана перед викликом, але для безпеки:
+            const validation = validatePaintAddition(paint);
+            if (!validation.valid) {
+                SICOMIX.utils.showNotification(validation.message, 'error');
                 return;
             }
 
@@ -1553,9 +1585,13 @@ window.SICOMIX = window.SICOMIX || {};
             }
             if (selectedIngredients.length > 0) {
                 const firstPaint = paintCatalog.find(p => String(p.id) === String(selectedIngredients[0].paintId));
-                if (firstPaint) lockedSeries = firstPaint.series;
+                if (firstPaint) {
+                    lockedSeries = firstPaint.series;
+                    lockedCategory = firstPaint.category; // НОВЕ
+                }
             } else {
                 lockedSeries = null;
+                lockedCategory = null; // НОВЕ
             }
             renderIngredientsList();
             calculatePercentages();
@@ -1611,6 +1647,7 @@ window.SICOMIX = window.SICOMIX || {};
                     selectedIngredients = [];
                     selectedRecipes = [];
                     lockedSeries = null;
+                    lockedCategory = null; // НОВЕ
                     saveData();
                     populateCategoryFilters();
                     renderRecipes();
@@ -1781,14 +1818,13 @@ window.SICOMIX = window.SICOMIX || {};
             fileNameSpan.textContent = SICOMIX.i18n.t('upload_photo');
         }
 
-        // ---------- НОВА ФУНКЦІЯ ДЛЯ ВІДОБРАЖЕННЯ ПАНТОНІВ ----------
+        // ---------- ФУНКЦІЯ ДЛЯ ВІДОБРАЖЕННЯ ПАНТОНІВ ----------
         function renderPantoneCatalog() {
             if (!pantoneCatalog) {
                 console.warn('pantoneCatalog element not found');
                 return;
             }
 
-            // Перевіряємо, чи є дані Pantone
             if (!SICOMIX.pantone || !SICOMIX.pantone.colors) {
                 pantoneCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Дані Pantone не завантажено</p>`;
                 return;
@@ -1834,11 +1870,9 @@ window.SICOMIX = window.SICOMIX || {};
 
             pantoneCatalog.innerHTML = html;
 
-            // Делегування подій для відкриття модального вікна при кліку на картку Pantone (але не на кнопку)
             pantoneCatalog.addEventListener('click', function(e) {
                 const card = e.target.closest('.pantone-card');
                 if (!card) return;
-                // Якщо клікнули на кнопку додавання – не відкриваємо модальне вікно
                 if (e.target.closest('.pantone-add-btn')) return;
                 
                 const pantoneNumber = card.dataset.pantoneNumber;
@@ -1848,7 +1882,6 @@ window.SICOMIX = window.SICOMIX || {};
             });
         }
 
-        // Функція для показу модального вікна з рецептом Pantone
         function showPantoneRecipeModal(pantoneNumber) {
             if (!SICOMIX.pantone) return;
             
@@ -1866,7 +1899,6 @@ window.SICOMIX = window.SICOMIX || {};
             }
             modalContent.innerHTML = html;
             
-            // Зберігаємо номер для кнопки додавання
             if (addBtn) {
                 addBtn.dataset.pantoneNumber = pantoneNumber;
             }
@@ -1875,7 +1907,6 @@ window.SICOMIX = window.SICOMIX || {};
             document.body.style.overflow = 'hidden';
         }
 
-        // Функція додавання Pantone до рецепту
         function addPantoneToRecipe(pantoneNumber) {
             const pantone = SICOMIX.pantone.findByNumber(pantoneNumber);
             if (!pantone) return;
@@ -1886,13 +1917,12 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
-            // Створюємо нову фарбу на основі Pantone
             const newPaint = {
                 id: SICOMIX.utils.generateId(),
                 name: pantone.number,
                 category: 'Pantone',
                 series: seriesSelect.value,
-                color: '#CCCCCC', // немає даних про колір
+                color: '#CCCCCC',
                 description: pantone.name || '',
                 manufacturer: 'Pantone',
                 article: pantone.number,
@@ -1902,17 +1932,23 @@ window.SICOMIX = window.SICOMIX || {};
 
             const existing = paintCatalog.find(p => p.article === pantone.number && p.series === seriesSelect.value);
             if (existing) {
-                if (checkSeriesLock(existing.series)) {
+                const validation = validatePaintAddition(existing);
+                if (validation.valid) {
                     addPaintToRecipeFromCatalog(existing);
+                } else {
+                    SICOMIX.utils.showNotification(validation.message, 'error');
                 }
             } else {
-                userPaints.push(newPaint);
-                paintCatalog = [...basePaints, ...userPaints];
-                saveData();
-                if (checkSeriesLock(newPaint.series)) {
+                const validation = validatePaintAddition(newPaint);
+                if (validation.valid) {
+                    userPaints.push(newPaint);
+                    paintCatalog = [...basePaints, ...userPaints];
+                    saveData();
                     addPaintToRecipeFromCatalog(newPaint);
+                    renderPaintCatalog();
+                } else {
+                    SICOMIX.utils.showNotification(validation.message, 'error');
                 }
-                renderPaintCatalog(); // оновлюємо каталог, щоб нова фарба з'явилася
             }
 
             if (!document.getElementById('new-recipe-page').classList.contains('active')) {
@@ -1920,14 +1956,13 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ---------- НОВА ФУНКЦІЯ ДЛЯ ВІДОБРАЖЕННЯ RAL ----------
+        // ---------- ФУНКЦІЯ ДЛЯ ВІДОБРАЖЕННЯ RAL ----------
         function renderRalCatalog() {
             if (!ralCatalog) {
                 console.warn('ralCatalog element not found');
                 return;
             }
 
-            // Перевіряємо, чи є дані RAL
             if (!window.ralColors || !Array.isArray(window.ralColors)) {
                 ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Дані RAL не завантажено</p>`;
                 return;
@@ -1962,7 +1997,6 @@ window.SICOMIX = window.SICOMIX || {};
 
             ralCatalog.innerHTML = html;
 
-            // Обробник для кнопок додавання
             ralCatalog.querySelectorAll('.ral-add-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -1973,7 +2007,6 @@ window.SICOMIX = window.SICOMIX || {};
             });
         }
 
-        // Функція додавання RAL до рецепту (створює нову фарбу)
         function addRalToRecipe(code, hex) {
             const seriesSelect = document.getElementById('recipeSeries');
             if (!seriesSelect || !seriesSelect.value) {
@@ -1981,7 +2014,6 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
-            // Створюємо нову фарбу на основі RAL
             const newPaint = {
                 id: SICOMIX.utils.generateId(),
                 name: code,
@@ -1995,20 +2027,25 @@ window.SICOMIX = window.SICOMIX || {};
                 displayName: { uk: code, en: code, pl: code }
             };
 
-            // Перевіряємо, чи вже є така фарба в каталозі
             const existing = paintCatalog.find(p => p.article === code && p.series === seriesSelect.value);
             if (existing) {
-                if (checkSeriesLock(existing.series)) {
+                const validation = validatePaintAddition(existing);
+                if (validation.valid) {
                     addPaintToRecipeFromCatalog(existing);
+                } else {
+                    SICOMIX.utils.showNotification(validation.message, 'error');
                 }
             } else {
-                userPaints.push(newPaint);
-                paintCatalog = [...basePaints, ...userPaints];
-                saveData();
-                if (checkSeriesLock(newPaint.series)) {
+                const validation = validatePaintAddition(newPaint);
+                if (validation.valid) {
+                    userPaints.push(newPaint);
+                    paintCatalog = [...basePaints, ...userPaints];
+                    saveData();
                     addPaintToRecipeFromCatalog(newPaint);
+                    renderPaintCatalog();
+                } else {
+                    SICOMIX.utils.showNotification(validation.message, 'error');
                 }
-                renderPaintCatalog(); // оновлюємо каталог
             }
 
             if (!document.getElementById('new-recipe-page').classList.contains('active')) {
@@ -2051,7 +2088,6 @@ window.SICOMIX = window.SICOMIX || {};
                     const targetSeries = lockedSeries || seriesSelect.value;
                     const seriesPaints = paintCatalog.filter(p => p.series === targetSeries);
 
-                    // Визначаємо префікс серії (шукаємо перший рядок, що містить щось на кшталт "ECP")
                     let seriesPrefix = '';
                     for (let line of lines) {
                         const match = line.toUpperCase().match(/\b([A-Z]{2})[A-Z0-9]*\b/);
@@ -2061,10 +2097,8 @@ window.SICOMIX = window.SICOMIX || {};
                         }
                     }
 
-                    // Об'єкт для накопичення сум
                     const ingredientSums = {};
 
-                    // Нормалізація назви фарби
                     function normalizePaintIdentifier(identifier, prefix) {
                         if (prefix && /^\d+$/.test(identifier)) {
                             return prefix + identifier;
@@ -2072,7 +2106,6 @@ window.SICOMIX = window.SICOMIX || {};
                         return identifier;
                     }
 
-                    // Нормалізація одиниць
                     function normalizeUnit(unitStr) {
                         const unit = unitStr.toLowerCase();
                         if (unit === 'g' || unit === 'г' || unit === '') return 'г';
@@ -2082,26 +2115,20 @@ window.SICOMIX = window.SICOMIX || {};
                         return 'г';
                     }
 
-                    // Розширений пошук фарби
                     function findPaint(identifier, paints, prefix) {
-                        // Точний збіг артикула
                         let paint = paints.find(p => p.article && p.article === identifier);
                         if (paint) return paint;
 
-                        // Нормалізована назва з префіксом
                         const normalized = normalizePaintIdentifier(identifier, prefix);
                         paint = paints.find(p => p.name.toUpperCase() === normalized.toUpperCase());
                         if (paint) return paint;
 
-                        // Частковий збіг назви
                         paint = paints.find(p => p.name.toUpperCase().includes(identifier.toUpperCase()));
                         if (paint) return paint;
 
-                        // Частковий збіг артикула
                         paint = paints.find(p => p.article && p.article.toUpperCase().includes(identifier.toUpperCase()));
                         if (paint) return paint;
 
-                        // Якщо ідентифікатор цифровий і є префікс, пробуємо без префікса (може бути просто число в назві)
                         if (prefix && /^\d+$/.test(identifier)) {
                             paint = paints.find(p => p.name.toUpperCase().includes(identifier));
                             if (paint) return paint;
@@ -2110,15 +2137,12 @@ window.SICOMIX = window.SICOMIX || {};
                         return null;
                     }
 
-                    // Обробка рядків
                     lines.forEach(line => {
-                        // Патерн з тире
                         const dashMatch = line.match(/([A-Za-z0-9]+)\s*[-–]\s*(.+)/);
                         if (dashMatch) {
                             const identifier = dashMatch[1].trim();
                             const rightPart = dashMatch[2].trim();
 
-                            // Розбиваємо по '+'
                             const amountParts = rightPart.split('+').map(p => p.trim()).filter(p => p.length > 0);
 
                             amountParts.forEach(part => {
@@ -2129,7 +2153,6 @@ window.SICOMIX = window.SICOMIX || {};
 
                                     const unit = normalizeUnit(amountMatch[2] || 'г');
 
-                                    // Знаходимо фарбу
                                     const paint = findPaint(identifier, seriesPaints, seriesPrefix);
                                     if (paint) {
                                         const key = paint.id + '_' + unit;
@@ -2147,14 +2170,12 @@ window.SICOMIX = window.SICOMIX || {};
                                 }
                             });
                         } else {
-                            // Запасний варіант – шукаємо число та можливу фарбу в рядку
                             const amountMatch = line.match(/(\d+(?:[.,]\d+)?)\s*([a-zA-Zа-яА-Я]*)/);
                             if (amountMatch) {
                                 const amount = parseFloat(amountMatch[1].replace(',', '.'));
                                 if (isNaN(amount) || amount <= 0) return;
                                 const unit = normalizeUnit(amountMatch[2] || 'г');
 
-                                // Шукаємо будь-яку фарбу, назва якої є в рядку
                                 for (let paint of seriesPaints) {
                                     if (line.toUpperCase().includes(paint.name.toUpperCase())) {
                                         const key = paint.id + '_' + unit;
@@ -2187,7 +2208,6 @@ window.SICOMIX = window.SICOMIX || {};
                         return;
                     }
 
-                    // Показуємо деталі
                     let message = '';
                     foundIngredients.forEach(ing => {
                         const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId));
