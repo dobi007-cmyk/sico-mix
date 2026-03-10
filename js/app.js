@@ -325,7 +325,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ---------- ПОДІЇ (ВИПРАВЛЕНО) ----------
+        // ---------- ПОДІЇ ----------
         function setupEventListeners() {
             document.addEventListener('click', function(e) {
                 const navLink = e.target.closest('.nav-link[data-page]');
@@ -423,6 +423,7 @@ window.SICOMIX = window.SICOMIX || {};
                 }, 300));
             }
 
+            // Pantone події
             if (pantoneSearch) {
                 pantoneSearch.addEventListener('input', SICOMIX.utils.debounce(() => {
                     renderPantoneCatalog();
@@ -439,11 +440,11 @@ window.SICOMIX = window.SICOMIX || {};
                     const btn = e.target.closest('.glass-add-btn, .glass-remove-btn');
                     if (!btn) return;
                     e.stopPropagation();
-                    
+
                     if (btn.classList.contains('glass-remove-btn')) {
-                        const paintId = btn.dataset.paintId;
-                        if (paintId) {
-                            removeIngredientByPaintId(paintId);
+                        const pantoneNumber = btn.dataset.pantoneNumber;
+                        if (pantoneNumber) {
+                            removeIngredientByArticle(pantoneNumber);
                         }
                     } else if (btn.classList.contains('glass-add-btn')) {
                         const pantoneNumber = btn.dataset.pantoneNumber;
@@ -472,6 +473,7 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
+            // RAL події
             if (ralSearch) {
                 ralSearch.addEventListener('input', SICOMIX.utils.debounce(() => {
                     renderRalCatalog();
@@ -483,11 +485,11 @@ window.SICOMIX = window.SICOMIX || {};
                     const btn = e.target.closest('.glass-add-btn, .glass-remove-btn');
                     if (!btn) return;
                     e.stopPropagation();
-                    
+
                     if (btn.classList.contains('glass-remove-btn')) {
-                        const paintId = btn.dataset.paintId;
-                        if (paintId) {
-                            removeIngredientByPaintId(paintId);
+                        const code = btn.dataset.ralCode;
+                        if (code) {
+                            removeIngredientByArticle(code);
                         }
                     } else if (btn.classList.contains('glass-add-btn')) {
                         const code = btn.dataset.ralCode;
@@ -522,7 +524,7 @@ window.SICOMIX = window.SICOMIX || {};
                     currentSettings.language = newLang;
                     SICOMIX.i18n.setLanguage(newLang);
                     SICOMIX.i18n.applyTranslations();
-                    
+
                     if (document.getElementById('new-recipe-page')?.classList.contains('active')) {
                         if (recipePhotoDataUrl) {
                             fileNameSpan.textContent = SICOMIX.i18n.t('photo_uploaded');
@@ -530,11 +532,11 @@ window.SICOMIX = window.SICOMIX || {};
                             fileNameSpan.textContent = SICOMIX.i18n.t('upload_photo');
                         }
                     }
-                    
+
                     populateCategoryFilters();
                     populateStandardCategorySelect();
                     populateSeriesSelect();
-                    
+
                     const activePage = document.querySelector('.page-content.active');
                     if (activePage) {
                         const pageId = activePage.id.replace('-page', '');
@@ -544,7 +546,7 @@ window.SICOMIX = window.SICOMIX || {};
                         if (pageId === 'pantone') renderPantoneCatalog();
                         if (pageId === 'ral') renderRalCatalog();
                     }
-                    
+
                     saveData();
                 });
             }
@@ -709,8 +711,7 @@ window.SICOMIX = window.SICOMIX || {};
 
             let html = '';
             selectedIngredients.forEach((ing, idx) => {
-                const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId));
-                if (!paint) return;
+                const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId)) || ing; // для тимчасових Pantone/RAL
                 const paintName = paint.displayName?.[SICOMIX.i18n.getLanguage()] || paint.name;
                 html += `<tr>
                     <td>
@@ -865,7 +866,7 @@ window.SICOMIX = window.SICOMIX || {};
                 renderPantoneCatalog();
                 renderRalCatalog();
                 
-                if (removed) {
+                if (removed && paintCatalog.some(p => String(p.id) === removed.paintId)) {
                     updatePaintButton(removed.paintId, false);
                 }
             }
@@ -873,6 +874,14 @@ window.SICOMIX = window.SICOMIX || {};
 
         function removeIngredientByPaintId(paintId) {
             const index = selectedIngredients.findIndex(ing => String(ing.paintId) === String(paintId));
+            if (index !== -1) {
+                deleteIngredient(index);
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_removed_from_recipe'), 'success');
+            }
+        }
+
+        function removeIngredientByArticle(article) {
+            const index = selectedIngredients.findIndex(ing => ing.article === article);
             if (index !== -1) {
                 deleteIngredient(index);
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_removed_from_recipe'), 'success');
@@ -1199,8 +1208,8 @@ window.SICOMIX = window.SICOMIX || {};
                         <tbody>
                 `;
                 recipe.ingredients.forEach(ing => {
-                    const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId));
-                    const paintName = paint ? (paint.displayName?.[lang] || paint.name) : '?';
+                    const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId)) || ing;
+                    const paintName = paint.displayName?.[lang] || paint.name;
                     html += `
                         <tr>
                             <td>${SICOMIX.utils.escapeHtml(paintName)}</td>
@@ -1621,6 +1630,11 @@ window.SICOMIX = window.SICOMIX || {};
 
             selectedIngredients.push({
                 paintId: paint.id,
+                article: paint.article,
+                name: paint.name,
+                category: paint.category,
+                series: paint.series,
+                color: paint.color,
                 amount: 100,
                 unit: 'г',
                 percentage: 0
@@ -2061,19 +2075,18 @@ window.SICOMIX = window.SICOMIX || {};
                 const firstAmount = p.ingredients && p.ingredients.length > 0 ? p.ingredients[0].amount : '';
                 const hex = p.hex && p.hex !== '#CCCCCC' ? p.hex : '#CCCCCC';
                 
-                const existingPaint = paintCatalog.find(paint => paint.article === p.number);
-                const isInRecipe = existingPaint ? selectedIngredients.some(ing => String(ing.paintId) === String(existingPaint.id)) : false;
+                const isInRecipe = selectedIngredients.some(ing => ing.article === p.number);
                 const buttonClass = isInRecipe ? 'glass-remove-btn' : 'glass-add-btn';
                 const buttonIcon = isInRecipe ? 'fa-trash' : 'fa-plus';
                 const buttonTitle = isInRecipe ? SICOMIX.i18n.t('remove_from_recipe') : SICOMIX.i18n.t('add_ingredient');
                 
                 return `
-                <div class="paint-card-glass pantone-card" ${existingPaint ? `data-paint-id="${existingPaint.id}"` : ''} style="color: #000;">
+                <div class="paint-card-glass pantone-card" style="color: #000;">
                     <div class="glass-swatch" style="background: ${hex};"></div>
                     <div class="glass-name">${SICOMIX.utils.escapeHtml(p.number)}</div>
                     <div class="glass-article">${SICOMIX.utils.escapeHtml(p.name || '')}</div>
                     <div style="font-size: 11px; margin-top: 5px; color: var(--text-tertiary);">${firstIngredient} ${firstAmount}</div>
-                    <button class="${buttonClass}" data-pantone-number="${p.number}" ${existingPaint ? `data-paint-id="${existingPaint.id}"` : ''} title="${buttonTitle}">
+                    <button class="${buttonClass}" data-pantone-number="${p.number}" title="${buttonTitle}">
                         <i class="fas ${buttonIcon}"></i>
                     </button>
                 </div>
@@ -2107,6 +2120,7 @@ window.SICOMIX = window.SICOMIX || {};
             document.body.style.overflow = 'hidden';
         }
 
+        // ---------- ДОДАВАННЯ PANTONE (без додавання до каталогу) ----------
         function addPantoneToRecipe(pantoneNumber) {
             const pantone = SICOMIX.pantone.findByNumber(pantoneNumber);
             if (!pantone) return;
@@ -2119,41 +2133,40 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
-            let existingPaint = paintCatalog.find(p => p.article === pantone.number);
+            // Створюємо тимчасовий об'єкт фарби (НЕ додаємо до userPaints)
+            const tempPaintId = 'pantone-' + pantone.number.replace(/\s+/g, '_');
+            const tempPaint = {
+                id: tempPaintId,
+                name: pantone.number,
+                category: 'Pantone',
+                series: currentSeries,
+                color: pantone.hex && pantone.hex !== '#CCCCCC' ? pantone.hex : '#CCCCCC',
+                description: pantone.name || '',
+                manufacturer: 'Pantone',
+                article: pantone.number,
+                isDefault: false,
+                displayName: { uk: pantone.number, en: pantone.number, pl: pantone.number }
+            };
 
-            if (!existingPaint) {
-                const newPaint = {
-                    id: SICOMIX.utils.generateId(),
-                    name: pantone.number,
-                    category: 'Pantone',
-                    series: currentSeries,
-                    color: pantone.hex && pantone.hex !== '#CCCCCC' ? pantone.hex : '#CCCCCC',
-                    description: pantone.name || '',
-                    manufacturer: 'Pantone',
-                    article: pantone.number,
-                    isDefault: false,
-                    displayName: { uk: pantone.number, en: pantone.number, pl: pantone.number }
-                };
-                userPaints.push(newPaint);
-                paintCatalog = [...basePaints, ...userPaints];
-                saveData();
-                existingPaint = newPaint;
-            }
-
-            const validation = validatePaintAddition(existingPaint);
+            const validation = validatePaintAddition(tempPaint);
             if (!validation.valid) {
                 SICOMIX.utils.showNotification(validation.message, 'error');
                 return;
             }
 
-            const existing = selectedIngredients.find(ing => String(ing.paintId) === String(existingPaint.id));
+            const existing = selectedIngredients.find(ing => ing.article === pantone.number);
             if (existing) {
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_already_added'), 'warning');
                 return;
             }
 
             selectedIngredients.push({
-                paintId: existingPaint.id,
+                paintId: tempPaintId,
+                article: pantone.number,
+                name: pantone.number,
+                category: 'Pantone',
+                series: currentSeries,
+                color: tempPaint.color,
                 amount: 100,
                 unit: 'г',
                 percentage: 0
@@ -2198,18 +2211,17 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             const html = filtered.map(c => {
-                const existingPaint = paintCatalog.find(p => p.article === c.code);
-                const isInRecipe = existingPaint ? selectedIngredients.some(ing => String(ing.paintId) === String(existingPaint.id)) : false;
+                const isInRecipe = selectedIngredients.some(ing => ing.article === c.code);
                 const buttonClass = isInRecipe ? 'glass-remove-btn' : 'glass-add-btn';
                 const buttonIcon = isInRecipe ? 'fa-trash' : 'fa-plus';
                 const buttonTitle = isInRecipe ? SICOMIX.i18n.t('remove_from_recipe') : SICOMIX.i18n.t('add_ingredient');
                 
                 return `
-                <div class="paint-card-glass ral-card" ${existingPaint ? `data-paint-id="${existingPaint.id}"` : ''} style="color: #000;">
+                <div class="paint-card-glass ral-card" style="color: #000;">
                     <div class="glass-swatch" style="background: ${c.hex};"></div>
                     <div class="glass-name">${SICOMIX.utils.escapeHtml(c.code)}</div>
                     <div class="glass-article">${SICOMIX.utils.escapeHtml(c.name)}</div>
-                    <button class="${buttonClass}" data-ral-code="${c.code}" data-ral-hex="${c.hex}" ${existingPaint ? `data-paint-id="${existingPaint.id}"` : ''} title="${buttonTitle}">
+                    <button class="${buttonClass}" data-ral-code="${c.code}" data-ral-hex="${c.hex}" title="${buttonTitle}">
                         <i class="fas ${buttonIcon}"></i>
                     </button>
                 </div>
@@ -2218,6 +2230,7 @@ window.SICOMIX = window.SICOMIX || {};
             ralCatalog.innerHTML = html;
         }
 
+        // ---------- ДОДАВАННЯ RAL (без додавання до каталогу) ----------
         function addRalToRecipe(code, hex) {
             const seriesSelect = document.getElementById('recipeSeries');
             const currentSeries = lockedSeries || (seriesSelect ? seriesSelect.value : null);
@@ -2227,41 +2240,39 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
-            let existingPaint = paintCatalog.find(p => p.article === code);
+            const tempPaintId = 'ral-' + code.replace(/\s+/g, '_');
+            const tempPaint = {
+                id: tempPaintId,
+                name: code,
+                category: 'RAL',
+                series: currentSeries,
+                color: hex || '#CCCCCC',
+                description: '',
+                manufacturer: 'RAL',
+                article: code,
+                isDefault: false,
+                displayName: { uk: code, en: code, pl: code }
+            };
 
-            if (!existingPaint) {
-                const newPaint = {
-                    id: SICOMIX.utils.generateId(),
-                    name: code,
-                    category: 'RAL',
-                    series: currentSeries,
-                    color: hex || '#CCCCCC',
-                    description: '',
-                    manufacturer: 'RAL',
-                    article: code,
-                    isDefault: false,
-                    displayName: { uk: code, en: code, pl: code }
-                };
-                userPaints.push(newPaint);
-                paintCatalog = [...basePaints, ...userPaints];
-                saveData();
-                existingPaint = newPaint;
-            }
-
-            const validation = validatePaintAddition(existingPaint);
+            const validation = validatePaintAddition(tempPaint);
             if (!validation.valid) {
                 SICOMIX.utils.showNotification(validation.message, 'error');
                 return;
             }
 
-            const existing = selectedIngredients.find(ing => String(ing.paintId) === String(existingPaint.id));
+            const existing = selectedIngredients.find(ing => ing.article === code);
             if (existing) {
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_already_added'), 'warning');
                 return;
             }
 
             selectedIngredients.push({
-                paintId: existingPaint.id,
+                paintId: tempPaintId,
+                article: code,
+                name: code,
+                category: 'RAL',
+                series: currentSeries,
+                color: tempPaint.color,
                 amount: 100,
                 unit: 'г',
                 percentage: 0
