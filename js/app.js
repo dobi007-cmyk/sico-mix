@@ -119,7 +119,8 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         // ---------- ЗАВАНТАЖЕННЯ ТА ЗБЕРЕЖЕННЯ ----------
-        function loadData() {
+        async function loadData() {
+            // Завантаження базових фарб (з data-colors.js)
             if (SICOMIX.data && Array.isArray(SICOMIX.data.paints)) {
                 basePaints = SICOMIX.data.paints.map(p => ({
                     ...p,
@@ -131,22 +132,48 @@ window.SICOMIX = window.SICOMIX || {};
                 basePaints = [];
             }
 
+            // Завантаження локальних даних
             userPaints = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumUserPaints', [])
                 .map(p => ({ ...p, id: String(p.id), isDefault: false }));
 
-            paintCatalog = [...basePaints, ...userPaints];
-
-            const savedRecipes = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumRecipes', []);
-            recipes = savedRecipes.map(r => ({
-                ...r,
-                id: String(r.id),
-                ingredients: (r.ingredients || []).map(ing => ({
-                    ...ing,
-                    paintId: String(ing.paintId)
-                }))
-            }));
+            recipes = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumRecipes', [])
+                .map(r => ({
+                    ...r,
+                    id: String(r.id),
+                    ingredients: (r.ingredients || []).map(ing => ({
+                        ...ing,
+                        paintId: String(ing.paintId)
+                    }))
+                }));
 
             currentSettings = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumSettings', SICOMIX.data.defaultSettings || {});
+
+            // Синхронізація з Firestore, якщо користувач авторизований
+            const user = SICOMIX.sync?.getCurrentUser();
+            if (user) {
+                try {
+                    const remoteData = await SICOMIX.sync.loadUserData(user.uid);
+                    if (remoteData) {
+                        // Об'єднуємо (тут просто замінюємо локальні на віддалені, але можна додати merge за часом)
+                        if (remoteData.recipes) {
+                            recipes = remoteData.recipes.map(r => ({ ...r, id: String(r.id) }));
+                        }
+                        if (remoteData.userPaints) {
+                            userPaints = remoteData.userPaints.map(p => ({ ...p, id: String(p.id), isDefault: false }));
+                        }
+                        if (remoteData.settings) {
+                            currentSettings = remoteData.settings;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Помилка синхронізації:', error);
+                }
+            }
+
+            // Оновлюємо каталог фарб
+            paintCatalog = [...basePaints, ...userPaints];
+
+            // Завантаження чернетки рецепту
             recipeDraft = SICOMIX.utils.loadFromLocalStorage('sicoSpectrumRecipeDraft', null);
             if (recipeDraft && recipeDraft.photo) {
                 recipePhotoDataUrl = recipeDraft.photo;
@@ -164,10 +191,24 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         function saveData() {
+            // Збереження в localStorage
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumUserPaints', userPaints);
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumRecipes', recipes);
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumSettings', currentSettings);
             updatePaintCount();
+
+            // Синхронізація з Firestore, якщо користувач авторизований
+            const user = SICOMIX.sync?.getCurrentUser();
+            if (user) {
+                const dataToSync = {
+                    recipes: recipes,
+                    userPaints: userPaints,
+                    settings: currentSettings
+                };
+                SICOMIX.sync.saveUserData(user.uid, dataToSync).catch(error => {
+                    console.error('Помилка збереження в Firestore:', error);
+                });
+            }
         }
 
         // ---------- АВТОЗБЕРЕЖЕННЯ ЧЕРНЕТКИ РЕЦЕПТУ ----------
@@ -400,13 +441,11 @@ window.SICOMIX = window.SICOMIX || {};
                     e.stopPropagation();
                     
                     if (btn.classList.contains('glass-remove-btn')) {
-                        // Видалення
                         const paintId = btn.dataset.paintId;
                         if (paintId) {
                             removeIngredientByPaintId(paintId);
                         }
                     } else if (btn.classList.contains('glass-add-btn')) {
-                        // Додавання
                         const pantoneNumber = btn.dataset.pantoneNumber;
                         if (pantoneNumber) {
                             addPantoneToRecipe(pantoneNumber);
@@ -2348,35 +2387,79 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         // ---------- ІНІЦІАЛІЗАЦІЯ ----------
-        function initApp() {
+        async function initApp() {
             cacheDOMElements();
-            loadData();
-            initSettings();
-            setupEventListeners();
-            updatePaintCount();
-            renderPaintCatalog();
-            renderRecipes();
-            renderIngredientsList();
-            populateCategoryFilters();
-            populateSeriesSelect();
-            updateSeriesLockUI();
+            
+            // Слухач стану аутентифікації
+            const auth = SICOMIX.firebase?.auth;
+            if (auth) {
+                auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        console.log('Користувач увійшов:', user.email);
+                        // При вході завантажуємо дані з Firestore
+                        await loadData();
+                    } else {
+                        console.log('Користувач вийшов');
+                        // При виході просто завантажуємо локальні дані
+                        loadData();
+                    }
+                    // Після завантаження даних оновлюємо інтерфейс
+                    initSettings();
+                    updatePaintCount();
+                    renderPaintCatalog();
+                    renderRecipes();
+                    renderIngredientsList();
+                    populateCategoryFilters();
+                    populateSeriesSelect();
+                    updateSeriesLockUI();
+                    
+                    if (window.innerWidth > 992) {
+                        sidebar.classList.add('active');
+                        mainContainer.classList.add('sidebar-open');
+                    }
 
-            if (window.innerWidth > 992) {
-                sidebar.classList.add('active');
-                mainContainer.classList.add('sidebar-open');
+                    if (document.getElementById('new-recipe-page')?.classList.contains('active')) {
+                        loadRecipeDraft();
+                    }
+
+                    const preloader = document.getElementById('preloader');
+                    if (preloader) {
+                        preloader.style.opacity = '0';
+                        setTimeout(() => preloader.remove(), 500);
+                    }
+
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('welcome_title'), 'success', 2000);
+                });
+            } else {
+                // Якщо Firebase не ініціалізовано, просто завантажуємо локальні дані
+                loadData();
+                initSettings();
+                setupEventListeners();
+                updatePaintCount();
+                renderPaintCatalog();
+                renderRecipes();
+                renderIngredientsList();
+                populateCategoryFilters();
+                populateSeriesSelect();
+                updateSeriesLockUI();
+
+                if (window.innerWidth > 992) {
+                    sidebar.classList.add('active');
+                    mainContainer.classList.add('sidebar-open');
+                }
+
+                if (document.getElementById('new-recipe-page')?.classList.contains('active')) {
+                    loadRecipeDraft();
+                }
+
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => preloader.remove(), 500);
+                }
+
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('welcome_title'), 'success', 2000);
             }
-
-            if (document.getElementById('new-recipe-page')?.classList.contains('active')) {
-                loadRecipeDraft();
-            }
-
-            const preloader = document.getElementById('preloader');
-            if (preloader) {
-                preloader.style.opacity = '0';
-                setTimeout(() => preloader.remove(), 500);
-            }
-
-            SICOMIX.utils.showNotification(SICOMIX.i18n.t('welcome_title'), 'success', 2000);
         }
 
         return {
