@@ -719,7 +719,7 @@ window.SICOMIX = window.SICOMIX || {};
                             <div>
                                 <div style="font-weight:600;">${SICOMIX.utils.escapeHtml(paintName)}</div>
                                 <div style="font-size:12px; color:var(--text-secondary);">
-                                    ${SICOMIX.i18n.translateCategory(paint.category)} 
+                                    ${SICOMIX.i18n.translateCategoryName(paint.category)} 
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:12px; margin-left:6px;">${SICOMIX.utils.escapeHtml(paint.series)}</span>
                                 </div>
                             </div>
@@ -799,7 +799,7 @@ window.SICOMIX = window.SICOMIX || {};
                 <div class="paint-selection-card" data-id="${p.id}">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <div style="width:32px; height:32px; background:${SICOMIX.utils.escapeHtml(p.color)}; border-radius:8px;"></div>
-                        <div><strong>${SICOMIX.utils.escapeHtml(paintName)}</strong><br><span style="font-size:12px;">${SICOMIX.i18n.translateCategory(p.category)} (${SICOMIX.utils.escapeHtml(p.series)})</span></div>
+                        <div><strong>${SICOMIX.utils.escapeHtml(paintName)}</strong><br><span style="font-size:12px;">${SICOMIX.i18n.translateCategoryName(p.category)} (${SICOMIX.utils.escapeHtml(p.series)})</span></div>
                     </div>
                 </div>
             `}).join('');
@@ -981,7 +981,7 @@ window.SICOMIX = window.SICOMIX || {};
                     </div>
                     <div class="recipe-content">
                         <div class="recipe-header">
-                            <div><h3 class="recipe-title">${SICOMIX.utils.escapeHtml(r.name)}</h3><span class="recipe-category">${SICOMIX.i18n.translateCategory(r.category)} / ${SICOMIX.utils.escapeHtml(r.series)}</span></div>
+                            <div><h3 class="recipe-title">${SICOMIX.utils.escapeHtml(r.name)}</h3><span class="recipe-category">${SICOMIX.i18n.translateCategoryName(r.category)} / ${SICOMIX.utils.escapeHtml(r.series)}</span></div>
                             <div class="recipe-select-container">
                                 <input type="checkbox" class="recipe-select" value="${r.id}" ${selectedRecipes.includes(r.id) ? 'checked' : ''}>
                                 <span>${SICOMIX.i18n.t('select')}</span>
@@ -1181,7 +1181,7 @@ window.SICOMIX = window.SICOMIX || {};
                 <div class="recipe-card">
                     <h2 class="recipe-title">${SICOMIX.utils.escapeHtml(recipe.name)}</h2>
                     <div class="recipe-meta">
-                        <span><strong>${SICOMIX.i18n.t('category')}:</strong> ${SICOMIX.i18n.translateCategory(recipe.category)} / ${SICOMIX.utils.escapeHtml(recipe.series)}</span>
+                        <span><strong>${SICOMIX.i18n.t('category')}:</strong> ${SICOMIX.i18n.translateCategoryName(recipe.category)} / ${SICOMIX.utils.escapeHtml(recipe.series)}</span>
                         <span><strong>${SICOMIX.i18n.t('date')}:</strong> ${SICOMIX.utils.escapeHtml(recipe.date || SICOMIX.i18n.t('unknown'))}</span>
                         <span><strong>${SICOMIX.i18n.t('total_weight')}:</strong> ${total} г</span>
                     </div>
@@ -1318,7 +1318,7 @@ window.SICOMIX = window.SICOMIX || {};
                     <div class="details">
                         <div><strong>${SICOMIX.i18n.t('series')}:</strong> ${SICOMIX.utils.escapeHtml(recipe.series)}</div>
                         <div><strong>${SICOMIX.i18n.t('date')}:</strong> ${date}</div>
-                        <div><strong>${SICOMIX.i18n.t('category')}:</strong> ${SICOMIX.i18n.translateCategory(recipe.category)}</div>
+                        <div><strong>${SICOMIX.i18n.t('category')}:</strong> ${SICOMIX.i18n.translateCategoryName(recipe.category)}</div>
                     </div>
                     <div class="weight">${weightKg.toFixed(2)} kg</div>
                     <div class="footer">
@@ -1456,7 +1456,7 @@ window.SICOMIX = window.SICOMIX || {};
                                             ${SICOMIX.utils.escapeHtml(seriesName)}
                                             <span class="series-count">(${seriesPaints.length})</span>
                                         </h3>
-                                        <span class="recipe-category">${SICOMIX.i18n.translateCategory(category)}</span>
+                                        <span class="recipe-category">${SICOMIX.i18n.translateCategoryName(category)}</span>
                                     </div>
                                     <div style="display: flex; gap: 8px;">
                                         <button class="btn-icon series-info-btn" title="${SICOMIX.i18n.t('properties')}">
@@ -1585,7 +1585,7 @@ window.SICOMIX = window.SICOMIX || {};
             const lang = SICOMIX.i18n.getLanguage();
             seriesDetailsTitle.textContent = series.name[lang] || series.id;
             
-            let html = `<p><strong>${SICOMIX.i18n.t('category')}:</strong> ${SICOMIX.i18n.translateCategory(series.category)}</p>`;
+            let html = `<p><strong>${SICOMIX.i18n.t('category')}:</strong> ${SICOMIX.i18n.translateCategoryName(series.category)}</p>`;
             if (series.description && series.description[lang]) {
                 html += `<p><strong>${SICOMIX.i18n.t('series_description')}:</strong> ${series.description[lang]}</p>`;
             }
@@ -1656,7 +1656,7 @@ window.SICOMIX = window.SICOMIX || {};
                         </div>
                     </div>
                     <table style="width: 100%; border-collapse: collapse;">
-                        <tr><th style="text-align: left; padding: 8px;">${SICOMIX.i18n.t('category')}</th><td>${SICOMIX.i18n.translateCategory(paint.category)}</td></tr>
+                        <tr><th style="text-align: left; padding: 8px;">${SICOMIX.i18n.t('category')}</th><td>${SICOMIX.i18n.translateCategoryName(paint.category)}</td></tr>
                         <tr><th style="text-align: left; padding: 8px;">${SICOMIX.i18n.t('series')}</th><td>${SICOMIX.utils.escapeHtml(paint.series)}</td></tr>
                         <tr><th style="text-align: left; padding: 8px;">${SICOMIX.i18n.t('manufacturer')}</th><td>${SICOMIX.utils.escapeHtml(paint.manufacturer || 'SICO')}</td></tr>
                         <tr><th style="text-align: left; padding: 8px;">${SICOMIX.i18n.t('color_code')}</th><td>${SICOMIX.utils.escapeHtml(paint.color)}</td></tr>
@@ -1955,7 +1955,7 @@ window.SICOMIX = window.SICOMIX || {};
                 uniqueCategories.forEach(c => {
                     const opt = document.createElement('option');
                     opt.value = c;
-                    opt.textContent = SICOMIX.i18n.translateCategory(c);
+                    opt.textContent = SICOMIX.i18n.translateCategoryName(c);
                     sel.appendChild(opt);
                 });
                 
@@ -1975,7 +1975,7 @@ window.SICOMIX = window.SICOMIX || {};
             standardCategories.forEach(c => {
                 const opt = document.createElement('option');
                 opt.value = c;
-                opt.textContent = SICOMIX.i18n.translateCategory(c);
+                opt.textContent = SICOMIX.i18n.translateCategoryName(c);
                 selectElement.appendChild(opt);
             });
             if (current && standardCategories.includes(current)) {
