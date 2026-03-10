@@ -154,7 +154,6 @@ window.SICOMIX = window.SICOMIX || {};
                 try {
                     const remoteData = await SICOMIX.sync.loadUserData(user.uid);
                     if (remoteData) {
-                        // Об'єднуємо (тут просто замінюємо локальні на віддалені, але можна додати merge за часом)
                         if (remoteData.recipes) {
                             recipes = remoteData.recipes.map(r => ({ ...r, id: String(r.id) }));
                         }
