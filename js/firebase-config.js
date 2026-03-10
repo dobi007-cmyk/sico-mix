@@ -6,12 +6,12 @@ window.SICOMIX = window.SICOMIX || {};
 
     // 🔧 ЗАМІНІТЬ ЦІ ДАНІ НА СВОЇ З FIREBASE CONSOLE
     const firebaseConfig = {
-        apiKey: "AIzaSyBp8jK...",            // <-- ВСТАВТЕ СВІЙ API KEY
-        authDomain: "sico-spectrum.firebaseapp.com",
-        projectId: "sico-spectrum",           // <-- ВСТАВТЕ СВІЙ PROJECT ID
-        storageBucket: "sico-spectrum.appspot.com",
-        messagingSenderId: "1234567890",      // <-- ВСТАВТЕ СВІЙ SENDER ID
-        appId: "1:1234567890:web:abcdef..."   // <-- ВСТАВТЕ СВІЙ APP ID
+        apiKey: "YOUR_API_KEY",                // <-- ВСТАВТЕ СВІЙ API KEY
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",           // <-- ВСТАВТЕ СВІЙ PROJECT ID
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",    // <-- ВСТАВТЕ СВІЙ SENDER ID
+        appId: "YOUR_APP_ID"                    // <-- ВСТАВТЕ СВІЙ APP ID
     };
 
     // Ініціалізація Firebase
@@ -22,7 +22,7 @@ window.SICOMIX = window.SICOMIX || {};
         db: firebase.firestore()
     };
 
-    // Додаємо провайдер Google
+    // Додаємо провайдер Google (для майбутнього використання)
     SICOMIX.firebase.auth.GoogleAuthProvider = firebase.auth.GoogleAuthProvider;
 
     // Налаштування Firestore (persistence)
