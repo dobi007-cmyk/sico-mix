@@ -711,7 +711,7 @@ window.SICOMIX = window.SICOMIX || {};
 
             let html = '';
             selectedIngredients.forEach((ing, idx) => {
-                const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId)) || ing; // для тимчасових Pantone/RAL
+                const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId)) || ing;
                 const paintName = paint.displayName?.[SICOMIX.i18n.getLanguage()] || paint.name;
                 html += `<tr>
                     <td>
@@ -1240,7 +1240,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- ДРУК ЕТИКЕТКИ ----------
+        // ---------- СТИЛЬНА ЕТИКЕТКА ДЛЯ ЗМІШАНОЇ ФАРБИ ----------
         function printLabel(recipeId) {
             const recipe = recipes.find(r => String(r.id) === String(recipeId));
             if (!recipe) return;
@@ -1253,91 +1253,342 @@ window.SICOMIX = window.SICOMIX || {};
 
             const lang = SICOMIX.i18n.getLanguage();
             const date = new Date().toLocaleDateString(lang);
+            
+            // Генеруємо акцентний колір на основі назви рецепту
+            const hash = recipe.name.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+            const hue = hash % 360;
+            const accentColor = `hsl(${hue}, 80%, 60%)`;
+            const darkAccent = `hsl(${hue}, 80%, 40%)`;
+            
             const labelHtml = `
             <!DOCTYPE html>
             <html lang="${lang}">
             <head>
                 <meta charset="UTF-8">
                 <title>Etykieta - ${SICOMIX.utils.escapeHtml(recipe.name)}</title>
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
                 <style>
-                    body {
-                        font-family: Arial, sans-serif;
+                    * {
                         margin: 0;
-                        padding: 20px;
-                        background: white;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
+                    body {
+                        font-family: 'Inter', sans-serif;
+                        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+                        min-height: 100vh;
                         display: flex;
                         justify-content: center;
                         align-items: center;
-                        min-height: 100vh;
+                        padding: 20px;
                     }
                     .label {
-                        width: 300px;
-                        border: 2px solid black;
-                        padding: 15px;
+                        width: 380px;
                         background: white;
-                        color: black;
-                        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                        border-radius: 24px;
+                        overflow: hidden;
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 10px 20px rgba(0,0,0,0.1);
+                        transition: transform 0.3s ease;
+                        border: 1px solid rgba(255,255,255,0.2);
+                    }
+                    .label:hover {
+                        transform: translateY(-5px);
                     }
                     .header {
-                        text-align: center;
-                        font-weight: bold;
-                        font-size: 18px;
-                        margin-bottom: 10px;
-                        border-bottom: 1px solid black;
-                        padding-bottom: 5px;
+                        background: linear-gradient(135deg, ${accentColor} 0%, ${darkAccent} 100%);
+                        color: white;
+                        padding: 20px 25px;
+                        position: relative;
+                        overflow: hidden;
                     }
-                    .product-name {
-                        font-size: 16px;
-                        font-weight: bold;
-                        margin: 10px 0;
-                        text-align: center;
+                    .header::after {
+                        content: '';
+                        position: absolute;
+                        top: -50%;
+                        right: -50%;
+                        width: 200%;
+                        height: 200%;
+                        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+                        opacity: 0.5;
                     }
-                    .details {
-                        margin: 10px 0;
+                    .header-content {
+                        position: relative;
+                        z-index: 2;
+                    }
+                    .header h1 {
+                        font-size: 24px;
+                        font-weight: 700;
+                        margin-bottom: 5px;
+                        letter-spacing: -0.5px;
+                        line-height: 1.2;
+                        word-break: break-word;
+                    }
+                    .header-subtitle {
                         font-size: 14px;
+                        opacity: 0.9;
+                        font-weight: 500;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
                     }
-                    .details div {
-                        margin: 5px 0;
-                    }
-                    .weight {
+                    .header-subtitle i {
                         font-size: 16px;
-                        font-weight: bold;
-                        text-align: center;
-                        margin: 15px 0;
                     }
-                    .footer {
-                        font-size: 12px;
+                    
+                    .content {
+                        padding: 25px;
+                    }
+                    
+                    .info-grid {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 20px;
+                        margin-bottom: 25px;
+                    }
+                    
+                    .info-item {
+                        background: #f8fafd;
+                        border-radius: 16px;
+                        padding: 15px;
                         text-align: center;
-                        margin-top: 15px;
-                        border-top: 1px solid black;
+                        border: 1px solid #eef2f6;
+                        transition: all 0.2s;
+                    }
+                    .info-item:hover {
+                        background: white;
+                        border-color: ${accentColor}40;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+                    }
+                    .info-label {
+                        font-size: 12px;
+                        color: #64748b;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        font-weight: 600;
+                        margin-bottom: 8px;
+                    }
+                    .info-value {
+                        font-size: 20px;
+                        font-weight: 700;
+                        color: #1e293b;
+                    }
+                    .info-value small {
+                        font-size: 14px;
+                        font-weight: 400;
+                        color: #64748b;
+                    }
+                    
+                    .weight-section {
+                        background: linear-gradient(135deg, #f8fafd 0%, #f1f5f9 100%);
+                        border-radius: 20px;
+                        padding: 20px;
+                        margin-bottom: 25px;
+                        text-align: center;
+                        border: 1px solid #e2e8f0;
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    .weight-section::before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        height: 4px;
+                        background: linear-gradient(90deg, ${accentColor}, ${darkAccent});
+                    }
+                    .weight-label {
+                        font-size: 14px;
+                        color: #475569;
+                        margin-bottom: 10px;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                    }
+                    .weight-value {
+                        font-size: 48px;
+                        font-weight: 800;
+                        color: #0f172a;
+                        line-height: 1;
+                        display: flex;
+                        align-items: baseline;
+                        justify-content: center;
+                        gap: 5px;
+                    }
+                    .weight-value span {
+                        font-size: 24px;
+                        font-weight: 500;
+                        color: #64748b;
+                    }
+                    
+                    .ingredients {
+                        margin-bottom: 25px;
+                    }
+                    .ingredients-title {
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #1e293b;
+                        margin-bottom: 15px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+                    .ingredients-title i {
+                        color: ${accentColor};
+                    }
+                    .ingredient-item {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 12px 15px;
+                        background: #f8fafd;
+                        border-radius: 14px;
+                        margin-bottom: 8px;
+                        border: 1px solid #eef2f6;
+                        transition: all 0.2s;
+                    }
+                    .ingredient-item:hover {
+                        background: white;
+                        border-color: ${accentColor}40;
+                    }
+                    .ingredient-name {
+                        font-weight: 500;
+                        color: #334155;
+                    }
+                    .ingredient-amount {
+                        font-weight: 600;
+                        color: #0f172a;
+                    }
+                    
+                    .footer {
+                        background: #f1f5f9;
+                        padding: 20px 25px;
+                        border-top: 1px solid #e2e8f0;
+                    }
+                    .company {
+                        font-weight: 700;
+                        font-size: 18px;
+                        color: #0f172a;
+                        margin-bottom: 8px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+                    .company span {
+                        background: ${accentColor};
+                        color: white;
+                        font-size: 12px;
+                        padding: 3px 10px;
+                        border-radius: 50px;
+                        font-weight: 500;
+                    }
+                    .address {
+                        font-size: 13px;
+                        color: #475569;
+                        margin-bottom: 5px;
+                        line-height: 1.5;
+                    }
+                    .contact {
+                        font-size: 13px;
+                        color: #1e293b;
+                        font-weight: 500;
+                        margin-top: 10px;
                         padding-top: 10px;
+                        border-top: 1px dashed #cbd5e1;
+                    }
+                    .contact i {
+                        color: ${accentColor};
+                        margin-right: 5px;
                     }
                     .note {
-                        font-size: 10px;
+                        font-size: 11px;
+                        color: #94a3b8;
                         text-align: center;
-                        color: #333;
-                        margin-top: 10px;
+                        margin-top: 15px;
+                        font-style: italic;
+                    }
+                    .barcode-fallback {
+                        font-size: 14px;
+                        font-family: monospace;
+                        color: #64748b;
+                        text-align: center;
+                        margin-top: 15px;
+                        letter-spacing: 2px;
+                        background: #e9eef3;
+                        padding: 8px;
+                        border-radius: 40px;
                     }
                 </style>
             </head>
             <body>
                 <div class="label">
-                    <div class="header">SICO POLSKA - FARBA MIESZANA</div>
-                    <div class="product-name">${SICOMIX.utils.escapeHtml(recipe.name)}</div>
-                    <div class="details">
-                        <div><strong>${SICOMIX.i18n.t('series')}:</strong> ${SICOMIX.utils.escapeHtml(recipe.series)}</div>
-                        <div><strong>${SICOMIX.i18n.t('date')}:</strong> ${date}</div>
-                        <div><strong>${SICOMIX.i18n.t('category')}:</strong> ${SICOMIX.i18n.translateCategoryName(recipe.category)}</div>
+                    <div class="header">
+                        <div class="header-content">
+                            <h1>${SICOMIX.utils.escapeHtml(recipe.name)}</h1>
+                            <div class="header-subtitle">
+                                <i>⚡</i> Farba mieszana • Mixed paint
+                            </div>
+                        </div>
                     </div>
-                    <div class="weight">${weightKg.toFixed(2)} kg</div>
+                    
+                    <div class="content">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">${SICOMIX.i18n.t('series')}</div>
+                                <div class="info-value">${SICOMIX.utils.escapeHtml(recipe.series)}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">${SICOMIX.i18n.t('date')}</div>
+                                <div class="info-value">${date}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">${SICOMIX.i18n.t('category')}</div>
+                                <div class="info-value">${SICOMIX.i18n.translateCategoryName(recipe.category)}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Składników</div>
+                                <div class="info-value">${recipe.ingredients.length}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="weight-section">
+                            <div class="weight-label">WAGA NETTO</div>
+                            <div class="weight-value">${weightKg.toFixed(2)}<span>kg</span></div>
+                        </div>
+                        
+                        <div class="ingredients">
+                            <div class="ingredients-title">
+                                <i>📋</i> Skład receptury
+                            </div>
+                            ${recipe.ingredients.map(ing => {
+                                const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId)) || ing;
+                                const paintName = paint.displayName?.[lang] || paint.name;
+                                return `
+                                <div class="ingredient-item">
+                                    <span class="ingredient-name">${SICOMIX.utils.escapeHtml(paintName)}</span>
+                                    <span class="ingredient-amount">${ing.amount} ${ing.unit} (${ing.percentage}%)</span>
+                                </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                    
                     <div class="footer">
-                        <div>Wyłączny dystrybutor w Polsce</div>
-                        <div>SICO Polska Sp. z o. o.</div>
-                        <div>ul. Annopol 3, 03-236 Warszawa</div>
-                        <div>tel.: +48 22 660 48 50, e-mail: sico@sico.pl</div>
-                    </div>
-                    <div class="note">
-                        PRZED DRUKIEM NAKŁADU ZALECAMY SPRAWDZENIE ZGODNOŚCI KOLORYSTYCZNEJ
+                        <div class="company">
+                            SICO Polska <span>Official</span>
+                        </div>
+                        <div class="address">
+                            ul. Annopol 3, 03-236 Warszawa<br>
+                            NIP: 526-030-45-12
+                        </div>
+                        <div class="contact">
+                            <i>📞</i> +48 22 660 48 50 • <i>✉</i> sico@sico.pl
+                        </div>
+                        <div class="barcode-fallback">
+                            ${recipe.id.substring(0, 8).toUpperCase()}
+                        </div>
+                        <div class="note">
+                            PRZED DRUKIEM NAKŁADU ZALECAMY SPRAWDZENIE ZGODNOŚCI KOLORYSTYCZNEJ
+                        </div>
                     </div>
                 </div>
             </body>
