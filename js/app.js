@@ -395,11 +395,21 @@ window.SICOMIX = window.SICOMIX || {};
 
             if (pantoneCatalog) {
                 pantoneCatalog.addEventListener('click', function(e) {
-                    const btn = e.target.closest('.pantone-add-btn');
+                    const btn = e.target.closest('.pantone-add-btn, .glass-remove-btn');
                     if (!btn) return;
-                    const pantoneNumber = btn.dataset.pantoneNumber;
-                    if (pantoneNumber) {
-                        addPantoneToRecipe(pantoneNumber);
+                    
+                    if (btn.classList.contains('glass-remove-btn')) {
+                        // Видалення
+                        const paintId = btn.dataset.paintId;
+                        if (paintId) {
+                            removeIngredientByPaintId(paintId);
+                        }
+                    } else if (btn.classList.contains('pantone-add-btn')) {
+                        // Додавання
+                        const pantoneNumber = btn.dataset.pantoneNumber;
+                        if (pantoneNumber) {
+                            addPantoneToRecipe(pantoneNumber);
+                        }
                     }
                 });
             }
@@ -427,6 +437,26 @@ window.SICOMIX = window.SICOMIX || {};
                 ralSearch.addEventListener('input', SICOMIX.utils.debounce(() => {
                     renderRalCatalog();
                 }, 300));
+            }
+
+            if (ralCatalog) {
+                ralCatalog.addEventListener('click', function(e) {
+                    const btn = e.target.closest('.ral-add-btn, .glass-remove-btn');
+                    if (!btn) return;
+                    
+                    if (btn.classList.contains('glass-remove-btn')) {
+                        const paintId = btn.dataset.paintId;
+                        if (paintId) {
+                            removeIngredientByPaintId(paintId);
+                        }
+                    } else if (btn.classList.contains('ral-add-btn')) {
+                        const code = btn.dataset.ralCode;
+                        const hex = btn.dataset.ralHex;
+                        if (code) {
+                            addRalToRecipe(code, hex);
+                        }
+                    }
+                });
             }
 
             // Відкриття PDF
@@ -762,6 +792,10 @@ window.SICOMIX = window.SICOMIX || {};
                     updateSeriesLockUI();
                     autoSaveRecipeDraft();
                     SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
+                    
+                    // Оновлюємо кнопки в каталогах Pantone та RAL (якщо потрібно)
+                    renderPantoneCatalog();
+                    renderRalCatalog();
                 }
                 modal.classList.remove('active');
                 list.removeEventListener('click', clickHandler);
@@ -781,6 +815,7 @@ window.SICOMIX = window.SICOMIX || {};
 
         function deleteIngredient(index) {
             if (index >= 0) {
+                const removed = selectedIngredients[index];
                 selectedIngredients.splice(index, 1);
                 if (selectedIngredients.length === 0) {
                     lockedSeries = null;
@@ -789,6 +824,15 @@ window.SICOMIX = window.SICOMIX || {};
                 renderIngredientsList();
                 updateSeriesLockUI();
                 autoSaveRecipeDraft();
+                
+                // Оновлюємо кнопки в каталогах
+                renderPantoneCatalog();
+                renderRalCatalog();
+                
+                // Оновлюємо кнопку в загальному каталозі, якщо там є ця фарба
+                if (removed) {
+                    updatePaintButton(removed.paintId, false);
+                }
             }
         }
 
@@ -865,6 +909,8 @@ window.SICOMIX = window.SICOMIX || {};
             lockedCategory = null;
             updateSeriesLockUI();
             renderIngredientsList();
+            renderPantoneCatalog();
+            renderRalCatalog();
             resetEditMode();
         }
 
@@ -1432,6 +1478,10 @@ window.SICOMIX = window.SICOMIX || {};
             updateSeriesLockUI();
             autoSaveRecipeDraft();
 
+            // Оновлюємо кнопки в каталогах Pantone та RAL
+            renderPantoneCatalog();
+            renderRalCatalog();
+
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
         }
 
@@ -1544,6 +1594,8 @@ window.SICOMIX = window.SICOMIX || {};
                         saveData();
                         renderPaintCatalog();
                         renderRecipes();
+                        renderPantoneCatalog();
+                        renderRalCatalog();
                         SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
                     }
                 );
@@ -1552,6 +1604,8 @@ window.SICOMIX = window.SICOMIX || {};
                 paintCatalog = [...basePaints, ...userPaints];
                 saveData();
                 renderPaintCatalog();
+                renderPantoneCatalog();
+                renderRalCatalog();
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
             }
         }
@@ -1647,6 +1701,8 @@ window.SICOMIX = window.SICOMIX || {};
                     populateCategoryFilters();
                     renderRecipes();
                     renderPaintCatalog();
+                    renderPantoneCatalog();
+                    renderRalCatalog();
                     updatePaintCount();
                     SICOMIX.utils.showNotification(SICOMIX.i18n.t('data_cleared'), 'success');
                 }
@@ -1696,6 +1752,8 @@ window.SICOMIX = window.SICOMIX || {};
                     populateCategoryFilters();
                     renderRecipes();
                     renderPaintCatalog();
+                    renderPantoneCatalog();
+                    renderRalCatalog();
                     SICOMIX.utils.showNotification(SICOMIX.i18n.t('imported') + '!', 'success');
                 } catch (err) {
                     console.error(err);
@@ -1851,30 +1909,26 @@ window.SICOMIX = window.SICOMIX || {};
                 const firstAmount = p.ingredients && p.ingredients.length > 0 ? p.ingredients[0].amount : '';
                 const hex = p.hex && p.hex !== '#CCCCCC' ? p.hex : '#CCCCCC';
                 
+                // Шукаємо, чи є вже така фарба в каталозі
+                const existingPaint = paintCatalog.find(paint => paint.article === p.number);
+                const isInRecipe = existingPaint ? selectedIngredients.some(ing => String(ing.paintId) === String(existingPaint.id)) : false;
+                const buttonClass = isInRecipe ? 'glass-remove-btn' : 'pantone-add-btn';
+                const buttonIcon = isInRecipe ? 'fa-trash' : 'fa-plus';
+                const buttonTitle = isInRecipe ? SICOMIX.i18n.t('remove_from_recipe') : SICOMIX.i18n.t('add_ingredient');
+                
                 return `
-                <div class="paint-card-glass pantone-card" data-pantone-number="${p.number}" style="color: #000;">
+                <div class="paint-card-glass pantone-card" ${existingPaint ? `data-paint-id="${existingPaint.id}"` : ''} style="color: #000;">
                     <div class="glass-swatch" style="background: ${hex};"></div>
                     <div class="glass-name">${SICOMIX.utils.escapeHtml(p.number)}</div>
                     <div class="glass-article">${SICOMIX.utils.escapeHtml(p.name || '')}</div>
                     <div style="font-size: 11px; margin-top: 5px; color: var(--text-tertiary);">${firstIngredient} ${firstAmount}</div>
-                    <button class="glass-add-btn pantone-add-btn" data-pantone-number="${p.number}" title="${SICOMIX.i18n.t('add_ingredient')}">
-                        <i class="fas fa-plus"></i>
+                    <button class="${buttonClass}" data-pantone-number="${p.number}" ${existingPaint ? `data-paint-id="${existingPaint.id}"` : ''} title="${buttonTitle}">
+                        <i class="fas ${buttonIcon}"></i>
                     </button>
                 </div>
             `}).join('');
 
             pantoneCatalog.innerHTML = html;
-
-            pantoneCatalog.addEventListener('click', function(e) {
-                const card = e.target.closest('.pantone-card');
-                if (!card) return;
-                if (e.target.closest('.pantone-add-btn')) return;
-                
-                const pantoneNumber = card.dataset.pantoneNumber;
-                if (pantoneNumber) {
-                    showPantoneRecipeModal(pantoneNumber);
-                }
-            });
         }
 
         function showPantoneRecipeModal(pantoneNumber) {
@@ -1902,7 +1956,7 @@ window.SICOMIX = window.SICOMIX || {};
             document.body.style.overflow = 'hidden';
         }
 
-        // ========== ВИПРАВЛЕНО: ДОДАВАННЯ PANTONE (ЗАВЖДИ ДО РЕЦЕПТУ) ==========
+        // ========== ВИПРАВЛЕНО: ДОДАВАННЯ PANTONE ==========
         function addPantoneToRecipe(pantoneNumber) {
             const pantone = SICOMIX.pantone.findByNumber(pantoneNumber);
             if (!pantone) return;
@@ -1914,29 +1968,26 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
-            // Створюємо об'єкт нової фарби
-            const newPaint = {
-                id: SICOMIX.utils.generateId(),
-                name: pantone.number,
-                category: 'Pantone',
-                series: seriesSelect.value,
-                color: pantone.hex && pantone.hex !== '#CCCCCC' ? pantone.hex : '#CCCCCC',
-                description: pantone.name || '',
-                manufacturer: 'Pantone',
-                article: pantone.number,
-                isDefault: false,
-                displayName: { uk: pantone.number, en: pantone.number, pl: pantone.number }
-            };
+            // Шукаємо існуючу фарбу в каталозі
+            let existingPaint = paintCatalog.find(p => p.article === pantone.number);
 
-            // Перевіряємо, чи вже є така фарба в каталозі
-            let existingPaint = paintCatalog.find(p => p.article === pantone.number && p.series === seriesSelect.value);
-            
             if (!existingPaint) {
-                // Додаємо нову фарбу до каталогу
+                // Створюємо нову фарбу
+                const newPaint = {
+                    id: SICOMIX.utils.generateId(),
+                    name: pantone.number,
+                    category: 'Pantone',
+                    series: seriesSelect.value,
+                    color: pantone.hex && pantone.hex !== '#CCCCCC' ? pantone.hex : '#CCCCCC',
+                    description: pantone.name || '',
+                    manufacturer: 'Pantone',
+                    article: pantone.number,
+                    isDefault: false,
+                    displayName: { uk: pantone.number, en: pantone.number, pl: pantone.number }
+                };
                 userPaints.push(newPaint);
                 paintCatalog = [...basePaints, ...userPaints];
                 saveData();
-                renderPaintCatalog();
                 existingPaint = newPaint;
             }
 
@@ -1966,6 +2017,9 @@ window.SICOMIX = window.SICOMIX || {};
             updateSeriesLockUI();
             autoSaveRecipeDraft();
 
+            // Оновлюємо каталог Pantone (щоб кнопка змінилася)
+            renderPantoneCatalog();
+            
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
 
             // Якщо ми не на сторінці нового рецепту – перемикаємо на неї
@@ -1974,7 +2028,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ========== ВИПРАВЛЕНО: ДОДАВАННЯ RAL (ЗАВЖДИ ДО РЕЦЕПТУ) ==========
+        // ========== ВИПРАВЛЕНО: ДОДАВАННЯ RAL ==========
         function renderRalCatalog() {
             if (!ralCatalog) {
                 console.warn('ralCatalog element not found');
@@ -2002,27 +2056,26 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
-            const html = filtered.map(c => `
-                <div class="paint-card-glass ral-card" data-ral-code="${c.code}" style="color: #000;">
+            const html = filtered.map(c => {
+                // Шукаємо, чи є вже така фарба в каталозі
+                const existingPaint = paintCatalog.find(p => p.article === c.code);
+                const isInRecipe = existingPaint ? selectedIngredients.some(ing => String(ing.paintId) === String(existingPaint.id)) : false;
+                const buttonClass = isInRecipe ? 'glass-remove-btn' : 'ral-add-btn';
+                const buttonIcon = isInRecipe ? 'fa-trash' : 'fa-plus';
+                const buttonTitle = isInRecipe ? SICOMIX.i18n.t('remove_from_recipe') : SICOMIX.i18n.t('add_ingredient');
+                
+                return `
+                <div class="paint-card-glass ral-card" ${existingPaint ? `data-paint-id="${existingPaint.id}"` : ''} style="color: #000;">
                     <div class="glass-swatch" style="background: ${c.hex};"></div>
                     <div class="glass-name">${SICOMIX.utils.escapeHtml(c.code)}</div>
                     <div class="glass-article">${SICOMIX.utils.escapeHtml(c.name)}</div>
-                    <button class="glass-add-btn ral-add-btn" data-ral-code="${c.code}" data-ral-hex="${c.hex}" title="${SICOMIX.i18n.t('add_ingredient')}">
-                        <i class="fas fa-plus"></i>
+                    <button class="${buttonClass}" data-ral-code="${c.code}" data-ral-hex="${c.hex}" ${existingPaint ? `data-paint-id="${existingPaint.id}"` : ''} title="${buttonTitle}">
+                        <i class="fas ${buttonIcon}"></i>
                     </button>
                 </div>
-            `).join('');
+            `}).join('');
 
             ralCatalog.innerHTML = html;
-
-            ralCatalog.querySelectorAll('.ral-add-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const code = this.dataset.ralCode;
-                    const hex = this.dataset.ralHex;
-                    addRalToRecipe(code, hex);
-                });
-            });
         }
 
         function addRalToRecipe(code, hex) {
@@ -2033,28 +2086,26 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
-            // Створюємо об'єкт нової фарби
-            const newPaint = {
-                id: SICOMIX.utils.generateId(),
-                name: code,
-                category: 'RAL',
-                series: seriesSelect.value,
-                color: hex || '#CCCCCC',
-                description: '',
-                manufacturer: 'RAL',
-                article: code,
-                isDefault: false,
-                displayName: { uk: code, en: code, pl: code }
-            };
-
-            // Перевіряємо, чи вже є така фарба в каталозі
-            let existingPaint = paintCatalog.find(p => p.article === code && p.series === seriesSelect.value);
+            // Шукаємо існуючу фарбу в каталозі
+            let existingPaint = paintCatalog.find(p => p.article === code);
 
             if (!existingPaint) {
+                // Створюємо нову фарбу
+                const newPaint = {
+                    id: SICOMIX.utils.generateId(),
+                    name: code,
+                    category: 'RAL',
+                    series: seriesSelect.value,
+                    color: hex || '#CCCCCC',
+                    description: '',
+                    manufacturer: 'RAL',
+                    article: code,
+                    isDefault: false,
+                    displayName: { uk: code, en: code, pl: code }
+                };
                 userPaints.push(newPaint);
                 paintCatalog = [...basePaints, ...userPaints];
                 saveData();
-                renderPaintCatalog();
                 existingPaint = newPaint;
             }
 
@@ -2084,6 +2135,9 @@ window.SICOMIX = window.SICOMIX || {};
             updateSeriesLockUI();
             autoSaveRecipeDraft();
 
+            // Оновлюємо каталог RAL (щоб кнопка змінилася)
+            renderRalCatalog();
+            
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
 
             // Якщо ми не на сторінці нового рецепту – перемикаємо на неї
@@ -2273,6 +2327,11 @@ window.SICOMIX = window.SICOMIX || {};
                             renderIngredientsList();
                             updateSeriesLockUI();
                             autoSaveRecipeDraft();
+                            
+                            // Оновлюємо каталоги Pantone та RAL (можливо, серед знайдених є Pantone/RAL)
+                            renderPantoneCatalog();
+                            renderRalCatalog();
+                            
                             SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
                             
                             // Перемикаємо на сторінку нового рецепту, якщо ми не на ній
