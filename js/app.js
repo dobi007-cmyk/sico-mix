@@ -970,10 +970,17 @@ window.SICOMIX = window.SICOMIX || {};
         // ---------- РЕЦЕПТИ ----------
         function renderRecipes() {
             if (!recipesContainer) return;
+
             const search = document.getElementById('recipeSearch')?.value.toLowerCase() || '';
             const cat = document.getElementById('recipeCategoryFilter')?.value || '';
+
             let filtered = recipes;
-            if (search) filtered = filtered.filter(r => r.name.toLowerCase().includes(search) || (r.description && r.description.toLowerCase().includes(search)));
+            if (search) {
+                filtered = filtered.filter(r =>
+                    r.name.toLowerCase().includes(search) ||
+                    (r.description && r.description.toLowerCase().includes(search))
+                );
+            }
             if (cat) filtered = filtered.filter(r => r.category === cat);
 
             if (filtered.length === 0) {
@@ -983,61 +990,110 @@ window.SICOMIX = window.SICOMIX || {};
 
             recipesContainer.innerHTML = filtered.map(r => {
                 const total = r.ingredients.reduce((s, i) => s + (i.amount || 0), 0);
-                const photoHtml = r.photo ? `<img src="${SICOMIX.utils.escapeHtml(r.photo)}" style="width:100%; height:100%; object-fit:cover;">` : `<i class="fas fa-palette"></i>`;
-                return `<div class="recipe-card" data-id="${r.id}">
-                    <div class="recipe-image" style="background: linear-gradient(145deg, #3a86ff80, #7b2cbf80);">
-                        ${photoHtml}
-                    </div>
-                    <div class="recipe-content">
-                        <div class="recipe-header">
-                            <div><h3 class="recipe-title">${SICOMIX.utils.escapeHtml(r.name)}</h3><span class="recipe-category">${SICOMIX.i18n.translateCategoryName(r.category)} / ${SICOMIX.utils.escapeHtml(r.series)}</span></div>
-                            <div class="recipe-select-container">
-                                <input type="checkbox" class="recipe-select" value="${r.id}" ${selectedRecipes.includes(r.id) ? 'checked' : ''}>
-                                <span>${SICOMIX.i18n.t('select')}</span>
+                const photoHtml = r.photo
+                    ? `<img src="${SICOMIX.utils.escapeHtml(r.photo)}" style="width:100%; height:100%; object-fit:cover;">`
+                    : `<i class="fas fa-palette"></i>`;
+
+                return `
+                <div class="recipe-card" data-id="${r.id}" style="background: var(--bg-card); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="display: flex; gap: 20px;">
+                        <div class="recipe-image" style="width: 100px; height: 100px; border-radius: 16px; background: linear-gradient(145deg, #3a86ff80, #7b2cbf80); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; overflow: hidden;">
+                            ${photoHtml}
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <h3 class="recipe-title" style="font-size: 20px; font-weight: 700; color: white;">${SICOMIX.utils.escapeHtml(r.name)}</h3>
+                                <div class="recipe-select-container" style="display: flex; align-items: center; gap: 6px;">
+                                    <input type="checkbox" class="recipe-select" value="${r.id}" ${selectedRecipes.includes(r.id) ? 'checked' : ''} style="width: 18px; height: 18px;">
+                                    <span style="font-size: 14px;">${SICOMIX.i18n.t('select')}</span>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <span class="recipe-category" style="background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px; font-size: 13px;">${SICOMIX.i18n.translateCategoryName(r.category)} / ${SICOMIX.utils.escapeHtml(r.series)}</span>
+                            </div>
+                            <p class="recipe-description" style="color: var(--text-secondary); margin-bottom: 16px;">
+                                ${SICOMIX.utils.escapeHtml(r.description || SICOMIX.i18n.t('no_description'))}
+                            </p>
+
+                            <!-- Statystyki w trzech prostokątach -->
+                            <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                                <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
+                                    <div style="font-size: 13px; color: var(--text-secondary);">${SICOMIX.i18n.t('ingredients_count')}</div>
+                                    <div style="font-size: 24px; font-weight: 700;">${r.ingredients.length}</div>
+                                </div>
+                                <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
+                                    <div style="font-size: 13px; color: var(--text-secondary);">${SICOMIX.i18n.t('total_weight')}</div>
+                                    <div style="font-size: 24px; font-weight: 700;">${total} ${SICOMIX.i18n.localizeUnitSymbol('г')}</div>
+                                </div>
+                                <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
+                                    <div style="font-size: 13px; color: var(--text-secondary);">${SICOMIX.i18n.t('date')}</div>
+                                    <div style="font-size: 18px; font-weight: 600;">${SICOMIX.utils.escapeHtml(r.date)}</div>
+                                </div>
+                            </div>
+
+                            <!-- Przyciski akcji -->
+                            <div class="recipe-actions" style="display: flex; gap: 12px;">
+                                <button class="recipe-btn edit-recipe" data-id="${r.id}" style="background: #3a86ff; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-edit"></i> ${SICOMIX.i18n.t('edit')}
+                                </button>
+                                <button class="recipe-btn delete-recipe" data-id="${r.id}" style="background: #e63946; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-trash"></i> ${SICOMIX.i18n.t('delete')}
+                                </button>
+                                <button class="recipe-btn export-recipe" data-id="${r.id}" style="background: #f4a261; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-download"></i> ${SICOMIX.i18n.t('export')}
+                                </button>
+                                <button class="recipe-btn print-label" data-recipe-id="${r.id}" style="background: #6d28d9; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-tag"></i> ${SICOMIX.i18n.t('print_label')}
+                                </button>
                             </div>
                         </div>
-                        <p class="recipe-description">${SICOMIX.utils.escapeHtml(r.description || SICOMIX.i18n.t('no_description'))}</p>
-                        <div class="recipe-meta">
-                            <div><span style="font-size:12px;">${SICOMIX.i18n.t('ingredients_count')}</span><br><strong>${r.ingredients.length}</strong></div>
-                            <div><span style="font-size:12px;">${SICOMIX.i18n.t('total_weight')}</span><br><strong>${total} ${SICOMIX.i18n.localizeUnitSymbol('г')}</strong></div>
-                            <div><span style="font-size:12px;">${SICOMIX.i18n.t('date')}</span><br><strong>${SICOMIX.utils.escapeHtml(r.date)}</strong></div>
-                        </div>
-                        <div class="recipe-actions">
-                            <button class="recipe-btn edit-recipe"><i class="fas fa-edit"></i> ${SICOMIX.i18n.t('edit')}</button>
-                            <button class="recipe-btn delete-recipe"><i class="fas fa-trash"></i> ${SICOMIX.i18n.t('delete')}</button>
-                            <button class="recipe-btn export-recipe"><i class="fas fa-download"></i> ${SICOMIX.i18n.t('export')}</button>
-                            <button class="recipe-btn print-label" data-recipe-id="${r.id}">
-                                <i class="fas fa-tag"></i> ${SICOMIX.i18n.t('print_label')}
-                            </button>
-                        </div>
                     </div>
-                </div>`;
+                </div>
+                `;
             }).join('');
 
-            recipesContainer.querySelectorAll('.edit-recipe').forEach(btn => btn.addEventListener('click', (e) => {
-                const id = e.target.closest('.recipe-card').dataset.id;
-                editRecipe(id);
-            }));
-            recipesContainer.querySelectorAll('.delete-recipe').forEach(btn => btn.addEventListener('click', (e) => {
-                const id = e.target.closest('.recipe-card').dataset.id;
-                deleteRecipe(id);
-            }));
-            recipesContainer.querySelectorAll('.export-recipe').forEach(btn => btn.addEventListener('click', (e) => {
-                const id = e.target.closest('.recipe-card').dataset.id;
-                exportRecipe(id);
-            }));
-            recipesContainer.querySelectorAll('.print-label').forEach(btn => btn.addEventListener('click', (e) => {
-                const id = e.target.closest('.recipe-card').dataset.id;
-                printLabel(id);
-            }));
-            recipesContainer.querySelectorAll('.recipe-select').forEach(cb => cb.addEventListener('change', function() {
-                const id = this.value;
-                if (this.checked) {
-                    if (!selectedRecipes.includes(id)) selectedRecipes.push(id);
-                } else {
-                    selectedRecipes = selectedRecipes.filter(v => v !== id);
+            // DELEGACJA ZDARZEŃ – jeden nasłuchiwacz dla wszystkich przycisków w kontenerze
+            recipesContainer.addEventListener('click', function(e) {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+
+                const card = btn.closest('.recipe-card');
+                if (!card) return;
+                const recipeId = card.dataset.id;
+
+                if (btn.classList.contains('edit-recipe')) {
+                    e.preventDefault();
+                    editRecipe(recipeId);
                 }
-            }));
+                else if (btn.classList.contains('delete-recipe')) {
+                    e.preventDefault();
+                    deleteRecipe(recipeId);
+                }
+                else if (btn.classList.contains('export-recipe')) {
+                    e.preventDefault();
+                    exportRecipe(recipeId);
+                }
+                else if (btn.classList.contains('print-label')) {
+                    e.preventDefault();
+                    printLabel(recipeId);
+                }
+            });
+
+            // Obsługa checkboxów (oddzielnie, bo to nie przyciski)
+            recipesContainer.querySelectorAll('.recipe-select').forEach(cb => {
+                cb.removeEventListener('change', handleRecipeSelectChange);
+                cb.addEventListener('change', handleRecipeSelectChange);
+            });
+        }
+
+        // Funkcja pomocnicza do zarządzania zaznaczonymi recepturami
+        function handleRecipeSelectChange(e) {
+            const id = e.target.value;
+            if (e.target.checked) {
+                if (!selectedRecipes.includes(id)) selectedRecipes.push(id);
+            } else {
+                selectedRecipes = selectedRecipes.filter(v => v !== id);
+            }
         }
 
         function deleteRecipe(id) {
@@ -1240,7 +1296,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- СТИЛЬНА ЕТИКЕТКА ДЛЯ ЗМІШАНОЇ ФАРБИ ----------
+        // ---------- STYLNA ETYKIETA DLA FARBY MIESZANEJ (wg wzoru) ----------
         function printLabel(recipeId) {
             const recipe = recipes.find(r => String(r.id) === String(recipeId));
             if (!recipe) return;
@@ -1445,7 +1501,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- ФУНКЦІЯ ОНОВЛЕННЯ КНОПКИ НА КАРТЦІ ----------
+        // ---------- FUNKCJA AKTUALIZUJĄCA PRZYCISK NA KARCIE ----------
         function updatePaintButton(paintId, isInRecipe) {
             const card = document.querySelector(`.paint-card-glass[data-paint-id="${paintId}"]`);
             if (!card) return;
@@ -1465,10 +1521,10 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ---------- КАТАЛОГ ФАРБ ----------
+        // ---------- KATALOG FARB ----------
         function renderPaintCatalog(append = false) {
             if (!paintCatalogEl) {
-                console.warn('⚠️ paintCatalogEl не знайдено!');
+                console.warn('⚠️ paintCatalogEl nie znaleziony!');
                 return;
             }
 
@@ -1580,7 +1636,7 @@ window.SICOMIX = window.SICOMIX || {};
                 });
 
                 if (search && !append) {
-                    const statsHtml = `<div class="search-stats"><i class="fas fa-search"></i> Знайдено фарб: ${totalFoundPaints} у ${paginatedSeries.length} серіях</div>`;
+                    const statsHtml = `<div class="search-stats"><i class="fas fa-search"></i> Znaleziono farb: ${totalFoundPaints} w ${paginatedSeries.length} seriach</div>`;
                     html = statsHtml + html;
                 }
 
@@ -1676,7 +1732,7 @@ window.SICOMIX = window.SICOMIX || {};
                 SICOMIX.i18n.applyTranslations();
 
             } catch (error) {
-                console.error('❌ Помилка в renderPaintCatalog:', error);
+                console.error('❌ Błąd w renderPaintCatalog:', error);
                 paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
                     <i class="fas fa-exclamation-triangle"></i> ${SICOMIX.i18n.t('catalog_render_error')}<br>${SICOMIX.utils.escapeHtml(error.message)}
                 </p>`;
@@ -1708,7 +1764,7 @@ window.SICOMIX = window.SICOMIX || {};
             document.body.style.overflow = 'hidden';
         }
 
-        // ---------- ДОДАВАННЯ ФАРБИ З КАТАЛОГУ ----------
+        // ---------- DODAWANIE FARBY Z KATALOGU ----------
         function addPaintToRecipeFromCatalog(paint) {
             const validation = validatePaintAddition(paint);
             if (!validation.valid) {
@@ -1876,7 +1932,7 @@ window.SICOMIX = window.SICOMIX || {};
             if (headerPaintCount) headerPaintCount.textContent = count;
         }
 
-        // ---------- РЕДАГУВАННЯ РЕЦЕПТУ ----------
+        // ---------- EDYCJA RECEPTURY ----------
         function editRecipe(id) {
             const recipe = recipes.find(r => String(r.id) === String(id));
             if (!recipe) return;
@@ -1915,7 +1971,7 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.showNotification(`"${SICOMIX.utils.escapeHtml(recipe.name)}" ${SICOMIX.i18n.t('edit')}`, 'info');
         }
 
-        // ---------- НАЛАШТУВАННЯ ----------
+        // ---------- USTAWIENIA ----------
         function saveSettings() {
             currentSettings = {
                 language: languageSelect.value,
@@ -1969,7 +2025,7 @@ window.SICOMIX = window.SICOMIX || {};
             );
         }
 
-        // ---------- ІМПОРТ/ЕКСПОРТ ----------
+        // ---------- IMPORT/EKSPORT ----------
         function startImport() {
             if (!importFile || !importFile.files || importFile.files.length === 0) {
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_import_file'), 'error');
@@ -2045,7 +2101,7 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('exported') + '!', 'success');
         }
 
-        // ---------- ДОПОМІЖНІ ФУНКЦІЇ ----------
+        // ---------- FUNKCJE POMOCNICZE ----------
         function populateCategoryFilters() {
             const uniqueCategories = [...new Set(paintCatalog.map(p => p.category).filter(Boolean))].sort();
             
@@ -2131,7 +2187,7 @@ window.SICOMIX = window.SICOMIX || {};
             fileNameSpan.textContent = SICOMIX.i18n.t('upload_photo');
         }
 
-        // ---------- ФУНКЦІЯ ДЛЯ ВІДОБРАЖЕННЯ ПАНТОНІВ ----------
+        // ---------- FUNKCJA WYŚWIETLANIA PANTONE ----------
         function renderPantoneCatalog() {
             if (!pantoneCatalog) {
                 console.warn('pantoneCatalog element not found');
@@ -2139,7 +2195,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             if (!SICOMIX.pantone || !SICOMIX.pantone.colors) {
-                pantoneCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Дані Pantone не завантажено</p>`;
+                pantoneCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Dane Pantone nie zostały załadowane</p>`;
                 return;
             }
 
@@ -2214,7 +2270,7 @@ window.SICOMIX = window.SICOMIX || {};
             document.body.style.overflow = 'hidden';
         }
 
-        // ---------- ДОДАВАННЯ PANTONE (без додавання до каталогу) ----------
+        // ---------- DODAWANIE PANTONE (bez dodawania do katalogu) ----------
         function addPantoneToRecipe(pantoneNumber) {
             const pantone = SICOMIX.pantone.findByNumber(pantoneNumber);
             if (!pantone) return;
@@ -2227,7 +2283,7 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
-            // Створюємо тимчасовий об'єкт фарби (НЕ додаємо до userPaints)
+            // Tworzymy tymczasowy obiekt farby (NIE dodajemy do userPaints)
             const tempPaintId = 'pantone-' + pantone.number.replace(/\s+/g, '_');
             const tempPaint = {
                 id: tempPaintId,
@@ -2284,7 +2340,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             if (!window.ralColors || !Array.isArray(window.ralColors)) {
-                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Дані RAL не завантажено</p>`;
+                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Dane RAL nie zostały załadowane</p>`;
                 return;
             }
 
@@ -2300,7 +2356,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             if (filtered.length === 0) {
-                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_ral') || 'RAL не знайдено'}</p>`;
+                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_ral') || 'RAL nie znaleziono'}</p>`;
                 return;
             }
 
@@ -2324,7 +2380,7 @@ window.SICOMIX = window.SICOMIX || {};
             ralCatalog.innerHTML = html;
         }
 
-        // ---------- ДОДАВАННЯ RAL (без додавання до каталогу) ----------
+        // ---------- DODAWANIE RAL (bez dodawania do katalogu) ----------
         function addRalToRecipe(code, hex) {
             const seriesSelect = document.getElementById('recipeSeries');
             const currentSeries = lockedSeries || (seriesSelect ? seriesSelect.value : null);
@@ -2382,7 +2438,7 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
         }
 
-        // ---------- СКАНУВАННЯ РЕЦЕПТУ З ФОТО ----------
+        // ---------- SKANOWANIE RECEPTURY Z ZDJĘCIA ----------
         async function scanRecipeFromPhoto() {
             const seriesSelect = document.getElementById('recipeSeries');
             if (!seriesSelect || !seriesSelect.value) {
@@ -2411,7 +2467,7 @@ window.SICOMIX = window.SICOMIX || {};
                         }
                     );
 
-                    console.log('Розпізнаний текст:', text);
+                    console.log('Rozpoznany tekst:', text);
 
                     const lines = text.split('\n').filter(line => line.trim().length > 0);
                     const targetSeries = lockedSeries || seriesSelect.value;
@@ -2494,7 +2550,7 @@ window.SICOMIX = window.SICOMIX || {};
                                         }
                                         ingredientSums[key].amount += amount;
                                     } else {
-                                        console.log('Не вдалося знайти фарбу для ідентифікатора:', identifier);
+                                        console.log('Nie udało się znaleźć farby dla identyfikatora:', identifier);
                                     }
                                 }
                             });
@@ -2573,7 +2629,7 @@ window.SICOMIX = window.SICOMIX || {};
                     );
 
                 } catch (error) {
-                    console.error('Помилка сканування:', error);
+                    console.error('Błąd skanowania:', error);
                     SICOMIX.utils.hideNotification();
                     SICOMIX.utils.showNotification(SICOMIX.i18n.t('scan_error'), 'error');
                 }
@@ -2582,7 +2638,7 @@ window.SICOMIX = window.SICOMIX || {};
             input.click();
         }
 
-        // ---------- ІНІЦІАЛІЗАЦІЯ ----------
+        // ---------- INICJALIZACJA ----------
         async function initApp() {
             cacheDOMElements();
             
@@ -2590,10 +2646,10 @@ window.SICOMIX = window.SICOMIX || {};
             if (auth) {
                 auth.onAuthStateChanged(async (user) => {
                     if (user) {
-                        console.log('Користувач увійшов:', user.email);
+                        console.log('Użytkownik zalogowany:', user.email);
                         await loadData();
                     } else {
-                        console.log('Користувач вийшов');
+                        console.log('Użytkownik wylogowany');
                         loadData();
                     }
                     initSettings();
