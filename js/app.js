@@ -968,7 +968,7 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         // ========== ОНОВЛЕНА ФУНКЦІЯ РЕЦЕПТІВ ==========
-        // Тепер усе велике, чітке і нічого не обрізається
+        // Назва рецепту тепер синя, велика, і при кліку відкриває редагування
         function renderRecipes() {
             if (!recipesContainer) return;
 
@@ -1005,9 +1005,11 @@ window.SICOMIX = window.SICOMIX || {};
                         
                         <!-- Правий блок (інформація + статистики) -->
                         <div style="flex: 1; min-width: 250px;">
-                            <!-- Верхній ряд: назва і чекбокс -->
+                            <!-- Верхній ряд: назва (клікабельна) і чекбокс -->
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-                                <h3 class="recipe-title" style="font-size: 22px; font-weight: 700; color: white; margin: 0;">${SICOMIX.utils.escapeHtml(r.name)}</h3>
+                                <h3 class="recipe-title" style="font-size: 24px; font-weight: 700; color: #1e3a8a; margin: 0; cursor: pointer;" onclick="SICOMIX.app.editRecipe('${r.id}')">
+                                    ${SICOMIX.utils.escapeHtml(r.name)}
+                                </h3>
                                 <div class="recipe-select-container" style="display: flex; align-items: center; gap: 8px;">
                                     <input type="checkbox" class="recipe-select" value="${r.id}" ${selectedRecipes.includes(r.id) ? 'checked' : ''} style="width: 20px; height: 20px;">
                                     <span style="font-size: 16px;">${SICOMIX.i18n.t('select')}</span>
