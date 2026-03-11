@@ -397,7 +397,7 @@
                 <div class="recipe-cards" id="recipesContainer"></div>
             </div>
 
-            <!-- CATALOG PAGE (видалено кнопку "Додати нову фарбу") -->
+            <!-- CATALOG PAGE -->
             <div class="page-content" id="catalog-page">
                 <h2 class="page-title" data-i18n="paint_catalog">Каталог фарб</h2>
                 <p class="page-description" data-i18n="catalog_desc_long">База всіх доступних фарб</p>
@@ -406,6 +406,7 @@
                         <input type="text" class="search-input" id="catalogSearch" placeholder="" data-i18n-placeholder="search_catalog">
                         <i class="fas fa-search search-icon"></i>
                     </div>
+                    <button class="btn btn-primary" id="addNewPaintBtn"><i class="fas fa-plus"></i> <span data-i18n="add_new_paint">Додати нову фарбу</span></button>
                 </div>
                 <div class="recipe-cards" id="paintCatalog"></div>
                 <div class="pagination-container">
@@ -503,7 +504,7 @@
                 </div>
             </div>
 
-            <!-- EXPORT PAGE (оновлено: прибрано "Обчислення") -->
+            <!-- EXPORT PAGE -->
             <div class="page-content" id="export-page">
                 <h2 class="page-title" data-i18n="export">Експорт даних</h2>
                 <p class="page-description" data-i18n="export_desc_long">Експортуйте ваші дані у різних форматах</p>
@@ -525,7 +526,9 @@
                             <label style="display: block; margin-bottom: 10px;">
                                 <input type="checkbox" id="exportPaintsCheckbox"> <span data-i18n="paint_catalog">Каталог фарб</span>
                             </label>
-                            <!-- Чекбокс "Обчислення" видалено -->
+                            <label style="display: block;">
+                                <input type="checkbox" id="exportCalculationsCheckbox"> <span data-i18n="calculations">Розрахунки</span>
+                            </label>
                         </div>
                     </div>
                     <div class="form-group">
