@@ -455,10 +455,17 @@ window.SICOMIX.data = (function() {
             "75M": { uk: "FARBA SICO SICOPLAST MAGENTA BAZA", pl: "FARBA SICO SICOPLAST MAGENTA BAZA", en: "FARBA SICO SICOPLAST MAGENTA BAZA", color: "#FF00FF" },
             "91/F": { uk: "FARBA SICO SICOPLAST BIAŁA FLASH", pl: "FARBA SICO SICOPLAST BIAŁA FLASH", en: "FARBA SICO SICOPLAST BIAŁA FLASH", color: "#FFFFFF" },
             "91/1": { uk: "FARBA SICO SICOPLAST BIAŁA KRYJĄCA", pl: "FARBA SICO SICOPLAST BIAŁA KRYJĄCA", en: "FARBA SICO SICOPLAST BIAŁA KRYJĄCA", color: "#F8F8FF" },
-            "91/61": { uk: "FARBA SICO SICOPLAST AMAZING WHITE", pl: "FARBA SICO SICOPLAST AMAZING WHITE", en: "FARBA SICO SICOPLAST AMAZING WHITE", color: "#FFFFFF" }
+            "91/61": { uk: "FARBA SICO SICOPLAST AMAZING WHITE", pl: "FARBA SICO SICOPLAST AMAZING WHITE", en: "FARBA SICO SICOPLAST AMAZING WHITE", color: "#FFFFFF" },
+            // Нові додатки
+            "1501HG": {
+                uk: "Захисний лак HG",
+                pl: "Lakier ochronny HG",
+                en: "Protective varnish HG",
+                color: "#CCCCCC"
+            }
         };
 
-        // ---------- МАСИВ КОДІВ ФАРБ (БЕЗ OTHER) ----------
+        // ---------- МАСИВ КОДІВ ФАРБ ----------
         const excelPaintCodes = [
             // ==================== EC ====================
             { code: "EC10", seriesId: "EC", colorCode: "10" },
@@ -911,7 +918,11 @@ window.SICOMIX.data = (function() {
             { code: "ECVF20", seriesId: "ECVF", colorCode: "20" },
             { code: "ECVF120", seriesId: "ECVF", colorCode: "120" },
             { code: "ECVF110", seriesId: "ECVF", colorCode: "110" },
-            { code: "ECVF100", seriesId: "ECVF", colorCode: "100" }
+            { code: "ECVF100", seriesId: "ECVF", colorCode: "100" },
+
+            // ==================== ДОДАТКИ ====================
+            { code: "EC1501HG", seriesId: "EC", colorCode: "1501HG" },
+            { code: "CF1501HG", seriesId: "CF", colorCode: "1501HG" }
         ];
 
         // Функція natural sort (оновлена)
@@ -1026,7 +1037,7 @@ window.SICOMIX.data = (function() {
 
         const paints = generatePaints();
 
-        // ---------- ДОДАТКИ (з доданими EC 1501 HG та CF 1501 HG) ----------
+        // ---------- ДОДАТКИ ----------
         const additives = [
             // Трансферні порошки
             {
@@ -1199,42 +1210,6 @@ window.SICOMIX.data = (function() {
                     uk: "Покращує адгезію УФ-фарб до складних поверхонь.",
                     pl: "Poprawia przyczepność farb UV do trudnych powierzchni.",
                     en: "Improves adhesion of UV inks to difficult surfaces."
-                }
-            },
-            // Додаток для серії EC
-            {
-                id: "add-ec-1501hg",
-                name: "EC 1501 HG",
-                series: "EC",
-                category: "Additives",
-                article: "EC1501HG",
-                displayName: {
-                    uk: "EC 1501 HG Лак захисний",
-                    pl: "EC 1501 HG Lakier ochronny",
-                    en: "EC 1501 HG Protective varnish"
-                },
-                description: {
-                    uk: "Захисний лак для серії EC, високий глянець, стійкість до стирання.",
-                    pl: "Lakier ochronny do serii EC, wysoki połysk, odporność na ścieranie.",
-                    en: "Protective varnish for EC series, high gloss, abrasion resistance."
-                }
-            },
-            // Додаток для серії CF
-            {
-                id: "add-cf-1501hg",
-                name: "CF 1501 HG",
-                series: "CF",
-                category: "Additives",
-                article: "CF1501HG",
-                displayName: {
-                    uk: "CF 1501 HG Лак захисний",
-                    pl: "CF 1501 HG Lakier ochronny",
-                    en: "CF 1501 HG Protective varnish"
-                },
-                description: {
-                    uk: "Захисний лак для серії CF, високий глянець, стійкість до стирання.",
-                    pl: "Lakier ochronny do serii CF, wysoki połysk, odporność na ścieranie.",
-                    en: "Protective varnish for CF series, high gloss, abrasion resistance."
                 }
             }
         ];
