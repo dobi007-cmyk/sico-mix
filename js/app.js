@@ -627,8 +627,29 @@ window.SICOMIX = window.SICOMIX || {};
                 }
             });
 
-            // Видаляємо обробник для кнопок у каталозі (вони більше не потрібні)
-            // Залишаємо тільки обробник для показу деталей (буде в renderPaintCatalog)
+            if (paintCatalogEl) {
+                paintCatalogEl.addEventListener('click', function(e) {
+                    const btn = e.target.closest('.glass-add-btn, .glass-remove-btn');
+                    if (!btn) return;
+                    e.stopPropagation();
+                    const paintId = btn.dataset.paintId;
+                    const paint = paintCatalog.find(p => String(p.id) === paintId);
+                    if (!paint) return;
+
+                    if (btn.classList.contains('glass-add-btn')) {
+                        const validation = validatePaintAddition(paint);
+                        if (validation.valid) {
+                            addPaintToRecipeFromCatalog(paint);
+                            updatePaintButton(paintId, true);
+                        } else {
+                            SICOMIX.utils.showNotification(validation.message, 'error');
+                        }
+                    } else if (btn.classList.contains('glass-remove-btn')) {
+                        removeIngredientByPaintId(paintId);
+                        updatePaintButton(paintId, false);
+                    }
+                });
+            }
         }
 
         // ---------- НАВІГАЦІЯ ----------
@@ -947,6 +968,7 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         // ========== НОВИЙ ДИЗАЙН КАРТКИ РЕЦЕПТУ ==========
+        // Головний акцент – на назві рецепту (великий білий шрифт)
         function renderRecipes() {
             if (!recipesContainer) return;
 
@@ -976,11 +998,14 @@ window.SICOMIX = window.SICOMIX || {};
                 return `
                 <div class="recipe-card" data-id="${r.id}" style="background: var(--bg-card); border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
                     <div style="display: flex; align-items: flex-start; gap: 15px;">
+                        <!-- Фото (невелике) -->
                         <div style="width: 70px; height: 70px; border-radius: 12px; background: linear-gradient(145deg, #3a86ff80, #7b2cbf80); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; overflow: hidden; flex-shrink: 0;">
                             ${photoHtml}
                         </div>
                         
+                        <!-- Основний контент -->
                         <div style="flex: 1;">
+                            <!-- Верхній ряд: назва і чекбокс -->
                             <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
                                 <h3 style="font-size: 28px; font-weight: 700; color: #ffffff; margin: 0; line-height: 1.2; cursor: pointer;" onclick="SICOMIX.app.editRecipe('${r.id}')">
                                     ${SICOMIX.utils.escapeHtml(r.name)}
@@ -991,12 +1016,14 @@ window.SICOMIX = window.SICOMIX || {};
                                 </div>
                             </div>
                             
+                            <!-- Категорія/серія -->
                             <div style="margin: 8px 0;">
                                 <span style="background: rgba(255,255,255,0.1); padding: 4px 14px; border-radius: 30px; font-size: 14px; display: inline-block;">
                                     ${SICOMIX.i18n.translateCategoryName(r.category)} / ${SICOMIX.utils.escapeHtml(r.series)}
                                 </span>
                             </div>
                             
+                            <!-- Статистики в рядок (іконки + значення) -->
                             <div style="display: flex; gap: 20px; margin: 12px 0; flex-wrap: wrap;">
                                 <div style="display: flex; align-items: center; gap: 5px;">
                                     <i class="fas fa-box" style="color: #3a86ff;"></i>
@@ -1012,8 +1039,10 @@ window.SICOMIX = window.SICOMIX || {};
                                 </div>
                             </div>
                             
+                            <!-- Опис (якщо є) -->
                             ${r.description ? `<p style="color: var(--text-secondary); font-size: 14px; margin: 5px 0 10px;">${SICOMIX.utils.escapeHtml(r.description)}</p>` : ''}
                             
+                            <!-- Кнопки -->
                             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
                                 <button class="recipe-btn edit-recipe" data-id="${r.id}" style="background: #3a86ff; border: none; color: white; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;">
                                     <i class="fas fa-edit"></i> Edytuj
@@ -1034,6 +1063,7 @@ window.SICOMIX = window.SICOMIX || {};
                 `;
             }).join('');
 
+            // Делегація подій для кнопок
             recipesContainer.addEventListener('click', function(e) {
                 const btn = e.target.closest('button');
                 if (!btn) return;
@@ -1060,6 +1090,7 @@ window.SICOMIX = window.SICOMIX || {};
                 }
             });
 
+            // Обробка чекбоксів
             recipesContainer.querySelectorAll('.recipe-select').forEach(cb => {
                 cb.removeEventListener('change', handleRecipeSelectChange);
                 cb.addEventListener('change', handleRecipeSelectChange);
@@ -1276,7 +1307,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- ЕТИКЕТКА ----------
+        // ---------- ЕТИКЕТКА (з кольорами як ви просили) ----------
         function printLabel(recipeId) {
             const recipe = recipes.find(r => String(r.id) === String(recipeId));
             if (!recipe) return;
@@ -1489,10 +1520,25 @@ window.SICOMIX = window.SICOMIX || {};
 
         // ---------- ФУНКЦІЯ ОНОВЛЕННЯ КНОПКИ НА КАРТЦІ ----------
         function updatePaintButton(paintId, isInRecipe) {
-            // Функція більше не використовується, але залишена для сумісності
+            const card = document.querySelector(`.paint-card-glass[data-paint-id="${paintId}"]`);
+            if (!card) return;
+            const btn = card.querySelector('.glass-add-btn, .glass-remove-btn');
+            if (btn) {
+                if (isInRecipe) {
+                    btn.classList.remove('glass-add-btn');
+                    btn.classList.add('glass-remove-btn');
+                    btn.innerHTML = '<i class="fas fa-trash"></i>';
+                    btn.title = SICOMIX.i18n.t('remove_from_recipe');
+                } else {
+                    btn.classList.remove('glass-remove-btn');
+                    btn.classList.add('glass-add-btn');
+                    btn.innerHTML = '<i class="fas fa-plus"></i>';
+                    btn.title = SICOMIX.i18n.t('add_ingredient');
+                }
+            }
         }
 
-        // ---------- КАТАЛОГ ФАРБ (оновлений) ----------
+        // ---------- КАТАЛОГ ФАРБ (оновлений: без кнопок, з покращеним пошуком) ----------
         function renderPaintCatalog(append = false) {
             if (!paintCatalogEl) {
                 console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -1639,7 +1685,6 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 }
 
-                // Обробники подій для серій
                 document.querySelectorAll('.toggle-series').forEach(btn => {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
@@ -1680,9 +1725,17 @@ window.SICOMIX = window.SICOMIX || {};
                     });
                 });
 
-                // Показ деталей при кліку на картку
+                document.querySelectorAll('.delete-paint').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const paintId = btn.dataset.paintId;
+                        if (paintId) deletePaint(paintId);
+                    });
+                });
+
                 document.querySelectorAll('.paint-card-glass').forEach(card => {
                     card.addEventListener('click', function(e) {
+                        if (e.target.closest('button')) return;
                         const paintId = this.dataset.paintId;
                         const paint = paintCatalog.find(p => String(p.id) === paintId);
                         if (paint) showPaintDetails(paint);
