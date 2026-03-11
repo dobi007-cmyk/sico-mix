@@ -1026,7 +1026,7 @@ window.SICOMIX.data = (function() {
 
         const paints = generatePaints();
 
-        // ---------- ДОДАТКИ (без дублів EC та CF) ----------
+        // ---------- ДОДАТКИ (з доданими EC 1501 HG та CF 1501 HG) ----------
         const additives = [
             // Трансферні порошки
             {
@@ -1199,6 +1199,42 @@ window.SICOMIX.data = (function() {
                     uk: "Покращує адгезію УФ-фарб до складних поверхонь.",
                     pl: "Poprawia przyczepność farb UV do trudnych powierzchni.",
                     en: "Improves adhesion of UV inks to difficult surfaces."
+                }
+            },
+            // Додаток для серії EC
+            {
+                id: "add-ec-1501hg",
+                name: "EC 1501 HG",
+                series: "EC",
+                category: "Additives",
+                article: "EC1501HG",
+                displayName: {
+                    uk: "EC 1501 HG Лак захисний",
+                    pl: "EC 1501 HG Lakier ochronny",
+                    en: "EC 1501 HG Protective varnish"
+                },
+                description: {
+                    uk: "Захисний лак для серії EC, високий глянець, стійкість до стирання.",
+                    pl: "Lakier ochronny do serii EC, wysoki połysk, odporność na ścieranie.",
+                    en: "Protective varnish for EC series, high gloss, abrasion resistance."
+                }
+            },
+            // Додаток для серії CF
+            {
+                id: "add-cf-1501hg",
+                name: "CF 1501 HG",
+                series: "CF",
+                category: "Additives",
+                article: "CF1501HG",
+                displayName: {
+                    uk: "CF 1501 HG Лак захисний",
+                    pl: "CF 1501 HG Lakier ochronny",
+                    en: "CF 1501 HG Protective varnish"
+                },
+                description: {
+                    uk: "Захисний лак для серії CF, високий глянець, стійкість до стирання.",
+                    pl: "Lakier ochronny do serii CF, wysoki połysk, odporność na ścieranie.",
+                    en: "Protective varnish for CF series, high gloss, abrasion resistance."
                 }
             }
         ];
