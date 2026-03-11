@@ -967,7 +967,9 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ---------- РЕЦЕПТИ (оновлено до точного дизайну з другого скріншоту) ----------
+        // ========== ОНОВЛЕНА ФУНКЦІЯ РЕЦЕПТІВ ==========
+        // Тепер усе чітко видно: три вертикальні блоки статистик праворуч,
+        // фото ліворуч, назва, категорія, опис, і чотири кнопки знизу
         function renderRecipes() {
             if (!recipesContainer) return;
 
@@ -997,18 +999,18 @@ window.SICOMIX = window.SICOMIX || {};
                 return `
                 <div class="recipe-card" data-id="${r.id}" style="background: var(--bg-card); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
                     <div style="display: flex; gap: 20px;">
-                        <!-- Ліва частина: фото -->
+                        <!-- Фото ліворуч (120x120) -->
                         <div class="recipe-image" style="width: 120px; height: 120px; border-radius: 16px; background: linear-gradient(145deg, #3a86ff80, #7b2cbf80); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; overflow: hidden; flex-shrink: 0;">
                             ${photoHtml}
                         </div>
                         
-                        <!-- Права частина: контент -->
+                        <!-- Основний контент (назва, категорія, опис) + статистики праворуч -->
                         <div style="flex: 1; display: flex; gap: 20px;">
-                            <!-- Ліва колонка з основною інформацією -->
+                            <!-- Ліва колонка: назва, категорія, опис -->
                             <div style="flex: 2;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <h3 class="recipe-title" style="font-size: 20px; font-weight: 700; color: white;">${SICOMIX.utils.escapeHtml(r.name)}</h3>
-                                    <div class="recipe-select-container" style="display: flex; align-items: center; gap: 6px;">
+                                    <h3 class="recipe-title" style="font-size: 20px; font-weight: 700; color: white; margin: 0;">${SICOMIX.utils.escapeHtml(r.name)}</h3>
+                                    <div class="recipe-select-container" style="display: flex; align-items: center; gap: 6px; margin-left: 10px;">
                                         <input type="checkbox" class="recipe-select" value="${r.id}" ${selectedRecipes.includes(r.id) ? 'checked' : ''} style="width: 18px; height: 18px;">
                                         <span style="font-size: 14px;">${SICOMIX.i18n.t('select')}</span>
                                     </div>
@@ -1018,12 +1020,12 @@ window.SICOMIX = window.SICOMIX || {};
                                     <span class="recipe-category" style="background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px; font-size: 13px;">${SICOMIX.i18n.translateCategoryName(r.category)} / ${SICOMIX.utils.escapeHtml(r.series)}</span>
                                 </div>
                                 
-                                <p class="recipe-description" style="color: var(--text-secondary); margin-bottom: 16px;">
+                                <p class="recipe-description" style="color: var(--text-secondary); margin-bottom: 0;">
                                     ${SICOMIX.utils.escapeHtml(r.description || SICOMIX.i18n.t('no_description'))}
                                 </p>
                             </div>
                             
-                            <!-- Права колонка: статистики вертикально -->
+                            <!-- Права колонка: три блоки статистик вертикально -->
                             <div style="width: 140px; display: flex; flex-direction: column; gap: 12px;">
                                 <div style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
                                     <div style="font-size: 13px; color: var(--text-secondary);">${SICOMIX.i18n.t('ingredients_count')}</div>
