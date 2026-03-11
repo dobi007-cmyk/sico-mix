@@ -967,7 +967,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ---------- РЕЦЕПТИ ----------
+        // ---------- РЕЦЕПТИ (оновлено до потрібного дизайну) ----------
         function renderRecipes() {
             if (!recipesContainer) return;
 
@@ -996,12 +996,12 @@ window.SICOMIX = window.SICOMIX || {};
 
                 return `
                 <div class="recipe-card" data-id="${r.id}" style="background: var(--bg-card); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
-                    <div style="display: flex; gap: 20px;">
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
                         <div class="recipe-image" style="width: 100px; height: 100px; border-radius: 16px; background: linear-gradient(145deg, #3a86ff80, #7b2cbf80); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; overflow: hidden;">
                             ${photoHtml}
                         </div>
-                        <div style="flex: 1;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
                                 <h3 class="recipe-title" style="font-size: 20px; font-weight: 700; color: white;">${SICOMIX.utils.escapeHtml(r.name)}</h3>
                                 <div class="recipe-select-container" style="display: flex; align-items: center; gap: 6px;">
                                     <input type="checkbox" class="recipe-select" value="${r.id}" ${selectedRecipes.includes(r.id) ? 'checked' : ''} style="width: 18px; height: 18px;">
@@ -1015,24 +1015,24 @@ window.SICOMIX = window.SICOMIX || {};
                                 ${SICOMIX.utils.escapeHtml(r.description || SICOMIX.i18n.t('no_description'))}
                             </p>
 
-                            <!-- Statystyki w trzech prostokątach -->
-                            <div style="display: flex; gap: 16px; margin-bottom: 20px;">
-                                <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
+                            <!-- Три статистики (Складників, Вага, Дата) -->
+                            <div style="display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 80px; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
                                     <div style="font-size: 13px; color: var(--text-secondary);">${SICOMIX.i18n.t('ingredients_count')}</div>
                                     <div style="font-size: 24px; font-weight: 700;">${r.ingredients.length}</div>
                                 </div>
-                                <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
+                                <div style="flex: 1; min-width: 80px; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
                                     <div style="font-size: 13px; color: var(--text-secondary);">${SICOMIX.i18n.t('total_weight')}</div>
                                     <div style="font-size: 24px; font-weight: 700;">${total} ${SICOMIX.i18n.localizeUnitSymbol('г')}</div>
                                 </div>
-                                <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
+                                <div style="flex: 1; min-width: 80px; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
                                     <div style="font-size: 13px; color: var(--text-secondary);">${SICOMIX.i18n.t('date')}</div>
                                     <div style="font-size: 18px; font-weight: 600;">${SICOMIX.utils.escapeHtml(r.date)}</div>
                                 </div>
                             </div>
 
-                            <!-- Przyciski akcji -->
-                            <div class="recipe-actions" style="display: flex; gap: 12px;">
+                            <!-- Чотири кнопки з адаптивним переносом -->
+                            <div class="recipe-actions" style="display: flex; gap: 12px; flex-wrap: wrap;">
                                 <button class="recipe-btn edit-recipe" data-id="${r.id}" style="background: #3a86ff; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
                                     <i class="fas fa-edit"></i> ${SICOMIX.i18n.t('edit')}
                                 </button>
@@ -1052,7 +1052,7 @@ window.SICOMIX = window.SICOMIX || {};
                 `;
             }).join('');
 
-            // DELEGACJA ZDARZEŃ – jeden nasłuchiwacz dla wszystkich przycisków w kontenerze
+            // Делегація подій для кнопок
             recipesContainer.addEventListener('click', function(e) {
                 const btn = e.target.closest('button');
                 if (!btn) return;
@@ -1079,14 +1079,14 @@ window.SICOMIX = window.SICOMIX || {};
                 }
             });
 
-            // Obsługa checkboxów (oddzielnie, bo to nie przyciski)
+            // Обробка чекбоксів
             recipesContainer.querySelectorAll('.recipe-select').forEach(cb => {
                 cb.removeEventListener('change', handleRecipeSelectChange);
                 cb.addEventListener('change', handleRecipeSelectChange);
             });
         }
 
-        // Funkcja pomocnicza do zarządzania zaznaczonymi recepturami
+        // Допоміжна функція для чекбоксів
         function handleRecipeSelectChange(e) {
             const id = e.target.value;
             if (e.target.checked) {
@@ -1296,7 +1296,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- STYLNA ETYKIETA DLA FARBY MIESZANEJ (wg wzoru) ----------
+        // ---------- ЕТИКЕТКА (з чорним текстом попередження) ----------
         function printLabel(recipeId) {
             const recipe = recipes.find(r => String(r.id) === String(recipeId));
             if (!recipe) return;
@@ -1425,7 +1425,7 @@ window.SICOMIX = window.SICOMIX || {};
                         font-size: 10px;
                         text-transform: uppercase;
                         font-weight: 600;
-                        color: #b91c1c;
+                        color: #000000; /* змінено з червоного на чорний */
                         text-align: center;
                         border-top: 1px dashed #9ca3af;
                         padding-top: 10px;
@@ -1501,7 +1501,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- FUNKCJA AKTUALIZUJĄCA PRZYCISK NA KARCIE ----------
+        // ---------- ФУНКЦІЯ ОНОВЛЕННЯ КНОПКИ НА КАРТЦІ ----------
         function updatePaintButton(paintId, isInRecipe) {
             const card = document.querySelector(`.paint-card-glass[data-paint-id="${paintId}"]`);
             if (!card) return;
@@ -1521,10 +1521,10 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ---------- KATALOG FARB ----------
+        // ---------- КАТАЛОГ ФАРБ ----------
         function renderPaintCatalog(append = false) {
             if (!paintCatalogEl) {
-                console.warn('⚠️ paintCatalogEl nie znaleziony!');
+                console.warn('⚠️ paintCatalogEl не знайдено!');
                 return;
             }
 
@@ -1636,7 +1636,7 @@ window.SICOMIX = window.SICOMIX || {};
                 });
 
                 if (search && !append) {
-                    const statsHtml = `<div class="search-stats"><i class="fas fa-search"></i> Znaleziono farb: ${totalFoundPaints} w ${paginatedSeries.length} seriach</div>`;
+                    const statsHtml = `<div class="search-stats"><i class="fas fa-search"></i> Знайдено фарб: ${totalFoundPaints} у ${paginatedSeries.length} серіях</div>`;
                     html = statsHtml + html;
                 }
 
@@ -1732,7 +1732,7 @@ window.SICOMIX = window.SICOMIX || {};
                 SICOMIX.i18n.applyTranslations();
 
             } catch (error) {
-                console.error('❌ Błąd w renderPaintCatalog:', error);
+                console.error('❌ Помилка в renderPaintCatalog:', error);
                 paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
                     <i class="fas fa-exclamation-triangle"></i> ${SICOMIX.i18n.t('catalog_render_error')}<br>${SICOMIX.utils.escapeHtml(error.message)}
                 </p>`;
@@ -1764,7 +1764,7 @@ window.SICOMIX = window.SICOMIX || {};
             document.body.style.overflow = 'hidden';
         }
 
-        // ---------- DODAWANIE FARBY Z KATALOGU ----------
+        // ---------- ДОДАВАННЯ ФАРБИ З КАТАЛОГУ ----------
         function addPaintToRecipeFromCatalog(paint) {
             const validation = validatePaintAddition(paint);
             if (!validation.valid) {
@@ -1932,7 +1932,7 @@ window.SICOMIX = window.SICOMIX || {};
             if (headerPaintCount) headerPaintCount.textContent = count;
         }
 
-        // ---------- EDYCJA RECEPTURY ----------
+        // ---------- РЕДАГУВАННЯ РЕЦЕПТУ ----------
         function editRecipe(id) {
             const recipe = recipes.find(r => String(r.id) === String(id));
             if (!recipe) return;
@@ -1971,7 +1971,7 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.showNotification(`"${SICOMIX.utils.escapeHtml(recipe.name)}" ${SICOMIX.i18n.t('edit')}`, 'info');
         }
 
-        // ---------- USTAWIENIA ----------
+        // ---------- НАЛАШТУВАННЯ ----------
         function saveSettings() {
             currentSettings = {
                 language: languageSelect.value,
@@ -2025,7 +2025,7 @@ window.SICOMIX = window.SICOMIX || {};
             );
         }
 
-        // ---------- IMPORT/EKSPORT ----------
+        // ---------- ІМПОРТ/ЕКСПОРТ ----------
         function startImport() {
             if (!importFile || !importFile.files || importFile.files.length === 0) {
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_import_file'), 'error');
@@ -2101,7 +2101,7 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('exported') + '!', 'success');
         }
 
-        // ---------- FUNKCJE POMOCNICZE ----------
+        // ---------- ДОПОМІЖНІ ФУНКЦІЇ ----------
         function populateCategoryFilters() {
             const uniqueCategories = [...new Set(paintCatalog.map(p => p.category).filter(Boolean))].sort();
             
@@ -2187,7 +2187,7 @@ window.SICOMIX = window.SICOMIX || {};
             fileNameSpan.textContent = SICOMIX.i18n.t('upload_photo');
         }
 
-        // ---------- FUNKCJA WYŚWIETLANIA PANTONE ----------
+        // ---------- ФУНКЦІЯ ДЛЯ ВІДОБРАЖЕННЯ ПАНТОНІВ ----------
         function renderPantoneCatalog() {
             if (!pantoneCatalog) {
                 console.warn('pantoneCatalog element not found');
@@ -2195,7 +2195,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             if (!SICOMIX.pantone || !SICOMIX.pantone.colors) {
-                pantoneCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Dane Pantone nie zostały załadowane</p>`;
+                pantoneCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Дані Pantone не завантажено</p>`;
                 return;
             }
 
@@ -2270,7 +2270,7 @@ window.SICOMIX = window.SICOMIX || {};
             document.body.style.overflow = 'hidden';
         }
 
-        // ---------- DODAWANIE PANTONE (bez dodawania do katalogu) ----------
+        // ---------- ДОДАВАННЯ PANTONE (без додавання до каталогу) ----------
         function addPantoneToRecipe(pantoneNumber) {
             const pantone = SICOMIX.pantone.findByNumber(pantoneNumber);
             if (!pantone) return;
@@ -2283,7 +2283,7 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
-            // Tworzymy tymczasowy obiekt farby (NIE dodajemy do userPaints)
+            // Створюємо тимчасовий об'єкт фарби (НЕ додаємо до userPaints)
             const tempPaintId = 'pantone-' + pantone.number.replace(/\s+/g, '_');
             const tempPaint = {
                 id: tempPaintId,
@@ -2340,7 +2340,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             if (!window.ralColors || !Array.isArray(window.ralColors)) {
-                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Dane RAL nie zostały załadowane</p>`;
+                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Дані RAL не завантажено</p>`;
                 return;
             }
 
@@ -2356,7 +2356,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             if (filtered.length === 0) {
-                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_ral') || 'RAL nie znaleziono'}</p>`;
+                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_ral') || 'RAL не знайдено'}</p>`;
                 return;
             }
 
@@ -2380,7 +2380,7 @@ window.SICOMIX = window.SICOMIX || {};
             ralCatalog.innerHTML = html;
         }
 
-        // ---------- DODAWANIE RAL (bez dodawania do katalogu) ----------
+        // ---------- ДОДАВАННЯ RAL (без додавання до каталогу) ----------
         function addRalToRecipe(code, hex) {
             const seriesSelect = document.getElementById('recipeSeries');
             const currentSeries = lockedSeries || (seriesSelect ? seriesSelect.value : null);
@@ -2438,7 +2438,7 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
         }
 
-        // ---------- SKANOWANIE RECEPTURY Z ZDJĘCIA ----------
+        // ---------- СКАНУВАННЯ РЕЦЕПТУ З ФОТО ----------
         async function scanRecipeFromPhoto() {
             const seriesSelect = document.getElementById('recipeSeries');
             if (!seriesSelect || !seriesSelect.value) {
@@ -2467,7 +2467,7 @@ window.SICOMIX = window.SICOMIX || {};
                         }
                     );
 
-                    console.log('Rozpoznany tekst:', text);
+                    console.log('Розпізнаний текст:', text);
 
                     const lines = text.split('\n').filter(line => line.trim().length > 0);
                     const targetSeries = lockedSeries || seriesSelect.value;
@@ -2550,7 +2550,7 @@ window.SICOMIX = window.SICOMIX || {};
                                         }
                                         ingredientSums[key].amount += amount;
                                     } else {
-                                        console.log('Nie udało się znaleźć farby dla identyfikatora:', identifier);
+                                        console.log('Не вдалося знайти фарбу для ідентифікатора:', identifier);
                                     }
                                 }
                             });
@@ -2629,7 +2629,7 @@ window.SICOMIX = window.SICOMIX || {};
                     );
 
                 } catch (error) {
-                    console.error('Błąd skanowania:', error);
+                    console.error('Помилка сканування:', error);
                     SICOMIX.utils.hideNotification();
                     SICOMIX.utils.showNotification(SICOMIX.i18n.t('scan_error'), 'error');
                 }
@@ -2638,7 +2638,7 @@ window.SICOMIX = window.SICOMIX || {};
             input.click();
         }
 
-        // ---------- INICJALIZACJA ----------
+        // ---------- ІНІЦІАЛІЗАЦІЯ ----------
         async function initApp() {
             cacheDOMElements();
             
@@ -2646,10 +2646,10 @@ window.SICOMIX = window.SICOMIX || {};
             if (auth) {
                 auth.onAuthStateChanged(async (user) => {
                     if (user) {
-                        console.log('Użytkownik zalogowany:', user.email);
+                        console.log('Користувач увійшов:', user.email);
                         await loadData();
                     } else {
-                        console.log('Użytkownik wylogowany');
+                        console.log('Користувач вийшов');
                         loadData();
                     }
                     initSettings();
