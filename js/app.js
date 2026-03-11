@@ -1015,7 +1015,7 @@ window.SICOMIX = window.SICOMIX || {};
                                 ${SICOMIX.utils.escapeHtml(r.description || SICOMIX.i18n.t('no_description'))}
                             </p>
 
-                            <!-- Три статистики (Складників, Вага, Дата) -->
+                            <!-- Три статистики в ряд -->
                             <div style="display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
                                 <div style="flex: 1; min-width: 80px; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
                                     <div style="font-size: 13px; color: var(--text-secondary);">${SICOMIX.i18n.t('ingredients_count')}</div>
@@ -1034,16 +1034,16 @@ window.SICOMIX = window.SICOMIX || {};
                             <!-- Чотири кнопки з адаптивним переносом -->
                             <div class="recipe-actions" style="display: flex; gap: 12px; flex-wrap: wrap;">
                                 <button class="recipe-btn edit-recipe" data-id="${r.id}" style="background: #3a86ff; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                                    <i class="fas fa-edit"></i> ${SICOMIX.i18n.t('edit')}
+                                    <i class="fas fa-edit"></i> Edytyuj
                                 </button>
                                 <button class="recipe-btn delete-recipe" data-id="${r.id}" style="background: #e63946; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                                    <i class="fas fa-trash"></i> ${SICOMIX.i18n.t('delete')}
+                                    <i class="fas fa-trash"></i> Usun
                                 </button>
                                 <button class="recipe-btn export-recipe" data-id="${r.id}" style="background: #f4a261; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                                    <i class="fas fa-download"></i> ${SICOMIX.i18n.t('export')}
+                                    <i class="fas fa-download"></i> Eksport
                                 </button>
                                 <button class="recipe-btn print-label" data-recipe-id="${r.id}" style="background: #6d28d9; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                                    <i class="fas fa-tag"></i> ${SICOMIX.i18n.t('print_label')}
+                                    <i class="fas fa-tag"></i> Etykieta
                                 </button>
                             </div>
                         </div>
@@ -1296,7 +1296,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- ЕТИКЕТКА (з чорним текстом попередження) ----------
+        // ---------- ЕТИКЕТКА (оновлено кольори) ----------
         function printLabel(recipeId) {
             const recipe = recipes.find(r => String(r.id) === String(recipeId));
             if (!recipe) return;
@@ -1353,11 +1353,13 @@ window.SICOMIX = window.SICOMIX || {};
                         letter-spacing: 1px;
                         text-transform: uppercase;
                         margin-bottom: 4px;
+                        color: #e63946; /* червоний */
                     }
                     .header .sub {
                         font-size: 14px;
                         font-weight: 500;
                         opacity: 0.9;
+                        color: #000000; /* чорний */
                     }
                     .product-info {
                         padding: 20px;
@@ -1367,7 +1369,7 @@ window.SICOMIX = window.SICOMIX || {};
                     .product-name {
                         font-size: 28px;
                         font-weight: 700;
-                        color: #1e3a8a;
+                        color: #1e3a8a; /* синій */
                         margin-bottom: 5px;
                         line-height: 1.2;
                     }
@@ -1375,7 +1377,7 @@ window.SICOMIX = window.SICOMIX || {};
                         display: flex;
                         justify-content: space-between;
                         font-size: 14px;
-                        color: #4b5563;
+                        color: #000000; /* чорний */
                         margin-bottom: 10px;
                     }
                     .weight-box {
@@ -1387,7 +1389,7 @@ window.SICOMIX = window.SICOMIX || {};
                         margin: 15px 0;
                         font-size: 32px;
                         font-weight: 800;
-                        color: #1e3a8a;
+                        color: #1e3a8a; /* синій */
                         display: inline-block;
                         min-width: 200px;
                     }
@@ -1400,32 +1402,36 @@ window.SICOMIX = window.SICOMIX || {};
                         background: #f3f4f6;
                         padding: 20px;
                         font-size: 12px;
-                        color: #374151;
+                        color: #000000; /* чорний */
                         border-top: 1px solid #d1d5db;
                     }
                     .footer .distributor {
                         font-weight: 600;
                         margin-bottom: 5px;
+                        color: #000000;
                     }
                     .footer .address {
                         line-height: 1.5;
                         margin-bottom: 5px;
+                        color: #000000;
                     }
                     .footer .contact {
                         margin-bottom: 10px;
+                        color: #000000;
                     }
                     .footer .producer {
                         font-style: italic;
                         border-top: 1px solid #9ca3af;
                         padding-top: 8px;
                         margin-top: 8px;
+                        color: #000000;
                     }
                     .footer .note {
                         margin-top: 15px;
                         font-size: 10px;
                         text-transform: uppercase;
                         font-weight: 600;
-                        color: #000000; /* змінено з червоного на чорний */
+                        color: #e63946; /* червоний */
                         text-align: center;
                         border-top: 1px dashed #9ca3af;
                         padding-top: 10px;
@@ -1439,7 +1445,7 @@ window.SICOMIX = window.SICOMIX || {};
                     .logo-text {
                         font-size: 20px;
                         font-weight: 800;
-                        color: #1e3a8a;
+                        color: #e63946; /* червоний */
                         background: #fbbf24;
                         padding: 5px 15px;
                         border-radius: 40px;
