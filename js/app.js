@@ -967,7 +967,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ---------- РЕЦЕПТИ (оновлено до потрібного дизайну) ----------
+        // ---------- РЕЦЕПТИ (оновлено до точного дизайну з другого скріншоту) ----------
         function renderRecipes() {
             if (!recipesContainer) return;
 
@@ -996,57 +996,65 @@ window.SICOMIX = window.SICOMIX || {};
 
                 return `
                 <div class="recipe-card" data-id="${r.id}" style="background: var(--bg-card); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
-                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                        <div class="recipe-image" style="width: 100px; height: 100px; border-radius: 16px; background: linear-gradient(145deg, #3a86ff80, #7b2cbf80); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; overflow: hidden;">
+                    <div style="display: flex; gap: 20px;">
+                        <!-- Ліва частина: фото -->
+                        <div class="recipe-image" style="width: 120px; height: 120px; border-radius: 16px; background: linear-gradient(145deg, #3a86ff80, #7b2cbf80); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; overflow: hidden; flex-shrink: 0;">
                             ${photoHtml}
                         </div>
-                        <div style="flex: 1; min-width: 200px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-                                <h3 class="recipe-title" style="font-size: 20px; font-weight: 700; color: white;">${SICOMIX.utils.escapeHtml(r.name)}</h3>
-                                <div class="recipe-select-container" style="display: flex; align-items: center; gap: 6px;">
-                                    <input type="checkbox" class="recipe-select" value="${r.id}" ${selectedRecipes.includes(r.id) ? 'checked' : ''} style="width: 18px; height: 18px;">
-                                    <span style="font-size: 14px;">${SICOMIX.i18n.t('select')}</span>
+                        
+                        <!-- Права частина: контент -->
+                        <div style="flex: 1; display: flex; gap: 20px;">
+                            <!-- Ліва колонка з основною інформацією -->
+                            <div style="flex: 2;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <h3 class="recipe-title" style="font-size: 20px; font-weight: 700; color: white;">${SICOMIX.utils.escapeHtml(r.name)}</h3>
+                                    <div class="recipe-select-container" style="display: flex; align-items: center; gap: 6px;">
+                                        <input type="checkbox" class="recipe-select" value="${r.id}" ${selectedRecipes.includes(r.id) ? 'checked' : ''} style="width: 18px; height: 18px;">
+                                        <span style="font-size: 14px;">${SICOMIX.i18n.t('select')}</span>
+                                    </div>
                                 </div>
+                                
+                                <div style="margin-bottom: 12px;">
+                                    <span class="recipe-category" style="background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px; font-size: 13px;">${SICOMIX.i18n.translateCategoryName(r.category)} / ${SICOMIX.utils.escapeHtml(r.series)}</span>
+                                </div>
+                                
+                                <p class="recipe-description" style="color: var(--text-secondary); margin-bottom: 16px;">
+                                    ${SICOMIX.utils.escapeHtml(r.description || SICOMIX.i18n.t('no_description'))}
+                                </p>
                             </div>
-                            <div style="margin-bottom: 12px;">
-                                <span class="recipe-category" style="background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px; font-size: 13px;">${SICOMIX.i18n.translateCategoryName(r.category)} / ${SICOMIX.utils.escapeHtml(r.series)}</span>
-                            </div>
-                            <p class="recipe-description" style="color: var(--text-secondary); margin-bottom: 16px;">
-                                ${SICOMIX.utils.escapeHtml(r.description || SICOMIX.i18n.t('no_description'))}
-                            </p>
-
-                            <!-- Три статистики в ряд -->
-                            <div style="display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
-                                <div style="flex: 1; min-width: 80px; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
+                            
+                            <!-- Права колонка: статистики вертикально -->
+                            <div style="width: 140px; display: flex; flex-direction: column; gap: 12px;">
+                                <div style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
                                     <div style="font-size: 13px; color: var(--text-secondary);">${SICOMIX.i18n.t('ingredients_count')}</div>
                                     <div style="font-size: 24px; font-weight: 700;">${r.ingredients.length}</div>
                                 </div>
-                                <div style="flex: 1; min-width: 80px; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
+                                <div style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
                                     <div style="font-size: 13px; color: var(--text-secondary);">${SICOMIX.i18n.t('total_weight')}</div>
                                     <div style="font-size: 24px; font-weight: 700;">${total} ${SICOMIX.i18n.localizeUnitSymbol('г')}</div>
                                 </div>
-                                <div style="flex: 1; min-width: 80px; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
+                                <div style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; text-align: center;">
                                     <div style="font-size: 13px; color: var(--text-secondary);">${SICOMIX.i18n.t('date')}</div>
                                     <div style="font-size: 18px; font-weight: 600;">${SICOMIX.utils.escapeHtml(r.date)}</div>
                                 </div>
                             </div>
-
-                            <!-- Чотири кнопки з адаптивним переносом -->
-                            <div class="recipe-actions" style="display: flex; gap: 12px; flex-wrap: wrap;">
-                                <button class="recipe-btn edit-recipe" data-id="${r.id}" style="background: #3a86ff; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                                    <i class="fas fa-edit"></i> Edytyuj
-                                </button>
-                                <button class="recipe-btn delete-recipe" data-id="${r.id}" style="background: #e63946; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                                    <i class="fas fa-trash"></i> Usun
-                                </button>
-                                <button class="recipe-btn export-recipe" data-id="${r.id}" style="background: #f4a261; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                                    <i class="fas fa-download"></i> Eksport
-                                </button>
-                                <button class="recipe-btn print-label" data-recipe-id="${r.id}" style="background: #6d28d9; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                                    <i class="fas fa-tag"></i> Etykieta
-                                </button>
-                            </div>
                         </div>
+                    </div>
+                    
+                    <!-- Кнопки в окремому рядку знизу, вирівняні по правому краю -->
+                    <div class="recipe-actions" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
+                        <button class="recipe-btn edit-recipe" data-id="${r.id}" style="background: #3a86ff; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-edit"></i> Edytyuj
+                        </button>
+                        <button class="recipe-btn delete-recipe" data-id="${r.id}" style="background: #e63946; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-trash"></i> Usuń
+                        </button>
+                        <button class="recipe-btn export-recipe" data-id="${r.id}" style="background: #f4a261; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-download"></i> Eksport
+                        </button>
+                        <button class="recipe-btn print-label" data-recipe-id="${r.id}" style="background: #6d28d9; border: none; color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-tag"></i> Etykieta
+                        </button>
                     </div>
                 </div>
                 `;
@@ -1296,7 +1304,7 @@ window.SICOMIX = window.SICOMIX || {};
             printWindow.print();
         }
 
-        // ---------- ЕТИКЕТКА (оновлено кольори) ----------
+        // ---------- ЕТИКЕТКА (з кольорами як ви просили) ----------
         function printLabel(recipeId) {
             const recipe = recipes.find(r => String(r.id) === String(recipeId));
             if (!recipe) return;
@@ -1353,13 +1361,13 @@ window.SICOMIX = window.SICOMIX || {};
                         letter-spacing: 1px;
                         text-transform: uppercase;
                         margin-bottom: 4px;
-                        color: #e63946; /* червоний */
+                        color: #e63946;
                     }
                     .header .sub {
                         font-size: 14px;
                         font-weight: 500;
                         opacity: 0.9;
-                        color: #000000; /* чорний */
+                        color: #000000;
                     }
                     .product-info {
                         padding: 20px;
@@ -1369,7 +1377,7 @@ window.SICOMIX = window.SICOMIX || {};
                     .product-name {
                         font-size: 28px;
                         font-weight: 700;
-                        color: #1e3a8a; /* синій */
+                        color: #1e3a8a;
                         margin-bottom: 5px;
                         line-height: 1.2;
                     }
@@ -1377,7 +1385,7 @@ window.SICOMIX = window.SICOMIX || {};
                         display: flex;
                         justify-content: space-between;
                         font-size: 14px;
-                        color: #000000; /* чорний */
+                        color: #000000;
                         margin-bottom: 10px;
                     }
                     .weight-box {
@@ -1389,7 +1397,7 @@ window.SICOMIX = window.SICOMIX || {};
                         margin: 15px 0;
                         font-size: 32px;
                         font-weight: 800;
-                        color: #1e3a8a; /* синій */
+                        color: #1e3a8a;
                         display: inline-block;
                         min-width: 200px;
                     }
@@ -1402,7 +1410,7 @@ window.SICOMIX = window.SICOMIX || {};
                         background: #f3f4f6;
                         padding: 20px;
                         font-size: 12px;
-                        color: #000000; /* чорний */
+                        color: #000000;
                         border-top: 1px solid #d1d5db;
                     }
                     .footer .distributor {
@@ -1431,7 +1439,7 @@ window.SICOMIX = window.SICOMIX || {};
                         font-size: 10px;
                         text-transform: uppercase;
                         font-weight: 600;
-                        color: #e63946; /* червоний */
+                        color: #e63946;
                         text-align: center;
                         border-top: 1px dashed #9ca3af;
                         padding-top: 10px;
@@ -1445,7 +1453,7 @@ window.SICOMIX = window.SICOMIX || {};
                     .logo-text {
                         font-size: 20px;
                         font-weight: 800;
-                        color: #e63946; /* червоний */
+                        color: #e63946;
                         background: #fbbf24;
                         padding: 5px 15px;
                         border-radius: 40px;
