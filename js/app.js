@@ -1,3 +1,4 @@
+
 // ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ ==========
 window.SICOMIX = window.SICOMIX || {};
 
@@ -967,8 +968,8 @@ window.SICOMIX = window.SICOMIX || {};
             }
         }
 
-        // ========== ОНОВЛЕНА ФУНКЦІЯ РЕЦЕПТІВ ==========
-        // Назва рецепту тепер синя, велика, і при кліку відкриває редагування
+        // ========== НОВИЙ ДИЗАЙН КАРТКИ РЕЦЕПТУ ==========
+        // Головний акцент – на назві рецепту (великий синій шрифт)
         function renderRecipes() {
             if (!recipesContainer) return;
 
@@ -996,66 +997,64 @@ window.SICOMIX = window.SICOMIX || {};
                     : `<i class="fas fa-palette"></i>`;
 
                 return `
-                <div class="recipe-card" data-id="${r.id}" style="background: var(--bg-card); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
-                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                        <!-- Фото ліворуч (120x120) -->
-                        <div class="recipe-image" style="width: 120px; height: 120px; border-radius: 16px; background: linear-gradient(145deg, #3a86ff80, #7b2cbf80); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; overflow: hidden; flex-shrink: 0;">
+                <div class="recipe-card" data-id="${r.id}" style="background: var(--bg-card); border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="display: flex; align-items: flex-start; gap: 15px;">
+                        <!-- Фото (невелике) -->
+                        <div style="width: 70px; height: 70px; border-radius: 12px; background: linear-gradient(145deg, #3a86ff80, #7b2cbf80); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; overflow: hidden; flex-shrink: 0;">
                             ${photoHtml}
                         </div>
                         
-                        <!-- Правий блок (інформація + статистики) -->
-                        <div style="flex: 1; min-width: 250px;">
-                            <!-- Верхній ряд: назва (клікабельна) і чекбокс -->
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-                                <h3 class="recipe-title" style="font-size: 24px; font-weight: 700; color: #1e3a8a; margin: 0; cursor: pointer;" onclick="SICOMIX.app.editRecipe('${r.id}')">
+                        <!-- Основний контент -->
+                        <div style="flex: 1;">
+                            <!-- Верхній ряд: назва і чекбокс -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <h3 style="font-size: 28px; font-weight: 700; color: #1e3a8a; margin: 0; line-height: 1.2; cursor: pointer;" onclick="SICOMIX.app.editRecipe('${r.id}')">
                                     ${SICOMIX.utils.escapeHtml(r.name)}
                                 </h3>
-                                <div class="recipe-select-container" style="display: flex; align-items: center; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
                                     <input type="checkbox" class="recipe-select" value="${r.id}" ${selectedRecipes.includes(r.id) ? 'checked' : ''} style="width: 20px; height: 20px;">
                                     <span style="font-size: 16px;">${SICOMIX.i18n.t('select')}</span>
                                 </div>
                             </div>
                             
                             <!-- Категорія/серія -->
-                            <div style="margin-bottom: 16px;">
-                                <span class="recipe-category" style="background: rgba(255,255,255,0.1); padding: 6px 16px; border-radius: 30px; font-size: 15px; display: inline-block;">
+                            <div style="margin: 8px 0;">
+                                <span style="background: rgba(255,255,255,0.1); padding: 4px 14px; border-radius: 30px; font-size: 14px; display: inline-block;">
                                     ${SICOMIX.i18n.translateCategoryName(r.category)} / ${SICOMIX.utils.escapeHtml(r.series)}
                                 </span>
                             </div>
                             
-                            <!-- Опис -->
-                            <p class="recipe-description" style="color: var(--text-secondary); margin-bottom: 20px; font-size: 15px; line-height: 1.5;">
-                                ${SICOMIX.utils.escapeHtml(r.description || SICOMIX.i18n.t('no_description'))}
-                            </p>
-                            
-                            <!-- Три блоки статистик (горизонтально) -->
-                            <div style="display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap;">
-                                <div style="flex: 1; min-width: 100px; background: rgba(255,255,255,0.05); border-radius: 20px; padding: 15px; text-align: center;">
-                                    <div style="font-size: 15px; color: var(--text-secondary); margin-bottom: 5px; white-space: normal;">${SICOMIX.i18n.t('ingredients_count')}</div>
-                                    <div style="font-size: 28px; font-weight: 700;">${r.ingredients.length}</div>
+                            <!-- Статистики в рядок (іконки + значення) -->
+                            <div style="display: flex; gap: 20px; margin: 12px 0; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <i class="fas fa-box" style="color: #3a86ff;"></i>
+                                    <span><strong>${r.ingredients.length}</strong> składników</span>
                                 </div>
-                                <div style="flex: 1; min-width: 100px; background: rgba(255,255,255,0.05); border-radius: 20px; padding: 15px; text-align: center;">
-                                    <div style="font-size: 15px; color: var(--text-secondary); margin-bottom: 5px; white-space: normal;">${SICOMIX.i18n.t('total_weight')}</div>
-                                    <div style="font-size: 28px; font-weight: 700;">${total} ${SICOMIX.i18n.localizeUnitSymbol('г')}</div>
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <i class="fas fa-weight-hanging" style="color: #f4a261;"></i>
+                                    <span><strong>${total} ${SICOMIX.i18n.localizeUnitSymbol('г')}</strong></span>
                                 </div>
-                                <div style="flex: 1; min-width: 100px; background: rgba(255,255,255,0.05); border-radius: 20px; padding: 15px; text-align: center;">
-                                    <div style="font-size: 15px; color: var(--text-secondary); margin-bottom: 5px; white-space: normal;">${SICOMIX.i18n.t('date')}</div>
-                                    <div style="font-size: 22px; font-weight: 600;">${SICOMIX.utils.escapeHtml(r.date)}</div>
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <i class="fas fa-calendar-alt" style="color: #6d28d9;"></i>
+                                    <span><strong>${SICOMIX.utils.escapeHtml(r.date)}</strong></span>
                                 </div>
                             </div>
                             
-                            <!-- Кнопки в ряд -->
-                            <div class="recipe-actions" style="display: flex; gap: 12px; flex-wrap: wrap;">
-                                <button class="recipe-btn edit-recipe" data-id="${r.id}" style="background: #3a86ff; border: none; color: white; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 15px;">
-                                    <i class="fas fa-edit"></i> Edytyuj
+                            <!-- Опис (якщо є) -->
+                            ${r.description ? `<p style="color: var(--text-secondary); font-size: 14px; margin: 5px 0 10px;">${SICOMIX.utils.escapeHtml(r.description)}</p>` : ''}
+                            
+                            <!-- Кнопки -->
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                                <button class="recipe-btn edit-recipe" data-id="${r.id}" style="background: #3a86ff; border: none; color: white; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;">
+                                    <i class="fas fa-edit"></i> Edytuj
                                 </button>
-                                <button class="recipe-btn delete-recipe" data-id="${r.id}" style="background: #e63946; border: none; color: white; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 15px;">
+                                <button class="recipe-btn delete-recipe" data-id="${r.id}" style="background: #e63946; border: none; color: white; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;">
                                     <i class="fas fa-trash"></i> Usuń
                                 </button>
-                                <button class="recipe-btn export-recipe" data-id="${r.id}" style="background: #f4a261; border: none; color: white; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 15px;">
+                                <button class="recipe-btn export-recipe" data-id="${r.id}" style="background: #f4a261; border: none; color: white; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;">
                                     <i class="fas fa-download"></i> Eksport
                                 </button>
-                                <button class="recipe-btn print-label" data-recipe-id="${r.id}" style="background: #6d28d9; border: none; color: white; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 15px;">
+                                <button class="recipe-btn print-label" data-recipe-id="${r.id}" style="background: #6d28d9; border: none; color: white; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;">
                                     <i class="fas fa-tag"></i> Etykieta
                                 </button>
                             </div>
