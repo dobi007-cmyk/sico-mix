@@ -1,4 +1,3 @@
-
 // ========== ОСНОВНИЙ МОДУЛЬ ДОДАТКУ ==========
 window.SICOMIX = window.SICOMIX || {};
 
@@ -969,7 +968,7 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         // ========== НОВИЙ ДИЗАЙН КАРТКИ РЕЦЕПТУ ==========
-        // Головний акцент – на назві рецепту (великий синій шрифт)
+        // Головний акцент – на назві рецепту (великий білий шрифт)
         function renderRecipes() {
             if (!recipesContainer) return;
 
@@ -1008,7 +1007,7 @@ window.SICOMIX = window.SICOMIX || {};
                         <div style="flex: 1;">
                             <!-- Верхній ряд: назва і чекбокс -->
                             <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
-                                <h3 style="font-size: 28px; font-weight: 700; color: #1e3a8a; margin: 0; line-height: 1.2; cursor: pointer;" onclick="SICOMIX.app.editRecipe('${r.id}')">
+                                <h3 style="font-size: 28px; font-weight: 700; color: #ffffff; margin: 0; line-height: 1.2; cursor: pointer;" onclick="SICOMIX.app.editRecipe('${r.id}')">
                                     ${SICOMIX.utils.escapeHtml(r.name)}
                                 </h3>
                                 <div style="display: flex; align-items: center; gap: 8px;">
