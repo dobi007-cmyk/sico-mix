@@ -1027,7 +1027,7 @@ window.SICOMIX = window.SICOMIX || {};
                             <div style="display: flex; gap: 20px; margin: 12px 0; flex-wrap: wrap;">
                                 <div style="display: flex; align-items: center; gap: 5px;">
                                     <i class="fas fa-box" style="color: #3a86ff;"></i>
-                                    <span><strong>${r.ingredients.length}</strong> składników</span>
+                                    <span><strong>${r.ingredients.length}</strong> ${SICOMIX.i18n.t('ingredients_count')}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 5px;">
                                     <i class="fas fa-weight-hanging" style="color: #f4a261;"></i>
@@ -1045,16 +1045,16 @@ window.SICOMIX = window.SICOMIX || {};
                             <!-- Кнопки -->
                             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
                                 <button class="recipe-btn edit-recipe" data-id="${r.id}" style="background: #3a86ff; border: none; color: white; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;">
-                                    <i class="fas fa-edit"></i> Edytuj
+                                    <i class="fas fa-edit"></i> ${SICOMIX.i18n.t('edit')}
                                 </button>
                                 <button class="recipe-btn delete-recipe" data-id="${r.id}" style="background: #e63946; border: none; color: white; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;">
-                                    <i class="fas fa-trash"></i> Usuń
+                                    <i class="fas fa-trash"></i> ${SICOMIX.i18n.t('delete')}
                                 </button>
                                 <button class="recipe-btn export-recipe" data-id="${r.id}" style="background: #f4a261; border: none; color: white; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;">
-                                    <i class="fas fa-download"></i> Eksport
+                                    <i class="fas fa-download"></i> ${SICOMIX.i18n.t('export')}
                                 </button>
                                 <button class="recipe-btn print-label" data-recipe-id="${r.id}" style="background: #6d28d9; border: none; color: white; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;">
-                                    <i class="fas fa-tag"></i> Etykieta
+                                    <i class="fas fa-tag"></i> ${SICOMIX.i18n.t('print_label')}
                                 </button>
                             </div>
                         </div>
@@ -1653,7 +1653,7 @@ window.SICOMIX = window.SICOMIX || {};
                 });
 
                 if (search && !append) {
-                    const statsHtml = `<div class="search-stats"><i class="fas fa-search"></i> Знайдено фарб: ${totalFoundPaints} у ${paginatedSeries.length} серіях</div>`;
+                    const statsHtml = `<div class="search-stats"><i class="fas fa-search"></i> ${SICOMIX.i18n.t('paints_found')}: ${totalFoundPaints} у ${paginatedSeries.length} ${SICOMIX.i18n.t('series')}</div>`;
                     html = statsHtml + html;
                 }
 
@@ -2212,7 +2212,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             if (!SICOMIX.pantone || !SICOMIX.pantone.colors) {
-                pantoneCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Дані Pantone не завантажено</p>`;
+                pantoneCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_pantone')}</p>`;
                 return;
             }
 
@@ -2357,7 +2357,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             if (!window.ralColors || !Array.isArray(window.ralColors)) {
-                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">Дані RAL не завантажено</p>`;
+                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_ral')}</p>`;
                 return;
             }
 
@@ -2373,7 +2373,7 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             if (filtered.length === 0) {
-                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_ral') || 'RAL не знайдено'}</p>`;
+                ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_ral')}</p>`;
                 return;
             }
 
