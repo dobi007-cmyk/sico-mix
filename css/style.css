@@ -1536,7 +1536,67 @@ body.theme-organic .paint-count {
     cursor: pointer;
 }
 
-/* Кнопка додавання фарби (вже є вище) */
+/* ===== КОМПОНУВАННЯ КАТАЛОГУ ===== */
+.catalog-layout-classic .series-paints {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.catalog-layout-compact .series-card {
+    padding: 16px;
+    margin-bottom: 16px;
+}
+.catalog-layout-compact .series-header h3 {
+    font-size: 22px;
+}
+.catalog-layout-compact .paint-card-glass {
+    padding: 12px;
+}
+.catalog-layout-compact .glass-swatch {
+    height: 80px;
+}
+.catalog-layout-compact .glass-name {
+    font-size: 14px;
+}
+.catalog-layout-compact .glass-article {
+    font-size: 10px;
+}
+
+.catalog-layout-list .series-paints {
+    display: block;
+}
+.catalog-layout-list .paint-card-glass {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 20px;
+    margin-bottom: 8px;
+}
+.catalog-layout-list .glass-swatch {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+.catalog-layout-list .glass-name {
+    flex: 1;
+    font-size: 16px;
+    white-space: normal;
+}
+.catalog-layout-list .glass-article {
+    width: 100px;
+    font-size: 14px;
+    margin-bottom: 0;
+}
+.catalog-layout-list .glass-add-btn,
+.catalog-layout-list .glass-remove-btn {
+    position: static;
+    opacity: 1;
+    transform: scale(1);
+    margin-left: auto;
+}
 
 /* Адаптація */
 @media (max-width: 768px) {
@@ -1555,6 +1615,34 @@ body.theme-organic .paint-count {
     }
     .paint-card-glass .glass-swatch {
         height: 100px;
+    }
+    .catalog-layout-list .paint-card-glass {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .catalog-layout-list .glass-swatch {
+        width: 100%;
+        height: 80px;
+    }
+    .catalog-layout-list .glass-name {
+        width: 100%;
+    }
+    .catalog-layout-list .glass-article {
+        width: 100%;
+    }
+    .catalog-layout-list .glass-add-btn,
+    .catalog-layout-list .glass-remove-btn {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    .catalog-layout-list .paint-card-glass:hover .glass-add-btn,
+    .catalog-layout-list .paint-card-glass:hover .glass-remove-btn {
+        opacity: 1;
+        transform: scale(1);
     }
 }
 
@@ -1704,21 +1792,21 @@ body.theme-organic .paint-count {
 /* ===== ПОКРАЩЕНА АДАПТАЦІЯ КНОПОК ===== */
 #addIngredientBtn,
 #scanRecipeBtn {
-    flex: 1 1 auto;           /* дозволяє зменшуватися, але не примушує до однакової ширини */
-    min-width: 200px;         /* мінімальна ширина, щоб не були занадто вузькими */
-    max-width: 300px;         /* максимальна ширина, щоб не розтягувалися на весь екран */
-    white-space: normal;      /* дозволяє переносити текст */
-    word-break: break-word;   /* переносить довгі слова */
+    flex: 1 1 auto;
+    min-width: 200px;
+    max-width: 300px;
+    white-space: normal;
+    word-break: break-word;
     text-align: center;
     line-height: 1.4;
-    padding: 14px 20px;       /* трохи зменшені горизонтальні відступи */
+    padding: 14px 20px;
 }
 
 /* На дуже маленьких екранах прибираємо обмеження, кнопки займають всю ширину */
 @media (max-width: 480px) {
     #addIngredientBtn,
     #scanRecipeBtn {
-        max-width: none;      /* прибираємо обмеження максимальної ширини */
-        width: 100%;          /* на всю ширину контейнера */
+        max-width: none;
+        width: 100%;
     }
 }
