@@ -1701,24 +1701,8 @@ body.theme-organic .paint-count {
     }
 }
 
-/* ===== ВИРІВНЮВАННЯ КНОПОК ===== */
+/* ===== ВИРІВНЮВАННЯ ШИРИНИ КНОПОК ===== */
+#addIngredientBtn,
 #scanRecipeBtn {
-    padding: 14px 28px;          /* такий самий відступ як у .btn-add */
-    font-size: 15px;             /* однаковий розмір шрифту */
-    border-radius: var(--radius-full);
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    border: none;
-    cursor: pointer;
-    transition: var(--transition-base);
-    background: linear-gradient(145deg, var(--spectrum-blue), var(--spectrum-violet));
-    color: white;
-    box-shadow: var(--shadow-glow);
-    white-space: nowrap;
-}
-#scanRecipeBtn:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-glow-hover);
+    flex: 1;
 }
