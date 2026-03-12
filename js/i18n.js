@@ -96,7 +96,7 @@ window.SICOMIX = window.SICOMIX || {};
             "ral_desc": "Кольори RAL Classic",
             "export_desc": "Експортуйте рецепти у різних форматах",
             
-            // ЗМІНЕНО: каталог
+            // ЗМІНЕНО
             "catalog_desc": "Каталог SICO Polska",
             "export_data": "Експорт",
             
@@ -254,6 +254,9 @@ window.SICOMIX = window.SICOMIX || {};
             "start_export": "Почати експорт",
             "select_data_to_export": "Виберіть дані для експорту",
             "invalid_file_format": "Невірний формат файлу",
+            // НОВІ ключі для імпорту
+            "select_data_to_import": "Виберіть тип даних для імпорту",
+            "and": "та",
             
             // Налаштування
             "settings_desc": "Налаштуйте систему за вашими потребами",
@@ -462,7 +465,7 @@ window.SICOMIX = window.SICOMIX || {};
             "ral_desc": "RAL Classic colors",
             "export_desc": "Export recipes in various formats",
             
-            // CHANGED: catalog
+            // CHANGED
             "catalog_desc": "SICO Polska Catalog",
             "export_data": "Export",
             
@@ -620,6 +623,9 @@ window.SICOMIX = window.SICOMIX || {};
             "start_export": "Start export",
             "select_data_to_export": "Select data to export",
             "invalid_file_format": "Invalid file format",
+            // NEW keys for import
+            "select_data_to_import": "Select data type to import",
+            "and": "and",
             
             // Settings
             "settings_desc": "Configure the system according to your needs",
@@ -828,7 +834,7 @@ window.SICOMIX = window.SICOMIX || {};
             "ral_desc": "Kolory RAL Classic",
             "export_desc": "Eksportuj receptury w różnych formatach",
             
-            // ZMIENIONO: katalog
+            // ZMIENIONO
             "catalog_desc": "Katalog SICO Polska",
             "export_data": "Eksport",
             
@@ -986,6 +992,9 @@ window.SICOMIX = window.SICOMIX || {};
             "start_export": "Rozpocznij eksport",
             "select_data_to_export": "Wybierz dane do eksportu",
             "invalid_file_format": "Nieprawidłowy format pliku",
+            // NOWE klucze dla importu
+            "select_data_to_import": "Wybierz typ danych do importu",
+            "and": "i",
             
             // Ustawienia
             "settings_desc": "Skonfiguruj system według swoich potrzeb",
