@@ -36,7 +36,7 @@ window.SICOMIX = window.SICOMIX || {};
         let languageSelect, unitsSelect, themeSelect, autoSaveCheckbox, backupCheckbox, saveSettingsBtn, resetSettingsBtn, clearAllDataBtn;
         let actionCards;
         let startImportBtn, startExportBtn, importFormat, exportFormat, importFile, importRecipesCheckbox, importPaintsCheckbox;
-        let exportRecipesCheckbox, exportPaintsCheckbox, exportCalculationsCheckbox, includePhotosCheckbox, compressDataCheckbox;
+        let exportRecipesCheckbox, includePhotosCheckbox; // Видалено exportPaintsCheckbox, exportCalculationsCheckbox, compressDataCheckbox
         let loadMoreCatalogBtn;
         let recipePhotoInput, recipePhotoPreview, recipePhotoImg, fileNameSpan;
         let seriesDetailsModal, closeSeriesModal, seriesDetailsTitle, seriesDetailsContent;
@@ -92,10 +92,7 @@ window.SICOMIX = window.SICOMIX || {};
             importRecipesCheckbox = document.getElementById('importRecipesCheckbox');
             importPaintsCheckbox = document.getElementById('importPaintsCheckbox');
             exportRecipesCheckbox = document.getElementById('exportRecipesCheckbox');
-            exportPaintsCheckbox = document.getElementById('exportPaintsCheckbox');
-            exportCalculationsCheckbox = document.getElementById('exportCalculationsCheckbox');
             includePhotosCheckbox = document.getElementById('includePhotosCheckbox');
-            compressDataCheckbox = document.getElementById('compressDataCheckbox');
             loadMoreCatalogBtn = document.getElementById('loadMoreCatalogBtn');
             recipePhotoInput = document.getElementById('recipePhoto');
             recipePhotoPreview = document.getElementById('recipePhotoPreview');
@@ -2134,26 +2131,66 @@ window.SICOMIX = window.SICOMIX || {};
             reader.readAsText(file);
         }
 
+        // ОНОВЛЕНА ФУНКЦІЯ ЕКСПОРТУ
         function startExport() {
             const format = exportFormat?.value || 'json';
             const exportRecipes = exportRecipesCheckbox?.checked;
-            const exportPaints = exportPaintsCheckbox?.checked;
-            const exportCalculations = exportCalculationsCheckbox?.checked;
+            const includePhotos = includePhotosCheckbox?.checked;
 
-            const exportData = {};
-            if (exportRecipes) exportData.recipes = recipes;
-            if (exportPaints) exportData.paints = userPaints;
-            if (exportCalculations) exportData.calculations = [];
-
-            if (Object.keys(exportData).length === 0) {
+            if (!exportRecipes) {
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_data_to_export'), 'warning');
                 return;
             }
 
-            const filename = `sico_spectrum_export_${new Date().toISOString().split('T')[0]}.${format}`;
-            const mime = format === 'json' ? 'application/json' : 'text/csv';
-            SICOMIX.utils.exportToFile(exportData, filename, mime);
-            SICOMIX.utils.showNotification(SICOMIX.i18n.t('exported') + '!', 'success');
+            // Підготовка даних для експорту
+            let exportData = {};
+
+            if (exportRecipes) {
+                // Якщо фото не потрібні, видаляємо їх з рецептів
+                if (!includePhotos) {
+                    exportData.recipes = recipes.map(r => {
+                        const { photo, ...rest } = r;
+                        return rest;
+                    });
+                } else {
+                    exportData.recipes = recipes;
+                }
+            }
+
+            // Визначаємо назву файлу
+            const filename = `sico_spectrum_recipes_${new Date().toISOString().split('T')[0]}.${format}`;
+
+            if (format === 'csv') {
+                // Для CSV конвертуємо рецепти у спрощений формат (без вкладених інгредієнтів)
+                try {
+                    // Спрощуємо рецепти для CSV (беремо тільки основні поля, інгредієнти перетворюємо в рядок)
+                    const simpleRecipes = exportData.recipes.map(r => ({
+                        id: r.id,
+                        name: r.name,
+                        category: r.category,
+                        series: r.series,
+                        description: r.description || '',
+                        date: r.date || '',
+                        ingredients: JSON.stringify(r.ingredients) // зберігаємо інгредієнти як JSON-рядок
+                    }));
+                    const csvContent = SICOMIX.utils.convertToCSV(simpleRecipes);
+                    const blob = new Blob([csvContent], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('exported')} ${recipes.length} ${SICOMIX.i18n.t('recipes')}`, 'success');
+                } catch (e) {
+                    console.error('Помилка створення CSV:', e);
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('export_error'), 'error');
+                }
+            } else {
+                // Експорт у JSON
+                SICOMIX.utils.exportToFile(exportData, filename, 'application/json');
+                SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('exported')} ${recipes.length} ${SICOMIX.i18n.t('recipes')}`, 'success');
+            }
         }
 
         // ---------- ДОПОМІЖНІ ФУНКЦІЇ ----------
