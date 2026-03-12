@@ -33,10 +33,10 @@ window.SICOMIX = window.SICOMIX || {};
         let addIngredientBtn, saveRecipeBtn, clearRecipeBtn, scanRecipeBtn;
         let recipesContainer, exportRecipesBtn, importRecipesBtn, printRecipesBtn, deleteSelectedRecipesBtn;
         let paintCatalogEl, addNewPaintBtn, addPaintModal, closePaintModal, savePaintBtn, cancelPaintBtn;
-        let languageSelect, unitsSelect, themeSelect, autoSaveCheckbox, backupCheckbox, saveSettingsBtn, resetSettingsBtn, clearAllDataBtn;
+        let languageSelect, unitsSelect, themeSelect, autoSaveCheckbox, backupCheckbox, catalogLayoutSelect, saveSettingsBtn, resetSettingsBtn, clearAllDataBtn, exportBackupBtn;
         let actionCards;
         let startImportBtn, startExportBtn, importFormat, exportFormat, importFile, importRecipesCheckbox, importPaintsCheckbox;
-        let exportRecipesCheckbox, includePhotosCheckbox; // Видалено exportPaintsCheckbox, exportCalculationsCheckbox, compressDataCheckbox
+        let exportRecipesCheckbox, includePhotosCheckbox;
         let loadMoreCatalogBtn;
         let recipePhotoInput, recipePhotoPreview, recipePhotoImg, fileNameSpan;
         let seriesDetailsModal, closeSeriesModal, seriesDetailsTitle, seriesDetailsContent;
@@ -45,6 +45,13 @@ window.SICOMIX = window.SICOMIX || {};
         let pantoneRecipeModal, closePantoneRecipe, pantoneRecipeContent, addPantoneFromRecipeBtn;
         // RAL елементи
         let ralSearch, ralCatalog;
+
+        // Мапа для перетворення одиниць
+        const unitMap = {
+            'grams': 'г',
+            'ml': 'мл',
+            'percent': '%'
+        };
 
         // ---------- КЕШУВАННЯ DOM ----------
         function cacheDOMElements() {
@@ -81,9 +88,11 @@ window.SICOMIX = window.SICOMIX || {};
             themeSelect = document.getElementById('themeSelect');
             autoSaveCheckbox = document.getElementById('autoSaveCheckbox');
             backupCheckbox = document.getElementById('backupCheckbox');
+            catalogLayoutSelect = document.getElementById('catalogLayoutSelect');
             saveSettingsBtn = document.getElementById('saveSettingsBtn');
             resetSettingsBtn = document.getElementById('resetSettingsBtn');
             clearAllDataBtn = document.getElementById('clearAllDataBtn');
+            exportBackupBtn = document.getElementById('exportBackupBtn');
             startImportBtn = document.getElementById('startImportBtn');
             startExportBtn = document.getElementById('startExportBtn');
             importFormat = document.getElementById('importFormat');
@@ -187,6 +196,11 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.utils.saveToLocalStorage('sicoSpectrumSettings', currentSettings);
             updatePaintCount();
 
+            // Автоматичне резервне копіювання, якщо увімкнено
+            if (currentSettings.backup) {
+                createLocalBackup();
+            }
+
             const user = SICOMIX.sync?.getCurrentUser();
             if (user) {
                 const dataToSync = {
@@ -198,6 +212,30 @@ window.SICOMIX = window.SICOMIX || {};
                     console.error('Помилка збереження в Firestore:', error);
                 });
             }
+        }
+
+        // ---------- РЕЗЕРВНЕ КОПІЮВАННЯ ----------
+        function createLocalBackup() {
+            const backupData = {
+                recipes: recipes,
+                userPaints: userPaints,
+                settings: currentSettings,
+                timestamp: new Date().toISOString()
+            };
+            SICOMIX.utils.saveToLocalStorage('sicoSpectrumBackup', backupData);
+            SICOMIX.utils.showNotification(SICOMIX.i18n.t('backup_created'), 'success');
+        }
+
+        function exportBackup() {
+            const backupData = {
+                recipes: recipes,
+                userPaints: userPaints,
+                settings: currentSettings,
+                timestamp: new Date().toISOString()
+            };
+            const filename = `sico_spectrum_backup_${new Date().toISOString().split('T')[0]}.json`;
+            SICOMIX.utils.exportToFile(backupData, filename, 'application/json');
+            SICOMIX.utils.showNotification(SICOMIX.i18n.t('backup_exported'), 'success');
         }
 
         // ---------- АВТОЗБЕРЕЖЕННЯ ЧЕРНЕТКИ РЕЦЕПТУ ----------
@@ -312,7 +350,9 @@ window.SICOMIX = window.SICOMIX || {};
             if (backupCheckbox) backupCheckbox.checked = currentSettings.backup === true;
             if (languageSelect) languageSelect.value = SICOMIX.i18n.getLanguage();
             if (themeSelect) themeSelect.value = currentSettings.theme || 'spectrum';
+            if (catalogLayoutSelect) catalogLayoutSelect.value = currentSettings.catalogLayout || 'classic';
             applyTheme(currentSettings.theme || 'spectrum');
+            applyCatalogLayout(currentSettings.catalogLayout || 'classic');
         }
 
         function applyTheme(theme) {
@@ -320,6 +360,20 @@ window.SICOMIX = window.SICOMIX || {};
             if (theme === 'organic') {
                 document.body.classList.add('theme-organic');
             }
+        }
+
+        function applyCatalogLayout(layout) {
+            if (paintCatalogEl) {
+                // Видаляємо попередні класи
+                paintCatalogEl.classList.remove('catalog-layout-classic', 'catalog-layout-compact', 'catalog-layout-list');
+                paintCatalogEl.classList.add(`catalog-layout-${layout}`);
+            }
+        }
+
+        // Отримання символу одиниці за замовчуванням
+        function getDefaultUnitSymbol() {
+            const unitKey = currentSettings.units || 'grams';
+            return unitMap[unitKey] || 'г';
         }
 
         // ---------- ПОДІЇ ----------
@@ -512,7 +566,7 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
-            // --- ПОКРАЩЕННЯ ДЛЯ ІМПОРТУ ---
+            // Імпорт/Експорт
             if (importFile) {
                 importFile.addEventListener('change', function(e) {
                     const fileNameSpan = document.getElementById('importFileName');
@@ -527,50 +581,31 @@ window.SICOMIX = window.SICOMIX || {};
             if (startImportBtn) startImportBtn.addEventListener('click', startImport);
             if (startExportBtn) startExportBtn.addEventListener('click', startExport);
 
+            // Налаштування
             if (languageSelect) {
                 languageSelect.addEventListener('change', function() {
-                    const newLang = this.value;
-                    currentSettings.language = newLang;
-                    SICOMIX.i18n.setLanguage(newLang);
-                    SICOMIX.i18n.applyTranslations();
-
-                    if (document.getElementById('new-recipe-page')?.classList.contains('active')) {
-                        if (recipePhotoDataUrl) {
-                            fileNameSpan.textContent = SICOMIX.i18n.t('photo_uploaded');
-                        } else {
-                            fileNameSpan.textContent = SICOMIX.i18n.t('upload_photo');
-                        }
-                    }
-
-                    populateCategoryFilters();
-                    populateStandardCategorySelect();
-                    populateSeriesSelect();
-
-                    const activePage = document.querySelector('.page-content.active');
-                    if (activePage) {
-                        const pageId = activePage.id.replace('-page', '');
-                        if (pageId === 'recipes') renderRecipes();
-                        if (pageId === 'catalog') renderPaintCatalog();
-                        if (pageId === 'new-recipe') renderIngredientsList();
-                        if (pageId === 'pantone') renderPantoneCatalog();
-                        if (pageId === 'ral') renderRalCatalog();
-                    }
-
-                    saveData();
+                    // Не зберігаємо одразу, тільки після натискання "Зберегти"
                 });
             }
 
             if (themeSelect) {
                 themeSelect.addEventListener('change', function() {
-                    currentSettings.theme = this.value;
+                    // Попередній перегляд теми
                     applyTheme(this.value);
-                    saveData();
+                });
+            }
+
+            if (catalogLayoutSelect) {
+                catalogLayoutSelect.addEventListener('change', function() {
+                    // Попередній перегляд компонування
+                    applyCatalogLayout(this.value);
                 });
             }
 
             if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSettings);
             if (resetSettingsBtn) resetSettingsBtn.addEventListener('click', resetSettings);
             if (clearAllDataBtn) clearAllDataBtn.addEventListener('click', clearAllData);
+            if (exportBackupBtn) exportBackupBtn.addEventListener('click', exportBackup);
 
             if (loadMoreCatalogBtn) {
                 loadMoreCatalogBtn.addEventListener('click', function() {
@@ -834,7 +869,9 @@ window.SICOMIX = window.SICOMIX || {};
                 if (selectedIngredients.some(ing => String(ing.paintId) === pid)) {
                     SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_already_added'), 'warning');
                 } else {
-                    selectedIngredients.push({ paintId: pid, amount: 100, unit: 'г', percentage: 0 });
+                    // Використовуємо одиницю за замовчуванням з налаштувань
+                    const defaultUnit = getDefaultUnitSymbol();
+                    selectedIngredients.push({ paintId: pid, amount: 100, unit: defaultUnit, percentage: 0 });
                     calculatePercentages();
                     renderIngredientsList();
                     updateSeriesLockUI();
@@ -1593,6 +1630,9 @@ window.SICOMIX = window.SICOMIX || {};
                     return;
                 }
 
+                // Застосування класу компонування
+                applyCatalogLayout(currentSettings.catalogLayout || 'classic');
+
                 let html = '';
                 let totalFoundPaints = 0;
 
@@ -1804,6 +1844,7 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
+            const defaultUnit = getDefaultUnitSymbol();
             selectedIngredients.push({
                 paintId: paint.id,
                 article: paint.article,
@@ -1812,7 +1853,7 @@ window.SICOMIX = window.SICOMIX || {};
                 series: paint.series,
                 color: paint.color,
                 amount: 100,
-                unit: 'г',
+                unit: defaultUnit,
                 percentage: 0
             });
 
@@ -1999,17 +2040,37 @@ window.SICOMIX = window.SICOMIX || {};
 
         // ---------- НАЛАШТУВАННЯ ----------
         function saveSettings() {
+            const newLanguage = languageSelect.value;
+            const newUnits = unitsSelect.value;
+            const newTheme = themeSelect.value;
+            const newAutoSave = autoSaveCheckbox.checked;
+            const newBackup = backupCheckbox.checked;
+            const newCatalogLayout = catalogLayoutSelect.value;
+
             currentSettings = {
-                language: languageSelect.value,
-                units: unitsSelect.value,
-                autoSave: autoSaveCheckbox.checked,
-                backup: backupCheckbox.checked,
-                theme: themeSelect.value,
+                ...currentSettings,
+                language: newLanguage,
+                units: newUnits,
+                autoSave: newAutoSave,
+                backup: newBackup,
+                theme: newTheme,
+                catalogLayout: newCatalogLayout,
                 notifications: true,
                 defaultCategory: 'Standard',
-                defaultUnit: 'г',
+                defaultUnit: unitMap[newUnits] || 'г',
                 calculationsPrecision: 2
             };
+
+            // Застосовуємо мову одразу
+            SICOMIX.i18n.setLanguage(newLanguage);
+            SICOMIX.i18n.applyTranslations();
+
+            // Застосовуємо тему
+            applyTheme(newTheme);
+
+            // Застосовуємо компонування каталогу
+            applyCatalogLayout(newCatalogLayout);
+
             saveData();
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('save_settings'), 'success');
         }
@@ -2020,8 +2081,21 @@ window.SICOMIX = window.SICOMIX || {};
                 SICOMIX.i18n.t('confirmation_message'),
                 () => {
                     currentSettings = SICOMIX.data.defaultSettings || {};
+                    // Застосовуємо стандартні значення до UI
+                    languageSelect.value = currentSettings.language || 'uk';
+                    unitsSelect.value = currentSettings.units || 'grams';
+                    themeSelect.value = currentSettings.theme || 'spectrum';
+                    autoSaveCheckbox.checked = currentSettings.autoSave !== false;
+                    backupCheckbox.checked = currentSettings.backup === true;
+                    catalogLayoutSelect.value = currentSettings.catalogLayout || 'classic';
+
+                    // Застосовуємо до системи
+                    SICOMIX.i18n.setLanguage(currentSettings.language || 'uk');
+                    SICOMIX.i18n.applyTranslations();
+                    applyTheme(currentSettings.theme || 'spectrum');
+                    applyCatalogLayout(currentSettings.catalogLayout || 'classic');
+
                     saveData();
-                    initSettings();
                     SICOMIX.utils.showNotification(SICOMIX.i18n.t('reset_defaults'), 'success');
                 }
             );
@@ -2402,6 +2476,7 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
+            const defaultUnit = getDefaultUnitSymbol();
             selectedIngredients.push({
                 paintId: tempPaintId,
                 article: pantone.number,
@@ -2410,7 +2485,7 @@ window.SICOMIX = window.SICOMIX || {};
                 series: currentSeries,
                 color: tempPaint.color,
                 amount: 100,
-                unit: 'г',
+                unit: defaultUnit,
                 percentage: 0
             });
 
@@ -2508,6 +2583,7 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
+            const defaultUnit = getDefaultUnitSymbol();
             selectedIngredients.push({
                 paintId: tempPaintId,
                 article: code,
@@ -2516,7 +2592,7 @@ window.SICOMIX = window.SICOMIX || {};
                 series: currentSeries,
                 color: tempPaint.color,
                 amount: 100,
-                unit: 'г',
+                unit: defaultUnit,
                 percentage: 0
             });
 
