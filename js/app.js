@@ -839,6 +839,7 @@ window.SICOMIX = window.SICOMIX || {};
             showPaintSelectionModal(filtered);
         }
 
+        // ВИПРАВЛЕНО: у модальному вікні тепер першим (жирним) показується код фарби
         function showPaintSelectionModal(paints) {
             const modal = document.getElementById('paintSelectionModal');
             const list = document.getElementById('paintSelectionList');
