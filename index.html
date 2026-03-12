@@ -504,7 +504,7 @@
                 </div>
             </div>
 
-            <!-- ОНОВЛЕНА СТОРІНКА ЕКСПОРТУ -->
+            <!-- EXPORT PAGE -->
             <div class="page-content" id="export-page">
                 <h2 class="page-title" data-i18n="export">Експорт даних</h2>
                 <p class="page-description" data-i18n="export_desc_long">Експортуйте ваші дані у різних форматах</p>
@@ -539,7 +539,7 @@
                 </div>
             </div>
 
-            <!-- SETTINGS PAGE -->
+            <!-- ОНОВЛЕНА СТОРІНКА НАЛАШТУВАНЬ -->
             <div class="page-content" id="settings-page">
                 <h2 class="page-title" data-i18n="settings">Налаштування</h2>
                 <p class="page-description" data-i18n="settings_desc">Налаштуйте систему за вашими потребами</p>
@@ -568,17 +568,17 @@
                     <div class="form-group">
                         <label class="form-label" data-i18n="theme">Тема оформлення</label>
                         <select class="form-select" id="themeSelect">
-                            <option value="spectrum" data-i18n="theme_spectrum">Спектр (за замовчуванням)</option>
-                            <option value="organic" data-i18n="theme_organic">Органічна</option>
+                            <option value="spectrum" data-i18n="theme_spectrum">Спектр (темна)</option>
+                            <option value="organic" data-i18n="theme_organic">Органічна (світла)</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" data-i18n="catalog_layout">Компонування каталогу</label>
                         <select class="form-select" id="catalogLayoutSelect">
-                            <option value="classic">Classic</option>
-                            <option value="compact">Compact</option>
-                            <option value="list">List</option>
+                            <option value="classic" data-i18n="layout_classic">Classic</option>
+                            <option value="compact" data-i18n="layout_compact">Compact</option>
+                            <option value="list" data-i18n="layout_list">List</option>
                         </select>
                     </div>
 
@@ -589,11 +589,14 @@
                         </label>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
                         <label style="display: flex; align-items: center; gap: 12px;">
                             <input type="checkbox" id="backupCheckbox">
                             <span data-i18n="create_backups">Створювати резервні копії</span>
                         </label>
+                        <button class="btn btn-secondary" id="exportBackupBtn" style="padding: 8px 16px;">
+                            <i class="fas fa-download"></i> <span data-i18n="export_backup">Експортувати бекап</span>
+                        </button>
                     </div>
 
                     <div class="action-buttons">
