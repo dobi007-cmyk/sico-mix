@@ -515,6 +515,18 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
+            // --- ПОКРАЩЕННЯ ДЛЯ ІМПОРТУ ---
+            if (importFile) {
+                importFile.addEventListener('change', function(e) {
+                    const fileNameSpan = document.getElementById('importFileName');
+                    if (this.files.length > 0) {
+                        fileNameSpan.textContent = this.files[0].name;
+                    } else {
+                        fileNameSpan.textContent = SICOMIX.i18n.t('select_import_file');
+                    }
+                });
+            }
+
             if (startImportBtn) startImportBtn.addEventListener('click', startImport);
             if (startExportBtn) startExportBtn.addEventListener('click', startExport);
 
@@ -2044,10 +2056,18 @@ window.SICOMIX = window.SICOMIX || {};
 
         // ---------- ІМПОРТ/ЕКСПОРТ ----------
         function startImport() {
+            // Перевірка, чи вибрано файл
             if (!importFile || !importFile.files || importFile.files.length === 0) {
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_import_file'), 'error');
                 return;
             }
+
+            // Перевірка, чи вибрано хоча б один тип даних
+            if (!importRecipesCheckbox?.checked && !importPaintsCheckbox?.checked) {
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_data_to_import'), 'warning');
+                return;
+            }
+
             const file = importFile.files[0];
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -2061,8 +2081,12 @@ window.SICOMIX = window.SICOMIX || {};
                         SICOMIX.utils.showNotification(SICOMIX.i18n.t('invalid_file_format'), 'error');
                         return;
                     }
+
                     const importRecipes = importRecipesCheckbox?.checked;
                     const importPaints = importPaintsCheckbox?.checked;
+
+                    let recipesCount = 0;
+                    let paintsCount = 0;
 
                     if (importRecipes && data.recipes && Array.isArray(data.recipes)) {
                         data.recipes.forEach(r => {
@@ -2071,6 +2095,7 @@ window.SICOMIX = window.SICOMIX || {};
                                 r.ingredients = r.ingredients.map(ing => ({ ...ing, paintId: String(ing.paintId) }));
                             }
                             recipes.push(r);
+                            recipesCount++;
                         });
                     }
                     if (importPaints && data.paints && Array.isArray(data.paints)) {
@@ -2078,16 +2103,29 @@ window.SICOMIX = window.SICOMIX || {};
                             p.id = SICOMIX.utils.generateId();
                             p.isDefault = false;
                             userPaints.push(p);
+                            paintsCount++;
                         });
                         paintCatalog = [...basePaints, ...userPaints];
                     }
+
                     saveData();
                     populateCategoryFilters();
                     renderRecipes();
                     renderPaintCatalog();
                     renderPantoneCatalog();
                     renderRalCatalog();
-                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('imported') + '!', 'success');
+
+                    // Показуємо детальне повідомлення
+                    let message = SICOMIX.i18n.t('imported') + '!';
+                    if (recipesCount > 0 && paintsCount > 0) {
+                        message = `${SICOMIX.i18n.t('imported')} ${recipesCount} ${SICOMIX.i18n.t('recipes')} ${SICOMIX.i18n.t('and')} ${paintsCount} ${SICOMIX.i18n.t('paints')}`;
+                    } else if (recipesCount > 0) {
+                        message = `${SICOMIX.i18n.t('imported')} ${recipesCount} ${SICOMIX.i18n.t('recipes')}`;
+                    } else if (paintsCount > 0) {
+                        message = `${SICOMIX.i18n.t('imported')} ${paintsCount} ${SICOMIX.i18n.t('paints')}`;
+                    }
+                    SICOMIX.utils.showNotification(message, 'success');
+
                 } catch (err) {
                     console.error(err);
                     SICOMIX.utils.showNotification(SICOMIX.i18n.t('invalid_file_format'), 'error');
