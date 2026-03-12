@@ -96,6 +96,10 @@ window.SICOMIX = window.SICOMIX || {};
             "ral_desc": "Кольори RAL Classic",
             "export_desc": "Експортуйте рецепти у різних форматах",
             
+            // ЗМІНЕНО: каталог
+            "catalog_desc": "Каталог SICO Polska",
+            "export_data": "Експорт",
+            
             // Новий рецепт
             "new_recipe_desc_long": "Створіть новий рецепт фарби, додаючи інгредієнти",
             "basic_info": "Основна інформація",
@@ -458,6 +462,10 @@ window.SICOMIX = window.SICOMIX || {};
             "ral_desc": "RAL Classic colors",
             "export_desc": "Export recipes in various formats",
             
+            // CHANGED: catalog
+            "catalog_desc": "SICO Polska Catalog",
+            "export_data": "Export",
+            
             // New recipe
             "new_recipe_desc_long": "Create a new paint recipe by adding ingredients",
             "basic_info": "Basic information",
@@ -819,6 +827,10 @@ window.SICOMIX = window.SICOMIX || {};
             "pantone_desc": "Kolory Pantone z katalogów Formula Guide",
             "ral_desc": "Kolory RAL Classic",
             "export_desc": "Eksportuj receptury w różnych formatach",
+            
+            // ZMIENIONO: katalog
+            "catalog_desc": "Katalog SICO Polska",
+            "export_data": "Eksport",
             
             // Nowa receptura
             "new_recipe_desc_long": "Stwórz nową recepturę farby, dodając składniki",
