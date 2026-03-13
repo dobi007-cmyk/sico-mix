@@ -10,61 +10,83 @@ window.SICOMIX = window.SICOMIX || {};
         console.log('📚 attachCatalogEventListeners викликано');
         if (!dom.paintCatalogEl) return;
 
-        dom.paintCatalogEl.addEventListener('click', function(e) {
-            const btn = e.target.closest('.glass-add-btn, .glass-remove-btn, .delete-paint, .series-info-btn, .toggle-series');
-            if (!btn) return;
-            e.stopPropagation();
+        // Видаляємо попередні обробники, щоб уникнути дублювання
+        dom.paintCatalogEl.removeEventListener('click', catalogClickHandler);
+        dom.paintCatalogEl.addEventListener('click', catalogClickHandler);
 
-            if (btn.classList.contains('glass-add-btn') || btn.classList.contains('glass-remove-btn')) {
-                const paintId = btn.dataset.paintId;
-                const paint = app.getPaintCatalog().find(p => String(p.id) === paintId);
-                if (!paint) return;
-
-                if (btn.classList.contains('glass-add-btn')) {
-                    const validation = app.validatePaintAddition(paint);
-                    if (validation.valid) {
-                        addPaintToRecipeFromCatalog(paint);
-                        if (SICOMIX.app.updatePaintButton) SICOMIX.app.updatePaintButton(paintId, true);
-                    } else {
-                        SICOMIX.utils.showNotification(validation.message, 'error');
-                    }
-                } else if (btn.classList.contains('glass-remove-btn')) {
-                    if (SICOMIX.app.removeIngredientByPaintId) {
-                        SICOMIX.app.removeIngredientByPaintId(paintId);
-                        if (SICOMIX.app.updatePaintButton) SICOMIX.app.updatePaintButton(paintId, false);
-                    }
-                }
-            } else if (btn.classList.contains('delete-paint')) {
-                const paintId = btn.dataset.paintId;
-                if (paintId) deletePaint(paintId);
-            } else if (btn.classList.contains('series-info-btn')) {
-                const card = btn.closest('.series-card');
-                const seriesId = card.dataset.series;
-                const series = SICOMIX.data.series.find(s => s.id === seriesId);
-                if (series) {
-                    openSeriesDetailsModal(series);
-                }
-            } else if (btn.classList.contains('toggle-series')) {
-                const card = btn.closest('.series-card');
-                const paintsDiv = card.querySelector('.series-paints');
-                const icon = btn.querySelector('i');
-
-                if (paintsDiv.style.display === 'none') {
-                    paintsDiv.style.display = 'grid';
-                    icon.classList.remove('fa-chevron-down');
-                    icon.classList.add('fa-chevron-up');
-                } else {
-                    paintsDiv.style.display = 'none';
-                    icon.classList.remove('fa-chevron-up');
-                    icon.classList.add('fa-chevron-down');
-                }
-            }
-        });
-
+        // Обробники для заголовків серій (клік для розгортання)
         dom.paintCatalogEl.querySelectorAll('.series-header').forEach(header => {
             header.removeEventListener('click', headerClickHandler);
             header.addEventListener('click', headerClickHandler);
         });
+    }
+
+    function catalogClickHandler(e) {
+        const btn = e.target.closest('.glass-add-btn, .glass-remove-btn, .delete-paint, .series-info-btn, .toggle-series');
+        if (!btn) return;
+        e.stopPropagation();
+
+        if (btn.classList.contains('glass-add-btn') || btn.classList.contains('glass-remove-btn')) {
+            const paintId = btn.dataset.paintId;
+            const paint = app.getPaintCatalog().find(p => String(p.id) === paintId);
+            if (!paint) return;
+
+            if (btn.classList.contains('glass-add-btn')) {
+                const validation = app.validatePaintAddition(paint);
+                if (validation.valid) {
+                    addPaintToRecipeFromCatalog(paint);
+                    if (SICOMIX.app.updatePaintButton) SICOMIX.app.updatePaintButton(paintId, true);
+                } else {
+                    SICOMIX.utils.showNotification(validation.message, 'error');
+                }
+            } else if (btn.classList.contains('glass-remove-btn')) {
+                if (SICOMIX.app.removeIngredientByPaintId) {
+                    SICOMIX.app.removeIngredientByPaintId(paintId);
+                    if (SICOMIX.app.updatePaintButton) SICOMIX.app.updatePaintButton(paintId, false);
+                }
+            }
+        } else if (btn.classList.contains('delete-paint')) {
+            const paintId = btn.dataset.paintId;
+            if (paintId) deletePaint(paintId);
+        } else if (btn.classList.contains('series-info-btn')) {
+            const card = btn.closest('.series-card');
+            const seriesId = card.dataset.series;
+            const series = SICOMIX.data.series.find(s => s.id === seriesId);
+            if (series) {
+                openSeriesDetailsModal(series);
+            }
+        } else if (btn.classList.contains('toggle-series')) {
+            const card = btn.closest('.series-card');
+            const paintsDiv = card.querySelector('.series-paints');
+            const icon = btn.querySelector('i');
+
+            if (paintsDiv.style.display === 'none' || !paintsDiv.style.display) {
+                paintsDiv.style.display = 'grid';
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+                // Зберігаємо стан у localStorage
+                try {
+                    const expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
+                    if (!expandedSeries.includes(card.dataset.series)) {
+                        expandedSeries.push(card.dataset.series);
+                        localStorage.setItem('expandedSeries', JSON.stringify(expandedSeries));
+                    }
+                } catch (e) {}
+            } else {
+                paintsDiv.style.display = 'none';
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+                // Видаляємо з localStorage
+                try {
+                    const expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
+                    const index = expandedSeries.indexOf(card.dataset.series);
+                    if (index > -1) {
+                        expandedSeries.splice(index, 1);
+                        localStorage.setItem('expandedSeries', JSON.stringify(expandedSeries));
+                    }
+                } catch (e) {}
+            }
+        }
     }
 
     function headerClickHandler(e) {
@@ -119,6 +141,12 @@ window.SICOMIX = window.SICOMIX || {};
             let html = '';
             let totalFoundPaints = 0;
 
+            // Отримуємо збережений стан розгорнутих серій
+            let expandedSeries = [];
+            try {
+                expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
+            } catch (e) {}
+
             paginatedSeries.forEach(series => {
                 let seriesPaints = paintCatalog.filter(p => p.series === series.id);
                 if (search) {
@@ -132,6 +160,7 @@ window.SICOMIX = window.SICOMIX || {};
 
                 const seriesName = series.name[lang] || series.id;
                 const category = series.category || '';
+                const isExpanded = expandedSeries.includes(series.id) || search.length > 0;
 
                 const paintsHtml = seriesPaints.map(p => {
                     const paintCode = p.name;
@@ -173,13 +202,13 @@ window.SICOMIX = window.SICOMIX || {};
                                         <i class="fas fa-info-circle"></i>
                                     </button>
                                     <button class="btn-icon toggle-series" title="${SICOMIX.i18n.t('expand')}" aria-label="${SICOMIX.i18n.t('expand')}">
-                                        <i class="fas fa-chevron-down"></i>
+                                        <i class="fas fa-chevron-${isExpanded ? 'up' : 'down'}"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="series-paints" style="display: none;">
+                        <div class="series-paints" style="display: ${isExpanded ? 'grid' : 'none'};">
                             ${paintsHtml}
                         </div>
                     </div>
@@ -223,7 +252,9 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
+            // Навішуємо обробники подій
             attachCatalogEventListeners();
+
             SICOMIX.i18n.applyTranslations();
 
         } catch (error) {
@@ -231,6 +262,13 @@ window.SICOMIX = window.SICOMIX || {};
             dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
                 <i class="fas fa-exclamation-triangle"></i> ${SICOMIX.i18n.t('catalog_render_error')}<br>${SICOMIX.utils.escapeHtml(error.message)}
             </p>`;
+        }
+    }
+
+    function applyCatalogLayout(layout) {
+        if (dom.paintCatalogEl) {
+            dom.paintCatalogEl.classList.remove('catalog-layout-classic', 'catalog-layout-compact', 'catalog-layout-list');
+            dom.paintCatalogEl.classList.add(`catalog-layout-${layout}`);
         }
     }
 
@@ -436,6 +474,27 @@ window.SICOMIX = window.SICOMIX || {};
         }
     }
 
+    function updatePaintButton(paintId, isInRecipe) {
+        const card = document.querySelector(`.paint-card-glass[data-paint-id="${paintId}"]`);
+        if (!card) return;
+        const btn = card.querySelector('.glass-add-btn, .glass-remove-btn');
+        if (btn) {
+            if (isInRecipe) {
+                btn.classList.remove('glass-add-btn');
+                btn.classList.add('glass-remove-btn');
+                btn.innerHTML = '<i class="fas fa-trash"></i>';
+                btn.title = SICOMIX.i18n.t('remove_from_recipe');
+                btn.setAttribute('aria-label', SICOMIX.i18n.t('remove_from_recipe'));
+            } else {
+                btn.classList.remove('glass-remove-btn');
+                btn.classList.add('glass-add-btn');
+                btn.innerHTML = '<i class="fas fa-plus"></i>';
+                btn.title = SICOMIX.i18n.t('add_ingredient');
+                btn.setAttribute('aria-label', SICOMIX.i18n.t('add_ingredient'));
+            }
+        }
+    }
+
     Object.assign(SICOMIX.app, {
         renderPaintCatalog,
         openSeriesDetailsModal,
@@ -444,7 +503,8 @@ window.SICOMIX = window.SICOMIX || {};
         addNewPaint,
         saveNewPaint,
         deletePaint,
-        attachCatalogEventListeners
+        attachCatalogEventListeners,
+        applyCatalogLayout
     });
 
     console.log('📦 app-catalog.js завантажено');
