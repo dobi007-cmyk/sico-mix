@@ -3,10 +3,15 @@ const urlsToCache = [
     './',
     './index.html',
     './css/style.css',
-    './js/data.js',
+    './js/data-colors.js',          // виправлено
     './js/i18n.js',
     './js/utils.js',
+    './js/pantone-data.js',
+    './js/pantone-external-colors.js',
+    './js/ral-data.js',
     './js/app.js',
+    './js/firebase-config.js',
+    './js/sync.js',
     './manifest.json',
     './icons/icon-192.png',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css'
