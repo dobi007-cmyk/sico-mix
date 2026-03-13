@@ -116,21 +116,32 @@ window.SICOMIX = window.SICOMIX || {};
 
     // ---------- ПРИВ'ЯЗКА ОБРОБНИКІВ КНОПОК ----------
     function attachSettingsEventListeners() {
+        console.log('⚙️ attachSettingsEventListeners викликано');
         if (dom.saveSettingsBtn) {
             dom.saveSettingsBtn.addEventListener('click', saveSettings);
+            console.log('✅ saveSettingsBtn обробник додано');
         }
         if (dom.resetSettingsBtn) {
             dom.resetSettingsBtn.addEventListener('click', resetSettings);
+            console.log('✅ resetSettingsBtn обробник додано');
         }
         if (dom.clearAllDataBtn) {
             dom.clearAllDataBtn.addEventListener('click', clearAllData);
+            console.log('✅ clearAllDataBtn обробник додано');
         }
         if (dom.exportBackupBtn) {
-            dom.exportBackupBtn.addEventListener('click', () => app.exportBackup());
+            dom.exportBackupBtn.addEventListener('click', () => {
+                if (typeof app.exportBackup === 'function') {
+                    app.exportBackup();
+                } else {
+                    console.error('❌ exportBackup не знайдено в app');
+                    SICOMIX.utils.showNotification('Помилка: функція експорту не доступна', 'error');
+                }
+            });
+            console.log('✅ exportBackupBtn обробник додано');
         }
     }
 
-    // ---------- ЕКСПОРТ МЕТОДІВ ----------
     Object.assign(SICOMIX.app, {
         initSettings,
         applyTheme,
@@ -140,5 +151,7 @@ window.SICOMIX = window.SICOMIX || {};
         clearAllData,
         attachSettingsEventListeners
     });
+
+    console.log('📦 app-settings.js завантажено, SICOMIX.app містить:', Object.keys(SICOMIX.app));
 
 })(window);
