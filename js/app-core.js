@@ -466,6 +466,15 @@ window.SICOMIX = window.SICOMIX || {};
             catalogPage = 1;
             if (SICOMIX.app.renderPaintCatalog) SICOMIX.app.renderPaintCatalog();
         } else if (pageId === 'new-recipe') {
+            // Populate dropdowns if they are empty
+            const seriesSelect = document.getElementById('recipeSeries');
+            if (seriesSelect && seriesSelect.options.length <= 1) {
+                populateSeriesSelect();
+            }
+            const catSelect = document.getElementById('recipeCategory');
+            if (catSelect && catSelect.options.length <= 1) {
+                populateCategoryFilters(); // populates all category selects
+            }
             if (!isEditingRecipe) {
                 if (selectedIngredients.length === 0) {
                     loadRecipeDraft();
@@ -770,9 +779,18 @@ window.SICOMIX = window.SICOMIX || {};
         });
     }
 
+    // ---------- ПРИВ'ЯЗКА ВСІХ ОБРОБНИКІВ З МОДУЛІВ ----------
+    function attachAllEventListeners() {
+        if (SICOMIX.app.attachRecipeEventListeners) SICOMIX.app.attachRecipeEventListeners();
+        if (SICOMIX.app.attachCatalogEventListeners) SICOMIX.app.attachCatalogEventListeners();
+        if (SICOMIX.app.attachSettingsEventListeners) SICOMIX.app.attachSettingsEventListeners();
+        // Pantone/RAL listeners are attached inside render functions
+    }
+
     // ---------- ІНІЦІАЛІЗАЦІЯ ----------
     async function initApp() {
         cacheDOMElements();
+        attachAllEventListeners();
 
         const auth = SICOMIX.firebase?.auth;
         if (auth) {
@@ -784,8 +802,10 @@ window.SICOMIX = window.SICOMIX || {};
                     console.log('Користувач вийшов');
                     await loadData();
                 }
+                // Заповнюємо випадаючі списки після завантаження даних
+                populateSeriesSelect();
+                populateCategoryFilters();
                 initSettings();
-                setupCoreEventListeners();
                 updatePaintCount();
 
                 // Викликаємо початковий рендеринг для активної сторінки
@@ -810,8 +830,9 @@ window.SICOMIX = window.SICOMIX || {};
             });
         } else {
             await loadData();
+            populateSeriesSelect();
+            populateCategoryFilters();
             initSettings();
-            setupCoreEventListeners();
             updatePaintCount();
 
             const activePage = document.querySelector('.page-content.active');
