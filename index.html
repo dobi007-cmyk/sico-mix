@@ -21,7 +21,7 @@
     <!-- Tesseract.js для OCR -->
     <script src='https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js'></script>
 
-    <!-- Простий обробник помилок (замість антикризового скрипта) -->
+    <!-- Простий обробник помилок -->
     <script>
         window.addEventListener('error', function(e) {
             console.error('❌ Помилка:', e.error || e.message);
@@ -309,7 +309,7 @@
                             <i class="fas fa-plus"></i> <span data-i18n="add_ingredient">Додати інгредієнт</span>
                         </button>
                         <button class="btn btn-secondary" id="scanRecipeBtn">
-                            <i class="fas fa-camera"></i> <span data-i18n="scan_recipe">Scan recipe from photo</span>
+                            <i class="fas fa-camera"></i> <span data-i18n="scan_recipe">Сканувати рецепт з фото</span>
                         </button>
                     </div>
                 </div>
@@ -355,7 +355,7 @@
                         <input type="text" class="search-input" id="catalogSearch" placeholder="" data-i18n-placeholder="search_catalog">
                         <i class="fas fa-search search-icon"></i>
                     </div>
-                    <button class="btn btn-primary" id="addNewPaintBtn"><i class="fas fa-plus"></i> <span data-i18n="add_new_paint">Додати нову фарбу</span></button>
+                    <!-- Кнопку додавання фарби видалено -->
                 </div>
                 <div class="recipe-cards" id="paintCatalog"></div>
                 <div class="pagination-container">
@@ -370,7 +370,7 @@
                 
                 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                     <button class="btn btn-primary" id="openPantonePdf">
-                        <i class="fas fa-file-pdf"></i> <span data-i18n="open_pantone_pdf">Відкрити веер Pantone</span>
+                        <i class="fas fa-file-pdf"></i> <span data-i18n="open_pantone_pdf">Відкрити віяло Pantone</span>
                     </button>
                 </div>
                 
@@ -397,7 +397,7 @@
                 
                 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                     <button class="btn btn-primary" id="openRalPdf">
-                        <i class="fas fa-file-pdf"></i> <span data-i18n="open_ral_pdf">Відкрити веер RAL</span>
+                        <i class="fas fa-file-pdf"></i> <span data-i18n="open_ral_pdf">Відкрити віяло RAL</span>
                     </button>
                 </div>
                 
@@ -523,9 +523,9 @@
                     <div class="form-group">
                         <label class="form-label" data-i18n="catalog_layout">Компонування каталогу</label>
                         <select class="form-select" id="catalogLayoutSelect">
-                            <option value="classic" data-i18n="layout_classic">Classic</option>
-                            <option value="compact" data-i18n="layout_compact">Compact</option>
-                            <option value="list" data-i18n="layout_list">List</option>
+                            <option value="classic" data-i18n="layout_classic">Класичне</option>
+                            <option value="compact" data-i18n="layout_compact">Компактне</option>
+                            <option value="list" data-i18n="layout_list">Список</option>
                         </select>
                     </div>
 
@@ -581,7 +581,7 @@
                 </div>
             </div>
 
-            <!-- MODAL: Weight Input for Label (без стрілок) -->
+            <!-- MODAL: Weight Input for Label -->
             <div class="modal" id="weightInputModal">
                 <div class="modal-content" style="max-width: 350px;">
                     <div class="modal-header">
@@ -605,7 +605,7 @@
         </footer>
     </div>
 
-    <!-- MODAL: Add Paint -->
+    <!-- MODAL: Add Paint (залишаємо для можливості додавання через код) -->
     <div class="modal" id="addPaintModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -708,7 +708,7 @@
         </div>
     </div>
 
-    <!-- Основні модулі (замість одного великого app.js) -->
+    <!-- Основні модулі -->
     <script src="./js/firebase-config.js?v=2026.02.28"></script>
     <script src="./js/data-colors.js?v=2026.02.28"></script>
     <script src="./js/i18n.js?v=2026.02.28"></script>
