@@ -6,7 +6,6 @@ window.SICOMIX = window.SICOMIX || {};
     const app = SICOMIX.app;
     const dom = app.dom;
 
-    // ---------- РЕНДЕРИНГ ІНГРЕДІЄНТІВ ----------
     function renderIngredientsList() {
         if (!dom.ingredientsList) return;
         const selectedIngredients = app.getSelectedIngredients();
@@ -1157,48 +1156,54 @@ window.SICOMIX = window.SICOMIX || {};
         }
     }
 
-    // ---------- ПРИВ'ЯЗКА ОБРОБНИКІВ КНОПОК ----------
     function attachRecipeEventListeners() {
+        console.log('🍳 attachRecipeEventListeners викликано');
         if (dom.addIngredientBtn) {
             dom.addIngredientBtn.addEventListener('click', addIngredient);
+            console.log('✅ addIngredientBtn обробник додано');
         }
         if (dom.scanRecipeBtn) {
             dom.scanRecipeBtn.addEventListener('click', scanRecipeFromPhoto);
+            console.log('✅ scanRecipeBtn обробник додано');
         }
         if (dom.saveRecipeBtn) {
             dom.saveRecipeBtn.addEventListener('click', saveRecipe);
+            console.log('✅ saveRecipeBtn обробник додано');
         }
         if (dom.clearRecipeBtn) {
             dom.clearRecipeBtn.addEventListener('click', clearRecipeForm);
+            console.log('✅ clearRecipeBtn обробник додано');
         }
-        // Кнопки імпорту/експорту на сторінці рецептів
         if (dom.importRecipesBtn) {
             dom.importRecipesBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 importRecipes();
             });
+            console.log('✅ importRecipesBtn обробник додано');
         }
         if (dom.exportRecipesBtn) {
             dom.exportRecipesBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 exportAllRecipes();
             });
+            console.log('✅ exportRecipesBtn обробник додано');
         }
         if (dom.printRecipesBtn) {
             dom.printRecipesBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 printRecipes();
             });
+            console.log('✅ printRecipesBtn обробник додано');
         }
         if (dom.deleteSelectedRecipesBtn) {
             dom.deleteSelectedRecipesBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 deleteSelectedRecipes();
             });
+            console.log('✅ deleteSelectedRecipesBtn обробник додано');
         }
     }
 
-    // ---------- ЕКСПОРТ МЕТОДІВ ----------
     Object.assign(SICOMIX.app, {
         renderIngredientsList,
         handleIngredientChange,
@@ -1226,5 +1231,7 @@ window.SICOMIX = window.SICOMIX || {};
         updatePaintButton,
         attachRecipeEventListeners
     });
+
+    console.log('📦 app-recipe.js завантажено');
 
 })(window);
