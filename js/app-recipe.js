@@ -156,8 +156,8 @@ window.SICOMIX = window.SICOMIX || {};
                 app.autoSaveRecipeDraft();
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
                 
-                if (window.SICOMIX.app.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-                if (window.SICOMIX.app.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
+                if (SICOMIX.app.renderPantoneCatalog) SICOMIX.app.renderPantoneCatalog();
+                if (SICOMIX.app.renderRalCatalog) SICOMIX.app.renderRalCatalog();
             }
             modal.classList.remove('active');
             list.removeEventListener('click', clickHandler);
@@ -189,8 +189,8 @@ window.SICOMIX = window.SICOMIX || {};
             app.updateSeriesLockUI();
             app.autoSaveRecipeDraft();
             
-            if (window.SICOMIX.app.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-            if (window.SICOMIX.app.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
+            if (SICOMIX.app.renderPantoneCatalog) SICOMIX.app.renderPantoneCatalog();
+            if (SICOMIX.app.renderRalCatalog) SICOMIX.app.renderRalCatalog();
             
             const paintCatalog = app.getPaintCatalog();
             if (removed && paintCatalog.some(p => String(p.id) === removed.paintId)) {
@@ -291,8 +291,8 @@ window.SICOMIX = window.SICOMIX || {};
         app.setLockedCategory(null);
         app.updateSeriesLockUI();
         renderIngredientsList();
-        if (window.SICOMIX.app.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-        if (window.SICOMIX.app.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
+        if (SICOMIX.app.renderPantoneCatalog) SICOMIX.app.renderPantoneCatalog();
+        if (SICOMIX.app.renderRalCatalog) SICOMIX.app.renderRalCatalog();
         resetEditMode();
     }
 
@@ -1113,8 +1113,8 @@ window.SICOMIX = window.SICOMIX || {};
                         app.updateSeriesLockUI();
                         app.autoSaveRecipeDraft();
                         
-                        if (window.SICOMIX.app.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-                        if (window.SICOMIX.app.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
+                        if (SICOMIX.app.renderPantoneCatalog) SICOMIX.app.renderPantoneCatalog();
+                        if (SICOMIX.app.renderRalCatalog) SICOMIX.app.renderRalCatalog();
                         
                         SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
                     },
@@ -1150,6 +1150,33 @@ window.SICOMIX = window.SICOMIX || {};
                 btn.setAttribute('aria-label', SICOMIX.i18n.t('add_ingredient'));
             }
         }
+    }
+
+    // ---------- ПРИВ'ЯЗКА СТАТИЧНИХ КНОПОК ----------
+    // Ці обробники мають бути додані один раз після завантаження модуля
+    if (dom.importRecipesBtn) {
+        dom.importRecipesBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            importRecipes();
+        });
+    }
+    if (dom.exportRecipesBtn) {
+        dom.exportRecipesBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            exportAllRecipes();
+        });
+    }
+    if (dom.printRecipesBtn) {
+        dom.printRecipesBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            printRecipes();
+        });
+    }
+    if (dom.deleteSelectedRecipesBtn) {
+        dom.deleteSelectedRecipesBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            deleteSelectedRecipes();
+        });
     }
 
     // ---------- ЕКСПОРТ МЕТОДІВ ----------
