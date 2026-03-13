@@ -10,11 +10,9 @@ window.SICOMIX = window.SICOMIX || {};
         console.log('📚 attachCatalogEventListeners викликано');
         if (!dom.paintCatalogEl) return;
 
-        // Видаляємо попередні обробники, щоб уникнути дублювання
         dom.paintCatalogEl.removeEventListener('click', catalogClickHandler);
         dom.paintCatalogEl.addEventListener('click', catalogClickHandler);
 
-        // Обробники для заголовків серій (клік для розгортання)
         dom.paintCatalogEl.querySelectorAll('.series-header').forEach(header => {
             header.removeEventListener('click', headerClickHandler);
             header.addEventListener('click', headerClickHandler);
@@ -64,7 +62,6 @@ window.SICOMIX = window.SICOMIX || {};
                 paintsDiv.style.display = 'grid';
                 icon.classList.remove('fa-chevron-down');
                 icon.classList.add('fa-chevron-up');
-                // Зберігаємо стан у localStorage
                 try {
                     const expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
                     if (!expandedSeries.includes(card.dataset.series)) {
@@ -76,7 +73,6 @@ window.SICOMIX = window.SICOMIX || {};
                 paintsDiv.style.display = 'none';
                 icon.classList.remove('fa-chevron-up');
                 icon.classList.add('fa-chevron-down');
-                // Видаляємо з localStorage
                 try {
                     const expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
                     const index = expandedSeries.indexOf(card.dataset.series);
@@ -141,7 +137,6 @@ window.SICOMIX = window.SICOMIX || {};
             let html = '';
             let totalFoundPaints = 0;
 
-            // Отримуємо збережений стан розгорнутих серій
             let expandedSeries = [];
             try {
                 expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
@@ -174,8 +169,8 @@ window.SICOMIX = window.SICOMIX || {};
                     return `
                     <div class="paint-card-glass" data-paint-id="${p.id}" data-paint-series="${p.series}" style="color: ${p.color};">
                         <div class="glass-swatch" style="background: ${SICOMIX.utils.escapeHtml(p.color)};"></div>
-                        <div class="glass-name">${SICOMIX.utils.escapeHtml(paintCode)}</div>
-                        <div class="glass-article">${SICOMIX.utils.escapeHtml(paintName)}</div>
+                        <div class="glass-name" title="${SICOMIX.utils.escapeHtml(paintCode)}">${SICOMIX.utils.escapeHtml(paintCode)}</div>
+                        <div class="glass-article" title="${SICOMIX.utils.escapeHtml(paintName)}">${SICOMIX.utils.escapeHtml(paintName)}</div>
                         <button class="${buttonClass}" data-paint-id="${p.id}" title="${buttonTitle}" aria-label="${buttonTitle}">
                             <i class="fas ${buttonIcon}"></i>
                         </button>
@@ -252,9 +247,7 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
-            // Навішуємо обробники подій
             attachCatalogEventListeners();
-
             SICOMIX.i18n.applyTranslations();
 
         } catch (error) {
