@@ -445,19 +445,27 @@ window.SICOMIX = window.SICOMIX || {};
 
     // ---------- НАВІГАЦІЯ ----------
     function hasUnsavedChanges() {
-        // Перевіряємо, чи активна сторінка нового рецепту і чи є зміни
         const newRecipeActive = document.getElementById('new-recipe-page')?.classList.contains('active');
-        if (!newRecipeActive) return false;
-        if (isEditingRecipe) return false; // При редагуванні не показуємо попередження? Можна налаштувати.
+        if (!newRecipeActive) {
+            console.log('📝 hasUnsavedChanges: сторінка не new-recipe, повертаємо false');
+            return false;
+        }
+        if (isEditingRecipe) {
+            console.log('📝 hasUnsavedChanges: режим редагування, повертаємо false (або можна true, якщо є зміни)');
+            // Якщо потрібно попереджати і при редагуванні, можна додати перевірку на зміни
+            return false;
+        }
 
-        const name = document.getElementById('recipeName')?.value.trim();
-        const category = document.getElementById('recipeCategory')?.value;
-        const series = document.getElementById('recipeSeries')?.value;
-        const description = document.getElementById('recipeDescription')?.value.trim();
+        const name = document.getElementById('recipeName')?.value.trim() || '';
+        const category = document.getElementById('recipeCategory')?.value || '';
+        const series = document.getElementById('recipeSeries')?.value || '';
+        const description = document.getElementById('recipeDescription')?.value.trim() || '';
 
-        const hasText = name || category || series || description;
+        const hasText = !!(name || category || series || description);
         const hasIngredients = selectedIngredients.length > 0;
         const hasPhoto = !!recipePhotoDataUrl;
+
+        console.log('📝 hasUnsavedChanges:', { name, category, series, description, hasText, hasIngredients, hasPhoto });
 
         return hasText || hasIngredients || hasPhoto;
     }
@@ -965,7 +973,7 @@ window.SICOMIX = window.SICOMIX || {};
         setRecipePhotoDataUrl: (url) => { recipePhotoDataUrl = url; },
         setRecipeDraft: (draft) => { recipeDraft = draft; },
         setCatalogPage: (page) => { catalogPage = page; },
-        setSelectedSeries: (series) => { selectedSeries = series; }, // Додано
+        setSelectedSeries: (series) => { selectedSeries = series; },
 
         // Базові функції
         cacheDOMElements,
@@ -1008,7 +1016,7 @@ window.SICOMIX = window.SICOMIX || {};
 
         // Додаємо функції, які будуть використовуватися в інших модулях
         attachAllEventListeners,
-        hasUnsavedChanges // експортуємо для можливого використання
+        hasUnsavedChanges
     });
 
 })(window);
