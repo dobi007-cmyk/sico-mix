@@ -455,21 +455,18 @@ window.SICOMIX = window.SICOMIX || {};
             const originalRecipe = recipes.find(r => String(r.id) === String(editingRecipeId));
             if (!originalRecipe) return false;
 
-            // Поточні значення з форми
             const currentName = document.getElementById('recipeName')?.value.trim() || '';
             const currentCategory = document.getElementById('recipeCategory')?.value || '';
             const currentSeries = document.getElementById('recipeSeries')?.value || '';
             const currentDesc = document.getElementById('recipeDescription')?.value.trim() || '';
             const currentPhoto = recipePhotoDataUrl || null;
 
-            // Порівнюємо з оригіналом
             const nameChanged = currentName !== (originalRecipe.name || '');
             const categoryChanged = currentCategory !== (originalRecipe.category || '');
             const seriesChanged = currentSeries !== (originalRecipe.series || '');
             const descChanged = currentDesc !== (originalRecipe.description || '');
             const photoChanged = currentPhoto !== (originalRecipe.photo || null);
 
-            // Перевірка інгредієнтів – глибоке порівняння
             let ingredientsChanged = false;
             const currentIngredients = selectedIngredients;
             const originalIngredients = originalRecipe.ingredients || [];
@@ -516,10 +513,9 @@ window.SICOMIX = window.SICOMIX || {};
             return;
         }
 
-        // Якщо переходимо на іншу сторінку, а ми в режимі редагування – скидаємо його
         if (isEditingRecipe && pageId !== 'new-recipe') {
             resetEditMode();
-            clearRecipeForm(); // Очищаємо форму
+            clearRecipeForm();
         }
 
         console.log('🗂️ Приховуємо всі сторінки...');
@@ -589,10 +585,14 @@ window.SICOMIX = window.SICOMIX || {};
                 SICOMIX.i18n.t('unsaved_changes_warning'),
                 SICOMIX.i18n.t('confirmation_message'),
                 () => {
-                    // Підтвердили – переходимо, але перед цим очищаємо чернетку і скидаємо режим редагування
+                    // Підтвердили – переходимо, очищаємо все
                     if (isEditingRecipe) {
                         resetEditMode();
                         clearRecipeForm();
+                        clearRecipeDraft(); // Видаляємо чернетку
+                    } else {
+                        // Для нового рецепту теж очищаємо чернетку
+                        clearRecipeDraft();
                     }
                     performSwitch(pageId);
                 },
