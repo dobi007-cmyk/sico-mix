@@ -17,6 +17,7 @@ window.SICOMIX = window.SICOMIX || {};
                 <i class="fas fa-palette" style="font-size:32px; opacity:0.5;"></i><br>
                 <span>${SICOMIX.i18n.t('paints_not_found')}</span>
             </td></tr>`;
+            SICOMIX.i18n.applyTranslations();
             return;
         }
 
@@ -53,6 +54,7 @@ window.SICOMIX = window.SICOMIX || {};
             </tr>`;
         });
         dom.ingredientsList.innerHTML = html;
+        SICOMIX.i18n.applyTranslations();
 
         dom.ingredientsList.querySelectorAll('input, select').forEach(el => {
             el.addEventListener('change', function(e) {
@@ -325,6 +327,7 @@ window.SICOMIX = window.SICOMIX || {};
 
         if (filtered.length === 0) {
             dom.recipesContainer.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_recipes')}</p>`;
+            SICOMIX.i18n.applyTranslations();
             return;
         }
 
@@ -396,6 +399,8 @@ window.SICOMIX = window.SICOMIX || {};
             </div>
             `;
         }).join('');
+
+        SICOMIX.i18n.applyTranslations();
 
         dom.recipesContainer.addEventListener('click', function(e) {
             const btn = e.target.closest('button');
@@ -1152,31 +1157,45 @@ window.SICOMIX = window.SICOMIX || {};
         }
     }
 
-    // ---------- ПРИВ'ЯЗКА СТАТИЧНИХ КНОПОК ----------
-    // Ці обробники мають бути додані один раз після завантаження модуля
-    if (dom.importRecipesBtn) {
-        dom.importRecipesBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            importRecipes();
-        });
-    }
-    if (dom.exportRecipesBtn) {
-        dom.exportRecipesBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            exportAllRecipes();
-        });
-    }
-    if (dom.printRecipesBtn) {
-        dom.printRecipesBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            printRecipes();
-        });
-    }
-    if (dom.deleteSelectedRecipesBtn) {
-        dom.deleteSelectedRecipesBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            deleteSelectedRecipes();
-        });
+    // ---------- ПРИВ'ЯЗКА ОБРОБНИКІВ КНОПОК ----------
+    function attachRecipeEventListeners() {
+        if (dom.addIngredientBtn) {
+            dom.addIngredientBtn.addEventListener('click', addIngredient);
+        }
+        if (dom.scanRecipeBtn) {
+            dom.scanRecipeBtn.addEventListener('click', scanRecipeFromPhoto);
+        }
+        if (dom.saveRecipeBtn) {
+            dom.saveRecipeBtn.addEventListener('click', saveRecipe);
+        }
+        if (dom.clearRecipeBtn) {
+            dom.clearRecipeBtn.addEventListener('click', clearRecipeForm);
+        }
+        // Кнопки імпорту/експорту на сторінці рецептів
+        if (dom.importRecipesBtn) {
+            dom.importRecipesBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                importRecipes();
+            });
+        }
+        if (dom.exportRecipesBtn) {
+            dom.exportRecipesBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                exportAllRecipes();
+            });
+        }
+        if (dom.printRecipesBtn) {
+            dom.printRecipesBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                printRecipes();
+            });
+        }
+        if (dom.deleteSelectedRecipesBtn) {
+            dom.deleteSelectedRecipesBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                deleteSelectedRecipes();
+            });
+        }
     }
 
     // ---------- ЕКСПОРТ МЕТОДІВ ----------
@@ -1204,7 +1223,8 @@ window.SICOMIX = window.SICOMIX || {};
         printLabelWithWeight,
         editRecipe,
         scanRecipeFromPhoto,
-        updatePaintButton
+        updatePaintButton,
+        attachRecipeEventListeners
     });
 
 })(window);
