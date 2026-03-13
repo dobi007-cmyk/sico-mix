@@ -318,20 +318,78 @@ window.SICOMIX = window.SICOMIX || {};
         SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
     }
 
+    // Функція для відкриття PDF з перевіркою наявності файлу
+    function openPdf(pdfPath) {
+        // Перевіряємо, чи існує файл (робимо запит HEAD)
+        fetch(pdfPath, { method: 'HEAD' })
+            .then(response => {
+                if (response.ok) {
+                    // Файл існує – відкриваємо
+                    window.open(pdfPath, '_blank');
+                } else {
+                    // Файл не знайдено
+                    console.error(`❌ PDF файл не знайдено: ${pdfPath}`);
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('pdf_not_found'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error(`❌ Помилка при перевірці PDF: ${pdfPath}`, error);
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('pdf_error'), 'error');
+            });
+    }
+
     function setupPdfButtons() {
         const openRalPdf = document.getElementById('openRalPdf');
         if (openRalPdf) {
-            openRalPdf.addEventListener('click', () => {
-                window.open('./files/Wzornik RAL.PDF', '_blank');
+            openRalPdf.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Спробуємо різні можливі шляхи
+                const possiblePaths = [
+                    './files/Wzornik RAL.PDF',
+                    './files/wzornik-ral.pdf',
+                    './files/ral.pdf',
+                    './files/RAL.pdf'
+                ];
+                // Для простоти використаємо перший варіант
+                openPdf('./files/Wzornik RAL.PDF');
             });
         }
 
         const openPantonePdf = document.getElementById('openPantonePdf');
         if (openPantonePdf) {
-            openPantonePdf.addEventListener('click', () => {
-                window.open('./files/60-vzornik-pantone.pdf', '_blank');
+            openPantonePdf.addEventListener('click', (e) => {
+                e.preventDefault();
+                openPdf('./files/60-vzornik-pantone.pdf');
             });
         }
+    }
+
+    // Функція для перевірки наявності файлів при завантаженні
+    function checkPdfFiles() {
+        const filesToCheck = [
+            './files/Wzornik RAL.PDF',
+            './files/60-vzornik-pantone.pdf'
+        ];
+        
+        filesToCheck.forEach(pdfPath => {
+            fetch(pdfPath, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        console.log(`✅ PDF файл знайдено: ${pdfPath}`);
+                    } else {
+                        console.warn(`⚠️ PDF файл не знайдено: ${pdfPath}`);
+                    }
+                })
+                .catch(error => {
+                    console.warn(`⚠️ Помилка перевірки PDF: ${pdfPath}`, error);
+                });
+        });
+    }
+
+    // Ініціалізація модуля
+    function initPantoneRal() {
+        setupPdfButtons();
+        checkPdfFiles(); // для діагностики
     }
 
     Object.assign(SICOMIX.app, {
@@ -342,7 +400,9 @@ window.SICOMIX = window.SICOMIX || {};
         addRalToRecipe,
         attachPantoneEventListeners,
         attachRalEventListeners,
-        setupPdfButtons
+        setupPdfButtons,
+        openPdf,
+        initPantoneRal
     });
 
     console.log('📦 app-pantone-ral.js завантажено');
