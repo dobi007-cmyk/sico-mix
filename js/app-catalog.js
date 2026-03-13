@@ -6,7 +6,96 @@ window.SICOMIX = window.SICOMIX || {};
     const app = SICOMIX.app;
     const dom = app.dom;
 
-    // ---------- КАТАЛОГ ----------
+    function attachCatalogEventListeners() {
+        if (!dom.paintCatalogEl) return;
+
+        // Обробник для кнопок додавання/видалення
+        dom.paintCatalogEl.addEventListener('click', function(e) {
+            const btn = e.target.closest('.glass-add-btn, .glass-remove-btn');
+            if (!btn) return;
+            e.stopPropagation();
+            const paintId = btn.dataset.paintId;
+            const paint = app.getPaintCatalog().find(p => String(p.id) === paintId);
+            if (!paint) return;
+
+            if (btn.classList.contains('glass-add-btn')) {
+                const validation = app.validatePaintAddition(paint);
+                if (validation.valid) {
+                    addPaintToRecipeFromCatalog(paint);
+                    updatePaintButton(paintId, true);
+                } else {
+                    SICOMIX.utils.showNotification(validation.message, 'error');
+                }
+            } else if (btn.classList.contains('glass-remove-btn')) {
+                if (SICOMIX.app.removeIngredientByPaintId) {
+                    SICOMIX.app.removeIngredientByPaintId(paintId);
+                    updatePaintButton(paintId, false);
+                }
+            }
+        });
+
+        // Обробник для видалення користувацьких фарб
+        dom.paintCatalogEl.addEventListener('click', function(e) {
+            const btn = e.target.closest('.delete-paint');
+            if (!btn) return;
+            e.stopPropagation();
+            const paintId = btn.dataset.paintId;
+            if (paintId) deletePaint(paintId);
+        });
+
+        // Обробник для кнопок розгортання серій
+        dom.paintCatalogEl.querySelectorAll('.toggle-series').forEach(btn => {
+            btn.removeEventListener('click', toggleSeriesHandler);
+            btn.addEventListener('click', toggleSeriesHandler);
+        });
+
+        // Обробник для кнопок інформації про серію
+        dom.paintCatalogEl.querySelectorAll('.series-info-btn').forEach(btn => {
+            btn.removeEventListener('click', seriesInfoHandler);
+            btn.addEventListener('click', seriesInfoHandler);
+        });
+
+        // Обробник для заголовків серій (клік для розгортання)
+        dom.paintCatalogEl.querySelectorAll('.series-header').forEach(header => {
+            header.removeEventListener('click', headerClickHandler);
+            header.addEventListener('click', headerClickHandler);
+        });
+    }
+
+    function toggleSeriesHandler(e) {
+        e.stopPropagation();
+        const card = this.closest('.series-card');
+        const paintsDiv = card.querySelector('.series-paints');
+        const icon = this.querySelector('i');
+
+        if (paintsDiv.style.display === 'none') {
+            paintsDiv.style.display = 'grid';
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        } else {
+            paintsDiv.style.display = 'none';
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        }
+    }
+
+    function seriesInfoHandler(e) {
+        e.stopPropagation();
+        const card = this.closest('.series-card');
+        const seriesId = card.dataset.series;
+        const series = SICOMIX.data.series.find(s => s.id === seriesId);
+        if (series) {
+            openSeriesDetailsModal(series);
+        }
+    }
+
+    function headerClickHandler(e) {
+        if (!e.target.closest('.toggle-series') && !e.target.closest('.series-info-btn')) {
+            const btn = this.querySelector('.toggle-series');
+            if (btn) btn.click();
+        }
+    }
+
     function renderPaintCatalog(append = false) {
         if (!dom.paintCatalogEl) {
             console.warn('⚠️ paintCatalogEl не знайдено!');
@@ -47,7 +136,7 @@ window.SICOMIX = window.SICOMIX || {};
 
             // Застосування класу компонування
             const currentSettings = app.getCurrentSettings();
-            applyCatalogLayout(currentSettings.catalogLayout || 'classic');
+            app.applyCatalogLayout(currentSettings.catalogLayout || 'classic');
 
             let html = '';
             let totalFoundPaints = 0;
@@ -156,62 +245,8 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
-            document.querySelectorAll('.toggle-series').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const card = this.closest('.series-card');
-                    const paintsDiv = card.querySelector('.series-paints');
-                    const icon = this.querySelector('i');
-
-                    if (paintsDiv.style.display === 'none') {
-                        paintsDiv.style.display = 'grid';
-                        icon.classList.remove('fa-chevron-down');
-                        icon.classList.add('fa-chevron-up');
-                    } else {
-                        paintsDiv.style.display = 'none';
-                        icon.classList.remove('fa-chevron-up');
-                        icon.classList.add('fa-chevron-down');
-                    }
-                });
-            });
-
-            document.querySelectorAll('.series-info-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const card = this.closest('.series-card');
-                    const seriesId = card.dataset.series;
-                    const series = SICOMIX.data.series.find(s => s.id === seriesId);
-                    if (series) {
-                        openSeriesDetailsModal(series);
-                    }
-                });
-            });
-
-            document.querySelectorAll('.series-header').forEach(header => {
-                header.addEventListener('click', function(e) {
-                    if (!e.target.closest('.toggle-series') && !e.target.closest('.series-info-btn')) {
-                        const btn = this.querySelector('.toggle-series');
-                        if (btn) btn.click();
-                    }
-                });
-            });
-
-            document.querySelectorAll('.delete-paint').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const paintId = btn.dataset.paintId;
-                    if (paintId) deletePaint(paintId);
-                });
-            });
-
-            document.querySelectorAll('.paint-card-glass').forEach(card => {
-                card.addEventListener('click', function(e) {
-                    if (e.target.closest('button')) return;
-                    const paintId = this.dataset.paintId;
-                    const paint = paintCatalog.find(p => String(p.id) === paintId);
-                    if (paint) showPaintDetails(paint);
-                });
-            });
+            // Навішуємо обробники подій
+            attachCatalogEventListeners();
 
             SICOMIX.i18n.applyTranslations();
 
@@ -276,13 +311,13 @@ window.SICOMIX = window.SICOMIX || {};
         });
         app.setSelectedIngredients(selectedIngredients);
 
-        app.calculatePercentages?.();
-        app.renderIngredientsList?.();
+        if (SICOMIX.app.calculatePercentages) SICOMIX.app.calculatePercentages();
+        if (SICOMIX.app.renderIngredientsList) SICOMIX.app.renderIngredientsList();
         app.updateSeriesLockUI();
         app.autoSaveRecipeDraft();
 
-        if (window.SICOMIX.app.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-        if (window.SICOMIX.app.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
+        if (SICOMIX.app.renderPantoneCatalog) SICOMIX.app.renderPantoneCatalog();
+        if (SICOMIX.app.renderRalCatalog) SICOMIX.app.renderRalCatalog();
 
         SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
     }
@@ -405,9 +440,9 @@ window.SICOMIX = window.SICOMIX || {};
                     app.invalidateSeriesCache();
                     app.saveData();
                     renderPaintCatalog();
-                    app.renderRecipes?.();
-                    if (window.SICOMIX.app.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-                    if (window.SICOMIX.app.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
+                    if (SICOMIX.app.renderRecipes) SICOMIX.app.renderRecipes();
+                    if (SICOMIX.app.renderPantoneCatalog) SICOMIX.app.renderPantoneCatalog();
+                    if (SICOMIX.app.renderRalCatalog) SICOMIX.app.renderRalCatalog();
                     SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
                 }
             );
@@ -419,16 +454,30 @@ window.SICOMIX = window.SICOMIX || {};
             app.invalidateSeriesCache();
             app.saveData();
             renderPaintCatalog();
-            if (window.SICOMIX.app.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-            if (window.SICOMIX.app.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
+            if (SICOMIX.app.renderPantoneCatalog) SICOMIX.app.renderPantoneCatalog();
+            if (SICOMIX.app.renderRalCatalog) SICOMIX.app.renderRalCatalog();
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_deleted'), 'success');
         }
     }
 
-    function applyCatalogLayout(layout) {
-        if (dom.paintCatalogEl) {
-            dom.paintCatalogEl.classList.remove('catalog-layout-classic', 'catalog-layout-compact', 'catalog-layout-list');
-            dom.paintCatalogEl.classList.add(`catalog-layout-${layout}`);
+    function updatePaintButton(paintId, isInRecipe) {
+        const card = document.querySelector(`.paint-card-glass[data-paint-id="${paintId}"]`);
+        if (!card) return;
+        const btn = card.querySelector('.glass-add-btn, .glass-remove-btn');
+        if (btn) {
+            if (isInRecipe) {
+                btn.classList.remove('glass-add-btn');
+                btn.classList.add('glass-remove-btn');
+                btn.innerHTML = '<i class="fas fa-trash"></i>';
+                btn.title = SICOMIX.i18n.t('remove_from_recipe');
+                btn.setAttribute('aria-label', SICOMIX.i18n.t('remove_from_recipe'));
+            } else {
+                btn.classList.remove('glass-remove-btn');
+                btn.classList.add('glass-add-btn');
+                btn.innerHTML = '<i class="fas fa-plus"></i>';
+                btn.title = SICOMIX.i18n.t('add_ingredient');
+                btn.setAttribute('aria-label', SICOMIX.i18n.t('add_ingredient'));
+            }
         }
     }
 
@@ -441,7 +490,8 @@ window.SICOMIX = window.SICOMIX || {};
         addNewPaint,
         saveNewPaint,
         deletePaint,
-        applyCatalogLayout
+        updatePaintButton,
+        attachCatalogEventListeners
     });
 
 })(window);
