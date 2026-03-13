@@ -446,38 +446,63 @@ window.SICOMIX = window.SICOMIX || {};
     // ---------- НАВІГАЦІЯ ----------
     function hasUnsavedChanges() {
         const newRecipeActive = document.getElementById('new-recipe-page')?.classList.contains('active');
-        if (!newRecipeActive) return false;
-        if (!isEditingRecipe) return false; // Модальне вікно ТІЛЬКИ при редагуванні
+        if (!newRecipeActive) {
+            return false;
+        }
 
-        // Перевіряємо, чи є реальні зміни порівняно з оригінальним рецептом
-        if (!editingRecipeId) return false;
-        
-        const original = recipes.find(r => String(r.id) === String(editingRecipeId));
-        if (!original) return false;
+        // Якщо ми в режимі редагування, перевіряємо, чи є зміни відносно оригінального рецепту
+        if (isEditingRecipe && editingRecipeId) {
+            const originalRecipe = recipes.find(r => String(r.id) === String(editingRecipeId));
+            if (!originalRecipe) return false;
 
-        const currentName = document.getElementById('recipeName')?.value.trim() || '';
-        const currentCategory = document.getElementById('recipeCategory')?.value || '';
-        const currentSeries = document.getElementById('recipeSeries')?.value || '';
-        const currentDescription = document.getElementById('recipeDescription')?.value.trim() || '';
-        const currentIngredients = selectedIngredients;
-        const currentPhoto = recipePhotoDataUrl;
+            // Поточні значення з форми
+            const currentName = document.getElementById('recipeName')?.value.trim() || '';
+            const currentCategory = document.getElementById('recipeCategory')?.value || '';
+            const currentSeries = document.getElementById('recipeSeries')?.value || '';
+            const currentDesc = document.getElementById('recipeDescription')?.value.trim() || '';
+            const currentPhoto = recipePhotoDataUrl || null;
 
-        // Порівнюємо з оригіналом
-        const nameChanged = currentName !== original.name;
-        const categoryChanged = currentCategory !== original.category;
-        const seriesChanged = currentSeries !== original.series;
-        const descChanged = currentDescription !== (original.description || '');
-        const ingredientsChanged = JSON.stringify(currentIngredients) !== JSON.stringify(original.ingredients);
-        const photoChanged = currentPhoto !== (original.photo || null);
+            // Порівнюємо з оригіналом
+            const nameChanged = currentName !== (originalRecipe.name || '');
+            const categoryChanged = currentCategory !== (originalRecipe.category || '');
+            const seriesChanged = currentSeries !== (originalRecipe.series || '');
+            const descChanged = currentDesc !== (originalRecipe.description || '');
+            const photoChanged = currentPhoto !== (originalRecipe.photo || null);
 
-        const hasChanges = nameChanged || categoryChanged || seriesChanged || descChanged || ingredientsChanged || photoChanged;
-        
-        console.log('📝 hasUnsavedChanges:', { 
-            nameChanged, categoryChanged, seriesChanged, descChanged, ingredientsChanged, photoChanged, 
-            hasChanges 
-        });
-        
-        return hasChanges;
+            // Перевірка інгредієнтів – глибоке порівняння
+            let ingredientsChanged = false;
+            const currentIngredients = selectedIngredients;
+            const originalIngredients = originalRecipe.ingredients || [];
+            if (currentIngredients.length !== originalIngredients.length) {
+                ingredientsChanged = true;
+            } else {
+                for (let i = 0; i < currentIngredients.length; i++) {
+                    const a = currentIngredients[i];
+                    const b = originalIngredients[i];
+                    if (a.paintId !== b.paintId || a.amount !== b.amount || a.unit !== b.unit) {
+                        ingredientsChanged = true;
+                        break;
+                    }
+                }
+            }
+
+            const changed = nameChanged || categoryChanged || seriesChanged || descChanged || photoChanged || ingredientsChanged;
+            console.log('📝 hasUnsavedChanges (edit):', { nameChanged, categoryChanged, seriesChanged, descChanged, photoChanged, ingredientsChanged, result: changed });
+            return changed;
+        }
+
+        // Для створення нового рецепту
+        const name = document.getElementById('recipeName')?.value.trim() || '';
+        const category = document.getElementById('recipeCategory')?.value || '';
+        const series = document.getElementById('recipeSeries')?.value || '';
+        const description = document.getElementById('recipeDescription')?.value.trim() || '';
+
+        const hasText = !!(name || category || series || description);
+        const hasIngredients = selectedIngredients.length > 0;
+        const hasPhoto = !!recipePhotoDataUrl;
+
+        console.log('📝 hasUnsavedChanges (new):', { hasText, hasIngredients, hasPhoto, result: hasText || hasIngredients || hasPhoto });
+        return hasText || hasIngredients || hasPhoto;
     }
 
     function performSwitch(pageId) {
@@ -491,8 +516,10 @@ window.SICOMIX = window.SICOMIX || {};
             return;
         }
 
+        // Якщо переходимо на іншу сторінку, а ми в режимі редагування – скидаємо його
         if (isEditingRecipe && pageId !== 'new-recipe') {
             resetEditMode();
+            clearRecipeForm(); // Очищаємо форму
         }
 
         console.log('🗂️ Приховуємо всі сторінки...');
@@ -562,7 +589,11 @@ window.SICOMIX = window.SICOMIX || {};
                 SICOMIX.i18n.t('unsaved_changes_warning'),
                 SICOMIX.i18n.t('confirmation_message'),
                 () => {
-                    // Підтвердили – переходимо
+                    // Підтвердили – переходимо, але перед цим очищаємо чернетку і скидаємо режим редагування
+                    if (isEditingRecipe) {
+                        resetEditMode();
+                        clearRecipeForm();
+                    }
                     performSwitch(pageId);
                 },
                 () => {
@@ -954,7 +985,6 @@ window.SICOMIX = window.SICOMIX || {};
     // ---------- ПУБЛІЧНІ МЕТОДИ ----------
     SICOMIX.app = SICOMIX.app || {};
     Object.assign(SICOMIX.app, {
-        // Стан (геттери)
         getRecipes: () => recipes,
         getUserPaints: () => userPaints,
         getPaintCatalog: () => paintCatalog,
@@ -969,7 +999,6 @@ window.SICOMIX = window.SICOMIX || {};
         getCatalogPage: () => catalogPage,
         getCATALOG_PAGE_SIZE: () => CATALOG_PAGE_SIZE,
 
-        // Сеттери
         setRecipes: (newRecipes) => { recipes = newRecipes; },
         setUserPaints: (newPaints) => { userPaints = newPaints; },
         setPaintCatalog: (newCatalog) => { paintCatalog = newCatalog; },
@@ -985,7 +1014,6 @@ window.SICOMIX = window.SICOMIX || {};
         setCatalogPage: (page) => { catalogPage = page; },
         setSelectedSeries: (series) => { selectedSeries = series; },
 
-        // Базові функції
         cacheDOMElements,
         loadData,
         saveData,
@@ -1010,21 +1038,16 @@ window.SICOMIX = window.SICOMIX || {};
         dom,
         unitMap,
 
-        // Навігація та налаштування
         switchPage,
         resetEditMode,
         initSettings,
         applyTheme,
         applyCatalogLayout,
 
-        // Імпорт/Експорт
         startImport,
         startExport,
 
-        // Головна ініціалізація
         init: initApp,
-
-        // Додаємо функції, які будуть використовуватися в інших модулях
         attachAllEventListeners,
         hasUnsavedChanges
     });
