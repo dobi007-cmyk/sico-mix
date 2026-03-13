@@ -21,64 +21,14 @@
     <!-- Tesseract.js для OCR -->
     <script src='https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js'></script>
 
-    <!-- ========== АНТИКРИЗОВИЙ ЗАХИСТ ========== -->
+    <!-- Простий обробник помилок (замість антикризового скрипта) -->
     <script>
-        (function() {
-            console.log('🛡️ Антикризовий захист активовано');
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                    for (let registration of registrations) {
-                        registration.unregister().then(success => {
-                            console.log(success ? '✅ SW видалено' : '❌ Не вдалося видалити SW');
-                        }).catch(e => console.error('Помилка видалення SW:', e));
-                    }
-                }).catch(console.error);
-                const originalRegister = navigator.serviceWorker.register;
-                navigator.serviceWorker.register = function() {
-                    console.warn('⚠️ Спроба реєстрації SW – ЗАБЛОКОВАНО');
-                    return Promise.reject(new Error('Service Worker disabled'));
-                };
-            }
-            const originalReload = window.location.reload;
-            window.location.reload = function() {
-                console.warn('⚠️ Спроба викликати location.reload() – ЗАБЛОКОВАНО');
-                return false;
-            };
-            const originalAssign = window.location.assign;
-            const originalReplace = window.location.replace;
-            window.location.assign = function(url) {
-                console.warn('⚠️ Спроба викликати location.assign() на', url, '– ЗАБЛОКОВАНО');
-            };
-            window.location.replace = function(url) {
-                console.warn('⚠️ Спроба викликати location.replace() на', url, '– ЗАБЛОКОВАНО');
-            };
-            try {
-                let currentHref = window.location.href;
-                Object.defineProperty(window.location, 'href', {
-                    set: function(value) {
-                        console.warn('⚠️ Спроба змінити location.href на', value, '– ЗАБЛОКОВАНО');
-                    },
-                    get: function() {
-                        return currentHref;
-                    },
-                    configurable: false
-                });
-            } catch (e) {
-                console.warn('⚠️ Не вдалося перевизначити location.href (пропускаємо)');
-            }
-            window.addEventListener('error', function(e) {
-                console.error('❌ Помилка перехоплена:', e.error || e.message);
-                e.preventDefault();
-                return true;
-            });
-            window.addEventListener('unhandledrejection', function(e) {
-                console.error('❌ Unhandled Promise Rejection:', e.reason);
-                e.preventDefault();
-            });
-            window.SICOMIX = window.SICOMIX || {};
-            window.SICOMIX.data = window.SICOMIX.data || {};
-            console.log('🛡️ Захист завершено');
-        })();
+        window.addEventListener('error', function(e) {
+            console.error('❌ Помилка:', e.error || e.message);
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('❌ Unhandled Promise Rejection:', e.reason);
+        });
     </script>
 
     <!-- Firebase SDK -->
@@ -192,7 +142,6 @@
             </li>
         </ul>
 
-        <!-- Тільки один пункт "Налаштування" (виправлено) -->
         <h3 class="nav-title" data-i18n="settings">Налаштування</h3>
         <ul class="nav-menu">
             <li class="nav-item">
@@ -414,12 +363,11 @@
                 </div>
             </div>
 
-            <!-- PANTONE PAGE (З КНОПКОЮ ДЛЯ PANTONE PDF) -->
+            <!-- PANTONE PAGE -->
             <div class="page-content" id="pantone-page">
                 <h2 class="page-title" data-i18n="pantone">Pantone</h2>
                 <p class="page-description" data-i18n="pantone_desc">Кольори Pantone з каталогів Formula Guide</p>
                 
-                <!-- КНОПКА ТІЛЬКИ ДЛЯ PANTONE PDF -->
                 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                     <button class="btn btn-primary" id="openPantonePdf">
                         <i class="fas fa-file-pdf"></i> <span data-i18n="open_pantone_pdf">Відкрити веер Pantone</span>
@@ -442,12 +390,11 @@
                 <div class="pantone-cards" id="pantoneCatalog" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; margin-top: 30px;"></div>
             </div>
 
-            <!-- RAL PAGE (З КНОПКОЮ ДЛЯ RAL PDF) -->
+            <!-- RAL PAGE -->
             <div class="page-content" id="ral-page">
                 <h2 class="page-title" data-i18n="ral">RAL</h2>
                 <p class="page-description" data-i18n="ral_desc">Кольори RAL Classic</p>
                 
-                <!-- КНОПКА ТІЛЬКИ ДЛЯ RAL PDF -->
                 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                     <button class="btn btn-primary" id="openRalPdf">
                         <i class="fas fa-file-pdf"></i> <span data-i18n="open_ral_pdf">Відкрити веер RAL</span>
@@ -539,7 +486,7 @@
                 </div>
             </div>
 
-            <!-- ОНОВЛЕНА СТОРІНКА НАЛАШТУВАНЬ -->
+            <!-- SETTINGS PAGE -->
             <div class="page-content" id="settings-page">
                 <h2 class="page-title" data-i18n="settings">Налаштування</h2>
                 <p class="page-description" data-i18n="settings_desc">Налаштуйте систему за вашими потребами</p>
@@ -630,6 +577,23 @@
                         <button class="btn btn-primary" id="addPantoneFromRecipeBtn">
                             <i class="fas fa-plus"></i> <span data-i18n="add_ingredient">Додати до рецепту</span>
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL: Weight Input for Label -->
+            <div class="modal" id="weightInputModal">
+                <div class="modal-content" style="max-width: 350px;">
+                    <div class="modal-header">
+                        <h3 class="modal-title" data-i18n="enter_weight_kg">Введіть вагу (кг):</h3>
+                        <button class="modal-close" id="closeWeightModal">&times;</button>
+                    </div>
+                    <div style="padding: 20px;">
+                        <input type="number" class="form-input" id="weightInput" step="0.01" min="0.01" value="1.00">
+                    </div>
+                    <div class="action-buttons" style="justify-content: center; padding: 0 20px 20px;">
+                        <button class="btn btn-primary" id="weightConfirmBtn"><span data-i18n="confirm">Підтвердити</span></button>
+                        <button class="btn btn-secondary" id="weightCancelBtn"><span data-i18n="cancel">Скасувати</span></button>
                     </div>
                 </div>
             </div>
