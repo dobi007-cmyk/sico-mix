@@ -21,7 +21,6 @@ window.SICOMIX = window.SICOMIX || {};
     let lockedCategory = null;
 
     // Пагінація каталогу
-    let catalogFilteredSeries = [];
     let catalogPage = 1;
     const CATALOG_PAGE_SIZE = 5;
 
@@ -258,7 +257,6 @@ window.SICOMIX = window.SICOMIX || {};
             lockedSeries = null;
             lockedCategory = null;
         }
-        // Викликаємо функції з інших модулів, якщо вони існують
         if (SICOMIX.app.renderIngredientsList) SICOMIX.app.renderIngredientsList();
         if (SICOMIX.app.calculatePercentages) SICOMIX.app.calculatePercentages();
         updateSeriesLockUI();
@@ -522,6 +520,139 @@ window.SICOMIX = window.SICOMIX || {};
         }
     }
 
+    // ---------- ІМПОРТ/ЕКСПОРТ ----------
+    function startImport() {
+        if (!dom.importFile || !dom.importFile.files || dom.importFile.files.length === 0) {
+            SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_import_file'), 'error');
+            return;
+        }
+
+        if (!dom.importRecipesCheckbox?.checked && !dom.importPaintsCheckbox?.checked) {
+            SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_data_to_import'), 'warning');
+            return;
+        }
+
+        const file = dom.importFile.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                let data;
+                if (file.name.endsWith('.json')) {
+                    data = JSON.parse(e.target.result);
+                } else if (file.name.endsWith('.csv')) {
+                    data = SICOMIX.utils.parseCSV(e.target.result);
+                } else {
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('invalid_file_format'), 'error');
+                    return;
+                }
+
+                const importRecipes = dom.importRecipesCheckbox?.checked;
+                const importPaints = dom.importPaintsCheckbox?.checked;
+
+                let recipesCount = 0;
+                let paintsCount = 0;
+
+                if (importRecipes && data.recipes && Array.isArray(data.recipes)) {
+                    data.recipes.forEach(r => {
+                        r.id = SICOMIX.utils.generateId();
+                        if (r.ingredients) {
+                            r.ingredients = r.ingredients.map(ing => ({ ...ing, paintId: String(ing.paintId) }));
+                        }
+                        recipes.push(r);
+                        recipesCount++;
+                    });
+                }
+                if (importPaints && data.paints && Array.isArray(data.paints)) {
+                    data.paints.forEach(p => {
+                        p.id = SICOMIX.utils.generateId();
+                        p.isDefault = false;
+                        userPaints.push(p);
+                        paintsCount++;
+                    });
+                    paintCatalog = [...basePaints, ...userPaints];
+                    invalidateSeriesCache();
+                }
+
+                saveData();
+                populateCategoryFilters();
+                if (SICOMIX.app.renderRecipes) SICOMIX.app.renderRecipes();
+                if (SICOMIX.app.renderPaintCatalog) SICOMIX.app.renderPaintCatalog();
+                if (SICOMIX.app.renderPantoneCatalog) SICOMIX.app.renderPantoneCatalog();
+                if (SICOMIX.app.renderRalCatalog) SICOMIX.app.renderRalCatalog();
+
+                let message = SICOMIX.i18n.t('imported') + '!';
+                if (recipesCount > 0 && paintsCount > 0) {
+                    message = `${SICOMIX.i18n.t('imported')} ${recipesCount} ${SICOMIX.i18n.t('recipes')} ${SICOMIX.i18n.t('and')} ${paintsCount} ${SICOMIX.i18n.t('paints')}`;
+                } else if (recipesCount > 0) {
+                    message = `${SICOMIX.i18n.t('imported')} ${recipesCount} ${SICOMIX.i18n.t('recipes')}`;
+                } else if (paintsCount > 0) {
+                    message = `${SICOMIX.i18n.t('imported')} ${paintsCount} ${SICOMIX.i18n.t('paints')}`;
+                }
+                SICOMIX.utils.showNotification(message, 'success');
+
+            } catch (err) {
+                console.error(err);
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('invalid_file_format'), 'error');
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function startExport() {
+        const format = dom.exportFormat?.value || 'json';
+        const exportRecipes = dom.exportRecipesCheckbox?.checked;
+        const includePhotos = dom.includePhotosCheckbox?.checked;
+
+        if (!exportRecipes) {
+            SICOMIX.utils.showNotification(SICOMIX.i18n.t('select_data_to_export'), 'warning');
+            return;
+        }
+
+        let exportData = {};
+
+        if (exportRecipes) {
+            if (!includePhotos) {
+                exportData.recipes = recipes.map(r => {
+                    const { photo, ...rest } = r;
+                    return rest;
+                });
+            } else {
+                exportData.recipes = recipes;
+            }
+        }
+
+        const filename = `sico_spectrum_recipes_${new Date().toISOString().split('T')[0]}.${format}`;
+
+        if (format === 'csv') {
+            try {
+                const simpleRecipes = exportData.recipes.map(r => ({
+                    id: r.id,
+                    name: r.name,
+                    category: r.category,
+                    series: r.series,
+                    description: r.description || '',
+                    date: r.date || '',
+                    ingredients: JSON.stringify(r.ingredients)
+                }));
+                const csvContent = SICOMIX.utils.convertToCSV(simpleRecipes);
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+                SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('exported')} ${recipes.length} ${SICOMIX.i18n.t('recipes')}`, 'success');
+            } catch (e) {
+                console.error('Помилка створення CSV:', e);
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('export_error'), 'error');
+            }
+        } else {
+            SICOMIX.utils.exportToFile(exportData, filename, 'application/json');
+            SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('exported')} ${recipes.length} ${SICOMIX.i18n.t('recipes')}`, 'success');
+        }
+    }
+
     // ---------- ГОЛОВНІ ПОДІЇ ----------
     function setupCoreEventListeners() {
         // Навігація
@@ -610,6 +741,20 @@ window.SICOMIX = window.SICOMIX || {};
 
         // Автозбереження
         attachAutoSaveListeners();
+
+        // Кнопки імпорту/експорту на окремих сторінках
+        if (dom.startImportBtn) {
+            dom.startImportBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                startImport();
+            });
+        }
+        if (dom.startExportBtn) {
+            dom.startExportBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                startExport();
+            });
+        }
 
         // Попередження про незбережені зміни
         window.addEventListener('beforeunload', function(e) {
@@ -754,6 +899,10 @@ window.SICOMIX = window.SICOMIX || {};
         initSettings,
         applyTheme,
         applyCatalogLayout,
+
+        // Імпорт/Експорт
+        startImport,
+        startExport,
 
         // Головна ініціалізація
         init: initApp
