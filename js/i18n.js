@@ -143,7 +143,7 @@ window.SICOMIX = window.SICOMIX || {};
             "scan_success": "Знайдено {{count}} інгредієнтів",
             "scan_no_paints": "Не вдалося розпізнати жодної фарби",
             "scan_error": "Помилка сканування",
-            "search_paints": "Пошук фарб...", // Додано
+            "search_paints": "Пошук фарб...",
             
             // Рецепти
             "my_recipes": "Мої рецепти",
@@ -379,7 +379,22 @@ window.SICOMIX = window.SICOMIX || {};
             "cat_uv_led": "UV фарби (LED)",
             
             // Друк етикетки
-            "enter_weight_kg": "Введіть вагу (кг):"
+            "enter_weight_kg": "Введіть вагу (кг):",
+
+            // Додаткові ключі для повідомлень
+            "recipe_exists_title": "Рецепт вже існує",
+            "recipe_exists_message": "Рецепт з такою назвою вже існує. Замінити його?",
+            "paints_in_series": "фарб у серії",
+            "series": "серій",
+            "remove_from_recipe": "Видалити з рецепту",
+            "add_ingredient": "Додати інгредієнт",
+            "paint_added": "Фарбу додано",
+            "paint_updated": "Фарбу оновлено",
+            "paint_deleted": "Фарбу видалено",
+            "backup_created": "Резервну копію створено",
+            "backup_exported": "Бекап експортовано",
+            "offline": "Офлайн",
+            "unknown": "Невідомо"
         },
         
         en: {
@@ -519,7 +534,7 @@ window.SICOMIX = window.SICOMIX || {};
             "scan_success": "Found {{count}} ingredients",
             "scan_no_paints": "No paints recognized",
             "scan_error": "Scan error",
-            "search_paints": "Search paints...", // Додано
+            "search_paints": "Search paints...",
             
             // Recipes
             "my_recipes": "My recipes",
@@ -755,7 +770,22 @@ window.SICOMIX = window.SICOMIX || {};
             "cat_uv_led": "UV paints (LED)",
             
             // Label printing
-            "enter_weight_kg": "Enter weight (kg):"
+            "enter_weight_kg": "Enter weight (kg):",
+
+            // Additional keys
+            "recipe_exists_title": "Recipe already exists",
+            "recipe_exists_message": "A recipe with this name already exists. Replace it?",
+            "paints_in_series": "paints in series",
+            "series": "series",
+            "remove_from_recipe": "Remove from recipe",
+            "add_ingredient": "Add ingredient",
+            "paint_added": "Paint added",
+            "paint_updated": "Paint updated",
+            "paint_deleted": "Paint deleted",
+            "backup_created": "Backup created",
+            "backup_exported": "Backup exported",
+            "offline": "Offline",
+            "unknown": "Unknown"
         },
         
         pl: {
@@ -895,7 +925,7 @@ window.SICOMIX = window.SICOMIX || {};
             "scan_success": "Znaleziono {{count}} składników",
             "scan_no_paints": "Nie rozpoznano żadnej farby",
             "scan_error": "Błąd skanowania",
-            "search_paints": "Szukaj farb...", // Додано
+            "search_paints": "Szukaj farb...",
             
             // Receptury
             "my_recipes": "Moje receptury",
@@ -1131,7 +1161,22 @@ window.SICOMIX = window.SICOMIX || {};
             "cat_uv_led": "Farby UV (LED)",
             
             // Drukowanie etykiety
-            "enter_weight_kg": "Wprowadź wagę (kg):"
+            "enter_weight_kg": "Wprowadź wagę (kg):",
+
+            // Dodatkowe klucze
+            "recipe_exists_title": "Przepis już istnieje",
+            "recipe_exists_message": "Przepis o tej nazwie już istnieje. Zastąpić go?",
+            "paints_in_series": "farb w serii",
+            "series": "serii",
+            "remove_from_recipe": "Usuń z receptury",
+            "add_ingredient": "Dodaj składnik",
+            "paint_added": "Farbę dodano",
+            "paint_updated": "Farbę zaktualizowano",
+            "paint_deleted": "Farbę usunięto",
+            "backup_created": "Kopia zapasowa utworzona",
+            "backup_exported": "Kopia wyeksportowana",
+            "offline": "Offline",
+            "unknown": "Nieznany"
         }
     };
 
@@ -1182,7 +1227,6 @@ window.SICOMIX = window.SICOMIX || {};
     // Функція для перекладу назв категорій (прямих рядків, наприклад з data-colors)
     function translateCategoryName(ukrainianName) {
         const lang = currentLanguage;
-        // Мапа відповідностей для кожної мови
         const categoryNameMap = {
             uk: {
                 "Універсальні": "Універсальні",
