@@ -6,6 +6,7 @@ window.SICOMIX = window.SICOMIX || {};
     const app = SICOMIX.app;
     const dom = app.dom;
 
+    // ---------- PANTONE ----------
     function attachPantoneEventListeners() {
         console.log('🎨 attachPantoneEventListeners викликано');
         if (dom.pantoneCatalog) {
@@ -23,30 +24,6 @@ window.SICOMIX = window.SICOMIX || {};
                     const pantoneNumber = btn.dataset.pantoneNumber;
                     if (pantoneNumber) {
                         addPantoneToRecipe(pantoneNumber);
-                    }
-                }
-            });
-        }
-    }
-
-    function attachRalEventListeners() {
-        console.log('🎨 attachRalEventListeners викликано');
-        if (dom.ralCatalog) {
-            dom.ralCatalog.addEventListener('click', function(e) {
-                const btn = e.target.closest('.glass-add-btn, .glass-remove-btn');
-                if (!btn) return;
-                e.stopPropagation();
-
-                if (btn.classList.contains('glass-remove-btn')) {
-                    const code = btn.dataset.ralCode;
-                    if (code && SICOMIX.app.removeIngredientByArticle) {
-                        SICOMIX.app.removeIngredientByArticle(code);
-                    }
-                } else if (btn.classList.contains('glass-add-btn')) {
-                    const code = btn.dataset.ralCode;
-                    const hex = btn.dataset.ralHex;
-                    if (code) {
-                        addRalToRecipe(code, hex);
                     }
                 }
             });
@@ -205,6 +182,31 @@ window.SICOMIX = window.SICOMIX || {};
         SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
     }
 
+    // ---------- RAL ----------
+    function attachRalEventListeners() {
+        console.log('🎨 attachRalEventListeners викликано');
+        if (dom.ralCatalog) {
+            dom.ralCatalog.addEventListener('click', function(e) {
+                const btn = e.target.closest('.glass-add-btn, .glass-remove-btn');
+                if (!btn) return;
+                e.stopPropagation();
+
+                if (btn.classList.contains('glass-remove-btn')) {
+                    const code = btn.dataset.ralCode;
+                    if (code && SICOMIX.app.removeIngredientByArticle) {
+                        SICOMIX.app.removeIngredientByArticle(code);
+                    }
+                } else if (btn.classList.contains('glass-add-btn')) {
+                    const code = btn.dataset.ralCode;
+                    const hex = btn.dataset.ralHex;
+                    if (code) {
+                        addRalToRecipe(code, hex);
+                    }
+                }
+            });
+        }
+    }
+
     function renderRalCatalog() {
         if (!dom.ralCatalog) {
             console.warn('ralCatalog element not found');
@@ -318,80 +320,63 @@ window.SICOMIX = window.SICOMIX || {};
         SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
     }
 
-    // Функція для відкриття PDF з перевіркою наявності файлу
-    function openPdf(pdfPath) {
-        // Перевіряємо, чи існує файл (робимо запит HEAD)
-        fetch(pdfPath, { method: 'HEAD' })
-            .then(response => {
-                if (response.ok) {
-                    // Файл існує – відкриваємо
-                    window.open(pdfPath, '_blank');
-                } else {
-                    // Файл не знайдено
-                    console.error(`❌ PDF файл не знайдено: ${pdfPath}`);
-                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('pdf_not_found'), 'error');
-                }
-            })
-            .catch(error => {
-                console.error(`❌ Помилка при перевірці PDF: ${pdfPath}`, error);
-                SICOMIX.utils.showNotification(SICOMIX.i18n.t('pdf_error'), 'error');
-            });
-    }
-
+    // ---------- PDF BUTTONS ----------
     function setupPdfButtons() {
+        console.log('📄 setupPdfButtons викликано');
         const openRalPdf = document.getElementById('openRalPdf');
         if (openRalPdf) {
-            openRalPdf.addEventListener('click', (e) => {
-                e.preventDefault();
-                // Спробуємо різні можливі шляхи
-                const possiblePaths = [
-                    './files/Wzornik RAL.PDF',
-                    './files/wzornik-ral.pdf',
-                    './files/ral.pdf',
-                    './files/RAL.pdf'
-                ];
-                // Для простоти використаємо перший варіант
-                openPdf('./files/Wzornik RAL.PDF');
-            });
+            // Видаляємо старі обробники, щоб уникнути дублювання
+            openRalPdf.removeEventListener('click', openRalPdfHandler);
+            openRalPdf.addEventListener('click', openRalPdfHandler);
+            console.log('✅ openRalPdf обробник додано');
+        } else {
+            console.warn('❌ openRalPdf не знайдено');
         }
 
         const openPantonePdf = document.getElementById('openPantonePdf');
         if (openPantonePdf) {
-            openPantonePdf.addEventListener('click', (e) => {
-                e.preventDefault();
-                openPdf('./files/60-vzornik-pantone.pdf');
-            });
+            openPantonePdf.removeEventListener('click', openPantonePdfHandler);
+            openPantonePdf.addEventListener('click', openPantonePdfHandler);
+            console.log('✅ openPantonePdf обробник додано');
+        } else {
+            console.warn('❌ openPantonePdf не знайдено');
         }
     }
 
-    // Функція для перевірки наявності файлів при завантаженні
-    function checkPdfFiles() {
-        const filesToCheck = [
-            './files/Wzornik RAL.PDF',
-            './files/60-vzornik-pantone.pdf'
-        ];
-        
-        filesToCheck.forEach(pdfPath => {
-            fetch(pdfPath, { method: 'HEAD' })
-                .then(response => {
-                    if (response.ok) {
-                        console.log(`✅ PDF файл знайдено: ${pdfPath}`);
-                    } else {
-                        console.warn(`⚠️ PDF файл не знайдено: ${pdfPath}`);
-                    }
-                })
-                .catch(error => {
-                    console.warn(`⚠️ Помилка перевірки PDF: ${pdfPath}`, error);
-                });
-        });
+    function openRalPdfHandler(e) {
+        e.preventDefault();
+        // Перевіряємо, чи файл існує, інакше показуємо помилку
+        const pdfPath = './files/Wzornik RAL.PDF';
+        fetch(pdfPath, { method: 'HEAD' })
+            .then(response => {
+                if (response.ok) {
+                    window.open(pdfPath, '_blank');
+                } else {
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('pdf_not_found'), 'error');
+                }
+            })
+            .catch(() => {
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('pdf_not_found'), 'error');
+            });
     }
 
-    // Ініціалізація модуля
-    function initPantoneRal() {
-        setupPdfButtons();
-        checkPdfFiles(); // для діагностики
+    function openPantonePdfHandler(e) {
+        e.preventDefault();
+        const pdfPath = './files/60-vzornik-pantone.pdf';
+        fetch(pdfPath, { method: 'HEAD' })
+            .then(response => {
+                if (response.ok) {
+                    window.open(pdfPath, '_blank');
+                } else {
+                    SICOMIX.utils.showNotification(SICOMIX.i18n.t('pdf_not_found'), 'error');
+                }
+            })
+            .catch(() => {
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('pdf_not_found'), 'error');
+            });
     }
 
+    // ---------- ЕКСПОРТ МЕТОДІВ ----------
     Object.assign(SICOMIX.app, {
         renderPantoneCatalog,
         showPantoneRecipeModal,
@@ -400,9 +385,7 @@ window.SICOMIX = window.SICOMIX || {};
         addRalToRecipe,
         attachPantoneEventListeners,
         attachRalEventListeners,
-        setupPdfButtons,
-        openPdf,
-        initPantoneRal
+        setupPdfButtons
     });
 
     console.log('📦 app-pantone-ral.js завантажено');
