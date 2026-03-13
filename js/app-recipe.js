@@ -6,7 +6,6 @@ window.SICOMIX = window.SICOMIX || {};
     const app = SICOMIX.app;
     const dom = app.dom;
 
-    // ---------- РЕНДЕРИНГ ІНГРЕДІЄНТІВ ----------
     function renderIngredientsList() {
         if (!dom.ingredientsList) return;
         const selectedIngredients = app.getSelectedIngredients();
@@ -307,7 +306,6 @@ window.SICOMIX = window.SICOMIX || {};
         }
     }
 
-    // ---------- РЕНДЕРИНГ РЕЦЕПТІВ ----------
     function renderRecipes() {
         if (!dom.recipesContainer) return;
 
@@ -922,7 +920,7 @@ window.SICOMIX = window.SICOMIX || {};
         document.getElementById('recipeName').value = recipe.name;
         document.getElementById('recipeCategory').value = recipe.category;
         document.getElementById('recipeSeries').value = recipe.series || '';
-        app.setSelectedSeries(recipe.series || '');
+        // Видалено app.setSelectedSeries, оскільки воно не потрібне
         document.getElementById('recipeDescription').value = recipe.description || '';
         app.setSelectedIngredients(recipe.ingredients.map(ing => ({ ...ing, paintId: String(ing.paintId) })));
         app.setRecipePhotoDataUrl(recipe.photo || null);
