@@ -56,7 +56,7 @@ window.SICOMIX = window.SICOMIX || {};
             "feedback": "Зворотній зв'язок",
             "rate_app": "Оцінити програму",
             "share_app": "Поділитися програмою",
-            
+
             // Меню
             "main_menu": "Головне меню",
             "home": "Головна",
@@ -76,7 +76,7 @@ window.SICOMIX = window.SICOMIX || {};
             "sync": "Синхронізація",
             "backup": "Резервне копіювання",
             "restore": "Відновлення",
-            
+
             // Головна сторінка
             "welcome_title": "Ласкаво просимо до SICO Spectrum",
             "welcome_subtitle": "Цифрова лабораторія кольору",
@@ -94,10 +94,9 @@ window.SICOMIX = window.SICOMIX || {};
             "pantone_desc": "Кольори Pantone з каталогів Formula Guide",
             "ral_desc": "Кольори RAL Classic",
             "export_desc": "Експортуйте рецепти у різних форматах",
-            
             "catalog_desc": "Каталог SICO Polska",
             "export_data": "Експорт",
-            
+
             // Новий рецепт
             "new_recipe_desc_long": "Створіть новий рецепт фарби, додаючи інгредієнти",
             "basic_info": "Основна інформація",
@@ -142,7 +141,7 @@ window.SICOMIX = window.SICOMIX || {};
             "scan_no_paints": "Не вдалося розпізнати жодної фарби",
             "scan_error": "Помилка сканування",
             "search_paints": "Пошук фарб...",
-            
+
             // Рецепти
             "my_recipes": "Мої рецепти",
             "my_recipes_desc_long": "Переглядайте, редагуйте та керуйте рецептами",
@@ -173,7 +172,7 @@ window.SICOMIX = window.SICOMIX || {};
             "import_confirm": "Імпортувати?",
             "imported": "Імпортовано",
             "no_recipes_to_export": "Немає рецептів для експорту",
-            
+
             // Каталог фарб
             "paint_catalog": "Каталог фарб",
             "catalog_desc_long": "База всіх доступних фарб",
@@ -188,7 +187,7 @@ window.SICOMIX = window.SICOMIX || {};
             "paints_in_catalog": "фарб у каталозі",
             "search_results": "Результати пошуку",
             "paints_found": "Знайдено фарб",
-            
+
             // Додавання/редагування фарби
             "add_new_paint_title": "Додати нову фарбу",
             "edit_paint": "Редагувати фарбу",
@@ -209,7 +208,7 @@ window.SICOMIX = window.SICOMIX || {};
             "cannot_delete_default_paint": "Не можна видалити стандартну фарбу",
             "paint_in_use_title": "Фарба використовується",
             "paint_in_use_message": "Ця фарба використовується в {{count}} рецептах. Видалити її з рецептів?",
-            
+
             // Pantone
             "pantone_desc": "Кольори Pantone з каталогів Formula Guide",
             "search_pantone": "Пошук Pantone...",
@@ -223,17 +222,17 @@ window.SICOMIX = window.SICOMIX || {};
             "amount": "Кількість",
             "no_recipe_data": "Немає даних про інгредієнти",
             "add_pantone_to_recipe": "Додати Pantone до рецепту",
-            
+
             // RAL
             "ral_desc": "Кольори RAL Classic",
             "search_ral": "Пошук RAL...",
             "no_ral": "RAL не знайдено",
             "add_ral_to_recipe": "Додати RAL до рецепту",
-            
+
             // PDF кнопки
-            "open_ral_pdf": "Відкрити веер RAL",
-            "open_pantone_pdf": "Відкрити веер Pantone",
-            
+            "open_ral_pdf": "Відкрити віяло RAL",
+            "open_pantone_pdf": "Відкрити віяло Pantone",
+
             // Імпорт/Експорт
             "import_desc": "Імпортуйте рецепти та каталог з файлів",
             "export_desc_long": "Експортуйте ваші дані у різних форматах",
@@ -256,7 +255,7 @@ window.SICOMIX = window.SICOMIX || {};
             "select_data_to_import": "Виберіть тип даних для імпорту",
             "and": "та",
             "export_error": "Помилка експорту",
-            
+
             // Налаштування
             "settings_desc": "Налаштуйте систему за вашими потребами",
             "general_settings": "Загальні налаштування",
@@ -269,9 +268,9 @@ window.SICOMIX = window.SICOMIX || {};
             "theme_spectrum": "Спектр (темна)",
             "theme_organic": "Органічна (світла)",
             "catalog_layout": "Компонування каталогу",
-            "layout_classic": "Classic",
-            "layout_compact": "Compact",
-            "layout_list": "List",
+            "layout_classic": "Класичне",
+            "layout_compact": "Компактне",
+            "layout_list": "Списком",
             "auto_save_changes": "Автоматично зберігати зміни",
             "create_backups": "Створювати резервні копії",
             "export_backup": "Експортувати бекап",
@@ -282,7 +281,7 @@ window.SICOMIX = window.SICOMIX || {};
             "clear_all_data": "Очистити всі дані",
             "clear_all_data_confirmation": "Ви впевнені? Всі рецепти та додані фарби будуть видалені!",
             "data_cleared": "Всі дані очищено",
-            
+
             // Модальні вікна
             "confirmation": "Підтвердження",
             "confirmation_message": "Ви впевнені?",
@@ -290,14 +289,14 @@ window.SICOMIX = window.SICOMIX || {};
             "unsaved_changes_warning": "У вас є незбережені зміни. Ви дійсно хочете піти?",
             "recipe_exists_title": "Рецепт вже існує",
             "recipe_exists_message": "Рецепт з такою назвою вже існує. Замінити його?",
-            
+
             // Синхронізація
             "syncing": "Синхронізація...",
             "sync_complete": "Синхронізацію завершено",
             "sync_error": "Помилка синхронізації",
             "sync_offline": "Немає з'єднання з інтернетом",
             "sync_in_progress": "Синхронізація...",
-            
+
             // Авторизація
             "email": "Email",
             "password": "Пароль",
@@ -306,7 +305,7 @@ window.SICOMIX = window.SICOMIX || {};
             "auth_note": "Дані синхронізуються між пристроями",
             "logout_confirmation": "Ви дійсно хочете вийти?",
             "logged_out": "Ви вийшли з системи",
-            
+
             // Помилки та повідомлення
             "paints_not_found": "Фарби не знайдено",
             "unknown_error": "Невідома помилка",
@@ -319,14 +318,14 @@ window.SICOMIX = window.SICOMIX || {};
             "try_again": "Спробуйте ще раз пізніше",
             "operation_successful": "Операцію виконано успішно",
             "operation_failed": "Операцію не виконано",
-            
+
             // Одиниці вимірювання
             "unit_g": "г",
             "unit_kg": "кг",
             "unit_ml": "мл",
             "unit_l": "л",
             "unit_percent": "%",
-            
+
             // Стандартні категорії (ключі)
             "cat_standard": "Стандартні",
             "cat_metallic": "Металік",
@@ -337,7 +336,7 @@ window.SICOMIX = window.SICOMIX || {};
             "cat_thermochromic": "Термохромні",
             "cat_photochromic": "Фотохромні",
             "cat_special": "Спеціальні",
-            
+
             // Місяці
             "january": "Січень",
             "february": "Лютий",
@@ -351,7 +350,7 @@ window.SICOMIX = window.SICOMIX || {};
             "october": "Жовтень",
             "november": "Листопад",
             "december": "Грудень",
-            
+
             // Дні тижня
             "monday": "Понеділок",
             "tuesday": "Вівторок",
@@ -360,7 +359,7 @@ window.SICOMIX = window.SICOMIX || {};
             "friday": "П'ятниця",
             "saturday": "Субота",
             "sunday": "Неділя",
-            
+
             // Скорочені дні тижня
             "mon": "Пн",
             "tue": "Вт",
@@ -369,7 +368,7 @@ window.SICOMIX = window.SICOMIX || {};
             "fri": "Пт",
             "sat": "Сб",
             "sun": "Нд",
-            
+
             // Користувацькі категорії (для перекладу)
             "cat_universal": "Універсальні",
             "cat_paper_cardboard": "Папір/картон",
@@ -377,11 +376,11 @@ window.SICOMIX = window.SICOMIX || {};
             "cat_textiles": "Текстиль",
             "cat_uv": "UV фарби",
             "cat_uv_led": "UV фарби (LED)",
-            
+
             // Друк етикетки
             "enter_weight_kg": "Введіть вагу (кг):"
         },
-        
+
         en: {
             // General
             "app_name": "SICO Spectrum",
@@ -433,7 +432,7 @@ window.SICOMIX = window.SICOMIX || {};
             "feedback": "Feedback",
             "rate_app": "Rate app",
             "share_app": "Share app",
-            
+
             // Menu
             "main_menu": "Main menu",
             "home": "Home",
@@ -453,7 +452,7 @@ window.SICOMIX = window.SICOMIX || {};
             "sync": "Sync",
             "backup": "Backup",
             "restore": "Restore",
-            
+
             // Home page
             "welcome_title": "Welcome to SICO Spectrum",
             "welcome_subtitle": "Digital Color Laboratory",
@@ -471,10 +470,9 @@ window.SICOMIX = window.SICOMIX || {};
             "pantone_desc": "Pantone colors from Formula Guide catalogs",
             "ral_desc": "RAL Classic colors",
             "export_desc": "Export recipes in various formats",
-            
             "catalog_desc": "SICO Polska Catalog",
             "export_data": "Export",
-            
+
             // New recipe
             "new_recipe_desc_long": "Create a new paint recipe by adding ingredients",
             "basic_info": "Basic information",
@@ -519,7 +517,7 @@ window.SICOMIX = window.SICOMIX || {};
             "scan_no_paints": "No paints recognized",
             "scan_error": "Scan error",
             "search_paints": "Search paints...",
-            
+
             // Recipes
             "my_recipes": "My recipes",
             "my_recipes_desc_long": "View, edit and manage recipes",
@@ -550,7 +548,7 @@ window.SICOMIX = window.SICOMIX || {};
             "import_confirm": "Import?",
             "imported": "Imported",
             "no_recipes_to_export": "No recipes to export",
-            
+
             // Paint catalog
             "paint_catalog": "Paint catalog",
             "catalog_desc_long": "Database of all available paints",
@@ -565,7 +563,7 @@ window.SICOMIX = window.SICOMIX || {};
             "paints_in_catalog": "paints in catalog",
             "search_results": "Search results",
             "paints_found": "Paints found",
-            
+
             // Add/edit paint
             "add_new_paint_title": "Add new paint",
             "edit_paint": "Edit paint",
@@ -586,7 +584,7 @@ window.SICOMIX = window.SICOMIX || {};
             "cannot_delete_default_paint": "Cannot delete default paint",
             "paint_in_use_title": "Paint in use",
             "paint_in_use_message": "This paint is used in {{count}} recipes. Remove it from recipes?",
-            
+
             // Pantone
             "pantone_desc": "Pantone colors from Formula Guide catalogs",
             "search_pantone": "Search Pantone...",
@@ -600,17 +598,17 @@ window.SICOMIX = window.SICOMIX || {};
             "amount": "Amount",
             "no_recipe_data": "No ingredient data",
             "add_pantone_to_recipe": "Add Pantone to recipe",
-            
+
             // RAL
             "ral_desc": "RAL Classic colors",
             "search_ral": "Search RAL...",
             "no_ral": "No RAL found",
             "add_ral_to_recipe": "Add RAL to recipe",
-            
+
             // PDF buttons
             "open_ral_pdf": "Open RAL fan deck",
             "open_pantone_pdf": "Open Pantone fan deck",
-            
+
             // Import/Export
             "import_desc": "Import recipes and catalog from files",
             "export_desc_long": "Export your data in various formats",
@@ -633,7 +631,7 @@ window.SICOMIX = window.SICOMIX || {};
             "select_data_to_import": "Select data type to import",
             "and": "and",
             "export_error": "Export error",
-            
+
             // Settings
             "settings_desc": "Configure the system according to your needs",
             "general_settings": "General settings",
@@ -659,7 +657,7 @@ window.SICOMIX = window.SICOMIX || {};
             "clear_all_data": "Clear all data",
             "clear_all_data_confirmation": "Are you sure? All recipes and added paints will be deleted!",
             "data_cleared": "All data cleared",
-            
+
             // Modals
             "confirmation": "Confirmation",
             "confirmation_message": "Are you sure?",
@@ -667,14 +665,14 @@ window.SICOMIX = window.SICOMIX || {};
             "unsaved_changes_warning": "You have unsaved changes. Are you sure you want to leave?",
             "recipe_exists_title": "Recipe already exists",
             "recipe_exists_message": "A recipe with this name already exists. Replace it?",
-            
+
             // Sync
             "syncing": "Syncing...",
             "sync_complete": "Sync complete",
             "sync_error": "Sync error",
             "sync_offline": "No internet connection",
             "sync_in_progress": "Syncing...",
-            
+
             // Auth
             "email": "Email",
             "password": "Password",
@@ -683,7 +681,7 @@ window.SICOMIX = window.SICOMIX || {};
             "auth_note": "Data is synced between devices",
             "logout_confirmation": "Are you sure you want to logout?",
             "logged_out": "You have been logged out",
-            
+
             // Errors and messages
             "paints_not_found": "Paints not found",
             "unknown_error": "Unknown error",
@@ -696,14 +694,14 @@ window.SICOMIX = window.SICOMIX || {};
             "try_again": "Try again later",
             "operation_successful": "Operation successful",
             "operation_failed": "Operation failed",
-            
+
             // Units
             "unit_g": "g",
             "unit_kg": "kg",
             "unit_ml": "ml",
             "unit_l": "l",
             "unit_percent": "%",
-            
+
             // Standard categories (keys)
             "cat_standard": "Standard",
             "cat_metallic": "Metallic",
@@ -714,7 +712,7 @@ window.SICOMIX = window.SICOMIX || {};
             "cat_thermochromic": "Thermochromic",
             "cat_photochromic": "Photochromic",
             "cat_special": "Special",
-            
+
             // Months
             "january": "January",
             "february": "February",
@@ -728,7 +726,7 @@ window.SICOMIX = window.SICOMIX || {};
             "october": "October",
             "november": "November",
             "december": "December",
-            
+
             // Days
             "monday": "Monday",
             "tuesday": "Tuesday",
@@ -737,7 +735,7 @@ window.SICOMIX = window.SICOMIX || {};
             "friday": "Friday",
             "saturday": "Saturday",
             "sunday": "Sunday",
-            
+
             // Short days
             "mon": "Mon",
             "tue": "Tue",
@@ -746,7 +744,7 @@ window.SICOMIX = window.SICOMIX || {};
             "fri": "Fri",
             "sat": "Sat",
             "sun": "Sun",
-            
+
             // Custom categories (for translation)
             "cat_universal": "Universal",
             "cat_paper_cardboard": "Paper/Cardboard",
@@ -754,11 +752,11 @@ window.SICOMIX = window.SICOMIX || {};
             "cat_textiles": "Textiles",
             "cat_uv": "UV paints",
             "cat_uv_led": "UV paints (LED)",
-            
+
             // Label printing
             "enter_weight_kg": "Enter weight (kg):"
         },
-        
+
         pl: {
             // Ogólne
             "app_name": "SICO Spectrum",
@@ -810,7 +808,7 @@ window.SICOMIX = window.SICOMIX || {};
             "feedback": "Opinia",
             "rate_app": "Oceń aplikację",
             "share_app": "Udostępnij aplikację",
-            
+
             // Menu
             "main_menu": "Menu główne",
             "home": "Strona główna",
@@ -830,7 +828,7 @@ window.SICOMIX = window.SICOMIX || {};
             "sync": "Synchronizacja",
             "backup": "Kopia zapasowa",
             "restore": "Przywróć",
-            
+
             // Strona główna
             "welcome_title": "Witaj w SICO Spectrum",
             "welcome_subtitle": "Cyfrowe laboratorium kolorów",
@@ -848,10 +846,9 @@ window.SICOMIX = window.SICOMIX || {};
             "pantone_desc": "Kolory Pantone z katalogów Formula Guide",
             "ral_desc": "Kolory RAL Classic",
             "export_desc": "Eksportuj receptury w różnych formatach",
-            
             "catalog_desc": "Katalog SICO Polska",
             "export_data": "Eksport",
-            
+
             // Nowa receptura
             "new_recipe_desc_long": "Stwórz nową recepturę farby, dodając składniki",
             "basic_info": "Podstawowe informacje",
@@ -896,7 +893,7 @@ window.SICOMIX = window.SICOMIX || {};
             "scan_no_paints": "Nie rozpoznano żadnej farby",
             "scan_error": "Błąd skanowania",
             "search_paints": "Szukaj farb...",
-            
+
             // Receptury
             "my_recipes": "Moje receptury",
             "my_recipes_desc_long": "Przeglądaj, edytuj i zarządzaj recepturami",
@@ -927,7 +924,7 @@ window.SICOMIX = window.SICOMIX || {};
             "import_confirm": "Importować?",
             "imported": "Zaimportowano",
             "no_recipes_to_export": "Brak receptur do eksportu",
-            
+
             // Katalog farb
             "paint_catalog": "Katalog farb",
             "catalog_desc_long": "Baza wszystkich dostępnych farb",
@@ -942,7 +939,7 @@ window.SICOMIX = window.SICOMIX || {};
             "paints_in_catalog": "farb w katalogu",
             "search_results": "Wyniki wyszukiwania",
             "paints_found": "Znaleziono farb",
-            
+
             // Dodawanie/edycja farby
             "add_new_paint_title": "Dodaj nową farbę",
             "edit_paint": "Edytuj farbę",
@@ -963,7 +960,7 @@ window.SICOMIX = window.SICOMIX || {};
             "cannot_delete_default_paint": "Nie można usunąć domyślnej farby",
             "paint_in_use_title": "Farba jest używana",
             "paint_in_use_message": "Ta farba jest używana w {{count}} recepturach. Usunąć ją z receptur?",
-            
+
             // Pantone
             "pantone_desc": "Kolory Pantone z katalogów Formula Guide",
             "search_pantone": "Szukaj Pantone...",
@@ -977,17 +974,17 @@ window.SICOMIX = window.SICOMIX || {};
             "amount": "Ilość",
             "no_recipe_data": "Brak danych o składnikach",
             "add_pantone_to_recipe": "Dodaj Pantone do receptury",
-            
+
             // RAL
             "ral_desc": "Kolory RAL Classic",
             "search_ral": "Szukaj RAL...",
             "no_ral": "Nie znaleziono RAL",
             "add_ral_to_recipe": "Dodaj RAL do receptury",
-            
+
             // Przyciski PDF
             "open_ral_pdf": "Otwórz wachlarz RAL",
             "open_pantone_pdf": "Otwórz wachlarz Pantone",
-            
+
             // Import/Eksport
             "import_desc": "Importuj receptury i katalog z plików",
             "export_desc_long": "Eksportuj swoje dane w różnych formatach",
@@ -1010,7 +1007,7 @@ window.SICOMIX = window.SICOMIX || {};
             "select_data_to_import": "Wybierz typ danych do importu",
             "and": "i",
             "export_error": "Błąd eksportu",
-            
+
             // Ustawienia
             "settings_desc": "Skonfiguruj system według swoich potrzeb",
             "general_settings": "Ustawienia ogólne",
@@ -1036,7 +1033,7 @@ window.SICOMIX = window.SICOMIX || {};
             "clear_all_data": "Wyczyść wszystkie dane",
             "clear_all_data_confirmation": "Czy na pewno? Wszystkie receptury i dodane farby zostaną usunięte!",
             "data_cleared": "Wszystkie dane wyczyszczone",
-            
+
             // Okna modalne
             "confirmation": "Potwierdzenie",
             "confirmation_message": "Czy na pewno?",
@@ -1044,14 +1041,14 @@ window.SICOMIX = window.SICOMIX || {};
             "unsaved_changes_warning": "Masz niezapisane zmiany. Czy na pewno chcesz wyjść?",
             "recipe_exists_title": "Przepis już istnieje",
             "recipe_exists_message": "Przepis o tej nazwie już istnieje. Zastąpić go?",
-            
+
             // Synchronizacja
             "syncing": "Synchronizacja...",
             "sync_complete": "Synchronizacja zakończona",
             "sync_error": "Błąd synchronizacji",
             "sync_offline": "Brak połączenia z internetem",
             "sync_in_progress": "Synchronizacja...",
-            
+
             // Autoryzacja
             "email": "Email",
             "password": "Hasło",
@@ -1060,7 +1057,7 @@ window.SICOMIX = window.SICOMIX || {};
             "auth_note": "Dane są synchronizowane między urządzeniami",
             "logout_confirmation": "Czy na pewno chcesz się wylogować?",
             "logged_out": "Zostałeś wylogowany",
-            
+
             // Błędy i komunikaty
             "paints_not_found": "Nie znaleziono farb",
             "unknown_error": "Nieznany błąd",
@@ -1073,14 +1070,14 @@ window.SICOMIX = window.SICOMIX || {};
             "try_again": "Spróbuj ponownie później",
             "operation_successful": "Operacja zakończona pomyślnie",
             "operation_failed": "Operacja nie powiodła się",
-            
+
             // Jednostki
             "unit_g": "g",
             "unit_kg": "kg",
             "unit_ml": "ml",
             "unit_l": "l",
             "unit_percent": "%",
-            
+
             // Standardowe kategorie (klucze)
             "cat_standard": "Standardowe",
             "cat_metallic": "Metaliczne",
@@ -1091,7 +1088,7 @@ window.SICOMIX = window.SICOMIX || {};
             "cat_thermochromic": "Termochromowe",
             "cat_photochromic": "Fotochromowe",
             "cat_special": "Specjalne",
-            
+
             // Miesiące
             "january": "Styczeń",
             "february": "Luty",
@@ -1105,7 +1102,7 @@ window.SICOMIX = window.SICOMIX || {};
             "october": "Październik",
             "november": "Listopad",
             "december": "Grudzień",
-            
+
             // Dni tygodnia
             "monday": "Poniedziałek",
             "tuesday": "Wtorek",
@@ -1114,7 +1111,7 @@ window.SICOMIX = window.SICOMIX || {};
             "friday": "Piątek",
             "saturday": "Sobota",
             "sunday": "Niedziela",
-            
+
             // Skrócone dni
             "mon": "Pon",
             "tue": "Wt",
@@ -1123,7 +1120,7 @@ window.SICOMIX = window.SICOMIX || {};
             "fri": "Pt",
             "sat": "Sob",
             "sun": "Niedz",
-            
+
             // Niestandardowe kategorie (do tłumaczenia)
             "cat_universal": "Uniwersalne",
             "cat_paper_cardboard": "Papier/Tektura",
@@ -1131,7 +1128,7 @@ window.SICOMIX = window.SICOMIX || {};
             "cat_textiles": "Tekstylia",
             "cat_uv": "Farby UV",
             "cat_uv_led": "Farby UV (LED)",
-            
+
             // Drukowanie etykiety
             "enter_weight_kg": "Wprowadź wagę (kg):"
         }
