@@ -59,6 +59,7 @@ window.SICOMIX = window.SICOMIX || {};
 
         if (!SICOMIX.pantone || !SICOMIX.pantone.colors) {
             dom.pantoneCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_pantone')}</p>`;
+            SICOMIX.i18n.applyTranslations();
             return;
         }
 
@@ -80,6 +81,7 @@ window.SICOMIX = window.SICOMIX || {};
 
         if (filtered.length === 0) {
             dom.pantoneCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_pantone')}</p>`;
+            SICOMIX.i18n.applyTranslations();
             return;
         }
 
@@ -108,6 +110,7 @@ window.SICOMIX = window.SICOMIX || {};
         `}).join('');
 
         dom.pantoneCatalog.innerHTML = html;
+        SICOMIX.i18n.applyTranslations();
         attachPantoneEventListeners();
     }
 
@@ -208,6 +211,7 @@ window.SICOMIX = window.SICOMIX || {};
 
         if (!window.ralColors || !Array.isArray(window.ralColors)) {
             dom.ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_ral')}</p>`;
+            SICOMIX.i18n.applyTranslations();
             return;
         }
 
@@ -225,6 +229,7 @@ window.SICOMIX = window.SICOMIX || {};
 
         if (filtered.length === 0) {
             dom.ralCatalog.innerHTML = `<p style="text-align:center; padding:40px;">${SICOMIX.i18n.t('no_ral')}</p>`;
+            SICOMIX.i18n.applyTranslations();
             return;
         }
 
@@ -246,6 +251,7 @@ window.SICOMIX = window.SICOMIX || {};
         `}).join('');
 
         dom.ralCatalog.innerHTML = html;
+        SICOMIX.i18n.applyTranslations();
         attachRalEventListeners();
     }
 
