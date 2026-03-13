@@ -19,14 +19,14 @@ window.SICOMIX = window.SICOMIX || {};
         // Анонімний вхід
         async function signInAnonymously() {
             try {
-                updateSyncStatus('Вхід...');
+                updateSyncStatus(SICOMIX.i18n.t('syncing'));
                 const result = await SICOMIX.firebase.auth.signInAnonymously();
                 currentUser = result.user;
-                updateSyncStatus('Синхронізовано');
+                updateSyncStatus(SICOMIX.i18n.t('sync_complete'));
                 return currentUser;
             } catch (error) {
                 console.error('Помилка входу:', error);
-                updateSyncStatus('Помилка синхронізації', true);
+                updateSyncStatus(SICOMIX.i18n.t('sync_error'), true);
                 throw error;
             }
         }
@@ -36,7 +36,7 @@ window.SICOMIX = window.SICOMIX || {};
             try {
                 await SICOMIX.firebase.auth.signOut();
                 currentUser = null;
-                updateSyncStatus('Офлайн');
+                updateSyncStatus(SICOMIX.i18n.t('offline'));
             } catch (error) {
                 console.error('Помилка виходу:', error);
             }
@@ -73,11 +73,11 @@ window.SICOMIX = window.SICOMIX || {};
                     ...data,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
-                updateSyncStatus('Синхронізовано');
+                updateSyncStatus(SICOMIX.i18n.t('sync_complete'));
                 return true;
             } catch (error) {
                 console.error('Помилка збереження в Firestore:', error);
-                updateSyncStatus('Помилка синхронізації', true);
+                updateSyncStatus(SICOMIX.i18n.t('sync_error'), true);
                 return false;
             }
         }
