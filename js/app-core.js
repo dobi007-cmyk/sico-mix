@@ -845,7 +845,7 @@ window.SICOMIX = window.SICOMIX || {};
                 initSettings();
                 updatePaintCount();
                 attachAllEventListeners();
-                setupCoreEventListeners(); // <-- ДОДАНО
+                setupCoreEventListeners();
 
                 const activePage = document.querySelector('.page-content.active');
                 if (activePage) {
@@ -873,7 +873,7 @@ window.SICOMIX = window.SICOMIX || {};
             initSettings();
             updatePaintCount();
             attachAllEventListeners();
-            setupCoreEventListeners(); // <-- ДОДАНО
+            setupCoreEventListeners();
 
             const activePage = document.querySelector('.page-content.active');
             if (activePage) {
@@ -899,6 +899,7 @@ window.SICOMIX = window.SICOMIX || {};
     // ---------- ПУБЛІЧНІ МЕТОДИ ----------
     SICOMIX.app = SICOMIX.app || {};
     Object.assign(SICOMIX.app, {
+        // Геттери
         getRecipes: () => recipes,
         getUserPaints: () => userPaints,
         getPaintCatalog: () => paintCatalog,
@@ -913,6 +914,7 @@ window.SICOMIX = window.SICOMIX || {};
         getCatalogPage: () => catalogPage,
         getCATALOG_PAGE_SIZE: () => CATALOG_PAGE_SIZE,
 
+        // Сеттери
         setRecipes: (newRecipes) => { recipes = newRecipes; },
         setUserPaints: (newPaints) => { userPaints = newPaints; },
         setPaintCatalog: (newCatalog) => { paintCatalog = newCatalog; },
@@ -926,7 +928,10 @@ window.SICOMIX = window.SICOMIX || {};
         setRecipePhotoDataUrl: (url) => { recipePhotoDataUrl = url; },
         setRecipeDraft: (draft) => { recipeDraft = draft; },
         setCatalogPage: (page) => { catalogPage = page; },
+        // Додано відсутній сетер для selectedSeries
+        setSelectedSeries: (value) => { selectedSeries = value; },
 
+        // Базові функції
         cacheDOMElements,
         loadData,
         saveData,
@@ -951,15 +956,18 @@ window.SICOMIX = window.SICOMIX || {};
         dom,
         unitMap,
 
+        // Навігація та налаштування
         switchPage,
         resetEditMode,
         initSettings,
         applyTheme,
         applyCatalogLayout,
 
+        // Імпорт/Експорт
         startImport,
         startExport,
 
+        // Головна ініціалізація
         init: initApp,
         attachAllEventListeners
     });
