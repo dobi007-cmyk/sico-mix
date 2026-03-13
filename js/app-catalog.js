@@ -102,7 +102,6 @@ window.SICOMIX = window.SICOMIX || {};
             const search = document.getElementById('catalogSearch')?.value?.toLowerCase() || '';
             const allSeries = app.getUniqueSeries();
             
-            // Перевірка, що allSeries є масивом
             if (!allSeries || !Array.isArray(allSeries)) {
                 console.error('❌ getUniqueSeries повернув не масив:', allSeries);
                 dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
@@ -114,7 +113,6 @@ window.SICOMIX = window.SICOMIX || {};
             const lang = SICOMIX.i18n.getLanguage();
             const paintCatalog = app.getPaintCatalog();
             
-            // Перевірка, що paintCatalog є масивом
             if (!paintCatalog || !Array.isArray(paintCatalog)) {
                 console.error('❌ getPaintCatalog повернув не масив:', paintCatalog);
                 dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
@@ -155,7 +153,8 @@ window.SICOMIX = window.SICOMIX || {};
             }
 
             const currentSettings = app.getCurrentSettings();
-            app.applyCatalogLayout(currentSettings.catalogLayout || 'classic');
+            // Застосовуємо клас компонування (без виклику renderPaintCatalog)
+            applyCatalogLayout(currentSettings.catalogLayout || 'classic');
 
             let html = '';
             let totalFoundPaints = 0;
@@ -179,7 +178,6 @@ window.SICOMIX = window.SICOMIX || {};
                 }
                 totalFoundPaints += seriesPaints.length;
 
-                // Безпечне отримання назви серії
                 const seriesName = (series.name && series.name[lang]) || series.id || 'Невідома серія';
                 const category = series.category || '';
                 const isExpanded = expandedSeries.includes(series.id) || search.length > 0;
@@ -195,7 +193,6 @@ window.SICOMIX = window.SICOMIX || {};
                     const buttonIcon = isInRecipe ? 'fa-trash' : 'fa-plus';
                     const buttonTitle = isInRecipe ? SICOMIX.i18n.t('remove_from_recipe') : SICOMIX.i18n.t('add_ingredient');
                     
-                    // Безпечне отримання кольору
                     const color = p.color || '#cccccc';
                     
                     return `
