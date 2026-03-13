@@ -258,8 +258,9 @@ window.SICOMIX = window.SICOMIX || {};
             lockedSeries = null;
             lockedCategory = null;
         }
-        renderIngredientsList();
-        calculatePercentages();
+        // Викликаємо функції з інших модулів, якщо вони існують
+        if (SICOMIX.app.renderIngredientsList) SICOMIX.app.renderIngredientsList();
+        if (SICOMIX.app.calculatePercentages) SICOMIX.app.calculatePercentages();
         updateSeriesLockUI();
     }
 
@@ -440,6 +441,255 @@ window.SICOMIX = window.SICOMIX || {};
         cachedUniqueSeries = null;
     }
 
+    // ---------- НАВІГАЦІЯ ----------
+    function switchPage(pageId) {
+        if (!pageId) return;
+        const targetPage = document.getElementById(`${pageId}-page`);
+        if (!targetPage) return;
+        if (targetPage.classList.contains('active')) return;
+
+        if (isEditingRecipe && pageId !== 'new-recipe') {
+            resetEditMode();
+        }
+
+        dom.pageContents.forEach(p => p.classList.remove('active'));
+        targetPage.classList.add('active');
+
+        dom.navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('data-page') === pageId) {
+                link.classList.add('active');
+            }
+        });
+
+        if (pageId === 'recipes') {
+            if (SICOMIX.app.renderRecipes) SICOMIX.app.renderRecipes();
+        } else if (pageId === 'catalog') {
+            catalogPage = 1;
+            if (SICOMIX.app.renderPaintCatalog) SICOMIX.app.renderPaintCatalog();
+        } else if (pageId === 'new-recipe') {
+            if (!isEditingRecipe) {
+                if (selectedIngredients.length === 0) {
+                    loadRecipeDraft();
+                }
+                if (recipePhotoDataUrl) {
+                    showPhotoPreview(recipePhotoDataUrl);
+                } else {
+                    resetPhotoPreview();
+                }
+            }
+            updateSeriesLockUI();
+            if (SICOMIX.app.renderIngredientsList) SICOMIX.app.renderIngredientsList();
+        } else if (pageId === 'pantone') {
+            if (SICOMIX.app.renderPantoneCatalog) SICOMIX.app.renderPantoneCatalog();
+        } else if (pageId === 'ral') {
+            if (SICOMIX.app.renderRalCatalog) SICOMIX.app.renderRalCatalog();
+        }
+    }
+
+    function resetEditMode() {
+        isEditingRecipe = false;
+        editingRecipeId = null;
+        if (dom.saveRecipeBtn) {
+            dom.saveRecipeBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="save_recipe"></span>`;
+            SICOMIX.i18n.applyTranslations();
+        }
+    }
+
+    // ---------- НАЛАШТУВАННЯ ----------
+    function initSettings() {
+        if (dom.unitsSelect) dom.unitsSelect.value = currentSettings.units || 'grams';
+        if (dom.autoSaveCheckbox) dom.autoSaveCheckbox.checked = currentSettings.autoSave !== false;
+        if (dom.backupCheckbox) dom.backupCheckbox.checked = currentSettings.backup === true;
+        if (dom.languageSelect) dom.languageSelect.value = SICOMIX.i18n.getLanguage();
+        if (dom.themeSelect) dom.themeSelect.value = currentSettings.theme || 'spectrum';
+        if (dom.catalogLayoutSelect) dom.catalogLayoutSelect.value = currentSettings.catalogLayout || 'classic';
+        applyTheme(currentSettings.theme || 'spectrum');
+        applyCatalogLayout(currentSettings.catalogLayout || 'classic');
+    }
+
+    function applyTheme(theme) {
+        document.body.classList.remove('theme-organic');
+        if (theme === 'organic') {
+            document.body.classList.add('theme-organic');
+        }
+    }
+
+    function applyCatalogLayout(layout) {
+        if (dom.paintCatalogEl) {
+            dom.paintCatalogEl.classList.remove('catalog-layout-classic', 'catalog-layout-compact', 'catalog-layout-list');
+            dom.paintCatalogEl.classList.add(`catalog-layout-${layout}`);
+        }
+    }
+
+    // ---------- ГОЛОВНІ ПОДІЇ ----------
+    function setupCoreEventListeners() {
+        // Навігація
+        document.addEventListener('click', function(e) {
+            const navLink = e.target.closest('.nav-link[data-page]');
+            if (navLink) {
+                e.preventDefault();
+                const page = navLink.getAttribute('data-page');
+                switchPage(page);
+                if (window.innerWidth <= 992) {
+                    dom.sidebar?.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                return;
+            }
+
+            const actionCard = e.target.closest('.action-card[data-page]');
+            if (actionCard) {
+                e.preventDefault();
+                const page = actionCard.getAttribute('data-page');
+                switchPage(page);
+                return;
+            }
+        });
+
+        // Мобільне меню
+        if (dom.menuToggle) {
+            dom.menuToggle.addEventListener('click', () => {
+                dom.sidebar.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        }
+        if (dom.desktopMenuToggle) {
+            dom.desktopMenuToggle.addEventListener('click', () => {
+                if (window.innerWidth <= 992) {
+                    dom.sidebar.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    dom.sidebar.classList.add('active');
+                    dom.mainContainer.classList.add('sidebar-open');
+                }
+            });
+        }
+        if (dom.closeSidebar) {
+            dom.closeSidebar.addEventListener('click', () => {
+                dom.sidebar.classList.remove('active');
+                dom.mainContainer.classList.remove('sidebar-open');
+                document.body.style.overflow = 'auto';
+            });
+        }
+
+        // Закриття модальних вікон по Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (dom.sidebar?.classList.contains('active') && window.innerWidth <= 992) {
+                    dom.sidebar.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (dom.addPaintModal?.classList.contains('active')) {
+                    dom.addPaintModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (dom.seriesDetailsModal?.classList.contains('active')) {
+                    dom.seriesDetailsModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (dom.pantoneRecipeModal?.classList.contains('active')) {
+                    dom.pantoneRecipeModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (dom.weightInputModal?.classList.contains('active')) {
+                    dom.weightInputModal.classList.remove('active');
+                }
+            }
+        });
+
+        // Закриття меню при кліку поза ним
+        document.addEventListener('click', function(e) {
+            if (!dom.sidebar || window.innerWidth > 992) return;
+            if (!dom.sidebar.classList.contains('active')) return;
+            if (dom.sidebar.contains(e.target) || dom.menuToggle?.contains(e.target) || dom.desktopMenuToggle?.contains(e.target) || dom.closeSidebar?.contains(e.target)) return;
+            dom.sidebar.classList.remove('active');
+            dom.mainContainer?.classList.remove('sidebar-open');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Автозбереження
+        attachAutoSaveListeners();
+
+        // Попередження про незбережені зміни
+        window.addEventListener('beforeunload', function(e) {
+            if (document.getElementById('new-recipe-page')?.classList.contains('active') && !isEditingRecipe) {
+                const currentName = document.getElementById('recipeName')?.value;
+                const currentIngredients = selectedIngredients.length;
+                if (currentName || currentIngredients > 0 || recipePhotoDataUrl) {
+                    const message = SICOMIX.i18n.t('unsaved_changes_warning');
+                    e.returnValue = message;
+                    return message;
+                }
+            }
+        });
+    }
+
+    // ---------- ІНІЦІАЛІЗАЦІЯ ----------
+    async function initApp() {
+        cacheDOMElements();
+
+        const auth = SICOMIX.firebase?.auth;
+        if (auth) {
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    console.log('Користувач увійшов:', user.email);
+                    await loadData();
+                } else {
+                    console.log('Користувач вийшов');
+                    await loadData();
+                }
+                initSettings();
+                setupCoreEventListeners();
+                updatePaintCount();
+
+                // Викликаємо початковий рендеринг для активної сторінки
+                const activePage = document.querySelector('.page-content.active');
+                if (activePage) {
+                    const pageId = activePage.id.replace('-page', '');
+                    switchPage(pageId);
+                }
+
+                if (window.innerWidth > 992) {
+                    dom.sidebar.classList.add('active');
+                    dom.mainContainer.classList.add('sidebar-open');
+                }
+
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => preloader.remove(), 500);
+                }
+
+                SICOMIX.utils.showNotification(SICOMIX.i18n.t('welcome_title'), 'success', 2000);
+            });
+        } else {
+            await loadData();
+            initSettings();
+            setupCoreEventListeners();
+            updatePaintCount();
+
+            const activePage = document.querySelector('.page-content.active');
+            if (activePage) {
+                const pageId = activePage.id.replace('-page', '');
+                switchPage(pageId);
+            }
+
+            if (window.innerWidth > 992) {
+                dom.sidebar.classList.add('active');
+                dom.mainContainer.classList.add('sidebar-open');
+            }
+
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                preloader.style.opacity = '0';
+                setTimeout(() => preloader.remove(), 500);
+            }
+
+            SICOMIX.utils.showNotification(SICOMIX.i18n.t('welcome_title'), 'success', 2000);
+        }
+    }
+
     // ---------- ПУБЛІЧНІ МЕТОДИ ----------
     SICOMIX.app = SICOMIX.app || {};
     Object.assign(SICOMIX.app, {
@@ -495,14 +745,18 @@ window.SICOMIX = window.SICOMIX || {};
         resetPhotoPreview,
         getUniqueSeries,
         invalidateSeriesCache,
-        dom, // об'єкт з DOM елементами
-        unitMap
-    });
+        dom,
+        unitMap,
 
-    // Ініціалізація (буде викликана з app.js)
-    SICOMIX.app.init = async function() {
-        cacheDOMElements();
-        // Завантаження даних відбувається в app.js після авторизації
-    };
+        // Навігація та налаштування
+        switchPage,
+        resetEditMode,
+        initSettings,
+        applyTheme,
+        applyCatalogLayout,
+
+        // Головна ініціалізація
+        init: initApp
+    });
 
 })(window);
