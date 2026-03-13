@@ -467,14 +467,13 @@ window.SICOMIX = window.SICOMIX || {};
             catalogPage = 1;
             if (SICOMIX.app.renderPaintCatalog) SICOMIX.app.renderPaintCatalog();
         } else if (pageId === 'new-recipe') {
-            // Populate dropdowns if they are empty
             const seriesSelect = document.getElementById('recipeSeries');
             if (seriesSelect && seriesSelect.options.length <= 1) {
                 populateSeriesSelect();
             }
             const catSelect = document.getElementById('recipeCategory');
             if (catSelect && catSelect.options.length <= 1) {
-                populateCategoryFilters(); // populates all category selects
+                populateCategoryFilters();
             }
             if (!isEditingRecipe) {
                 if (selectedIngredients.length === 0) {
@@ -667,7 +666,6 @@ window.SICOMIX = window.SICOMIX || {};
     function setupCoreEventListeners() {
         console.log('🔊 setupCoreEventListeners викликано');
 
-        // Навігація
         document.addEventListener('click', function(e) {
             console.log('🖱️ Клік по document, target:', e.target);
 
@@ -694,7 +692,6 @@ window.SICOMIX = window.SICOMIX || {};
             }
         });
 
-        // Мобільне меню
         if (dom.menuToggle) {
             dom.menuToggle.addEventListener('click', () => {
                 dom.sidebar.classList.add('active');
@@ -720,7 +717,6 @@ window.SICOMIX = window.SICOMIX || {};
             });
         }
 
-        // Закриття модальних вікон по Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 if (dom.sidebar?.classList.contains('active') && window.innerWidth <= 992) {
@@ -745,7 +741,6 @@ window.SICOMIX = window.SICOMIX || {};
             }
         });
 
-        // Закриття меню при кліку поза ним
         document.addEventListener('click', function(e) {
             if (!dom.sidebar || window.innerWidth > 992) return;
             if (!dom.sidebar.classList.contains('active')) return;
@@ -755,10 +750,8 @@ window.SICOMIX = window.SICOMIX || {};
             document.body.style.overflow = 'auto';
         });
 
-        // Автозбереження
         attachAutoSaveListeners();
 
-        // Кнопки імпорту/експорту на окремих сторінках
         if (dom.startImportBtn) {
             dom.startImportBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -772,7 +765,6 @@ window.SICOMIX = window.SICOMIX || {};
             });
         }
 
-        // Попередження про незбережені зміни
         window.addEventListener('beforeunload', function(e) {
             if (document.getElementById('new-recipe-page')?.classList.contains('active') && !isEditingRecipe) {
                 const currentName = document.getElementById('recipeName')?.value;
@@ -824,14 +816,12 @@ window.SICOMIX = window.SICOMIX || {};
                     console.log('Користувач вийшов');
                     await loadData();
                 }
-                // Заповнюємо випадаючі списки після завантаження даних
                 populateSeriesSelect();
                 populateCategoryFilters();
                 initSettings();
                 updatePaintCount();
                 attachAllEventListeners();
 
-                // Викликаємо початковий рендеринг для активної сторінки
                 const activePage = document.querySelector('.page-content.active');
                 if (activePage) {
                     const pageId = activePage.id.replace('-page', '');
@@ -883,7 +873,6 @@ window.SICOMIX = window.SICOMIX || {};
     // ---------- ПУБЛІЧНІ МЕТОДИ ----------
     SICOMIX.app = SICOMIX.app || {};
     Object.assign(SICOMIX.app, {
-        // Стан (геттери)
         getRecipes: () => recipes,
         getUserPaints: () => userPaints,
         getPaintCatalog: () => paintCatalog,
@@ -898,7 +887,6 @@ window.SICOMIX = window.SICOMIX || {};
         getCatalogPage: () => catalogPage,
         getCATALOG_PAGE_SIZE: () => CATALOG_PAGE_SIZE,
 
-        // Сеттери
         setRecipes: (newRecipes) => { recipes = newRecipes; },
         setUserPaints: (newPaints) => { userPaints = newPaints; },
         setPaintCatalog: (newCatalog) => { paintCatalog = newCatalog; },
@@ -913,7 +901,6 @@ window.SICOMIX = window.SICOMIX || {};
         setRecipeDraft: (draft) => { recipeDraft = draft; },
         setCatalogPage: (page) => { catalogPage = page; },
 
-        // Базові функції
         cacheDOMElements,
         loadData,
         saveData,
@@ -938,21 +925,16 @@ window.SICOMIX = window.SICOMIX || {};
         dom,
         unitMap,
 
-        // Навігація та налаштування
         switchPage,
         resetEditMode,
         initSettings,
         applyTheme,
         applyCatalogLayout,
 
-        // Імпорт/Експорт
         startImport,
         startExport,
 
-        // Головна ініціалізація
         init: initApp,
-
-        // Додаємо функції, які будуть використовуватися в інших модулях
         attachAllEventListeners
     });
 
