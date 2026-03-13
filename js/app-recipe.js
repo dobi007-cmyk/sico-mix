@@ -6,6 +6,7 @@ window.SICOMIX = window.SICOMIX || {};
     const app = SICOMIX.app;
     const dom = app.dom;
 
+    // ---------- РЕНДЕРИНГ ІНГРЕДІЄНТІВ ----------
     function renderIngredientsList() {
         if (!dom.ingredientsList) return;
         const selectedIngredients = app.getSelectedIngredients();
@@ -231,6 +232,8 @@ window.SICOMIX = window.SICOMIX || {};
         const series = document.getElementById('recipeSeries')?.value;
         const desc = document.getElementById('recipeDescription')?.value.trim();
         const selectedIngredients = app.getSelectedIngredients();
+        const isEditing = app.getIsEditingRecipe();
+        const editingId = app.getEditingRecipeId();
 
         if (!name || !cat || !series || selectedIngredients.length === 0) {
             SICOMIX.utils.showNotification(SICOMIX.i18n.t('fill_required_fields'), 'error');
@@ -247,11 +250,67 @@ window.SICOMIX = window.SICOMIX || {};
         };
 
         const recipes = app.getRecipes();
-        const isEditingRecipe = app.getIsEditingRecipe();
-        const editingRecipeId = app.getEditingRecipeId();
 
-        if (isEditingRecipe && editingRecipeId) {
-            const idx = recipes.findIndex(r => String(r.id) === String(editingRecipeId));
+        // Пошук існуючого рецепту з такою ж назвою (не враховуючи поточний, якщо редагуємо)
+        const existing = recipes.find(r => 
+            r.name.toLowerCase() === name.toLowerCase() && 
+            (!isEditing || String(r.id) !== String(editingId))
+        );
+
+        if (existing) {
+            // Запитуємо, чи хоче користувач замінити існуючий рецепт
+            SICOMIX.utils.showConfirmation(
+                SICOMIX.i18n.t('recipe_exists_title') || 'Рецепт з такою назвою вже існує',
+                SICOMIX.i18n.t('recipe_exists_message') || 'Бажаєте замінити його?',
+                () => {
+                    // Замінити – видаляємо старий і додаємо новий (або оновлюємо поточний)
+                    if (isEditing) {
+                        // Якщо ми в режимі редагування, але назва збігається з іншим – видаляємо інший
+                        const otherIndex = recipes.findIndex(r => String(r.id) !== String(editingId) && r.name.toLowerCase() === name.toLowerCase());
+                        if (otherIndex !== -1) {
+                            recipes.splice(otherIndex, 1);
+                        }
+                        // Оновлюємо поточний
+                        const idx = recipes.findIndex(r => String(r.id) === String(editingId));
+                        if (idx !== -1) {
+                            recipes[idx] = {
+                                ...recipes[idx],
+                                ...recipeData,
+                                date: new Date().toLocaleDateString('uk-UA')
+                            };
+                        }
+                    } else {
+                        // Видаляємо існуючий з такою ж назвою
+                        const existingIndex = recipes.findIndex(r => r.name.toLowerCase() === name.toLowerCase());
+                        if (existingIndex !== -1) {
+                            recipes.splice(existingIndex, 1);
+                        }
+                        // Додаємо новий
+                        const newRecipe = {
+                            id: SICOMIX.utils.generateId(),
+                            ...recipeData,
+                            date: new Date().toLocaleDateString('uk-UA')
+                        };
+                        recipes.push(newRecipe);
+                    }
+                    app.setRecipes(recipes);
+                    app.saveData();
+                    SICOMIX.utils.showNotification(`${SICOMIX.i18n.t('recipe_saved')} "${SICOMIX.utils.escapeHtml(name)}"`, 'success');
+                    clearRecipeForm();
+                    app.clearRecipeDraft();
+                    app.switchPage('recipes');
+                },
+                () => {
+                    // Скасувати – нічого не робимо
+                    console.log('❌ Заміну скасовано');
+                }
+            );
+            return;
+        }
+
+        // Стандартне збереження (без конфлікту назв)
+        if (isEditing && editingId) {
+            const idx = recipes.findIndex(r => String(r.id) === String(editingId));
             if (idx !== -1) {
                 recipes[idx] = {
                     ...recipes[idx],
@@ -401,7 +460,6 @@ window.SICOMIX = window.SICOMIX || {};
 
         SICOMIX.i18n.applyTranslations();
 
-        // Делегування подій на контейнері рецептів
         dom.recipesContainer.addEventListener('click', function(e) {
             const btn = e.target.closest('button');
             if (!btn) return;
@@ -920,7 +978,6 @@ window.SICOMIX = window.SICOMIX || {};
         document.getElementById('recipeName').value = recipe.name;
         document.getElementById('recipeCategory').value = recipe.category;
         document.getElementById('recipeSeries').value = recipe.series || '';
-        // Видалено app.setSelectedSeries, оскільки воно не потрібне
         document.getElementById('recipeDescription').value = recipe.description || '';
         app.setSelectedIngredients(recipe.ingredients.map(ing => ({ ...ing, paintId: String(ing.paintId) })));
         app.setRecipePhotoDataUrl(recipe.photo || null);
