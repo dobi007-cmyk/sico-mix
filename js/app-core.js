@@ -444,12 +444,7 @@ window.SICOMIX = window.SICOMIX || {};
     }
 
     // ---------- НАВІГАЦІЯ ----------
-    function switchPage(pageId) {
-        console.log('🔄 switchPage викликано з pageId =', pageId);
-        if (!pageId) {
-            console.warn('⚠️ pageId порожній');
-            return;
-        }
+    function performSwitch(pageId) {
         const targetPage = document.getElementById(`${pageId}-page`);
         if (!targetPage) {
             console.error('❌ Сторінка не знайдена:', pageId);
@@ -516,6 +511,41 @@ window.SICOMIX = window.SICOMIX || {};
             console.log('🎨 Викликаємо renderRalCatalog');
             if (SICOMIX.app.renderRalCatalog) SICOMIX.app.renderRalCatalog();
         }
+    }
+
+    function switchPage(pageId) {
+        console.log('🔄 switchPage викликано з pageId =', pageId);
+        if (!pageId) {
+            console.warn('⚠️ pageId порожній');
+            return;
+        }
+
+        // Перевірка на незбережені зміни
+        const isNewRecipeActive = document.getElementById('new-recipe-page')?.classList.contains('active');
+        const hasUnsavedChanges = (isNewRecipeActive && !isEditingRecipe) && 
+            (document.getElementById('recipeName')?.value || 
+             selectedIngredients.length > 0 || 
+             recipePhotoDataUrl);
+
+        if (hasUnsavedChanges && pageId !== 'new-recipe') {
+            // Показуємо модальне вікно підтвердження
+            SICOMIX.utils.showConfirmation(
+                SICOMIX.i18n.t('unsaved_changes_warning'),
+                SICOMIX.i18n.t('confirmation_message'),
+                () => {
+                    // Користувач підтвердив — виконуємо перехід
+                    performSwitch(pageId);
+                },
+                () => {
+                    // Скасування — нічого не робимо
+                    console.log('⏭️ Перехід скасовано');
+                }
+            );
+            return;
+        }
+
+        // Якщо змін немає або ми на тій же сторінці, просто переходимо
+        performSwitch(pageId);
     }
 
     function resetEditMode() {
@@ -899,7 +929,7 @@ window.SICOMIX = window.SICOMIX || {};
     // ---------- ПУБЛІЧНІ МЕТОДИ ----------
     SICOMIX.app = SICOMIX.app || {};
     Object.assign(SICOMIX.app, {
-        // Геттери
+        // Стан (геттери)
         getRecipes: () => recipes,
         getUserPaints: () => userPaints,
         getPaintCatalog: () => paintCatalog,
@@ -928,8 +958,7 @@ window.SICOMIX = window.SICOMIX || {};
         setRecipePhotoDataUrl: (url) => { recipePhotoDataUrl = url; },
         setRecipeDraft: (draft) => { recipeDraft = draft; },
         setCatalogPage: (page) => { catalogPage = page; },
-        // Додано відсутній сетер для selectedSeries
-        setSelectedSeries: (value) => { selectedSeries = value; },
+        setSelectedSeries: (series) => { selectedSeries = series; }, // Додано
 
         // Базові функції
         cacheDOMElements,
@@ -969,6 +998,8 @@ window.SICOMIX = window.SICOMIX || {};
 
         // Головна ініціалізація
         init: initApp,
+
+        // Додаємо функції, які будуть використовуватися в інших модулях
         attachAllEventListeners
     });
 
