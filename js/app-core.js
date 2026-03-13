@@ -450,7 +450,6 @@ window.SICOMIX = window.SICOMIX || {};
             return false;
         }
 
-        // Якщо ми в режимі редагування, перевіряємо, чи є зміни відносно оригінального рецепту
         if (isEditingRecipe && editingRecipeId) {
             const originalRecipe = recipes.find(r => String(r.id) === String(editingRecipeId));
             if (!originalRecipe) return false;
@@ -488,7 +487,6 @@ window.SICOMIX = window.SICOMIX || {};
             return changed;
         }
 
-        // Для створення нового рецепту
         const name = document.getElementById('recipeName')?.value.trim() || '';
         const category = document.getElementById('recipeCategory')?.value || '';
         const series = document.getElementById('recipeSeries')?.value || '';
@@ -515,7 +513,8 @@ window.SICOMIX = window.SICOMIX || {};
 
         if (isEditingRecipe && pageId !== 'new-recipe') {
             resetEditMode();
-            clearRecipeForm();
+            clearRecipeForm();   // очищає форму
+            clearRecipeDraft();  // видаляє чернетку
         }
 
         console.log('🗂️ Приховуємо всі сторінки...');
@@ -591,20 +590,17 @@ window.SICOMIX = window.SICOMIX || {};
                         clearRecipeForm();
                         clearRecipeDraft(); // Видаляємо чернетку
                     } else {
-                        // Для нового рецепту теж очищаємо чернетку
                         clearRecipeDraft();
                     }
                     performSwitch(pageId);
                 },
                 () => {
-                    // Скасували – нічого не робимо
                     console.log('⏭️ Перехід скасовано');
                 }
             );
             return;
         }
 
-        // Якщо змін немає, переходимо одразу
         performSwitch(pageId);
     }
 
@@ -625,6 +621,10 @@ window.SICOMIX = window.SICOMIX || {};
         if (dom.languageSelect) dom.languageSelect.value = SICOMIX.i18n.getLanguage();
         if (dom.themeSelect) dom.themeSelect.value = currentSettings.theme || 'spectrum';
         if (dom.catalogLayoutSelect) dom.catalogLayoutSelect.value = currentSettings.catalogLayout || 'classic';
+        
+        // Оновлюємо тексти опцій (викликаємо через app, оскільки функція з іншого модуля)
+        if (SICOMIX.app.updateLayoutOptionsText) SICOMIX.app.updateLayoutOptionsText();
+        
         applyTheme(currentSettings.theme || 'spectrum');
         applyCatalogLayout(currentSettings.catalogLayout || 'classic');
     }
@@ -640,6 +640,10 @@ window.SICOMIX = window.SICOMIX || {};
         if (dom.paintCatalogEl) {
             dom.paintCatalogEl.classList.remove('catalog-layout-classic', 'catalog-layout-compact', 'catalog-layout-list');
             dom.paintCatalogEl.classList.add(`catalog-layout-${layout}`);
+        }
+        if (SICOMIX.app.renderPaintCatalog) {
+            SICOMIX.app.setCatalogPage(1);
+            SICOMIX.app.renderPaintCatalog();
         }
     }
 
