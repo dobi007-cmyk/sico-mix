@@ -441,6 +441,7 @@ window.SICOMIX = window.SICOMIX || {};
 
     // ---------- НАВІГАЦІЯ ----------
     function switchPage(pageId) {
+        console.log('🔄 switchPage викликано з pageId =', pageId);
         if (!pageId) return;
         const targetPage = document.getElementById(`${pageId}-page`);
         if (!targetPage) return;
@@ -664,10 +665,15 @@ window.SICOMIX = window.SICOMIX || {};
 
     // ---------- ГОЛОВНІ ПОДІЇ ----------
     function setupCoreEventListeners() {
+        console.log('🔊 setupCoreEventListeners викликано');
+
         // Навігація
         document.addEventListener('click', function(e) {
+            console.log('🖱️ Клік по document, target:', e.target);
+
             const navLink = e.target.closest('.nav-link[data-page]');
             if (navLink) {
+                console.log('✅ Знайдено navLink з data-page =', navLink.getAttribute('data-page'));
                 e.preventDefault();
                 const page = navLink.getAttribute('data-page');
                 switchPage(page);
@@ -680,6 +686,7 @@ window.SICOMIX = window.SICOMIX || {};
 
             const actionCard = e.target.closest('.action-card[data-page]');
             if (actionCard) {
+                console.log('✅ Знайдено actionCard з data-page =', actionCard.getAttribute('data-page'));
                 e.preventDefault();
                 const page = actionCard.getAttribute('data-page');
                 switchPage(page);
@@ -781,10 +788,26 @@ window.SICOMIX = window.SICOMIX || {};
 
     // ---------- ПРИВ'ЯЗКА ВСІХ ОБРОБНИКІВ З МОДУЛІВ ----------
     function attachAllEventListeners() {
-        if (SICOMIX.app.attachRecipeEventListeners) SICOMIX.app.attachRecipeEventListeners();
-        if (SICOMIX.app.attachCatalogEventListeners) SICOMIX.app.attachCatalogEventListeners();
-        if (SICOMIX.app.attachSettingsEventListeners) SICOMIX.app.attachSettingsEventListeners();
-        // Pantone/RAL listeners are attached inside render functions
+        console.log('🔌 attachAllEventListeners початок');
+        if (SICOMIX.app.attachRecipeEventListeners) {
+            console.log('✅ attachRecipeEventListeners викликається');
+            SICOMIX.app.attachRecipeEventListeners();
+        } else {
+            console.warn('❌ attachRecipeEventListeners не знайдено');
+        }
+        if (SICOMIX.app.attachCatalogEventListeners) {
+            console.log('✅ attachCatalogEventListeners викликається');
+            SICOMIX.app.attachCatalogEventListeners();
+        } else {
+            console.warn('❌ attachCatalogEventListeners не знайдено');
+        }
+        if (SICOMIX.app.attachSettingsEventListeners) {
+            console.log('✅ attachSettingsEventListeners викликається');
+            SICOMIX.app.attachSettingsEventListeners();
+        } else {
+            console.warn('❌ attachSettingsEventListeners не знайдено');
+        }
+        console.log('🔌 attachAllEventListeners завершено');
     }
 
     // ---------- ІНІЦІАЛІЗАЦІЯ ----------
