@@ -6,6 +6,7 @@ window.SICOMIX = window.SICOMIX || {};
     const app = SICOMIX.app;
     const dom = app.dom;
 
+    // ---------- РЕНДЕРИНГ ІНГРЕДІЄНТІВ ----------
     function renderIngredientsList() {
         if (!dom.ingredientsList) return;
         const selectedIngredients = app.getSelectedIngredients();
@@ -306,6 +307,7 @@ window.SICOMIX = window.SICOMIX || {};
         }
     }
 
+    // ---------- РЕНДЕРИНГ РЕЦЕПТІВ ----------
     function renderRecipes() {
         if (!dom.recipesContainer) return;
 
@@ -401,6 +403,7 @@ window.SICOMIX = window.SICOMIX || {};
 
         SICOMIX.i18n.applyTranslations();
 
+        // Делегування подій на контейнері рецептів
         dom.recipesContainer.addEventListener('click', function(e) {
             const btn = e.target.closest('button');
             if (!btn) return;
@@ -411,19 +414,39 @@ window.SICOMIX = window.SICOMIX || {};
 
             if (btn.classList.contains('edit-recipe')) {
                 e.preventDefault();
-                editRecipe(recipeId);
+                console.log('✏️ Редагування рецепту', recipeId);
+                if (typeof SICOMIX.app.editRecipe === 'function') {
+                    SICOMIX.app.editRecipe(recipeId);
+                } else {
+                    console.error('❌ editRecipe не знайдено');
+                }
             }
             else if (btn.classList.contains('delete-recipe')) {
                 e.preventDefault();
-                deleteRecipe(recipeId);
+                console.log('🗑️ Видалення рецепту', recipeId);
+                if (typeof SICOMIX.app.deleteRecipe === 'function') {
+                    SICOMIX.app.deleteRecipe(recipeId);
+                } else {
+                    console.error('❌ deleteRecipe не знайдено');
+                }
             }
             else if (btn.classList.contains('export-recipe')) {
                 e.preventDefault();
-                exportRecipe(recipeId);
+                console.log('📤 Експорт рецепту', recipeId);
+                if (typeof SICOMIX.app.exportRecipe === 'function') {
+                    SICOMIX.app.exportRecipe(recipeId);
+                } else {
+                    console.error('❌ exportRecipe не знайдено');
+                }
             }
             else if (btn.classList.contains('print-label')) {
                 e.preventDefault();
-                showWeightInput(recipeId);
+                console.log('🏷️ Друк етикетки', recipeId);
+                if (typeof SICOMIX.app.showWeightInput === 'function') {
+                    SICOMIX.app.showWeightInput(recipeId);
+                } else {
+                    console.error('❌ showWeightInput не знайдено');
+                }
             }
         });
 
