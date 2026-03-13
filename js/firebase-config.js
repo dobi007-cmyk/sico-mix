@@ -6,12 +6,12 @@ window.SICOMIX = window.SICOMIX || {};
 
     // 🔧 ЗАМІНІТЬ ЦІ ДАНІ НА СВОЇ З FIREBASE CONSOLE
     const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",                // <-- ВСТАВТЕ СВІЙ API KEY
+        apiKey: "YOUR_API_KEY",
         authDomain: "YOUR_PROJECT.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",           // <-- ВСТАВТЕ СВІЙ PROJECT ID
+        projectId: "YOUR_PROJECT_ID",
         storageBucket: "YOUR_PROJECT.appspot.com",
-        messagingSenderId: "YOUR_SENDER_ID",    // <-- ВСТАВТЕ СВІЙ SENDER ID
-        appId: "YOUR_APP_ID"                    // <-- ВСТАВТЕ СВІЙ APP ID
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
     };
 
     // Ініціалізація Firebase
@@ -22,13 +22,15 @@ window.SICOMIX = window.SICOMIX || {};
         db: firebase.firestore()
     };
 
-    // Додаємо провайдер Google (для майбутнього використання)
+    // Додаємо провайдер Google
     SICOMIX.firebase.auth.GoogleAuthProvider = firebase.auth.GoogleAuthProvider;
 
-    // Налаштування Firestore (persistence)
+    // Налаштування Firestore з {merge: true} – це запобігає перезапису інших налаштувань
     SICOMIX.firebase.db.settings({
         cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
-    });
+    }, { merge: true });
+
+    // Увімкнення persistence (якщо можливо)
     firebase.firestore().enablePersistence()
         .catch((err) => {
             if (err.code == 'failed-precondition') {
