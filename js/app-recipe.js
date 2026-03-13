@@ -156,7 +156,6 @@ window.SICOMIX = window.SICOMIX || {};
                 app.autoSaveRecipeDraft();
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
                 
-                // Оновлення кнопок в інших модулях
                 if (window.SICOMIX.app.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
                 if (window.SICOMIX.app.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
             }
@@ -276,7 +275,7 @@ window.SICOMIX = window.SICOMIX || {};
         }
         clearRecipeForm();
         app.clearRecipeDraft();
-        switchPage('recipes');
+        app.switchPage('recipes');
     }
 
     function clearRecipeForm() {
@@ -306,7 +305,6 @@ window.SICOMIX = window.SICOMIX || {};
         }
     }
 
-    // ---------- РЕНДЕРИНГ РЕЦЕПТІВ ----------
     function renderRecipes() {
         if (!dom.recipesContainer) return;
 
@@ -655,7 +653,6 @@ window.SICOMIX = window.SICOMIX || {};
         printWindow.print();
     }
 
-    // ---------- ЕТИКЕТКА ----------
     function showWeightInput(recipeId) {
         const recipes = app.getRecipes();
         const recipe = recipes.find(r => String(r.id) === String(recipeId));
@@ -928,11 +925,10 @@ window.SICOMIX = window.SICOMIX || {};
             dom.saveRecipeBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="update_recipe"></span>`;
             SICOMIX.i18n.applyTranslations();
         }
-        switchPage('new-recipe');
+        app.switchPage('new-recipe');
         SICOMIX.utils.showNotification(`"${SICOMIX.utils.escapeHtml(recipe.name)}" ${SICOMIX.i18n.t('edit')}`, 'info');
     }
 
-    // ---------- СКАНУВАННЯ ----------
     async function scanRecipeFromPhoto() {
         const seriesSelect = document.getElementById('recipeSeries');
         if (!seriesSelect || !seriesSelect.value) {
@@ -1135,53 +1131,6 @@ window.SICOMIX = window.SICOMIX || {};
         input.click();
     }
 
-    // Функція перемикання сторінок (дублюється з app-core, але можна винести окремо)
-    function switchPage(pageId) {
-        if (!pageId) return;
-        const targetPage = document.getElementById(`${pageId}-page`);
-        if (!targetPage) return;
-        if (targetPage.classList.contains('active')) return;
-
-        if (app.getIsEditingRecipe() && pageId !== 'new-recipe') {
-            resetEditMode();
-        }
-
-        document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-        targetPage.classList.add('active');
-
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('data-page') === pageId) {
-                link.classList.add('active');
-            }
-        });
-
-        if (pageId === 'recipes') {
-            renderRecipes();
-        } else if (pageId === 'catalog') {
-            app.setCatalogPage(1);
-            if (window.SICOMIX.app.renderPaintCatalog) window.SICOMIX.app.renderPaintCatalog();
-        } else if (pageId === 'new-recipe') {
-            if (!app.getIsEditingRecipe()) {
-                if (app.getSelectedIngredients().length === 0) {
-                    app.loadRecipeDraft();
-                }
-                if (app.getRecipePhotoDataUrl()) {
-                    app.showPhotoPreview(app.getRecipePhotoDataUrl());
-                } else {
-                    app.resetPhotoPreview();
-                }
-            }
-            app.updateSeriesLockUI();
-            renderIngredientsList();
-        } else if (pageId === 'pantone') {
-            if (window.SICOMIX.app.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-        } else if (pageId === 'ral') {
-            if (window.SICOMIX.app.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
-        }
-    }
-
-    // Функція оновлення кнопки (для каталогу)
     function updatePaintButton(paintId, isInRecipe) {
         const card = document.querySelector(`.paint-card-glass[data-paint-id="${paintId}"]`);
         if (!card) return;
@@ -1228,7 +1177,6 @@ window.SICOMIX = window.SICOMIX || {};
         printLabelWithWeight,
         editRecipe,
         scanRecipeFromPhoto,
-        switchPage,
         updatePaintButton
     });
 
