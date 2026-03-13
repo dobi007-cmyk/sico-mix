@@ -114,6 +114,22 @@ window.SICOMIX = window.SICOMIX || {};
         );
     }
 
+    // ---------- ПРИВ'ЯЗКА ОБРОБНИКІВ КНОПОК ----------
+    function attachSettingsEventListeners() {
+        if (dom.saveSettingsBtn) {
+            dom.saveSettingsBtn.addEventListener('click', saveSettings);
+        }
+        if (dom.resetSettingsBtn) {
+            dom.resetSettingsBtn.addEventListener('click', resetSettings);
+        }
+        if (dom.clearAllDataBtn) {
+            dom.clearAllDataBtn.addEventListener('click', clearAllData);
+        }
+        if (dom.exportBackupBtn) {
+            dom.exportBackupBtn.addEventListener('click', exportBackup);
+        }
+    }
+
     // ---------- ЕКСПОРТ МЕТОДІВ ----------
     Object.assign(SICOMIX.app, {
         initSettings,
@@ -121,7 +137,8 @@ window.SICOMIX = window.SICOMIX || {};
         applyCatalogLayout,
         saveSettings,
         resetSettings,
-        clearAllData
+        clearAllData,
+        attachSettingsEventListeners
     });
 
 })(window);
