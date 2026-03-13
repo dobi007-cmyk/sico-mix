@@ -446,28 +446,38 @@ window.SICOMIX = window.SICOMIX || {};
     // ---------- НАВІГАЦІЯ ----------
     function hasUnsavedChanges() {
         const newRecipeActive = document.getElementById('new-recipe-page')?.classList.contains('active');
-        if (!newRecipeActive) {
-            console.log('📝 hasUnsavedChanges: сторінка не new-recipe, повертаємо false');
-            return false;
-        }
-        if (isEditingRecipe) {
-            console.log('📝 hasUnsavedChanges: режим редагування, повертаємо false (або можна true, якщо є зміни)');
-            // Якщо потрібно попереджати і при редагуванні, можна додати перевірку на зміни
-            return false;
-        }
+        if (!newRecipeActive) return false;
+        if (!isEditingRecipe) return false; // Модальне вікно ТІЛЬКИ при редагуванні
 
-        const name = document.getElementById('recipeName')?.value.trim() || '';
-        const category = document.getElementById('recipeCategory')?.value || '';
-        const series = document.getElementById('recipeSeries')?.value || '';
-        const description = document.getElementById('recipeDescription')?.value.trim() || '';
+        // Перевіряємо, чи є реальні зміни порівняно з оригінальним рецептом
+        if (!editingRecipeId) return false;
+        
+        const original = recipes.find(r => String(r.id) === String(editingRecipeId));
+        if (!original) return false;
 
-        const hasText = !!(name || category || series || description);
-        const hasIngredients = selectedIngredients.length > 0;
-        const hasPhoto = !!recipePhotoDataUrl;
+        const currentName = document.getElementById('recipeName')?.value.trim() || '';
+        const currentCategory = document.getElementById('recipeCategory')?.value || '';
+        const currentSeries = document.getElementById('recipeSeries')?.value || '';
+        const currentDescription = document.getElementById('recipeDescription')?.value.trim() || '';
+        const currentIngredients = selectedIngredients;
+        const currentPhoto = recipePhotoDataUrl;
 
-        console.log('📝 hasUnsavedChanges:', { name, category, series, description, hasText, hasIngredients, hasPhoto });
+        // Порівнюємо з оригіналом
+        const nameChanged = currentName !== original.name;
+        const categoryChanged = currentCategory !== original.category;
+        const seriesChanged = currentSeries !== original.series;
+        const descChanged = currentDescription !== (original.description || '');
+        const ingredientsChanged = JSON.stringify(currentIngredients) !== JSON.stringify(original.ingredients);
+        const photoChanged = currentPhoto !== (original.photo || null);
 
-        return hasText || hasIngredients || hasPhoto;
+        const hasChanges = nameChanged || categoryChanged || seriesChanged || descChanged || ingredientsChanged || photoChanged;
+        
+        console.log('📝 hasUnsavedChanges:', { 
+            nameChanged, categoryChanged, seriesChanged, descChanged, ingredientsChanged, photoChanged, 
+            hasChanges 
+        });
+        
+        return hasChanges;
     }
 
     function performSwitch(pageId) {
