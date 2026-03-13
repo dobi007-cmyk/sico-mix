@@ -14,8 +14,23 @@ window.SICOMIX = window.SICOMIX || {};
         if (dom.languageSelect) dom.languageSelect.value = SICOMIX.i18n.getLanguage();
         if (dom.themeSelect) dom.themeSelect.value = currentSettings.theme || 'spectrum';
         if (dom.catalogLayoutSelect) dom.catalogLayoutSelect.value = currentSettings.catalogLayout || 'classic';
+        
+        // Оновлюємо тексти опцій відповідно до мови
+        updateLayoutOptionsText();
+        
         applyTheme(currentSettings.theme || 'spectrum');
         applyCatalogLayout(currentSettings.catalogLayout || 'classic');
+    }
+
+    function updateLayoutOptionsText() {
+        if (!dom.catalogLayoutSelect) return;
+        const options = dom.catalogLayoutSelect.options;
+        for (let i = 0; i < options.length; i++) {
+            const opt = options[i];
+            if (opt.value === 'classic') opt.textContent = SICOMIX.i18n.t('layout_classic');
+            else if (opt.value === 'compact') opt.textContent = SICOMIX.i18n.t('layout_compact');
+            else if (opt.value === 'list') opt.textContent = SICOMIX.i18n.t('layout_list');
+        }
     }
 
     function applyTheme(theme) {
@@ -29,6 +44,11 @@ window.SICOMIX = window.SICOMIX || {};
         if (dom.paintCatalogEl) {
             dom.paintCatalogEl.classList.remove('catalog-layout-classic', 'catalog-layout-compact', 'catalog-layout-list');
             dom.paintCatalogEl.classList.add(`catalog-layout-${layout}`);
+        }
+        // При зміні компонування перерендерити каталог, щоб оновити відображення
+        if (SICOMIX.app.renderPaintCatalog) {
+            SICOMIX.app.setCatalogPage(1);
+            SICOMIX.app.renderPaintCatalog();
         }
     }
 
@@ -58,6 +78,10 @@ window.SICOMIX = window.SICOMIX || {};
 
         SICOMIX.i18n.setLanguage(newLanguage);
         SICOMIX.i18n.applyTranslations();
+        
+        // Оновлюємо тексти опцій після зміни мови
+        updateLayoutOptionsText();
+        
         applyTheme(newTheme);
         applyCatalogLayout(newCatalogLayout);
         app.saveData();
@@ -80,6 +104,10 @@ window.SICOMIX = window.SICOMIX || {};
 
                 SICOMIX.i18n.setLanguage(defaultSettings.language || 'uk');
                 SICOMIX.i18n.applyTranslations();
+                
+                // Оновлюємо тексти опцій
+                updateLayoutOptionsText();
+                
                 applyTheme(defaultSettings.theme || 'spectrum');
                 applyCatalogLayout(defaultSettings.catalogLayout || 'classic');
 
@@ -139,6 +167,14 @@ window.SICOMIX = window.SICOMIX || {};
             });
             console.log('✅ exportBackupBtn обробник додано');
         }
+        // Додатково – оновлюємо переклад опцій при зміні мови через селект
+        if (dom.languageSelect) {
+            dom.languageSelect.addEventListener('change', () => {
+                // Негайно оновлюємо текст опцій (але мова ще не збережена)
+                // Це для попереднього перегляду
+                updateLayoutOptionsText();
+            });
+        }
     }
 
     Object.assign(SICOMIX.app, {
@@ -148,7 +184,8 @@ window.SICOMIX = window.SICOMIX || {};
         saveSettings,
         resetSettings,
         clearAllData,
-        attachSettingsEventListeners
+        attachSettingsEventListeners,
+        updateLayoutOptionsText // експортуємо для використання в інших модулях
     });
 
     console.log('📦 app-settings.js завантажено, SICOMIX.app містить:', Object.keys(SICOMIX.app));
