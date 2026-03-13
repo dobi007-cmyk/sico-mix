@@ -7,6 +7,7 @@ window.SICOMIX = window.SICOMIX || {};
     const dom = app.dom;
 
     function attachPantoneEventListeners() {
+        console.log('🎨 attachPantoneEventListeners викликано');
         if (dom.pantoneCatalog) {
             dom.pantoneCatalog.addEventListener('click', function(e) {
                 const btn = e.target.closest('.glass-add-btn, .glass-remove-btn');
@@ -29,6 +30,7 @@ window.SICOMIX = window.SICOMIX || {};
     }
 
     function attachRalEventListeners() {
+        console.log('🎨 attachRalEventListeners викликано');
         if (dom.ralCatalog) {
             dom.ralCatalog.addEventListener('click', function(e) {
                 const btn = e.target.closest('.glass-add-btn, .glass-remove-btn');
@@ -332,7 +334,6 @@ window.SICOMIX = window.SICOMIX || {};
         }
     }
 
-    // ---------- ЕКСПОРТ МЕТОДІВ ----------
     Object.assign(SICOMIX.app, {
         renderPantoneCatalog,
         showPantoneRecipeModal,
@@ -343,5 +344,7 @@ window.SICOMIX = window.SICOMIX || {};
         attachRalEventListeners,
         setupPdfButtons
     });
+
+    console.log('📦 app-pantone-ral.js завантажено');
 
 })(window);
