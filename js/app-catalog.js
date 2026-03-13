@@ -101,14 +101,35 @@ window.SICOMIX = window.SICOMIX || {};
         try {
             const search = document.getElementById('catalogSearch')?.value?.toLowerCase() || '';
             const allSeries = app.getUniqueSeries();
+            
+            // Перевірка, що allSeries є масивом
+            if (!allSeries || !Array.isArray(allSeries)) {
+                console.error('❌ getUniqueSeries повернув не масив:', allSeries);
+                dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
+                    <i class="fas fa-exclamation-triangle"></i> Помилка завантаження серій
+                </p>`;
+                return;
+            }
+
             const lang = SICOMIX.i18n.getLanguage();
             const paintCatalog = app.getPaintCatalog();
+            
+            // Перевірка, що paintCatalog є масивом
+            if (!paintCatalog || !Array.isArray(paintCatalog)) {
+                console.error('❌ getPaintCatalog повернув не масив:', paintCatalog);
+                dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
+                    <i class="fas fa-exclamation-triangle"></i> Помилка завантаження фарб
+                </p>`;
+                return;
+            }
 
             let seriesWithPaints = allSeries.filter(series => {
-                let seriesPaints = paintCatalog.filter(p => p.series === series.id);
+                if (!series || !series.id) return false;
+                let seriesPaints = paintCatalog.filter(p => p && p.series === series.id);
                 if (search) {
                     seriesPaints = seriesPaints.filter(p => {
-                        const paintName = p.displayName?.[lang] || p.name;
+                        if (!p) return false;
+                        const paintName = p.displayName?.[lang] || p.name || '';
                         return paintName.toLowerCase().includes(search) ||
                                (p.article && p.article.toLowerCase().includes(search));
                     });
@@ -116,8 +137,10 @@ window.SICOMIX = window.SICOMIX || {};
                 return seriesPaints.length > 0;
             });
 
+            const catalogPage = app.getCatalogPage();
+            const pageSize = app.getCATALOG_PAGE_SIZE();
             const startIndex = 0;
-            const endIndex = app.getCatalogPage() * app.getCATALOG_PAGE_SIZE();
+            const endIndex = catalogPage * pageSize;
             const paginatedSeries = seriesWithPaints.slice(startIndex, endIndex);
             const hasMore = seriesWithPaints.length > endIndex;
 
@@ -143,32 +166,41 @@ window.SICOMIX = window.SICOMIX || {};
             } catch (e) {}
 
             paginatedSeries.forEach(series => {
-                let seriesPaints = paintCatalog.filter(p => p.series === series.id);
+                if (!series || !series.id) return;
+                
+                let seriesPaints = paintCatalog.filter(p => p && p.series === series.id);
                 if (search) {
                     seriesPaints = seriesPaints.filter(p => {
-                        const paintName = p.displayName?.[lang] || p.name;
+                        if (!p) return false;
+                        const paintName = p.displayName?.[lang] || p.name || '';
                         return paintName.toLowerCase().includes(search) ||
                                (p.article && p.article.toLowerCase().includes(search));
                     });
                 }
                 totalFoundPaints += seriesPaints.length;
 
-                const seriesName = series.name[lang] || series.id;
+                // Безпечне отримання назви серії
+                const seriesName = (series.name && series.name[lang]) || series.id || 'Невідома серія';
                 const category = series.category || '';
                 const isExpanded = expandedSeries.includes(series.id) || search.length > 0;
 
                 const paintsHtml = seriesPaints.map(p => {
-                    const paintCode = p.name;
-                    const paintName = p.displayName?.[lang] || p.name;
-                    const selectedIngredients = app.getSelectedIngredients();
-                    const isInRecipe = selectedIngredients.some(ing => String(ing.paintId) === String(p.id));
+                    if (!p) return '';
+                    
+                    const paintCode = p.name || '';
+                    const paintName = p.displayName?.[lang] || p.name || '';
+                    const selectedIngredients = app.getSelectedIngredients() || [];
+                    const isInRecipe = selectedIngredients.some(ing => ing && String(ing.paintId) === String(p.id));
                     const buttonClass = isInRecipe ? 'glass-remove-btn' : 'glass-add-btn';
                     const buttonIcon = isInRecipe ? 'fa-trash' : 'fa-plus';
                     const buttonTitle = isInRecipe ? SICOMIX.i18n.t('remove_from_recipe') : SICOMIX.i18n.t('add_ingredient');
                     
+                    // Безпечне отримання кольору
+                    const color = p.color || '#cccccc';
+                    
                     return `
-                    <div class="paint-card-glass" data-paint-id="${p.id}" data-paint-series="${p.series}" style="color: ${p.color};">
-                        <div class="glass-swatch" style="background: ${SICOMIX.utils.escapeHtml(p.color)};"></div>
+                    <div class="paint-card-glass" data-paint-id="${p.id}" data-paint-series="${p.series || ''}" style="color: ${color};">
+                        <div class="glass-swatch" style="background: ${SICOMIX.utils.escapeHtml(color)};"></div>
                         <div class="glass-name" title="${SICOMIX.utils.escapeHtml(paintCode)}">${SICOMIX.utils.escapeHtml(paintCode)}</div>
                         <div class="glass-article" title="${SICOMIX.utils.escapeHtml(paintName)}">${SICOMIX.utils.escapeHtml(paintName)}</div>
                         <button class="${buttonClass}" data-paint-id="${p.id}" title="${buttonTitle}" aria-label="${buttonTitle}">
@@ -251,10 +283,12 @@ window.SICOMIX = window.SICOMIX || {};
             SICOMIX.i18n.applyTranslations();
 
         } catch (error) {
-            console.error('❌ Помилка в renderPaintCatalog:', error);
-            dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
-                <i class="fas fa-exclamation-triangle"></i> ${SICOMIX.i18n.t('catalog_render_error')}<br>${SICOMIX.utils.escapeHtml(error.message)}
-            </p>`;
+            console.error('❌ Помилка в renderPaintCatalog:', error, error.stack);
+            if (dom.paintCatalogEl) {
+                dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
+                    <i class="fas fa-exclamation-triangle"></i> ${SICOMIX.i18n.t('catalog_render_error')}<br>${SICOMIX.utils.escapeHtml(error.message || '')}
+                </p>`;
+            }
         }
     }
 
@@ -497,7 +531,8 @@ window.SICOMIX = window.SICOMIX || {};
         saveNewPaint,
         deletePaint,
         attachCatalogEventListeners,
-        applyCatalogLayout
+        applyCatalogLayout,
+        updatePaintButton
     });
 
     console.log('📦 app-catalog.js завантажено');
