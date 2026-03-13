@@ -6,7 +6,51 @@ window.SICOMIX = window.SICOMIX || {};
     const app = SICOMIX.app;
     const dom = app.dom;
 
-    // ---------- PANTONE ----------
+    function attachPantoneEventListeners() {
+        if (dom.pantoneCatalog) {
+            dom.pantoneCatalog.addEventListener('click', function(e) {
+                const btn = e.target.closest('.glass-add-btn, .glass-remove-btn');
+                if (!btn) return;
+                e.stopPropagation();
+
+                if (btn.classList.contains('glass-remove-btn')) {
+                    const pantoneNumber = btn.dataset.pantoneNumber;
+                    if (pantoneNumber && SICOMIX.app.removeIngredientByArticle) {
+                        SICOMIX.app.removeIngredientByArticle(pantoneNumber);
+                    }
+                } else if (btn.classList.contains('glass-add-btn')) {
+                    const pantoneNumber = btn.dataset.pantoneNumber;
+                    if (pantoneNumber) {
+                        addPantoneToRecipe(pantoneNumber);
+                    }
+                }
+            });
+        }
+    }
+
+    function attachRalEventListeners() {
+        if (dom.ralCatalog) {
+            dom.ralCatalog.addEventListener('click', function(e) {
+                const btn = e.target.closest('.glass-add-btn, .glass-remove-btn');
+                if (!btn) return;
+                e.stopPropagation();
+
+                if (btn.classList.contains('glass-remove-btn')) {
+                    const code = btn.dataset.ralCode;
+                    if (code && SICOMIX.app.removeIngredientByArticle) {
+                        SICOMIX.app.removeIngredientByArticle(code);
+                    }
+                } else if (btn.classList.contains('glass-add-btn')) {
+                    const code = btn.dataset.ralCode;
+                    const hex = btn.dataset.ralHex;
+                    if (code) {
+                        addRalToRecipe(code, hex);
+                    }
+                }
+            });
+        }
+    }
+
     function renderPantoneCatalog() {
         if (!dom.pantoneCatalog) {
             console.warn('pantoneCatalog element not found');
@@ -64,6 +108,7 @@ window.SICOMIX = window.SICOMIX || {};
         `}).join('');
 
         dom.pantoneCatalog.innerHTML = html;
+        attachPantoneEventListeners();
     }
 
     function showPantoneRecipeModal(pantoneNumber) {
@@ -145,8 +190,8 @@ window.SICOMIX = window.SICOMIX || {};
         });
         app.setSelectedIngredients(selectedIngredients);
 
-        app.calculatePercentages?.();
-        app.renderIngredientsList?.();
+        if (SICOMIX.app.calculatePercentages) SICOMIX.app.calculatePercentages();
+        if (SICOMIX.app.renderIngredientsList) SICOMIX.app.renderIngredientsList();
         app.updateSeriesLockUI();
         app.autoSaveRecipeDraft();
 
@@ -155,7 +200,6 @@ window.SICOMIX = window.SICOMIX || {};
         SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
     }
 
-    // ---------- RAL ----------
     function renderRalCatalog() {
         if (!dom.ralCatalog) {
             console.warn('ralCatalog element not found');
@@ -202,6 +246,7 @@ window.SICOMIX = window.SICOMIX || {};
         `}).join('');
 
         dom.ralCatalog.innerHTML = html;
+        attachRalEventListeners();
     }
 
     function addRalToRecipe(code, hex) {
@@ -255,8 +300,8 @@ window.SICOMIX = window.SICOMIX || {};
         });
         app.setSelectedIngredients(selectedIngredients);
 
-        app.calculatePercentages?.();
-        app.renderIngredientsList?.();
+        if (SICOMIX.app.calculatePercentages) SICOMIX.app.calculatePercentages();
+        if (SICOMIX.app.renderIngredientsList) SICOMIX.app.renderIngredientsList();
         app.updateSeriesLockUI();
         app.autoSaveRecipeDraft();
 
@@ -265,7 +310,6 @@ window.SICOMIX = window.SICOMIX || {};
         SICOMIX.utils.showNotification(SICOMIX.i18n.t('paint_added_to_recipe'), 'success');
     }
 
-    // ---------- PDF КНОПКИ ----------
     function setupPdfButtons() {
         const openRalPdf = document.getElementById('openRalPdf');
         if (openRalPdf) {
@@ -289,6 +333,8 @@ window.SICOMIX = window.SICOMIX || {};
         addPantoneToRecipe,
         renderRalCatalog,
         addRalToRecipe,
+        attachPantoneEventListeners,
+        attachRalEventListeners,
         setupPdfButtons
     });
 
