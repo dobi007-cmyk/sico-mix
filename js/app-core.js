@@ -444,6 +444,24 @@ window.SICOMIX = window.SICOMIX || {};
     }
 
     // ---------- НАВІГАЦІЯ ----------
+    function hasUnsavedChanges() {
+        // Перевіряємо, чи активна сторінка нового рецепту і чи є зміни
+        const newRecipeActive = document.getElementById('new-recipe-page')?.classList.contains('active');
+        if (!newRecipeActive) return false;
+        if (isEditingRecipe) return false; // При редагуванні не показуємо попередження? Можна налаштувати.
+
+        const name = document.getElementById('recipeName')?.value.trim();
+        const category = document.getElementById('recipeCategory')?.value;
+        const series = document.getElementById('recipeSeries')?.value;
+        const description = document.getElementById('recipeDescription')?.value.trim();
+
+        const hasText = name || category || series || description;
+        const hasIngredients = selectedIngredients.length > 0;
+        const hasPhoto = !!recipePhotoDataUrl;
+
+        return hasText || hasIngredients || hasPhoto;
+    }
+
     function performSwitch(pageId) {
         const targetPage = document.getElementById(`${pageId}-page`);
         if (!targetPage) {
@@ -520,31 +538,24 @@ window.SICOMIX = window.SICOMIX || {};
             return;
         }
 
-        // Перевірка на незбережені зміни
-        const isNewRecipeActive = document.getElementById('new-recipe-page')?.classList.contains('active');
-        const hasUnsavedChanges = (isNewRecipeActive && !isEditingRecipe) && 
-            (document.getElementById('recipeName')?.value || 
-             selectedIngredients.length > 0 || 
-             recipePhotoDataUrl);
-
-        if (hasUnsavedChanges && pageId !== 'new-recipe') {
-            // Показуємо модальне вікно підтвердження
+        if (hasUnsavedChanges() && pageId !== 'new-recipe') {
+            console.log('⚠️ Є незбережені зміни, показуємо підтвердження');
             SICOMIX.utils.showConfirmation(
                 SICOMIX.i18n.t('unsaved_changes_warning'),
                 SICOMIX.i18n.t('confirmation_message'),
                 () => {
-                    // Користувач підтвердив — виконуємо перехід
+                    // Підтвердили – переходимо
                     performSwitch(pageId);
                 },
                 () => {
-                    // Скасування — нічого не робимо
+                    // Скасували – нічого не робимо
                     console.log('⏭️ Перехід скасовано');
                 }
             );
             return;
         }
 
-        // Якщо змін немає або ми на тій же сторінці, просто переходимо
+        // Якщо змін немає, переходимо одразу
         performSwitch(pageId);
     }
 
@@ -820,14 +831,10 @@ window.SICOMIX = window.SICOMIX || {};
         }
 
         window.addEventListener('beforeunload', function(e) {
-            if (document.getElementById('new-recipe-page')?.classList.contains('active') && !isEditingRecipe) {
-                const currentName = document.getElementById('recipeName')?.value;
-                const currentIngredients = selectedIngredients.length;
-                if (currentName || currentIngredients > 0 || recipePhotoDataUrl) {
-                    const message = SICOMIX.i18n.t('unsaved_changes_warning');
-                    e.returnValue = message;
-                    return message;
-                }
+            if (hasUnsavedChanges()) {
+                const message = SICOMIX.i18n.t('unsaved_changes_warning');
+                e.returnValue = message;
+                return message;
             }
         });
     }
@@ -1000,7 +1007,8 @@ window.SICOMIX = window.SICOMIX || {};
         init: initApp,
 
         // Додаємо функції, які будуть використовуватися в інших модулях
-        attachAllEventListeners
+        attachAllEventListeners,
+        hasUnsavedChanges // експортуємо для можливого використання
     });
 
 })(window);
