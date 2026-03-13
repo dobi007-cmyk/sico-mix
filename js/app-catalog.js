@@ -7,9 +7,9 @@ window.SICOMIX = window.SICOMIX || {};
     const dom = app.dom;
 
     function attachCatalogEventListeners() {
+        console.log('📚 attachCatalogEventListeners викликано');
         if (!dom.paintCatalogEl) return;
 
-        // Використовуємо делегування подій для всіх кнопок
         dom.paintCatalogEl.addEventListener('click', function(e) {
             const btn = e.target.closest('.glass-add-btn, .glass-remove-btn, .delete-paint, .series-info-btn, .toggle-series');
             if (!btn) return;
@@ -61,7 +61,6 @@ window.SICOMIX = window.SICOMIX || {};
             }
         });
 
-        // Обробник для заголовків серій (клік для розгортання)
         dom.paintCatalogEl.querySelectorAll('.series-header').forEach(header => {
             header.removeEventListener('click', headerClickHandler);
             header.addEventListener('click', headerClickHandler);
@@ -114,7 +113,6 @@ window.SICOMIX = window.SICOMIX || {};
                 return;
             }
 
-            // Застосування класу компонування
             const currentSettings = app.getCurrentSettings();
             app.applyCatalogLayout(currentSettings.catalogLayout || 'classic');
 
@@ -225,9 +223,7 @@ window.SICOMIX = window.SICOMIX || {};
                 });
             }
 
-            // Навішуємо обробники подій
             attachCatalogEventListeners();
-
             SICOMIX.i18n.applyTranslations();
 
         } catch (error) {
@@ -440,7 +436,6 @@ window.SICOMIX = window.SICOMIX || {};
         }
     }
 
-    // ---------- ЕКСПОРТ МЕТОДІВ ----------
     Object.assign(SICOMIX.app, {
         renderPaintCatalog,
         openSeriesDetailsModal,
@@ -451,5 +446,7 @@ window.SICOMIX = window.SICOMIX || {};
         deletePaint,
         attachCatalogEventListeners
     });
+
+    console.log('📦 app-catalog.js завантажено');
 
 })(window);
