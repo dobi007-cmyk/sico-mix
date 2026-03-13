@@ -114,7 +114,6 @@ window.SICOMIX = window.SICOMIX || {};
         );
     }
 
-    // ---------- ПРИВ'ЯЗКА ОБРОБНИКІВ КНОПОК ----------
     function attachSettingsEventListeners() {
         console.log('⚙️ attachSettingsEventListeners викликано');
         if (dom.saveSettingsBtn) {
