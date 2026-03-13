@@ -104,10 +104,10 @@ window.SICOMIX = window.SICOMIX || {};
                 app.invalidateSeriesCache();
                 app.saveData();
                 app.populateCategoryFilters();
-                if (app.renderRecipes) app.renderRecipes();
-                if (app.renderPaintCatalog) app.renderPaintCatalog();
-                if (app.renderPantoneCatalog) app.renderPantoneCatalog();
-                if (app.renderRalCatalog) app.renderRalCatalog();
+                if (SICOMIX.app.renderRecipes) SICOMIX.app.renderRecipes();
+                if (SICOMIX.app.renderPaintCatalog) SICOMIX.app.renderPaintCatalog();
+                if (SICOMIX.app.renderPantoneCatalog) SICOMIX.app.renderPantoneCatalog();
+                if (SICOMIX.app.renderRalCatalog) SICOMIX.app.renderRalCatalog();
                 app.updatePaintCount();
                 SICOMIX.utils.showNotification(SICOMIX.i18n.t('data_cleared'), 'success');
             }
