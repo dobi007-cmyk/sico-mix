@@ -143,6 +143,7 @@ window.SICOMIX = window.SICOMIX || {};
             "scan_success": "Знайдено {{count}} інгредієнтів",
             "scan_no_paints": "Не вдалося розпізнати жодної фарби",
             "scan_error": "Помилка сканування",
+            "search_paints": "Пошук фарб...", // Додано
             
             // Рецепти
             "my_recipes": "Мої рецепти",
@@ -518,6 +519,7 @@ window.SICOMIX = window.SICOMIX || {};
             "scan_success": "Found {{count}} ingredients",
             "scan_no_paints": "No paints recognized",
             "scan_error": "Scan error",
+            "search_paints": "Search paints...", // Додано
             
             // Recipes
             "my_recipes": "My recipes",
@@ -893,6 +895,7 @@ window.SICOMIX = window.SICOMIX || {};
             "scan_success": "Znaleziono {{count}} składników",
             "scan_no_paints": "Nie rozpoznano żadnej farby",
             "scan_error": "Błąd skanowania",
+            "search_paints": "Szukaj farb...", // Додано
             
             // Receptury
             "my_recipes": "Moje receptury",
