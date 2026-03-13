@@ -790,7 +790,6 @@ window.SICOMIX = window.SICOMIX || {};
     // ---------- ІНІЦІАЛІЗАЦІЯ ----------
     async function initApp() {
         cacheDOMElements();
-        attachAllEventListeners();
 
         const auth = SICOMIX.firebase?.auth;
         if (auth) {
@@ -807,6 +806,7 @@ window.SICOMIX = window.SICOMIX || {};
                 populateCategoryFilters();
                 initSettings();
                 updatePaintCount();
+                attachAllEventListeners();
 
                 // Викликаємо початковий рендеринг для активної сторінки
                 const activePage = document.querySelector('.page-content.active');
@@ -834,6 +834,7 @@ window.SICOMIX = window.SICOMIX || {};
             populateCategoryFilters();
             initSettings();
             updatePaintCount();
+            attachAllEventListeners();
 
             const activePage = document.querySelector('.page-content.active');
             if (activePage) {
@@ -926,7 +927,10 @@ window.SICOMIX = window.SICOMIX || {};
         startExport,
 
         // Головна ініціалізація
-        init: initApp
+        init: initApp,
+
+        // Додаємо функції, які будуть використовуватися в інших модулях
+        attachAllEventListeners
     });
 
 })(window);
