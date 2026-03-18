@@ -108,6 +108,11 @@ function cacheDOMElements() {
     dom.weightInput = document.getElementById('weightInput');
     dom.weightConfirmBtn = document.getElementById('weightConfirmBtn');
     dom.weightCancelBtn = document.getElementById('weightCancelBtn');
+
+    // Додаємо елементи для авторизації
+    dom.authButton = document.getElementById('authButton');
+    dom.authModal = document.getElementById('authModal');
+    dom.closeAuthModal = document.getElementById('closeAuthModal');
 }
 
 // ---------- ЗАВАНТАЖЕННЯ ТА ЗБЕРЕЖЕННЯ ----------
@@ -848,6 +853,10 @@ function setupCoreEventListeners() {
             if (dom.weightInputModal?.classList.contains('active')) {
                 dom.weightInputModal.classList.remove('active');
             }
+            if (dom.authModal?.classList.contains('active')) {
+                dom.authModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
         }
     });
 
@@ -872,6 +881,24 @@ function setupCoreEventListeners() {
         dom.startExportBtn.addEventListener('click', (e) => {
             e.preventDefault();
             startExport();
+        });
+    }
+
+    // Обробник для кнопки "Увійти"
+    if (dom.authButton) {
+        dom.authButton.addEventListener('click', () => {
+            if (dom.authModal) {
+                dom.authModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    }
+
+    // Обробник для закриття модального вікна авторизації
+    if (dom.closeAuthModal) {
+        dom.closeAuthModal.addEventListener('click', () => {
+            dom.authModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
         });
     }
 
