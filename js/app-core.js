@@ -960,50 +960,41 @@ async function initApp() {
     }
 }
 
-// ---------- ЕКСПОРТ ПУБЛІЧНИХ МЕТОДІВ ----------
+// ========== ЕКСПОРТ ПУБЛІЧНИХ МЕТОДІВ (ІМЕНОВАНІ) ==========
+
+// Геттери
+export function getRecipes() { return recipes; }
+export function getUserPaints() { return userPaints; }
+export function getPaintCatalog() { return paintCatalog; }
+export function getSelectedIngredients() { return selectedIngredients; }
+export function getSelectedRecipes() { return selectedRecipes; }
+export function getCurrentSettings() { return currentSettings; }
+export function getIsEditingRecipe() { return isEditingRecipe; }
+export function getEditingRecipeId() { return editingRecipeId; }
+export function getLockedSeries() { return lockedSeries; }
+export function getLockedCategory() { return lockedCategory; }
+export function getRecipePhotoDataUrl() { return recipePhotoDataUrl; }
+export function getCatalogPage() { return catalogPage; }
+export function getCATALOG_PAGE_SIZE() { return CATALOG_PAGE_SIZE; }
+
+// Сеттери
+export function setRecipes(newRecipes) { recipes = newRecipes; }
+export function setUserPaints(newPaints) { userPaints = newPaints; }
+export function setPaintCatalog(newCatalog) { paintCatalog = newCatalog; }
+export function setSelectedIngredients(newIngredients) { selectedIngredients = newIngredients; }
+export function setSelectedRecipes(newSelected) { selectedRecipes = newSelected; }
+export function setCurrentSettings(newSettings) { currentSettings = newSettings; }
+export function setIsEditingRecipe(value) { isEditingRecipe = value; }
+export function setEditingRecipeId(id) { editingRecipeId = id; }
+export function setLockedSeries(series) { lockedSeries = series; }
+export function setLockedCategory(category) { lockedCategory = category; }
+export function setRecipePhotoDataUrl(url) { recipePhotoDataUrl = url; }
+export function setRecipeDraft(draft) { recipeDraft = draft; }
+export function setCatalogPage(page) { catalogPage = page; }
+export function setSelectedSeries(series) { selectedSeries = series; }
+
+// Інші функції (вже визначені вище)
 export {
-    recipes,
-    userPaints,
-    paintCatalog,
-    selectedIngredients,
-    selectedRecipes,
-    currentSettings,
-    isEditingRecipe,
-    editingRecipeId,
-    lockedSeries,
-    lockedCategory,
-    recipePhotoDataUrl,
-    catalogPage,
-    CATALOG_PAGE_SIZE,
-    unitMap,
-    dom,
-    getRecipes: () => recipes,
-    getUserPaints: () => userPaints,
-    getPaintCatalog: () => paintCatalog,
-    getSelectedIngredients: () => selectedIngredients,
-    getSelectedRecipes: () => selectedRecipes,
-    getCurrentSettings: () => currentSettings,
-    getIsEditingRecipe: () => isEditingRecipe,
-    getEditingRecipeId: () => editingRecipeId,
-    getLockedSeries: () => lockedSeries,
-    getLockedCategory: () => lockedCategory,
-    getRecipePhotoDataUrl: () => recipePhotoDataUrl,
-    getCatalogPage: () => catalogPage,
-    getCATALOG_PAGE_SIZE: () => CATALOG_PAGE_SIZE,
-    setRecipes: (newRecipes) => { recipes = newRecipes; },
-    setUserPaints: (newPaints) => { userPaints = newPaints; },
-    setPaintCatalog: (newCatalog) => { paintCatalog = newCatalog; },
-    setSelectedIngredients: (newIngredients) => { selectedIngredients = newIngredients; },
-    setSelectedRecipes: (newSelected) => { selectedRecipes = newSelected; },
-    setCurrentSettings: (newSettings) => { currentSettings = newSettings; },
-    setIsEditingRecipe: (value) => { isEditingRecipe = value; },
-    setEditingRecipeId: (id) => { editingRecipeId = id; },
-    setLockedSeries: (series) => { lockedSeries = series; },
-    setLockedCategory: (category) => { lockedCategory = category; },
-    setRecipePhotoDataUrl: (url) => { recipePhotoDataUrl = url; },
-    setRecipeDraft: (draft) => { recipeDraft = draft; },
-    setCatalogPage: (page) => { catalogPage = page; },
-    setSelectedSeries: (series) => { selectedSeries = series; },
     cacheDOMElements,
     loadData,
     saveData,
@@ -1033,27 +1024,30 @@ export {
     applyCatalogLayout,
     startImport,
     startExport,
-    init: initApp,
+    initApp as init,
     attachAllEventListeners,
     hasUnsavedChanges
 };
 
+// Експорт констант та об'єктів, які можуть знадобитися
+export { unitMap, dom, CATALOG_PAGE_SIZE };
+
 // Для зворотної сумісності створюємо глобальний об'єкт
 window.SICOMIX = window.SICOMIX || {};
 window.SICOMIX.app = {
-    getRecipes: () => recipes,
-    getUserPaints: () => userPaints,
-    getPaintCatalog: () => paintCatalog,
-    getSelectedIngredients: () => selectedIngredients,
-    getSelectedRecipes: () => selectedRecipes,
-    getCurrentSettings: () => currentSettings,
-    getIsEditingRecipe: () => isEditingRecipe,
-    getEditingRecipeId: () => editingRecipeId,
-    getLockedSeries: () => lockedSeries,
-    getLockedCategory: () => lockedCategory,
-    getRecipePhotoDataUrl: () => recipePhotoDataUrl,
-    getCatalogPage: () => catalogPage,
-    getCATALOG_PAGE_SIZE: () => CATALOG_PAGE_SIZE,
+    getRecipes,
+    getUserPaints,
+    getPaintCatalog,
+    getSelectedIngredients,
+    getSelectedRecipes,
+    getCurrentSettings,
+    getIsEditingRecipe,
+    getEditingRecipeId,
+    getLockedSeries,
+    getLockedCategory,
+    getRecipePhotoDataUrl,
+    getCatalogPage,
+    getCATALOG_PAGE_SIZE,
     setRecipes,
     setUserPaints,
     setPaintCatalog,
