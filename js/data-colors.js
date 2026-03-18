@@ -1285,3 +1285,6 @@ window.SICOMIX.data = (function() {
 })();
 
 console.log('[SICOMIX] data-colors.js завантажено успішно, SICOMIX.data.paints.length =', window.SICOMIX.data?.paints?.length);
+
+// Експорт для модулів
+export const data = window.SICOMIX.data;
