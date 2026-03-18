@@ -25,6 +25,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Іменовані експорти для використання в інших модулях
+export { auth, db, serverTimestamp };
+
 // Обгортка для auth (сумісна зі старим API)
 const authWrapper = {
     signInAnonymously: () => signInAnonymously(auth),
@@ -66,7 +69,7 @@ const FieldValue = {
     serverTimestamp: serverTimestamp
 };
 
-// Глобальний об'єкт SICOMIX.firebase
+// Глобальний об'єкт SICOMIX.firebase (для зворотної сумісності)
 window.SICOMIX = window.SICOMIX || {};
 window.SICOMIX.firebase = {
     auth: authWrapper,
