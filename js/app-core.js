@@ -109,10 +109,15 @@ function cacheDOMElements() {
     dom.weightConfirmBtn = document.getElementById('weightConfirmBtn');
     dom.weightCancelBtn = document.getElementById('weightCancelBtn');
 
-    // Додаємо елементи для авторизації
+    // Елементи авторизації
     dom.authButton = document.getElementById('authButton');
     dom.authModal = document.getElementById('authModal');
     dom.closeAuthModal = document.getElementById('closeAuthModal');
+    dom.authEmail = document.getElementById('authEmail');
+    dom.authPassword = document.getElementById('authPassword');
+    dom.authLoginBtn = document.getElementById('authLoginBtn');
+    dom.authSignupBtn = document.getElementById('authSignupBtn');
+    dom.authGoogleBtn = document.getElementById('authGoogleBtn');
 }
 
 // ---------- ЗАВАНТАЖЕННЯ ТА ЗБЕРЕЖЕННЯ ----------
@@ -783,6 +788,76 @@ function startExport() {
     }
 }
 
+// ---------- ФУНКЦІЇ АВТОРИЗАЦІЇ ----------
+async function handleLogin() {
+    const email = dom.authEmail?.value.trim();
+    const password = dom.authPassword?.value.trim();
+    
+    if (!email || !password) {
+        utils.showNotification(i18n.t('fill_required_fields'), 'error');
+        return;
+    }
+    
+    try {
+        const auth = window.SICOMIX?.firebase?.auth;
+        if (!auth) throw new Error('Firebase auth not initialized');
+        
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        console.log('Успішний вхід:', userCredential.user.email);
+        utils.showNotification(i18n.t('login_success'), 'success');
+        dom.authModal?.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        // Оновити дані після входу
+        await loadData();
+    } catch (error) {
+        console.error('Помилка входу:', error);
+        utils.showNotification(error.message || i18n.t('login_error'), 'error');
+    }
+}
+
+async function handleSignup() {
+    const email = dom.authEmail?.value.trim();
+    const password = dom.authPassword?.value.trim();
+    
+    if (!email || !password) {
+        utils.showNotification(i18n.t('fill_required_fields'), 'error');
+        return;
+    }
+    
+    try {
+        const auth = window.SICOMIX?.firebase?.auth;
+        if (!auth) throw new Error('Firebase auth not initialized');
+        
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        console.log('Успішна реєстрація:', userCredential.user.email);
+        utils.showNotification(i18n.t('signup_success'), 'success');
+        dom.authModal?.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        await loadData();
+    } catch (error) {
+        console.error('Помилка реєстрації:', error);
+        utils.showNotification(error.message || i18n.t('signup_error'), 'error');
+    }
+}
+
+async function handleGoogleSignIn() {
+    try {
+        const auth = window.SICOMIX?.firebase?.auth;
+        if (!auth) throw new Error('Firebase auth not initialized');
+        
+        const provider = new auth.GoogleAuthProvider();
+        const userCredential = await auth.signInWithPopup(provider);
+        console.log('Успішний вхід через Google:', userCredential.user.email);
+        utils.showNotification(i18n.t('login_success'), 'success');
+        dom.authModal?.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        await loadData();
+    } catch (error) {
+        console.error('Помилка входу через Google:', error);
+        utils.showNotification(error.message || i18n.t('login_error'), 'error');
+    }
+}
+
 // ---------- ГОЛОВНІ ПОДІЇ ----------
 function setupCoreEventListeners() {
     document.addEventListener('click', function(e) {
@@ -900,6 +975,17 @@ function setupCoreEventListeners() {
             dom.authModal.classList.remove('active');
             document.body.style.overflow = 'auto';
         });
+    }
+
+    // Обробники для кнопок всередині модального вікна
+    if (dom.authLoginBtn) {
+        dom.authLoginBtn.addEventListener('click', handleLogin);
+    }
+    if (dom.authSignupBtn) {
+        dom.authSignupBtn.addEventListener('click', handleSignup);
+    }
+    if (dom.authGoogleBtn) {
+        dom.authGoogleBtn.addEventListener('click', handleGoogleSignIn);
     }
 
     window.addEventListener('beforeunload', function(e) {
