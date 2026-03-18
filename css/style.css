@@ -160,6 +160,17 @@ body.theme-organic .recipe-title {
     font-weight: 700;
 }
 
+/* ===== ВИПРАВЛЕННЯ: назви серій (груп фарб) в органічній темі – чорним ===== */
+body.theme-organic .series-header h3 {
+    color: #1e1c1a !important;  /* примусово чорний */
+    text-shadow: none;
+}
+body.theme-organic .series-header .recipe-category {
+    background: rgba(127, 154, 165, 0.3);
+    color: #2c2a27;
+    border-color: var(--border-accent);
+}
+
 /* Звичайний текст */
 body.theme-organic p,
 body.theme-organic span,
