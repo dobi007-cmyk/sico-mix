@@ -1,230 +1,209 @@
-// ========== УТИЛІТИ (ОНОВЛЕНО) ==========
+// ========== УТИЛІТИ (МОДУЛЬ) ==========
+// Екранування HTML
+export function escapeHtml(unsafe) {
+    if (unsafe === undefined || unsafe === null) return '';
+    return String(unsafe)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// Показує сповіщення
+export function showNotification(message, type = 'success', duration = 3000) {
+    hideNotification();
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${type === 'success' ? 'linear-gradient(145deg, #3a86ff, #7b2cbf)' : 
+                     type === 'error' ? '#e63946' : 
+                     type === 'warning' ? '#fb8500' : '#3a86ff'};
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 3000;
+        font-weight: 500;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        max-width: 300px;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,0.2);
+        animation: slideUp 0.3s ease;
+    `;
+    const icon = type === 'success' ? 'fa-check-circle' :
+                 type === 'error' ? 'fa-exclamation-circle' :
+                 type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+    notification.innerHTML = `<i class="fas ${icon}"></i><span>${escapeHtml(message)}</span>`;
+    document.body.appendChild(notification);
+
+    if (duration > 0) {
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }
+        }, duration);
+    }
+}
+
+export function hideNotification() {
+    const existing = document.querySelectorAll('.notification');
+    existing.forEach(n => {
+        n.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => n.remove(), 300);
+    });
+}
+
+export function showConfirmation(title, message, onConfirm, onCancel) {
+    const modal = document.getElementById('confirmationModal');
+    const titleEl = document.getElementById('confirmationTitle');
+    const msgEl = document.getElementById('confirmationMessage');
+    const confirmBtn = document.getElementById('confirmActionBtn');
+    const cancelBtn = document.getElementById('cancelActionBtn');
+    const closeBtn = document.getElementById('closeConfirmationModal');
+
+    titleEl.textContent = title;
+    msgEl.innerHTML = `<span>${escapeHtml(message)}</span>`;
+    modal.classList.add('active');
+
+    const handleConfirm = () => {
+        onConfirm?.();
+        modal.classList.remove('active');
+        cleanup();
+    };
+    const handleCancel = () => {
+        onCancel?.();
+        modal.classList.remove('active');
+        cleanup();
+    };
+    const cleanup = () => {
+        confirmBtn.onclick = null;
+        cancelBtn.onclick = null;
+        closeBtn.onclick = null;
+        document.removeEventListener('keydown', escHandler);
+    };
+    const escHandler = (e) => { if (e.key === 'Escape') handleCancel(); };
+
+    confirmBtn.onclick = handleConfirm;
+    cancelBtn.onclick = handleCancel;
+    closeBtn.onclick = handleCancel;
+    document.addEventListener('keydown', escHandler);
+    modal._escHandler = escHandler;
+}
+
+export function generateId() {
+    return Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+}
+
+export function calculateIngredientPercentages(ingredients) {
+    const total = ingredients.reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0);
+    if (total === 0) return ingredients;
+    return ingredients.map(ing => ({
+        ...ing,
+        percentage: parseFloat(((ing.amount / total) * 100).toFixed(1))
+    }));
+}
+
+export function exportToFile(data, filename, type = 'application/json') {
+    let content;
+    if (type === 'application/json') {
+        content = JSON.stringify(data, null, 2);
+    } else if (type === 'text/csv') {
+        content = convertToCSV(data);
+    } else {
+        content = JSON.stringify(data, null, 2);
+    }
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+export function convertToCSV(data) {
+    if (!Array.isArray(data) || data.length === 0) return '';
+    const headers = Object.keys(data[0]);
+    const rows = data.map(item => 
+        headers.map(h => {
+            const val = item[h] ?? '';
+            if (typeof val === 'string' && (val.includes(',') || val.includes('"') || val.includes('\n'))) {
+                return `"${val.replace(/"/g, '""')}"`;
+            }
+            return val;
+        }).join(',')
+    );
+    return [headers.join(','), ...rows].join('\n');
+}
+
+export function parseCSV(csvText) {
+    const lines = csvText.split('\n').filter(line => line.trim() !== '');
+    if (lines.length === 0) return [];
+    const headers = lines[0].split(',').map(h => h.trim());
+    const result = [];
+    for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        if (values.length !== headers.length) continue;
+        const obj = {};
+        headers.forEach((h, idx) => {
+            obj[h] = values[idx];
+        });
+        result.push(obj);
+    }
+    return result;
+}
+
+export function debounce(fn, delay) {
+    let timer;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
+export function saveToLocalStorage(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+    } catch (e) {
+        console.error('LocalStorage save error:', e);
+        showNotification('Помилка збереження даних. Можливо, перевищено ліміт пам\'яті.', 'error');
+        return false;
+    }
+}
+
+export function loadFromLocalStorage(key, defaultValue = null) {
+    try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : defaultValue;
+    } catch (e) {
+        console.error('LocalStorage load error:', e);
+        return defaultValue;
+    }
+}
+
+// Для зворотної сумісності створюємо глобальний об'єкт
 window.SICOMIX = window.SICOMIX || {};
-
-(function(global) {
-    const SICOMIX = global.SICOMIX;
-
-    SICOMIX.utils = (function() {
-        // Екранування HTML для захисту від XSS
-        function escapeHtml(unsafe) {
-            if (unsafe === undefined || unsafe === null) return '';
-            return String(unsafe)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        // Показує сповіщення. Якщо duration = 0, сповіщення не зникає автоматично.
-        function showNotification(message, type = 'success', duration = 3000) {
-            // Спочатку видаляємо попередні сповіщення
-            hideNotification();
-
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: ${type === 'success' ? 'linear-gradient(145deg, #3a86ff, #7b2cbf)' : 
-                             type === 'error' ? '#e63946' : 
-                             type === 'warning' ? '#fb8500' : '#3a86ff'};
-                color: white;
-                padding: 10px 20px;
-                border-radius: 30px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                z-index: 3000;
-                font-weight: 500;
-                font-size: 14px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                max-width: 300px;
-                backdrop-filter: blur(8px);
-                border: 1px solid rgba(255,255,255,0.2);
-                animation: slideUp 0.3s ease;
-            `;
-            const icon = type === 'success' ? 'fa-check-circle' :
-                         type === 'error' ? 'fa-exclamation-circle' :
-                         type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
-            notification.innerHTML = `<i class="fas ${icon}"></i><span>${escapeHtml(message)}</span>`;
-            document.body.appendChild(notification);
-
-            if (duration > 0) {
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.style.animation = 'slideOut 0.3s ease';
-                        setTimeout(() => notification.remove(), 300);
-                    }
-                }, duration);
-            }
-            // Якщо duration === 0, сповіщення залишається до виклику hideNotification
-        }
-
-        // Приховує всі активні сповіщення
-        function hideNotification() {
-            const existing = document.querySelectorAll('.notification');
-            existing.forEach(n => {
-                n.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => n.remove(), 300);
-            });
-        }
-
-        // Показує модальне вікно підтвердження
-        function showConfirmation(title, message, onConfirm, onCancel) {
-            const modal = document.getElementById('confirmationModal');
-            const titleEl = document.getElementById('confirmationTitle');
-            const msgEl = document.getElementById('confirmationMessage');
-            const confirmBtn = document.getElementById('confirmActionBtn');
-            const cancelBtn = document.getElementById('cancelActionBtn');
-            const closeBtn = document.getElementById('closeConfirmationModal');
-
-            titleEl.textContent = title;
-            msgEl.innerHTML = `<span>${escapeHtml(message)}</span>`;
-            modal.classList.add('active');
-
-            const handleConfirm = () => {
-                onConfirm?.();
-                modal.classList.remove('active');
-                cleanup();
-            };
-            const handleCancel = () => {
-                onCancel?.();
-                modal.classList.remove('active');
-                cleanup();
-            };
-            const cleanup = () => {
-                confirmBtn.onclick = null;
-                cancelBtn.onclick = null;
-                closeBtn.onclick = null;
-                document.removeEventListener('keydown', escHandler);
-            };
-            const escHandler = (e) => { if (e.key === 'Escape') handleCancel(); };
-
-            confirmBtn.onclick = handleConfirm;
-            cancelBtn.onclick = handleCancel;
-            closeBtn.onclick = handleCancel;
-            document.addEventListener('keydown', escHandler);
-            modal._escHandler = escHandler; // для можливого зовнішнього доступу
-        }
-
-        // Генерує унікальний ідентифікатор
-        function generateId() {
-            return Date.now() + '-' + Math.random().toString(36).substring(2, 9);
-        }
-
-        // Розраховує відсотки для інгредієнтів на основі кількості
-        function calculateIngredientPercentages(ingredients) {
-            const total = ingredients.reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0);
-            if (total === 0) return ingredients;
-            return ingredients.map(ing => ({
-                ...ing,
-                percentage: parseFloat(((ing.amount / total) * 100).toFixed(1))
-            }));
-        }
-
-        // Експортує дані у файл
-        function exportToFile(data, filename, type = 'application/json') {
-            let content;
-            if (type === 'application/json') {
-                content = JSON.stringify(data, null, 2);
-            } else if (type === 'text/csv') {
-                content = convertToCSV(data);
-            } else {
-                content = JSON.stringify(data, null, 2); // fallback
-            }
-            const blob = new Blob([content], { type });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // Конвертує масив об'єктів у CSV
-        function convertToCSV(data) {
-            if (!Array.isArray(data) || data.length === 0) return '';
-            const headers = Object.keys(data[0]);
-            const rows = data.map(item => 
-                headers.map(h => {
-                    const val = item[h] ?? '';
-                    // Екрануємо коми та лапки
-                    if (typeof val === 'string' && (val.includes(',') || val.includes('"') || val.includes('\n'))) {
-                        return `"${val.replace(/"/g, '""')}"`;
-                    }
-                    return val;
-                }).join(',')
-            );
-            return [headers.join(','), ...rows].join('\n');
-        }
-
-        // Простий парсер CSV (припускає, що поля не містять ком, крім роздільників)
-        function parseCSV(csvText) {
-            const lines = csvText.split('\n').filter(line => line.trim() !== '');
-            if (lines.length === 0) return [];
-            const headers = lines[0].split(',').map(h => h.trim());
-            const result = [];
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',').map(v => v.trim());
-                if (values.length !== headers.length) continue; // пропускаємо некоректні рядки
-                const obj = {};
-                headers.forEach((h, idx) => {
-                    obj[h] = values[idx];
-                });
-                result.push(obj);
-            }
-            return result;
-        }
-
-        // Дебаунс для оптимізації частих викликів
-        function debounce(fn, delay) {
-            let timer;
-            return function(...args) {
-                clearTimeout(timer);
-                timer = setTimeout(() => fn.apply(this, args), delay);
-            };
-        }
-
-        // Збереження в localStorage
-        function saveToLocalStorage(key, value) {
-            try {
-                localStorage.setItem(key, JSON.stringify(value));
-                return true;
-            } catch (e) {
-                console.error('LocalStorage save error:', e);
-                showNotification('Помилка збереження даних. Можливо, перевищено ліміт пам\'яті.', 'error');
-                return false;
-            }
-        }
-
-        // Завантаження з localStorage
-        function loadFromLocalStorage(key, defaultValue = null) {
-            try {
-                const item = localStorage.getItem(key);
-                return item ? JSON.parse(item) : defaultValue;
-            } catch (e) {
-                console.error('LocalStorage load error:', e);
-                return defaultValue;
-            }
-        }
-
-        return {
-            escapeHtml,
-            showNotification,
-            hideNotification,
-            showConfirmation,
-            generateId,
-            calculateIngredientPercentages,
-            exportToFile,
-            convertToCSV,
-            parseCSV,
-            debounce,
-            saveToLocalStorage,
-            loadFromLocalStorage
-        };
-    })();
-
-})(window);
+window.SICOMIX.utils = {
+    escapeHtml,
+    showNotification,
+    hideNotification,
+    showConfirmation,
+    generateId,
+    calculateIngredientPercentages,
+    exportToFile,
+    convertToCSV,
+    parseCSV,
+    debounce,
+    saveToLocalStorage,
+    loadFromLocalStorage
+};
