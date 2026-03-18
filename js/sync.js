@@ -71,7 +71,7 @@ window.SICOMIX = window.SICOMIX || {};
                 const docRef = SICOMIX.firebase.db.collection('users').doc(userId);
                 await docRef.set({
                     ...data,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    updatedAt: SICOMIX.firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
                 updateSyncStatus(SICOMIX.i18n.t('sync_complete'));
                 return true;
