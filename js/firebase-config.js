@@ -1,6 +1,14 @@
 // ========== КОНФІГУРАЦІЯ FIREBASE (МОДУЛЬ) ==========
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getAuth, signInAnonymously, signOut, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+import { 
+    getAuth, 
+    signInAnonymously, 
+    signOut,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signInWithPopup,
+    GoogleAuthProvider
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -21,12 +29,15 @@ const db = getFirestore(app);
 const authWrapper = {
     signInAnonymously: () => signInAnonymously(auth),
     signOut: () => signOut(auth),
+    signInWithEmailAndPassword: (email, password) => signInWithEmailAndPassword(auth, email, password),
+    createUserWithEmailAndPassword: (email, password) => createUserWithEmailAndPassword(auth, email, password),
+    signInWithPopup: (provider) => signInWithPopup(auth, provider),
     get currentUser() { return auth.currentUser; },
     onAuthStateChanged: (callback) => auth.onAuthStateChanged(callback),
     GoogleAuthProvider: GoogleAuthProvider
 };
 
-// Обгортка для Firestore
+// Обгортка для Firestore (імітує старий firebase.firestore())
 const dbWrapper = {
     collection: (path) => {
         const colRef = collection(db, path);
@@ -50,15 +61,17 @@ const dbWrapper = {
     }
 };
 
-// Експортуємо для використання в інших модулях
-export { authWrapper as auth, dbWrapper as db, serverTimestamp };
+// FieldValue для serverTimestamp
+const FieldValue = {
+    serverTimestamp: serverTimestamp
+};
 
-// Також створюємо глобальний об'єкт для зворотної сумісності
+// Глобальний об'єкт SICOMIX.firebase
 window.SICOMIX = window.SICOMIX || {};
 window.SICOMIX.firebase = {
     auth: authWrapper,
     db: dbWrapper,
-    firestore: { FieldValue: { serverTimestamp } }
+    firestore: { FieldValue }
 };
 
-console.log('🔥 Firebase ініціалізовано (модуль)');
+console.log('🔥 Firebase ініціалізовано (модульна версія)');
