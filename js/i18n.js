@@ -300,6 +300,7 @@ const translations = {
         "auth_note": "Дані синхронізуються між пристроями",
         "logout_confirmation": "Ви дійсно хочете вийти?",
         "logged_out": "Ви вийшли з системи",
+        "logout_error": "Помилка при виході",
 
         // Помилки та повідомлення
         "paints_not_found": "Фарби не знайдено",
@@ -675,6 +676,7 @@ const translations = {
         "auth_note": "Data is synced between devices",
         "logout_confirmation": "Are you sure you want to logout?",
         "logged_out": "You have been logged out",
+        "logout_error": "Logout error",
 
         // Errors and messages
         "paints_not_found": "Paints not found",
@@ -1049,7 +1051,8 @@ const translations = {
         "signin_google": "Zaloguj przez Google",
         "auth_note": "Dane są synchronizowane między urządzeniami",
         "logout_confirmation": "Czy na pewno chcesz się wylogować?",
-        "logged_out": "Zostałeś wylogowany",
+        "logged_out": "Wylogowano pomyślnie",
+        "logout_error": "Błąd podczas wylogowywania",
 
         // Błędy i komunikaty
         "paints_not_found": "Nie znaleziono farb",
