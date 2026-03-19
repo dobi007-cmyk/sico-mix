@@ -314,7 +314,7 @@ function performSave(existingId, name, cat, series, desc, selectedIngredients, i
     app.switchPage('recipes');
 }
 
-// ОНОВЛЕНА ФУНКЦІЯ: додано app.clearRecipeDraft()
+// Оновлена функція очищення форми
 function clearRecipeForm() {
     document.getElementById('recipeName').value = '';
     document.getElementById('recipeCategory').value = '';
@@ -331,8 +331,7 @@ function clearRecipeForm() {
     if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
     if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
     resetEditMode();
-    // Видаляємо збережену чернетку, щоб при поверненні на сторінку не відновлювались дані
-    app.clearRecipeDraft();
+    app.clearRecipeDraft(); // Видаляємо чернетку
 }
 
 function resetEditMode() {
@@ -738,7 +737,7 @@ function showWeightInput(recipeId) {
     app.dom.closeWeightModal.addEventListener('click', onCancel, { once: true });
 }
 
-// Оновлена функція друку етикетки – видалено зайві елементи (спеціальні примітки)
+// Оновлена функція друку етикетки – без номера партії, з кольоровою смугою
 function printLabelWithWeight(recipe, weightKg) {
     const lang = i18n.getLanguage();
     const date = new Date().toLocaleDateString(lang);
@@ -903,7 +902,7 @@ function printLabelWithWeight(recipe, weightKg) {
     // Вибираємо стиль для серії, якщо немає – використовуємо EC
     const style = seriesStyles[seriesId] || seriesStyles.EC;
     
-    // Базові технічні дані – тільки основні
+    // Базові технічні дані
     let useText = '', aspectText = '', dryingText = '';
     
     if (series && series.properties) {
@@ -913,7 +912,7 @@ function printLabelWithWeight(recipe, weightKg) {
         dryingText = props.drying?.[lang] || props.drying?.uk || '';
     }
     
-    // Формуємо HTML – без зайвих блоків (special, remark, type)
+    // Формуємо HTML – без номера партії, з кольоровою смугою
     const labelHtml = `
     <!DOCTYPE html>
     <html>
@@ -1054,7 +1053,6 @@ function printLabelWithWeight(recipe, weightKg) {
                 <div class="product-name">${utils.escapeHtml(recipe.name)}</div>
                 <div class="product-meta">
                     <span>Data: ${date}</span>
-                    <span>Nr partii: ${recipe.id.substring(0,8).toUpperCase()}</span>
                 </div>
 
                 <div style="text-align: center;">
@@ -1063,7 +1061,7 @@ function printLabelWithWeight(recipe, weightKg) {
                     </div>
                 </div>
                 
-                <!-- Технічні дані серії (червоним) – тільки основні -->
+                <!-- Технічні дані серії (червоним) -->
                 <div class="tech-data">
                     ${useText ? `<div class="tech-item"><strong>Use:</strong> ${utils.escapeHtml(useText)}</div>` : ''}
                     ${aspectText ? `<div class="tech-item"><strong>Aspect:</strong> ${utils.escapeHtml(aspectText)}</div>` : ''}
@@ -1071,7 +1069,7 @@ function printLabelWithWeight(recipe, weightKg) {
                 </div>
             </div>
 
-            <!-- Примітка перед друком (окремий блок після технічних даних) -->
+            <!-- Примітка перед друком -->
             <div class="note-section">
                 PRZED DRUKIEM NAKŁADU ZALECAMY SPRAWDZENIE ZGODNOŚCI KOLORYSTYCZNEJ.
             </div>
