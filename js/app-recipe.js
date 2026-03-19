@@ -735,7 +735,7 @@ function showWeightInput(recipeId) {
     app.dom.closeWeightModal.addEventListener('click', onCancel, { once: true });
 }
 
-// Оновлена функція друку етикетки з правильними розмірами та синім kg
+// Оновлена функція друку етикетки з дизайном під серію (заводські етикетки SICO)
 function printLabelWithWeight(recipe, weightKg) {
     const lang = i18n.getLanguage();
     const date = new Date().toLocaleDateString(lang);
@@ -745,6 +745,180 @@ function printLabelWithWeight(recipe, weightKg) {
     const labelWidth = isSmall ? '104mm' : '147mm';
     const labelHeight = isSmall ? '100mm' : '105mm';
     
+    // Отримуємо дані серії
+    const seriesId = recipe.series;
+    const allSeries = window.SICOMIX?.data?.series || [];
+    const series = allSeries.find(s => s.id === seriesId);
+    
+    // Розширені налаштування дизайну для різних серій (кольори, логотипи)
+    const seriesStyles = {
+        EC: {
+            headerBg: '#1e3a8a',
+            headerBorder: '#fbbf24',
+            titleColor: '#e63946',
+            subColor: '#ffffff',
+            productNameColor: '#1e3a8a',
+            weightBorder: '#1e3a8a',
+            weightColor: '#1e3a8a',
+            noteColor: '#e63946',
+            logoBg: '#fbbf24',
+            logoText: '#e63946',
+            seriesDisplay: 'EURECO EC'
+        },
+        CF: {
+            headerBg: '#2563eb',
+            headerBorder: '#fcd34d',
+            titleColor: '#b91c1c',
+            subColor: '#ffffff',
+            productNameColor: '#2563eb',
+            weightBorder: '#2563eb',
+            weightColor: '#2563eb',
+            noteColor: '#b91c1c',
+            logoBg: '#fcd34d',
+            logoText: '#b91c1c',
+            seriesDisplay: 'CARTOFLEX CF'
+        },
+        PLUV: {
+            headerBg: '#0e7a7a',
+            headerBorder: '#fbbf24',
+            titleColor: '#ffffff',
+            subColor: '#ffffff',
+            productNameColor: '#0e7a7a',
+            weightBorder: '#0e7a7a',
+            weightColor: '#0e7a7a',
+            noteColor: '#fbbf24',
+            logoBg: '#fbbf24',
+            logoText: '#0e7a7a',
+            seriesDisplay: 'UVIPLAST PLUV'
+        },
+        PLUV_LED: {
+            headerBg: '#0e7a7a',
+            headerBorder: '#fbbf24',
+            titleColor: '#ffffff',
+            subColor: '#ffffff',
+            productNameColor: '#0e7a7a',
+            weightBorder: '#0e7a7a',
+            weightColor: '#0e7a7a',
+            noteColor: '#fbbf24',
+            logoBg: '#fbbf24',
+            logoText: '#0e7a7a',
+            seriesDisplay: 'UVIPLAST PLUV LED'
+        },
+        SX: {
+            headerBg: '#047857',
+            headerBorder: '#fbbf24',
+            titleColor: '#f59e0b',
+            subColor: '#ffffff',
+            productNameColor: '#047857',
+            weightBorder: '#047857',
+            weightColor: '#047857',
+            noteColor: '#f59e0b',
+            logoBg: '#fbbf24',
+            logoText: '#047857',
+            seriesDisplay: 'SICOTEX SX'
+        },
+        SPTN: {
+            headerBg: '#7e22ce',
+            headerBorder: '#fcd34d',
+            titleColor: '#fbbf24',
+            subColor: '#ffffff',
+            productNameColor: '#7e22ce',
+            weightBorder: '#7e22ce',
+            weightColor: '#7e22ce',
+            noteColor: '#fbbf24',
+            logoBg: '#fcd34d',
+            logoText: '#7e22ce',
+            seriesDisplay: 'SICOPLAST SPTN'
+        },
+        TPP: {
+            headerBg: '#b91c1c',
+            headerBorder: '#fbbf24',
+            titleColor: '#ffffff',
+            subColor: '#ffffff',
+            productNameColor: '#b91c1c',
+            weightBorder: '#b91c1c',
+            weightColor: '#b91c1c',
+            noteColor: '#fbbf24',
+            logoBg: '#fbbf24',
+            logoText: '#b91c1c',
+            seriesDisplay: 'POLYPRO TPP'
+        },
+        AS: {
+            headerBg: '#0e7a7a',
+            headerBorder: '#fbbf24',
+            titleColor: '#fbbf24',
+            subColor: '#ffffff',
+            productNameColor: '#0e7a7a',
+            weightBorder: '#0e7a7a',
+            weightColor: '#0e7a7a',
+            noteColor: '#fbbf24',
+            logoBg: '#fbbf24',
+            logoText: '#0e7a7a',
+            seriesDisplay: 'AQUASET AS'
+        },
+        NST: {
+            headerBg: '#0f172a',
+            headerBorder: '#fbbf24',
+            titleColor: '#e63946',
+            subColor: '#ffffff',
+            productNameColor: '#0f172a',
+            weightBorder: '#0f172a',
+            weightColor: '#0f172a',
+            noteColor: '#e63946',
+            logoBg: '#fbbf24',
+            logoText: '#e63946',
+            seriesDisplay: 'SICONYL NST'
+        },
+        QS: {
+            headerBg: '#c2410c',
+            headerBorder: '#fcd34d',
+            titleColor: '#ffffff',
+            subColor: '#ffffff',
+            productNameColor: '#c2410c',
+            weightBorder: '#c2410c',
+            weightColor: '#c2410c',
+            noteColor: '#fcd34d',
+            logoBg: '#fcd34d',
+            logoText: '#c2410c',
+            seriesDisplay: 'QUICKSET QS'
+        },
+        SN: {
+            headerBg: '#4b5563',
+            headerBorder: '#fbbf24',
+            titleColor: '#ffffff',
+            subColor: '#ffffff',
+            productNameColor: '#4b5563',
+            weightBorder: '#4b5563',
+            weightColor: '#4b5563',
+            noteColor: '#fbbf24',
+            logoBg: '#fbbf24',
+            logoText: '#4b5563',
+            seriesDisplay: 'SICONYL SN'
+        }
+    };
+    
+    // Вибираємо стиль для серії, якщо немає – використовуємо EC
+    const style = seriesStyles[seriesId] || seriesStyles.EC;
+    
+    // Базові технічні дані
+    let useText = '', aspectText = '', dryingText = '', remarkText = '', typeText = '';
+    
+    if (series && series.properties) {
+        const props = series.properties;
+        useText = props.type?.[lang] || props.type?.uk || '';
+        aspectText = props.finish?.[lang] || props.finish?.uk || '';
+        dryingText = props.drying?.[lang] || props.drying?.uk || '';
+        
+        // Спеціальні примітки
+        if (seriesId === 'NST') {
+            remarkText = 'Not wash resistant!';
+        } else if (seriesId === 'SX') {
+            typeText = props.type?.[lang] || props.type?.uk || '';
+        } else if (props.special) {
+            remarkText = props.special?.[lang] || props.special?.uk || '';
+        }
+    }
+    
     const labelHtml = `
     <!DOCTYPE html>
     <html>
@@ -753,12 +927,7 @@ function printLabelWithWeight(recipe, weightKg) {
         <title>Etykieta - ${utils.escapeHtml(recipe.name)}</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <style>
-            /* Скидання відступів та полів сторінки */
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
             html, body {
                 width: ${labelWidth};
                 height: ${labelHeight};
@@ -770,7 +939,6 @@ function printLabelWithWeight(recipe, weightKg) {
                 justify-content: center;
                 font-family: 'Inter', sans-serif;
             }
-            /* Правила для друку */
             @page {
                 size: ${labelWidth} ${labelHeight};
                 margin: 0;
@@ -788,25 +956,31 @@ function printLabelWithWeight(recipe, weightKg) {
                 font-size: ${isSmall ? '3.2mm' : '3.5mm'};
             }
             .header {
-                background: #1e3a8a;
+                background: ${style.headerBg};
                 color: white;
                 padding: ${isSmall ? '2mm' : '3mm'};
                 text-align: center;
-                border-bottom: 0.5mm solid #fbbf24;
+                border-bottom: 0.5mm solid ${style.headerBorder};
+            }
+            .header .top-logo {
+                font-size: ${isSmall ? '3mm' : '3.5mm'};
+                font-weight: 500;
+                letter-spacing: 1px;
+                margin-bottom: 1mm;
+                color: rgba(255,255,255,0.9);
             }
             .header h1 {
-                font-size: ${isSmall ? '4mm' : '5mm'};
-                font-weight: 700;
-                letter-spacing: 0.5px;
+                font-size: ${isSmall ? '4.5mm' : '5.5mm'};
+                font-weight: 800;
                 text-transform: uppercase;
                 margin-bottom: 1mm;
-                color: #e63946;
+                color: ${style.titleColor};
+                line-height: 1.2;
             }
             .header .sub {
                 font-size: ${isSmall ? '2.5mm' : '3mm'};
                 font-weight: 500;
-                opacity: 0.9;
-                color: #000000;
+                color: ${style.subColor};
             }
             .product-info {
                 padding: ${isSmall ? '2mm' : '3mm'};
@@ -817,7 +991,7 @@ function printLabelWithWeight(recipe, weightKg) {
             .product-name {
                 font-size: ${isSmall ? '5mm' : '6mm'};
                 font-weight: 700;
-                color: #1e3a8a;
+                color: ${style.productNameColor};
                 margin-bottom: 1mm;
                 line-height: 1.2;
             }
@@ -830,21 +1004,43 @@ function printLabelWithWeight(recipe, weightKg) {
             }
             .weight-box {
                 background: white;
-                border: 0.5mm solid #1e3a8a;
+                border: 0.5mm solid ${style.weightBorder};
                 border-radius: 5mm;
                 padding: ${isSmall ? '2mm' : '3mm'};
                 text-align: center;
                 margin: 3mm 0;
                 font-size: ${isSmall ? '6mm' : '7mm'};
                 font-weight: 800;
-                color: #1e3a8a;
+                color: ${style.weightColor};
                 display: inline-block;
                 min-width: ${isSmall ? '40mm' : '50mm'};
             }
             .weight-box span {
                 font-size: ${isSmall ? '3mm' : '4mm'};
                 font-weight: 500;
-                color: #1e3a8a; /* синє "kg" */
+                color: ${style.weightColor};
+            }
+            .tech-data {
+                margin-top: 2mm;
+                font-size: ${isSmall ? '2.5mm' : '3mm'};
+                border-top: 0.3mm dashed #9ca3af;
+                padding-top: 2mm;
+            }
+            .tech-item {
+                margin-bottom: 1mm;
+                line-height: 1.4;
+            }
+            .tech-item strong {
+                color: ${style.productNameColor};
+                font-weight: 600;
+                display: inline-block;
+                min-width: ${isSmall ? '15mm' : '20mm'};
+            }
+            .remark {
+                color: ${style.noteColor};
+                font-weight: 600;
+                margin-top: 1mm;
+                font-style: italic;
             }
             .footer {
                 background: #f3f4f6;
@@ -879,7 +1075,7 @@ function printLabelWithWeight(recipe, weightKg) {
                 font-size: ${isSmall ? '1.8mm' : '2.2mm'};
                 text-transform: uppercase;
                 font-weight: 600;
-                color: #e63946;
+                color: ${style.noteColor};
                 text-align: center;
                 border-top: 0.3mm dashed #9ca3af;
                 padding-top: 1.5mm;
@@ -893,8 +1089,8 @@ function printLabelWithWeight(recipe, weightKg) {
             .logo-text {
                 font-size: ${isSmall ? '4mm' : '5mm'};
                 font-weight: 800;
-                color: #e63946;
-                background: #fbbf24;
+                color: ${style.logoText};
+                background: ${style.logoBg};
                 padding: 0.5mm 2mm;
                 border-radius: 5mm;
                 letter-spacing: 0.5px;
@@ -904,10 +1100,8 @@ function printLabelWithWeight(recipe, weightKg) {
     <body>
         <div class="label">
             <div class="header">
-                <div class="logo-area">
-                    <span class="logo-text">SICO</span>
-                </div>
-                <h1>SICO POLSKA - FARBA MIESZANA</h1>
+                <div class="top-logo">SICO Screen Inks</div>
+                <h1>${style.seriesDisplay}</h1>
                 <div class="sub">${utils.escapeHtml(recipe.series)} / ${i18n.translateCategoryName(recipe.category)}</div>
             </div>
 
@@ -922,6 +1116,15 @@ function printLabelWithWeight(recipe, weightKg) {
                     <div class="weight-box">
                         ${weightKg.toFixed(2).replace('.', ',')} <span>kg</span>
                     </div>
+                </div>
+                
+                <!-- Технічні дані серії (англійською, як на заводських етикетках) -->
+                <div class="tech-data">
+                    ${useText ? `<div class="tech-item"><strong>Use:</strong> ${utils.escapeHtml(useText)}</div>` : ''}
+                    ${typeText ? `<div class="tech-item"><strong>Type:</strong> ${utils.escapeHtml(typeText)}</div>` : ''}
+                    ${aspectText ? `<div class="tech-item"><strong>Aspect:</strong> ${utils.escapeHtml(aspectText)}</div>` : ''}
+                    ${dryingText ? `<div class="tech-item"><strong>Drying:</strong> ${utils.escapeHtml(dryingText)}</div>` : ''}
+                    ${remarkText ? `<div class="remark">${utils.escapeHtml(remarkText)}</div>` : ''}
                 </div>
             </div>
 
