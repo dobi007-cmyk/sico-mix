@@ -735,9 +735,17 @@ function showWeightInput(recipeId) {
     app.dom.closeWeightModal.addEventListener('click', onCancel, { once: true });
 }
 
+// Оновлена функція друку етикетки з різними розмірами
 function printLabelWithWeight(recipe, weightKg) {
     const lang = i18n.getLanguage();
     const date = new Date().toLocaleDateString(lang);
+    
+    // Визначаємо розмір етикетки залежно від ваги
+    // Якщо вага <= 2 кг, використовуємо малий розмір (104x100 мм), інакше великий (147x105 мм)
+    const isSmall = weightKg <= 2;
+    const labelWidth = isSmall ? '104mm' : '147mm';
+    const labelHeight = isSmall ? '100mm' : '105mm';
+    const fontSizeMultiplier = isSmall ? 0.9 : 1; // трохи менший шрифт для маленької етикетки
 
     const labelHtml = `
     <!DOCTYPE html>
@@ -759,126 +767,131 @@ function printLabelWithWeight(recipe, weightKg) {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                padding: 20px;
+                padding: 5mm;
             }
             .label {
-                width: 420px;
+                width: ${labelWidth};
+                height: ${labelHeight};
                 background: white;
-                border-radius: 8px;
+                border-radius: 3mm;
                 overflow: hidden;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-                border: 1px solid #ccc;
+                box-shadow: 0 2mm 5mm rgba(0,0,0,0.1);
+                border: 0.3mm solid #ccc;
+                display: flex;
+                flex-direction: column;
+                font-size: ${isSmall ? '3.2mm' : '3.5mm'};
             }
             .header {
                 background: #1e3a8a;
                 color: white;
-                padding: 16px 20px;
+                padding: ${isSmall ? '2mm' : '3mm'};
                 text-align: center;
-                border-bottom: 3px solid #fbbf24;
+                border-bottom: 0.5mm solid #fbbf24;
             }
             .header h1 {
-                font-size: 24px;
+                font-size: ${isSmall ? '4mm' : '5mm'};
                 font-weight: 700;
-                letter-spacing: 1px;
+                letter-spacing: 0.5px;
                 text-transform: uppercase;
-                margin-bottom: 4px;
+                margin-bottom: 1mm;
                 color: #e63946;
             }
             .header .sub {
-                font-size: 14px;
+                font-size: ${isSmall ? '2.5mm' : '3mm'};
                 font-weight: 500;
                 opacity: 0.9;
                 color: #000000;
             }
             .product-info {
-                padding: 20px;
-                border-bottom: 1px solid #ddd;
+                padding: ${isSmall ? '2mm' : '3mm'};
+                border-bottom: 0.3mm solid #ddd;
                 background: #f9fafb;
+                flex: 1;
             }
             .product-name {
-                font-size: 28px;
+                font-size: ${isSmall ? '5mm' : '6mm'};
                 font-weight: 700;
                 color: #1e3a8a;
-                margin-bottom: 5px;
+                margin-bottom: 1mm;
                 line-height: 1.2;
             }
             .product-meta {
                 display: flex;
                 justify-content: space-between;
-                font-size: 14px;
+                font-size: ${isSmall ? '2.2mm' : '2.8mm'};
                 color: #000000;
-                margin-bottom: 10px;
+                margin-bottom: 2mm;
             }
             .weight-box {
                 background: white;
-                border: 2px solid #1e3a8a;
-                border-radius: 40px;
-                padding: 12px 20px;
+                border: 0.5mm solid #1e3a8a;
+                border-radius: 5mm;
+                padding: ${isSmall ? '2mm' : '3mm'};
                 text-align: center;
-                margin: 15px 0;
-                font-size: 32px;
+                margin: 3mm 0;
+                font-size: ${isSmall ? '6mm' : '7mm'};
                 font-weight: 800;
                 color: #1e3a8a;
                 display: inline-block;
-                min-width: 200px;
+                min-width: ${isSmall ? '40mm' : '50mm'};
             }
             .weight-box span {
-                font-size: 18px;
+                font-size: ${isSmall ? '3mm' : '4mm'};
                 font-weight: 500;
                 color: #6b7280;
             }
             .footer {
                 background: #f3f4f6;
-                padding: 20px;
-                font-size: 12px;
+                padding: ${isSmall ? '2mm' : '3mm'};
+                font-size: ${isSmall ? '2mm' : '2.5mm'};
                 color: #000000;
-                border-top: 1px solid #d1d5db;
+                border-top: 0.3mm solid #d1d5db;
             }
             .footer .distributor {
                 font-weight: 600;
-                margin-bottom: 5px;
+                margin-bottom: 1mm;
                 color: #000000;
             }
             .footer .address {
                 line-height: 1.5;
-                margin-bottom: 5px;
+                margin-bottom: 1mm;
                 color: #000000;
             }
             .footer .contact {
-                margin-bottom: 10px;
+                margin-bottom: 2mm;
                 color: #000000;
             }
             .footer .producer {
                 font-style: italic;
-                border-top: 1px solid #9ca3af;
-                padding-top: 8px;
-                margin-top: 8px;
+                border-top: 0.3mm solid #9ca3af;
+                padding-top: 1.5mm;
+                margin-top: 1.5mm;
                 color: #000000;
             }
             .footer .note {
-                margin-top: 15px;
-                font-size: 10px;
+                margin-top: 2mm;
+                font-size: ${isSmall ? '1.8mm' : '2.2mm'};
                 text-transform: uppercase;
                 font-weight: 600;
                 color: #e63946;
                 text-align: center;
-                border-top: 1px dashed #9ca3af;
-                padding-top: 10px;
+                border-top: 0.3mm dashed #9ca3af;
+                padding-top: 1.5mm;
             }
             .logo-area {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                margin-bottom: 10px;
+                margin-bottom: 1mm;
             }
             .logo-text {
-                font-size: 20px;
+                font-size: ${isSmall ? '4mm' : '5mm'};
                 font-weight: 800;
                 color: #e63946;
                 background: #fbbf24;
-                padding: 5px 15px;
-                border-radius: 40px;
-                letter-spacing: 1px;
+                padding: 0.5mm 2mm;
+                border-radius: 5mm;
+                letter-spacing: 0.5px;
             }
         </style>
     </head>
@@ -901,7 +914,7 @@ function printLabelWithWeight(recipe, weightKg) {
 
                 <div style="text-align: center;">
                     <div class="weight-box">
-                        ${weightKg.toFixed(2)} <span>kg</span>
+                        ${weightKg.toFixed(2).replace('.', ',')} <span>kg</span>
                     </div>
                 </div>
             </div>
