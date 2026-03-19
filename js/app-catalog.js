@@ -3,29 +3,71 @@ import * as utils from './utils.js';
 import * as i18n from './i18n.js';
 import * as app from './app-core.js';
 
-// Обробник для кнопки "Завантажити ще"
-function loadMoreHandler(e) {
+// Прапорець для запобігання одночасним завантаженням
+let isLoadingMore = false;
+
+// Обробник для кнопки "Завантажити ще" (глобальне делегування)
+function globalLoadMoreHandler(e) {
+    const btn = e.target.closest('#loadMoreCatalogBtn');
+    if (!btn) return;
     e.preventDefault();
+    
+    if (isLoadingMore) return; // запобігаємо подвійним клікам
+    isLoadingMore = true;
+    
     const newPage = app.getCatalogPage() + 1;
     app.setCatalogPage(newPage);
-    renderPaintCatalog(true);
+    renderPaintCatalog(true).finally(() => {
+        isLoadingMore = false;
+    });
 }
+
+// Додаємо глобальний обробник один раз при завантаженні модуля
+document.addEventListener('click', globalLoadMoreHandler);
 
 function attachCatalogEventListeners() {
     console.log('📚 attachCatalogEventListeners викликано');
     const dom = app.dom;
     if (!dom.paintCatalogEl) return;
 
-    // Використовуємо делегування подій на весь контейнер каталогу
+    // Делегування на контейнер каталогу для внутрішніх кнопок
     dom.paintCatalogEl.removeEventListener('click', catalogClickHandler);
     dom.paintCatalogEl.addEventListener('click', catalogClickHandler);
     
-    // Окремо додаємо обробник для кнопки "Завантажити ще"
+    // Кнопка "Завантажити ще" тепер обробляється глобально, тому окремо не чіпляємо
+    // Просто оновлюємо її видимість
+    updateLoadMoreButtonVisibility();
+}
+
+function updateLoadMoreButtonVisibility() {
     const loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
-    if (loadMoreBtn) {
-        loadMoreBtn.removeEventListener('click', loadMoreHandler);
-        loadMoreBtn.addEventListener('click', loadMoreHandler);
-    }
+    if (!loadMoreBtn) return;
+    
+    const allSeries = app.getUniqueSeries();
+    const search = document.getElementById('catalogSearch')?.value?.toLowerCase() || '';
+    const lang = i18n.getLanguage();
+    const paintCatalog = app.getPaintCatalog();
+    
+    let seriesWithPaints = allSeries.filter(series => {
+        if (!series || !series.id) return false;
+        let seriesPaints = paintCatalog.filter(p => p && p.series === series.id);
+        if (search) {
+            seriesPaints = seriesPaints.filter(p => {
+                if (!p) return false;
+                const paintName = p.displayName?.[lang] || p.name || '';
+                return paintName.toLowerCase().includes(search) ||
+                       (p.article && p.article.toLowerCase().includes(search));
+            });
+        }
+        return seriesPaints.length > 0;
+    });
+    
+    const catalogPage = app.getCatalogPage();
+    const pageSize = app.getCATALOG_PAGE_SIZE();
+    const endIndex = catalogPage * pageSize;
+    const hasMore = seriesWithPaints.length > endIndex;
+    
+    loadMoreBtn.style.display = hasMore ? 'inline-block' : 'none';
 }
 
 function catalogClickHandler(e) {
@@ -43,7 +85,6 @@ function catalogClickHandler(e) {
             paintsDiv.style.display = 'grid';
             icon.classList.remove('fa-chevron-down');
             icon.classList.add('fa-chevron-up');
-            // Зберігаємо стан розгортання в localStorage
             try {
                 const expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
                 if (!expandedSeries.includes(card.dataset.series)) {
@@ -100,187 +141,193 @@ function renderPaintCatalog(append = false) {
     const dom = app.dom;
     if (!dom.paintCatalogEl) {
         console.warn('⚠️ paintCatalogEl не знайдено!');
-        return;
+        return Promise.resolve();
     }
 
-    try {
-        const search = document.getElementById('catalogSearch')?.value?.toLowerCase() || '';
-        const allSeries = app.getUniqueSeries();
-        
-        if (!allSeries || !Array.isArray(allSeries)) {
-            console.error('❌ getUniqueSeries повернув не масив:', allSeries);
-            dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
-                <i class="fas fa-exclamation-triangle"></i> Помилка завантаження серій
-            </p>`;
-            return;
-        }
-
-        const lang = i18n.getLanguage();
-        const paintCatalog = app.getPaintCatalog();
-        
-        if (!paintCatalog || !Array.isArray(paintCatalog)) {
-            console.error('❌ getPaintCatalog повернув не масив:', paintCatalog);
-            dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
-                <i class="fas fa-exclamation-triangle"></i> Помилка завантаження фарб
-            </p>`;
-            return;
-        }
-
-        let seriesWithPaints = allSeries.filter(series => {
-            if (!series || !series.id) return false;
-            let seriesPaints = paintCatalog.filter(p => p && p.series === series.id);
-            if (search) {
-                seriesPaints = seriesPaints.filter(p => {
-                    if (!p) return false;
-                    const paintName = p.displayName?.[lang] || p.name || '';
-                    return paintName.toLowerCase().includes(search) ||
-                           (p.article && p.article.toLowerCase().includes(search));
-                });
-            }
-            return seriesPaints.length > 0;
-        });
-
-        const catalogPage = app.getCatalogPage();
-        const pageSize = app.getCATALOG_PAGE_SIZE();
-        const startIndex = 0;
-        const endIndex = catalogPage * pageSize;
-        const paginatedSeries = seriesWithPaints.slice(startIndex, endIndex);
-        const hasMore = seriesWithPaints.length > endIndex;
-
-        // Оновлюємо відображення кнопки "Завантажити ще"
-        const loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
-        if (loadMoreBtn) {
-            loadMoreBtn.style.display = hasMore ? 'inline-block' : 'none';
-        }
-
-        if (paginatedSeries.length === 0 && !append) {
-            dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px;">${i18n.t('catalog_empty')}</p>`;
-            i18n.applyTranslations();
-            return;
-        }
-
-        const currentSettings = app.getCurrentSettings();
-        applyCatalogLayout(currentSettings.catalogLayout || 'classic');
-
-        let html = '';
-        let totalFoundPaints = 0;
-
-        let expandedSeries = [];
+    return new Promise((resolve) => {
         try {
-            expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
-        } catch (e) {}
-
-        paginatedSeries.forEach(series => {
-            if (!series || !series.id) return;
+            const search = document.getElementById('catalogSearch')?.value?.toLowerCase() || '';
+            const allSeries = app.getUniqueSeries();
             
-            let seriesPaints = paintCatalog.filter(p => p && p.series === series.id);
-            if (search) {
-                seriesPaints = seriesPaints.filter(p => {
-                    if (!p) return false;
-                    const paintName = p.displayName?.[lang] || p.name || '';
-                    return paintName.toLowerCase().includes(search) ||
-                           (p.article && p.article.toLowerCase().includes(search));
-                });
+            if (!allSeries || !Array.isArray(allSeries)) {
+                console.error('❌ getUniqueSeries повернув не масив:', allSeries);
+                dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
+                    <i class="fas fa-exclamation-triangle"></i> Помилка завантаження серій
+                </p>`;
+                resolve();
+                return;
             }
-            totalFoundPaints += seriesPaints.length;
 
-            const seriesName = (series.name && series.name[lang]) || series.id || 'Невідома серія';
-            const category = series.category || '';
-            // Якщо є пошук, розгортаємо всі серії, інакше дивимось у localStorage
-            const isExpanded = search.length > 0 || expandedSeries.includes(series.id);
+            const lang = i18n.getLanguage();
+            const paintCatalog = app.getPaintCatalog();
+            
+            if (!paintCatalog || !Array.isArray(paintCatalog)) {
+                console.error('❌ getPaintCatalog повернув не масив:', paintCatalog);
+                dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
+                    <i class="fas fa-exclamation-triangle"></i> Помилка завантаження фарб
+                </p>`;
+                resolve();
+                return;
+            }
 
-            const paintsHtml = seriesPaints.map(p => {
-                if (!p) return '';
-                
-                const paintCode = p.name || '';
-                const paintName = p.displayName?.[lang] || p.name || '';
-                const selectedIngredients = app.getSelectedIngredients() || [];
-                const isInRecipe = selectedIngredients.some(ing => ing && String(ing.paintId) === String(p.id));
-                const buttonClass = isInRecipe ? 'glass-remove-btn' : 'glass-add-btn';
-                const buttonIcon = isInRecipe ? 'fa-trash' : 'fa-plus';
-                const buttonTitle = isInRecipe ? i18n.t('remove_from_recipe') : i18n.t('add_ingredient');
-                
-                const color = p.color || '#cccccc';
-                
-                return `
-                <div class="paint-card-glass" data-paint-id="${p.id}" data-paint-series="${p.series || ''}" style="color: ${color};">
-                    <div class="glass-swatch" style="background: ${utils.escapeHtml(color)};"></div>
-                    <div class="glass-name" title="${utils.escapeHtml(paintCode)}">${utils.escapeHtml(paintCode)}</div>
-                    <div class="glass-article" title="${utils.escapeHtml(paintName)}">${utils.escapeHtml(paintName)}</div>
-                    <button class="${buttonClass}" data-paint-id="${p.id}" title="${buttonTitle}" aria-label="${buttonTitle}">
-                        <i class="fas ${buttonIcon}"></i>
-                    </button>
-                    ${!p.isDefault ? `
-                        <button class="delete-paint" data-paint-id="${p.id}" title="${i18n.t('delete')}" aria-label="${i18n.t('delete')}">
-                            <i class="fas fa-trash"></i>
-                        </button>` : ''}
-                </div>
-            `}).join('');
+            let seriesWithPaints = allSeries.filter(series => {
+                if (!series || !series.id) return false;
+                let seriesPaints = paintCatalog.filter(p => p && p.series === series.id);
+                if (search) {
+                    seriesPaints = seriesPaints.filter(p => {
+                        if (!p) return false;
+                        const paintName = p.displayName?.[lang] || p.name || '';
+                        return paintName.toLowerCase().includes(search) ||
+                               (p.article && p.article.toLowerCase().includes(search));
+                    });
+                }
+                return seriesPaints.length > 0;
+            });
 
-            html += `
-                <div class="series-card" data-series="${series.id}">
-                    <div class="series-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <div>
-                                <h3>
-                                    ${utils.escapeHtml(seriesName)}
-                                    <span class="series-count">(${seriesPaints.length})</span>
-                                </h3>
-                                <span class="recipe-category">${i18n.translateCategoryName(category)}</span>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn-icon series-info-btn" title="${i18n.t('properties')}" aria-label="${i18n.t('properties')}">
-                                    <i class="fas fa-info-circle"></i>
-                                </button>
-                                <button class="btn-icon toggle-series" title="${i18n.t('expand')}" aria-label="${i18n.t('expand')}">
-                                    <i class="fas fa-chevron-${isExpanded ? 'up' : 'down'}"></i>
-                                </button>
+            const catalogPage = app.getCatalogPage();
+            const pageSize = app.getCATALOG_PAGE_SIZE();
+            const startIndex = 0;
+            const endIndex = catalogPage * pageSize;
+            const paginatedSeries = seriesWithPaints.slice(startIndex, endIndex);
+            const hasMore = seriesWithPaints.length > endIndex;
+
+            // Оновлюємо видимість кнопки
+            const loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
+            if (loadMoreBtn) {
+                loadMoreBtn.style.display = hasMore ? 'inline-block' : 'none';
+            }
+
+            if (paginatedSeries.length === 0 && !append) {
+                dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px;">${i18n.t('catalog_empty')}</p>`;
+                i18n.applyTranslations();
+                resolve();
+                return;
+            }
+
+            const currentSettings = app.getCurrentSettings();
+            applyCatalogLayout(currentSettings.catalogLayout || 'classic');
+
+            let html = '';
+            let totalFoundPaints = 0;
+
+            let expandedSeries = [];
+            try {
+                expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
+            } catch (e) {}
+
+            paginatedSeries.forEach(series => {
+                if (!series || !series.id) return;
+                
+                let seriesPaints = paintCatalog.filter(p => p && p.series === series.id);
+                if (search) {
+                    seriesPaints = seriesPaints.filter(p => {
+                        if (!p) return false;
+                        const paintName = p.displayName?.[lang] || p.name || '';
+                        return paintName.toLowerCase().includes(search) ||
+                               (p.article && p.article.toLowerCase().includes(search));
+                    });
+                }
+                totalFoundPaints += seriesPaints.length;
+
+                const seriesName = (series.name && series.name[lang]) || series.id || 'Невідома серія';
+                const category = series.category || '';
+                const isExpanded = search.length > 0 || expandedSeries.includes(series.id);
+
+                const paintsHtml = seriesPaints.map(p => {
+                    if (!p) return '';
+                    
+                    const paintCode = p.name || '';
+                    const paintName = p.displayName?.[lang] || p.name || '';
+                    const selectedIngredients = app.getSelectedIngredients() || [];
+                    const isInRecipe = selectedIngredients.some(ing => ing && String(ing.paintId) === String(p.id));
+                    const buttonClass = isInRecipe ? 'glass-remove-btn' : 'glass-add-btn';
+                    const buttonIcon = isInRecipe ? 'fa-trash' : 'fa-plus';
+                    const buttonTitle = isInRecipe ? i18n.t('remove_from_recipe') : i18n.t('add_ingredient');
+                    
+                    const color = p.color || '#cccccc';
+                    
+                    return `
+                    <div class="paint-card-glass" data-paint-id="${p.id}" data-paint-series="${p.series || ''}" style="color: ${color};">
+                        <div class="glass-swatch" style="background: ${utils.escapeHtml(color)};"></div>
+                        <div class="glass-name" title="${utils.escapeHtml(paintCode)}">${utils.escapeHtml(paintCode)}</div>
+                        <div class="glass-article" title="${utils.escapeHtml(paintName)}">${utils.escapeHtml(paintName)}</div>
+                        <button class="${buttonClass}" data-paint-id="${p.id}" title="${buttonTitle}" aria-label="${buttonTitle}">
+                            <i class="fas ${buttonIcon}"></i>
+                        </button>
+                        ${!p.isDefault ? `
+                            <button class="delete-paint" data-paint-id="${p.id}" title="${i18n.t('delete')}" aria-label="${i18n.t('delete')}">
+                                <i class="fas fa-trash"></i>
+                            </button>` : ''}
+                    </div>
+                `}).join('');
+
+                html += `
+                    <div class="series-card" data-series="${series.id}">
+                        <div class="series-header">
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <div>
+                                    <h3>
+                                        ${utils.escapeHtml(seriesName)}
+                                        <span class="series-count">(${seriesPaints.length})</span>
+                                    </h3>
+                                    <span class="recipe-category">${i18n.translateCategoryName(category)}</span>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn-icon series-info-btn" title="${i18n.t('properties')}" aria-label="${i18n.t('properties')}">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                    <button class="btn-icon toggle-series" title="${i18n.t('expand')}" aria-label="${i18n.t('expand')}">
+                                        <i class="fas fa-chevron-${isExpanded ? 'up' : 'down'}"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
+
+                        <div class="series-paints" style="display: ${isExpanded ? 'grid' : 'none'};">
+                            ${paintsHtml}
+                        </div>
                     </div>
-
-                    <div class="series-paints" style="display: ${isExpanded ? 'grid' : 'none'};">
-                        ${paintsHtml}
-                    </div>
-                </div>
-            `;
-        });
-
-        if (search && !append) {
-            const statsHtml = `<div class="search-stats"><i class="fas fa-search"></i> ${i18n.t('paints_found')}: ${totalFoundPaints} у ${paginatedSeries.length} ${i18n.t('series')}</div>`;
-            html = statsHtml + html;
-        }
-
-        if (append) {
-            const existingSeriesIds = new Set(Array.from(document.querySelectorAll('.series-card')).map(card => card.dataset.series));
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-            const newSeries = Array.from(tempDiv.children).filter(el => {
-                if (el.classList.contains('series-card')) {
-                    const seriesId = el.dataset.series;
-                    return !existingSeriesIds.has(seriesId);
-                }
-                return true;
+                `;
             });
-            if (newSeries.length > 0) {
-                dom.paintCatalogEl.insertAdjacentHTML('beforeend', newSeries.map(el => el.outerHTML).join(''));
+
+            if (search && !append) {
+                const statsHtml = `<div class="search-stats"><i class="fas fa-search"></i> ${i18n.t('paints_found')}: ${totalFoundPaints} у ${paginatedSeries.length} ${i18n.t('series')}</div>`;
+                html = statsHtml + html;
             }
-        } else {
-            dom.paintCatalogEl.innerHTML = html;
-        }
 
-        // Після додавання HTML знову прив'язуємо обробники
-        attachCatalogEventListeners();
-        i18n.applyTranslations();
+            if (append) {
+                const existingSeriesIds = new Set(Array.from(document.querySelectorAll('.series-card')).map(card => card.dataset.series));
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const newSeries = Array.from(tempDiv.children).filter(el => {
+                    if (el.classList.contains('series-card')) {
+                        const seriesId = el.dataset.series;
+                        return !existingSeriesIds.has(seriesId);
+                    }
+                    return true;
+                });
+                if (newSeries.length > 0) {
+                    dom.paintCatalogEl.insertAdjacentHTML('beforeend', newSeries.map(el => el.outerHTML).join(''));
+                }
+            } else {
+                dom.paintCatalogEl.innerHTML = html;
+            }
 
-    } catch (error) {
-        console.error('❌ Помилка в renderPaintCatalog:', error, error.stack);
-        if (dom.paintCatalogEl) {
-            dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
-                <i class="fas fa-exclamation-triangle"></i> ${i18n.t('catalog_render_error')}<br>${utils.escapeHtml(error.message || '')}
-            </p>`;
+            // Після додавання HTML знову прив'язуємо обробники
+            attachCatalogEventListeners();
+            i18n.applyTranslations();
+            resolve();
+
+        } catch (error) {
+            console.error('❌ Помилка в renderPaintCatalog:', error, error.stack);
+            if (dom.paintCatalogEl) {
+                dom.paintCatalogEl.innerHTML = `<p style="text-align:center; padding:40px; color:#e63946;">
+                    <i class="fas fa-exclamation-triangle"></i> ${i18n.t('catalog_render_error')}<br>${utils.escapeHtml(error.message || '')}
+                </p>`;
+            }
+            resolve();
         }
-    }
+    });
 }
 
 function applyCatalogLayout(layout) {
