@@ -744,29 +744,36 @@ function printLabelWithWeight(recipe, weightKg) {
     const isSmall = weightKg <= 2;
     const labelWidth = isSmall ? '104mm' : '147mm';
     const labelHeight = isSmall ? '100mm' : '105mm';
-    const fontSizeMultiplier = isSmall ? 0.9 : 1;
-
+    
     const labelHtml = `
     <!DOCTYPE html>
-    <html lang="${lang}">
+    <html>
     <head>
         <meta charset="UTF-8">
         <title>Etykieta - ${utils.escapeHtml(recipe.name)}</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <style>
+            /* Скидання відступів та полів сторінки */
             * {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
             }
-            body {
-                font-family: 'Inter', sans-serif;
+            html, body {
+                width: ${labelWidth};
+                height: ${labelHeight};
+                margin: 0;
+                padding: 0;
                 background: #e5e7eb;
-                min-height: 100vh;
                 display: flex;
-                justify-content: center;
                 align-items: center;
-                padding: 5mm;
+                justify-content: center;
+                font-family: 'Inter', sans-serif;
+            }
+            /* Правила для друку */
+            @page {
+                size: ${labelWidth} ${labelHeight};
+                margin: 0;
             }
             .label {
                 width: ${labelWidth};
@@ -837,7 +844,7 @@ function printLabelWithWeight(recipe, weightKg) {
             .weight-box span {
                 font-size: ${isSmall ? '3mm' : '4mm'};
                 font-weight: 500;
-                color: #1e3a8a; /* Синій колір для "kg" */
+                color: #1e3a8a; /* синє "kg" */
             }
             .footer {
                 background: #f3f4f6;
