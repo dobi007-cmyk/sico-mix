@@ -1,7 +1,4 @@
 // ========== МОДУЛЬ СИНХРОНІЗАЦІЇ ==========
-// Імпортуємо Firebase з нашого конфігураційного модуля
-import { auth, db, serverTimestamp } from './firebase-config.js';
-
 // Використовуємо глобальний SICOMIX для i18n та utils
 const { i18n, utils } = window.SICOMIX;
 
@@ -20,7 +17,7 @@ function updateSyncStatus(message, isError = false) {
 async function signInAnonymously() {
     try {
         updateSyncStatus(i18n.t('syncing'));
-        const result = await auth.signInAnonymously();
+        const result = await window.SICOMIX.firebase.auth.signInAnonymously();
         currentUser = result.user;
         updateSyncStatus(i18n.t('sync_complete'));
         return currentUser;
@@ -34,7 +31,7 @@ async function signInAnonymously() {
 // Вихід
 async function signOut() {
     try {
-        await auth.signOut();
+        await window.SICOMIX.firebase.auth.signOut();
         currentUser = null;
         updateSyncStatus(i18n.t('offline'));
     } catch (error) {
@@ -44,14 +41,14 @@ async function signOut() {
 
 // Отримати поточного користувача
 function getCurrentUser() {
-    return currentUser || auth.currentUser;
+    return currentUser || window.SICOMIX.firebase?.auth?.currentUser;
 }
 
 // Завантажити всі дані користувача з Firestore
 async function loadUserData(userId) {
     if (!userId) return null;
     try {
-        const docRef = db.collection('users').doc(userId);
+        const docRef = window.SICOMIX.firebase.db.collection('users').doc(userId);
         const doc = await docRef.get();
         if (doc.exists) {
             return doc.data();
@@ -68,10 +65,10 @@ async function loadUserData(userId) {
 async function saveUserData(userId, data) {
     if (!userId) return false;
     try {
-        const docRef = db.collection('users').doc(userId);
+        const docRef = window.SICOMIX.firebase.db.collection('users').doc(userId);
         await docRef.set({
             ...data,
-            updatedAt: serverTimestamp()
+            updatedAt: window.SICOMIX.firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
         updateSyncStatus(i18n.t('sync_complete'));
         return true;
