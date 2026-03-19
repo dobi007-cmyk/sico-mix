@@ -737,7 +737,7 @@ function showWeightInput(recipeId) {
     app.dom.closeWeightModal.addEventListener('click', onCancel, { once: true });
 }
 
-// Оновлена функція друку етикетки – без номера партії, з кольоровою смугою
+// Оновлена функція друку етикетки з примусовим друком фонових кольорів
 function printLabelWithWeight(recipe, weightKg) {
     const lang = i18n.getLanguage();
     const date = new Date().toLocaleDateString(lang);
@@ -902,7 +902,7 @@ function printLabelWithWeight(recipe, weightKg) {
     // Вибираємо стиль для серії, якщо немає – використовуємо EC
     const style = seriesStyles[seriesId] || seriesStyles.EC;
     
-    // Базові технічні дані
+    // Базові технічні дані – тільки основні
     let useText = '', aspectText = '', dryingText = '';
     
     if (series && series.properties) {
@@ -912,7 +912,7 @@ function printLabelWithWeight(recipe, weightKg) {
         dryingText = props.drying?.[lang] || props.drying?.uk || '';
     }
     
-    // Формуємо HTML – без номера партії, з кольоровою смугою
+    // Формуємо HTML – без номера партії, з правилами для кольорового друку
     const labelHtml = `
     <!DOCTYPE html>
     <html>
@@ -936,6 +936,13 @@ function printLabelWithWeight(recipe, weightKg) {
             @page {
                 size: ${labelWidth} ${labelHeight};
                 margin: 0;
+            }
+            /* Примусовий друк фонових кольорів */
+            @media print {
+                .label, .header {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
             }
             .label {
                 width: ${labelWidth};
@@ -1061,7 +1068,7 @@ function printLabelWithWeight(recipe, weightKg) {
                     </div>
                 </div>
                 
-                <!-- Технічні дані серії (червоним) -->
+                <!-- Технічні дані серії (червоним) – тільки основні -->
                 <div class="tech-data">
                     ${useText ? `<div class="tech-item"><strong>Use:</strong> ${utils.escapeHtml(useText)}</div>` : ''}
                     ${aspectText ? `<div class="tech-item"><strong>Aspect:</strong> ${utils.escapeHtml(aspectText)}</div>` : ''}
@@ -1069,7 +1076,7 @@ function printLabelWithWeight(recipe, weightKg) {
                 </div>
             </div>
 
-            <!-- Примітка перед друком -->
+            <!-- Примітка перед друком (окремий блок після технічних даних) -->
             <div class="note-section">
                 PRZED DRUKIEM NAKŁADU ZALECAMY SPRAWDZENIE ZGODNOŚCI KOLORYSTYCZNEJ.
             </div>
