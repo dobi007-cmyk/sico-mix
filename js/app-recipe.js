@@ -735,7 +735,7 @@ function showWeightInput(recipeId) {
     app.dom.closeWeightModal.addEventListener('click', onCancel, { once: true });
 }
 
-// Оновлена функція друку етикетки з кольорами серій та червоними технічними даними
+// Оновлена функція друку етикетки – видалено зайві елементи (спеціальні примітки)
 function printLabelWithWeight(recipe, weightKg) {
     const lang = i18n.getLanguage();
     const date = new Date().toLocaleDateString(lang);
@@ -900,26 +900,17 @@ function printLabelWithWeight(recipe, weightKg) {
     // Вибираємо стиль для серії, якщо немає – використовуємо EC
     const style = seriesStyles[seriesId] || seriesStyles.EC;
     
-    // Базові технічні дані
-    let useText = '', aspectText = '', dryingText = '', remarkText = '', typeText = '';
+    // Базові технічні дані – тільки основні
+    let useText = '', aspectText = '', dryingText = '';
     
     if (series && series.properties) {
         const props = series.properties;
         useText = props.type?.[lang] || props.type?.uk || '';
         aspectText = props.finish?.[lang] || props.finish?.uk || '';
         dryingText = props.drying?.[lang] || props.drying?.uk || '';
-        
-        // Спеціальні примітки
-        if (seriesId === 'NST') {
-            remarkText = 'Not wash resistant!';
-        } else if (seriesId === 'SX') {
-            typeText = props.type?.[lang] || props.type?.uk || '';
-        } else if (props.special) {
-            remarkText = props.special?.[lang] || props.special?.uk || '';
-        }
     }
     
-    // Формуємо HTML з динамічними стилями, але без зайвих блоків
+    // Формуємо HTML – без зайвих блоків (special, remark, type)
     const labelHtml = `
     <!DOCTYPE html>
     <html>
@@ -1037,12 +1028,6 @@ function printLabelWithWeight(recipe, weightKg) {
                 display: inline-block;
                 min-width: ${isSmall ? '15mm' : '20mm'};
             }
-            .remark {
-                color: ${style.noteColor};
-                font-weight: 600;
-                margin-top: 1mm;
-                font-style: italic;
-            }
             .note-section {
                 margin: ${isSmall ? '2mm' : '3mm'};
                 font-size: ${isSmall ? '2.2mm' : '2.8mm'};
@@ -1075,13 +1060,11 @@ function printLabelWithWeight(recipe, weightKg) {
                     </div>
                 </div>
                 
-                <!-- Технічні дані серії (червоним) -->
+                <!-- Технічні дані серії (червоним) – тільки основні -->
                 <div class="tech-data">
                     ${useText ? `<div class="tech-item"><strong>Use:</strong> ${utils.escapeHtml(useText)}</div>` : ''}
-                    ${typeText ? `<div class="tech-item"><strong>Type:</strong> ${utils.escapeHtml(typeText)}</div>` : ''}
                     ${aspectText ? `<div class="tech-item"><strong>Aspect:</strong> ${utils.escapeHtml(aspectText)}</div>` : ''}
                     ${dryingText ? `<div class="tech-item"><strong>Drying:</strong> ${utils.escapeHtml(dryingText)}</div>` : ''}
-                    ${remarkText ? `<div class="remark">${utils.escapeHtml(remarkText)}</div>` : ''}
                 </div>
             </div>
 
