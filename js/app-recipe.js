@@ -735,17 +735,16 @@ function showWeightInput(recipeId) {
     app.dom.closeWeightModal.addEventListener('click', onCancel, { once: true });
 }
 
-// Оновлена функція друку етикетки з різними розмірами
+// Оновлена функція друку етикетки з правильними розмірами та синім kg
 function printLabelWithWeight(recipe, weightKg) {
     const lang = i18n.getLanguage();
     const date = new Date().toLocaleDateString(lang);
     
     // Визначаємо розмір етикетки залежно від ваги
-    // Якщо вага <= 2 кг, використовуємо малий розмір (104x100 мм), інакше великий (147x105 мм)
     const isSmall = weightKg <= 2;
     const labelWidth = isSmall ? '104mm' : '147mm';
     const labelHeight = isSmall ? '100mm' : '105mm';
-    const fontSizeMultiplier = isSmall ? 0.9 : 1; // трохи менший шрифт для маленької етикетки
+    const fontSizeMultiplier = isSmall ? 0.9 : 1;
 
     const labelHtml = `
     <!DOCTYPE html>
@@ -838,7 +837,7 @@ function printLabelWithWeight(recipe, weightKg) {
             .weight-box span {
                 font-size: ${isSmall ? '3mm' : '4mm'};
                 font-weight: 500;
-                color: #6b7280;
+                color: #1e3a8a; /* Синій колір для "kg" */
             }
             .footer {
                 background: #f3f4f6;
