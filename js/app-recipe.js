@@ -753,74 +753,74 @@ function printLabelWithWeight(recipe, weightKg) {
     // Розширені налаштування дизайну для різних серій (кольори, логотипи)
     const seriesStyles = {
         EC: {
-            headerBg: '#1e3a8a',
+            headerBg: '#10b981', // зелений
             headerBorder: '#fbbf24',
-            titleColor: '#e63946',
+            titleColor: '#ffffff',
             subColor: '#ffffff',
-            productNameColor: '#1e3a8a',
-            weightBorder: '#1e3a8a',
-            weightColor: '#1e3a8a',
+            productNameColor: '#10b981',
+            weightBorder: '#10b981',
+            weightColor: '#10b981',
             noteColor: '#e63946',
             logoBg: '#fbbf24',
-            logoText: '#e63946',
+            logoText: '#10b981',
             seriesDisplay: 'EURECO EC'
         },
         CF: {
-            headerBg: '#2563eb',
+            headerBg: '#dc2626', // червоний
             headerBorder: '#fcd34d',
-            titleColor: '#b91c1c',
+            titleColor: '#ffffff',
+            subColor: '#ffffff',
+            productNameColor: '#dc2626',
+            weightBorder: '#dc2626',
+            weightColor: '#dc2626',
+            noteColor: '#b91c1c',
+            logoBg: '#fcd34d',
+            logoText: '#dc2626',
+            seriesDisplay: 'CARTOFLEX CF'
+        },
+        PLUV: {
+            headerBg: '#2563eb', // синій
+            headerBorder: '#fbbf24',
+            titleColor: '#ffffff',
             subColor: '#ffffff',
             productNameColor: '#2563eb',
             weightBorder: '#2563eb',
             weightColor: '#2563eb',
-            noteColor: '#b91c1c',
-            logoBg: '#fcd34d',
-            logoText: '#b91c1c',
-            seriesDisplay: 'CARTOFLEX CF'
-        },
-        PLUV: {
-            headerBg: '#0e7a7a',
-            headerBorder: '#fbbf24',
-            titleColor: '#ffffff',
-            subColor: '#ffffff',
-            productNameColor: '#0e7a7a',
-            weightBorder: '#0e7a7a',
-            weightColor: '#0e7a7a',
             noteColor: '#fbbf24',
             logoBg: '#fbbf24',
-            logoText: '#0e7a7a',
+            logoText: '#2563eb',
             seriesDisplay: 'UVIPLAST PLUV'
         },
         PLUV_LED: {
-            headerBg: '#0e7a7a',
+            headerBg: '#2563eb', // синій
             headerBorder: '#fbbf24',
             titleColor: '#ffffff',
             subColor: '#ffffff',
-            productNameColor: '#0e7a7a',
-            weightBorder: '#0e7a7a',
-            weightColor: '#0e7a7a',
+            productNameColor: '#2563eb',
+            weightBorder: '#2563eb',
+            weightColor: '#2563eb',
             noteColor: '#fbbf24',
             logoBg: '#fbbf24',
-            logoText: '#0e7a7a',
+            logoText: '#2563eb',
             seriesDisplay: 'UVIPLAST PLUV LED'
         },
         SX: {
-            headerBg: '#047857',
-            headerBorder: '#fbbf24',
-            titleColor: '#f59e0b',
-            subColor: '#ffffff',
-            productNameColor: '#047857',
-            weightBorder: '#047857',
-            weightColor: '#047857',
-            noteColor: '#f59e0b',
-            logoBg: '#fbbf24',
-            logoText: '#047857',
+            headerBg: '#fbbf24', // жовтий
+            headerBorder: '#000000',
+            titleColor: '#1e1e1e', // темний текст
+            subColor: '#1e1e1e',
+            productNameColor: '#b45309',
+            weightBorder: '#b45309',
+            weightColor: '#b45309',
+            noteColor: '#b91c1c',
+            logoBg: '#000000',
+            logoText: '#fbbf24',
             seriesDisplay: 'SICOTEX SX'
         },
         SPTN: {
-            headerBg: '#7e22ce',
+            headerBg: '#7e22ce', // фіолетовий
             headerBorder: '#fcd34d',
-            titleColor: '#fbbf24',
+            titleColor: '#ffffff',
             subColor: '#ffffff',
             productNameColor: '#7e22ce',
             weightBorder: '#7e22ce',
@@ -831,22 +831,22 @@ function printLabelWithWeight(recipe, weightKg) {
             seriesDisplay: 'SICOPLAST SPTN'
         },
         TPP: {
-            headerBg: '#b91c1c',
+            headerBg: '#a78bfa', // світло-фіолетовий (як на фото ET01A)
             headerBorder: '#fbbf24',
-            titleColor: '#ffffff',
-            subColor: '#ffffff',
-            productNameColor: '#b91c1c',
-            weightBorder: '#b91c1c',
-            weightColor: '#b91c1c',
-            noteColor: '#fbbf24',
+            titleColor: '#1e1e1e',
+            subColor: '#1e1e1e',
+            productNameColor: '#6d28d9',
+            weightBorder: '#6d28d9',
+            weightColor: '#6d28d9',
+            noteColor: '#b91c1c',
             logoBg: '#fbbf24',
-            logoText: '#b91c1c',
+            logoText: '#6d28d9',
             seriesDisplay: 'POLYPRO TPP'
         },
         AS: {
-            headerBg: '#0e7a7a',
+            headerBg: '#0e7a7a', // бірюзовий (як на фото ET23A)
             headerBorder: '#fbbf24',
-            titleColor: '#fbbf24',
+            titleColor: '#ffffff',
             subColor: '#ffffff',
             productNameColor: '#0e7a7a',
             weightBorder: '#0e7a7a',
@@ -857,42 +857,42 @@ function printLabelWithWeight(recipe, weightKg) {
             seriesDisplay: 'AQUASET AS'
         },
         NST: {
-            headerBg: '#0f172a',
+            headerBg: '#1e293b', // темно-синій
             headerBorder: '#fbbf24',
-            titleColor: '#e63946',
+            titleColor: '#ffffff',
             subColor: '#ffffff',
-            productNameColor: '#0f172a',
-            weightBorder: '#0f172a',
-            weightColor: '#0f172a',
+            productNameColor: '#1e293b',
+            weightBorder: '#1e293b',
+            weightColor: '#1e293b',
             noteColor: '#e63946',
             logoBg: '#fbbf24',
             logoText: '#e63946',
             seriesDisplay: 'SICONYL NST'
         },
         QS: {
-            headerBg: '#c2410c',
+            headerBg: '#f97316', // оранжевий
             headerBorder: '#fcd34d',
             titleColor: '#ffffff',
             subColor: '#ffffff',
-            productNameColor: '#c2410c',
-            weightBorder: '#c2410c',
-            weightColor: '#c2410c',
+            productNameColor: '#f97316',
+            weightBorder: '#f97316',
+            weightColor: '#f97316',
             noteColor: '#fcd34d',
             logoBg: '#fcd34d',
-            logoText: '#c2410c',
+            logoText: '#f97316',
             seriesDisplay: 'QUICKSET QS'
         },
         SN: {
-            headerBg: '#4b5563',
+            headerBg: '#6b7280', // сірий
             headerBorder: '#fbbf24',
             titleColor: '#ffffff',
             subColor: '#ffffff',
-            productNameColor: '#4b5563',
-            weightBorder: '#4b5563',
-            weightColor: '#4b5563',
+            productNameColor: '#6b7280',
+            weightBorder: '#6b7280',
+            weightColor: '#6b7280',
             noteColor: '#fbbf24',
             logoBg: '#fbbf24',
-            logoText: '#4b5563',
+            logoText: '#6b7280',
             seriesDisplay: 'SICONYL SN'
         }
     };
@@ -984,7 +984,6 @@ function printLabelWithWeight(recipe, weightKg) {
             }
             .product-info {
                 padding: ${isSmall ? '2mm' : '3mm'};
-                border-bottom: 0.3mm solid #ddd;
                 background: #f9fafb;
                 flex: 1;
             }
@@ -1042,6 +1041,13 @@ function printLabelWithWeight(recipe, weightKg) {
                 margin-top: 1mm;
                 font-style: italic;
             }
+            .note-section {
+                margin: ${isSmall ? '2mm' : '3mm'};
+                font-size: ${isSmall ? '2.2mm' : '2.8mm'};
+                color: #000000;
+                text-align: center;
+                font-weight: 500;
+            }
             .footer {
                 background: #f3f4f6;
                 padding: ${isSmall ? '2mm' : '3mm'};
@@ -1069,16 +1075,6 @@ function printLabelWithWeight(recipe, weightKg) {
                 padding-top: 1.5mm;
                 margin-top: 1.5mm;
                 color: #000000;
-            }
-            .footer .note {
-                margin-top: 2mm;
-                font-size: ${isSmall ? '1.8mm' : '2.2mm'};
-                text-transform: uppercase;
-                font-weight: 600;
-                color: ${style.noteColor};
-                text-align: center;
-                border-top: 0.3mm dashed #9ca3af;
-                padding-top: 1.5mm;
             }
             .logo-area {
                 display: flex;
@@ -1128,6 +1124,11 @@ function printLabelWithWeight(recipe, weightKg) {
                 </div>
             </div>
 
+            <!-- Примітка перед друком -->
+            <div class="note-section">
+                PRZED DRUKIEM NAKŁADU ZALECAMY SPRAWDZENIE ZGODNOŚCI KOLORYSTYCZNEJ
+            </div>
+
             <div class="footer">
                 <div class="distributor">Wyłączny dystrybutor w Polsce</div>
                 <div class="address">
@@ -1141,9 +1142,6 @@ function printLabelWithWeight(recipe, weightKg) {
                 <div class="producer">
                     Producent n.v. Sico s.a. - Belgia<br>
                     n.v. SICO Screen Inks s.a.
-                </div>
-                <div class="note">
-                    PRZED DRUKIEM NAKŁADU ZALECAMY SPRAWDZENIE ZGODNOŚCI KOLORYSTYCZNEJ
                 </div>
             </div>
         </div>
