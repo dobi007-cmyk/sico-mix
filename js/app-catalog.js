@@ -3,6 +3,14 @@ import * as utils from './utils.js';
 import * as i18n from './i18n.js';
 import * as app from './app-core.js';
 
+// Обробник для кнопки "Завантажити ще"
+function loadMoreHandler(e) {
+    e.preventDefault();
+    const newPage = app.getCatalogPage() + 1;
+    app.setCatalogPage(newPage);
+    renderPaintCatalog(true);
+}
+
 function attachCatalogEventListeners() {
     console.log('📚 attachCatalogEventListeners викликано');
     const dom = app.dom;
@@ -11,6 +19,13 @@ function attachCatalogEventListeners() {
     // Використовуємо делегування подій на весь контейнер каталогу
     dom.paintCatalogEl.removeEventListener('click', catalogClickHandler);
     dom.paintCatalogEl.addEventListener('click', catalogClickHandler);
+    
+    // Окремо додаємо обробник для кнопки "Завантажити ще"
+    const loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
+    if (loadMoreBtn) {
+        loadMoreBtn.removeEventListener('click', loadMoreHandler);
+        loadMoreBtn.addEventListener('click', loadMoreHandler);
+    }
 }
 
 function catalogClickHandler(e) {
@@ -132,8 +147,10 @@ function renderPaintCatalog(append = false) {
         const paginatedSeries = seriesWithPaints.slice(startIndex, endIndex);
         const hasMore = seriesWithPaints.length > endIndex;
 
-        if (dom.loadMoreCatalogBtn) {
-            dom.loadMoreCatalogBtn.style.display = hasMore ? 'inline-block' : 'none';
+        // Оновлюємо відображення кнопки "Завантажити ще"
+        const loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
+        if (loadMoreBtn) {
+            loadMoreBtn.style.display = hasMore ? 'inline-block' : 'none';
         }
 
         if (paginatedSeries.length === 0 && !append) {
