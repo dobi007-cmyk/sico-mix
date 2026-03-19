@@ -735,7 +735,7 @@ function showWeightInput(recipeId) {
     app.dom.closeWeightModal.addEventListener('click', onCancel, { once: true });
 }
 
-// Оновлена функція друку етикетки з дизайном під серію (заводські етикетки SICO)
+// Оновлена функція друку етикетки з кольорами серій та червоними технічними даними
 function printLabelWithWeight(recipe, weightKg) {
     const lang = i18n.getLanguage();
     const date = new Date().toLocaleDateString(lang);
@@ -750,7 +750,7 @@ function printLabelWithWeight(recipe, weightKg) {
     const allSeries = window.SICOMIX?.data?.series || [];
     const series = allSeries.find(s => s.id === seriesId);
     
-    // Розширені налаштування дизайну для різних серій (кольори, логотипи)
+    // Налаштування дизайну для різних серій (кольори, логотипи)
     const seriesStyles = {
         EC: {
             headerBg: '#10b981', // зелений
@@ -831,7 +831,7 @@ function printLabelWithWeight(recipe, weightKg) {
             seriesDisplay: 'SICOPLAST SPTN'
         },
         TPP: {
-            headerBg: '#a78bfa', // світло-фіолетовий (як на фото ET01A)
+            headerBg: '#a78bfa', // світло-фіолетовий
             headerBorder: '#fbbf24',
             titleColor: '#1e1e1e',
             subColor: '#1e1e1e',
@@ -844,7 +844,7 @@ function printLabelWithWeight(recipe, weightKg) {
             seriesDisplay: 'POLYPRO TPP'
         },
         AS: {
-            headerBg: '#0e7a7a', // бірюзовий (як на фото ET23A)
+            headerBg: '#0e7a7a', // бірюзовий
             headerBorder: '#fbbf24',
             titleColor: '#ffffff',
             subColor: '#ffffff',
@@ -919,6 +919,7 @@ function printLabelWithWeight(recipe, weightKg) {
         }
     }
     
+    // Формуємо HTML з динамічними стилями, але без зайвих блоків
     const labelHtml = `
     <!DOCTYPE html>
     <html>
@@ -1024,6 +1025,7 @@ function printLabelWithWeight(recipe, weightKg) {
                 font-size: ${isSmall ? '2.5mm' : '3mm'};
                 border-top: 0.3mm dashed #9ca3af;
                 padding-top: 2mm;
+                color: #e63946; /* червоний колір для технічних даних */
             }
             .tech-item {
                 margin-bottom: 1mm;
@@ -1047,49 +1049,8 @@ function printLabelWithWeight(recipe, weightKg) {
                 color: #000000;
                 text-align: center;
                 font-weight: 500;
-            }
-            .footer {
-                background: #f3f4f6;
-                padding: ${isSmall ? '2mm' : '3mm'};
-                font-size: ${isSmall ? '2mm' : '2.5mm'};
-                color: #000000;
-                border-top: 0.3mm solid #d1d5db;
-            }
-            .footer .distributor {
-                font-weight: 600;
-                margin-bottom: 1mm;
-                color: #000000;
-            }
-            .footer .address {
-                line-height: 1.5;
-                margin-bottom: 1mm;
-                color: #000000;
-            }
-            .footer .contact {
-                margin-bottom: 2mm;
-                color: #000000;
-            }
-            .footer .producer {
-                font-style: italic;
-                border-top: 0.3mm solid #9ca3af;
-                padding-top: 1.5mm;
-                margin-top: 1.5mm;
-                color: #000000;
-            }
-            .logo-area {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin-bottom: 1mm;
-            }
-            .logo-text {
-                font-size: ${isSmall ? '4mm' : '5mm'};
-                font-weight: 800;
-                color: ${style.logoText};
-                background: ${style.logoBg};
-                padding: 0.5mm 2mm;
-                border-radius: 5mm;
-                letter-spacing: 0.5px;
+                border-top: 0.3mm dashed #9ca3af;
+                padding-top: ${isSmall ? '2mm' : '3mm'};
             }
         </style>
     </head>
@@ -1114,7 +1075,7 @@ function printLabelWithWeight(recipe, weightKg) {
                     </div>
                 </div>
                 
-                <!-- Технічні дані серії (англійською, як на заводських етикетках) -->
+                <!-- Технічні дані серії (червоним) -->
                 <div class="tech-data">
                     ${useText ? `<div class="tech-item"><strong>Use:</strong> ${utils.escapeHtml(useText)}</div>` : ''}
                     ${typeText ? `<div class="tech-item"><strong>Type:</strong> ${utils.escapeHtml(typeText)}</div>` : ''}
@@ -1124,25 +1085,9 @@ function printLabelWithWeight(recipe, weightKg) {
                 </div>
             </div>
 
-            <!-- Примітка перед друком -->
+            <!-- Примітка перед друком (окремий блок після технічних даних) -->
             <div class="note-section">
-                PRZED DRUKIEM NAKŁADU ZALECAMY SPRAWDZENIE ZGODNOŚCI KOLORYSTYCZNEJ
-            </div>
-
-            <div class="footer">
-                <div class="distributor">Wyłączny dystrybutor w Polsce</div>
-                <div class="address">
-                    SICO Polska Sp. z o. o.<br>
-                    ul. Annopol 3, 03-236 Warszawa
-                </div>
-                <div class="contact">
-                    tel.: 00 48 22 660 48 50 (-9)<br>
-                    e-mail: sico@sico.pl
-                </div>
-                <div class="producer">
-                    Producent n.v. Sico s.a. - Belgia<br>
-                    n.v. SICO Screen Inks s.a.
-                </div>
+                PRZED DRUKIEM NAKŁADU ZALECAMY SPRAWDZENIE ZGODNOŚCI KOLORYSTYCZNEJ.
             </div>
         </div>
     </body>
