@@ -807,7 +807,6 @@ async function handleLogin() {
         utils.showNotification(i18n.t('login_success'), 'success');
         dom.authModal?.classList.remove('active');
         document.body.style.overflow = 'auto';
-        // Дані оновляться через onAuthStateChanged
     } catch (error) {
         console.error('Помилка входу:', error);
         utils.showNotification(error.message || i18n.t('login_error'), 'error');
@@ -864,37 +863,58 @@ function updateAuthUI(user) {
         const displayName = user.email || user.displayName || 'Користувач';
         dom.authButton.innerHTML = `<i class="fas fa-user-circle"></i> <span>${displayName}</span>`;
         
-        // Додаємо обробник для виходу
+        // Видаляємо всі старі обробники
         dom.authButton.removeEventListener('click', handleLogout);
-        dom.authButton.addEventListener('click', handleLogout);
+        dom.authButton.removeEventListener('click', openAuthModal);
+        
+        // Додаємо новий обробник, який питає підтвердження
+        dom.authButton.addEventListener('click', confirmLogout);
     } else {
         // Користувач вийшов
         dom.authButton.innerHTML = `<i class="fas fa-sign-in-alt"></i> <span data-i18n="login">Увійти</span>`;
         i18n.applyTranslations();
         
-        // Повертаємо обробник для відкриття модального вікна
+        // Видаляємо всі старі обробники
         dom.authButton.removeEventListener('click', handleLogout);
-        dom.authButton.addEventListener('click', () => {
-            if (dom.authModal) {
-                dom.authModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-        });
+        dom.authButton.removeEventListener('click', confirmLogout);
+        
+        // Додаємо обробник для відкриття модального вікна
+        dom.authButton.addEventListener('click', openAuthModal);
     }
 }
 
-// Функція для виходу
-async function handleLogout() {
-    try {
-        const auth = window.SICOMIX?.firebase?.auth;
-        if (!auth) throw new Error('Firebase auth not initialized');
-        
-        await auth.signOut();
-        utils.showNotification(i18n.t('logged_out'), 'success');
-    } catch (error) {
-        console.error('Помилка виходу:', error);
-        utils.showNotification(error.message || i18n.t('logout_error'), 'error');
+// Функція для відкриття модального вікна входу
+function openAuthModal() {
+    if (dom.authModal) {
+        dom.authModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
+}
+
+// Функція для підтвердження виходу
+function confirmLogout() {
+    utils.showConfirmation(
+        i18n.t('logout_confirmation'), // "Ви дійсно хочете вийти?"
+        i18n.t('confirmation_message'),
+        async () => {
+            try {
+                const auth = window.SICOMIX?.firebase?.auth;
+                if (!auth) throw new Error('Firebase auth not initialized');
+                
+                await auth.signOut();
+                utils.showNotification(i18n.t('logged_out'), 'success');
+            } catch (error) {
+                console.error('Помилка виходу:', error);
+                utils.showNotification(error.message || i18n.t('logout_error'), 'error');
+            }
+        },
+        () => {} // скасування
+    );
+}
+
+// Функція для виходу (залишаємо для сумісності, але тепер вона не використовується напряму)
+async function handleLogout() {
+    confirmLogout();
 }
 
 // ---------- ГОЛОВНІ ПОДІЇ ----------
@@ -1002,7 +1022,7 @@ function setupCoreEventListeners() {
     // але потім updateAuthUI змінить його, якщо користувач увійшов.
     if (dom.authButton) {
         dom.authButton.addEventListener('click', () => {
-            // Якщо користувач увійшов, то обробник буде замінено на handleLogout
+            // Якщо користувач увійшов, то обробник буде замінено на confirmLogout
             // тому цей код спрацює тільки для виходу з системи або якщо користувач не увійшов.
             if (!window.SICOMIX?.firebase?.auth?.currentUser) {
                 if (dom.authModal) {
@@ -1195,6 +1215,8 @@ export {
     handleSignup,
     handleGoogleSignIn,
     updateAuthUI,
+    openAuthModal,
+    confirmLogout,
     handleLogout
 };
 
@@ -1269,5 +1291,7 @@ window.SICOMIX.app = {
     handleSignup,
     handleGoogleSignIn,
     updateAuthUI,
+    openAuthModal,
+    confirmLogout,
     handleLogout
 };
