@@ -807,8 +807,7 @@ async function handleLogin() {
         utils.showNotification(i18n.t('login_success'), 'success');
         dom.authModal?.classList.remove('active');
         document.body.style.overflow = 'auto';
-        // Оновити дані після входу
-        await loadData();
+        // Дані оновляться через onAuthStateChanged
     } catch (error) {
         console.error('Помилка входу:', error);
         utils.showNotification(error.message || i18n.t('login_error'), 'error');
@@ -833,7 +832,6 @@ async function handleSignup() {
         utils.showNotification(i18n.t('signup_success'), 'success');
         dom.authModal?.classList.remove('active');
         document.body.style.overflow = 'auto';
-        await loadData();
     } catch (error) {
         console.error('Помилка реєстрації:', error);
         utils.showNotification(error.message || i18n.t('signup_error'), 'error');
@@ -851,10 +849,51 @@ async function handleGoogleSignIn() {
         utils.showNotification(i18n.t('login_success'), 'success');
         dom.authModal?.classList.remove('active');
         document.body.style.overflow = 'auto';
-        await loadData();
     } catch (error) {
         console.error('Помилка входу через Google:', error);
         utils.showNotification(error.message || i18n.t('login_error'), 'error');
+    }
+}
+
+// ---------- ОНОВЛЕННЯ ІНТЕРФЕЙСУ КОРИСТУВАЧА ----------
+function updateAuthUI(user) {
+    if (!dom.authButton) return;
+    
+    if (user) {
+        // Користувач увійшов
+        const displayName = user.email || user.displayName || 'Користувач';
+        dom.authButton.innerHTML = `<i class="fas fa-user-circle"></i> <span>${displayName}</span>`;
+        
+        // Додаємо обробник для виходу
+        dom.authButton.removeEventListener('click', handleLogout);
+        dom.authButton.addEventListener('click', handleLogout);
+    } else {
+        // Користувач вийшов
+        dom.authButton.innerHTML = `<i class="fas fa-sign-in-alt"></i> <span data-i18n="login">Увійти</span>`;
+        i18n.applyTranslations();
+        
+        // Повертаємо обробник для відкриття модального вікна
+        dom.authButton.removeEventListener('click', handleLogout);
+        dom.authButton.addEventListener('click', () => {
+            if (dom.authModal) {
+                dom.authModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    }
+}
+
+// Функція для виходу
+async function handleLogout() {
+    try {
+        const auth = window.SICOMIX?.firebase?.auth;
+        if (!auth) throw new Error('Firebase auth not initialized');
+        
+        await auth.signOut();
+        utils.showNotification(i18n.t('logged_out'), 'success');
+    } catch (error) {
+        console.error('Помилка виходу:', error);
+        utils.showNotification(error.message || i18n.t('logout_error'), 'error');
     }
 }
 
@@ -959,12 +998,17 @@ function setupCoreEventListeners() {
         });
     }
 
-    // Обробник для кнопки "Увійти"
+    // Обробник для кнопки "Увійти" – спочатку просто відкриває модалку,
+    // але потім updateAuthUI змінить його, якщо користувач увійшов.
     if (dom.authButton) {
         dom.authButton.addEventListener('click', () => {
-            if (dom.authModal) {
-                dom.authModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
+            // Якщо користувач увійшов, то обробник буде замінено на handleLogout
+            // тому цей код спрацює тільки для виходу з системи або якщо користувач не увійшов.
+            if (!window.SICOMIX?.firebase?.auth?.currentUser) {
+                if (dom.authModal) {
+                    dom.authModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
             }
         });
     }
@@ -1017,6 +1061,10 @@ async function initApp() {
                 console.log('Користувач вийшов');
                 await loadData();
             }
+            
+            // Оновлюємо інтерфейс
+            updateAuthUI(user);
+            
             populateSeriesSelect();
             populateCategoryFilters();
             initSettings();
@@ -1051,6 +1099,9 @@ async function initApp() {
         updatePaintCount();
         attachAllEventListeners();
         setupCoreEventListeners();
+        
+        // Якщо Firebase немає, кнопка залишається "Увійти"
+        updateAuthUI(null);
 
         const activePage = document.querySelector('.page-content.active');
         if (activePage) {
@@ -1139,7 +1190,12 @@ export {
     startExport,
     initApp as init,
     attachAllEventListeners,
-    hasUnsavedChanges
+    hasUnsavedChanges,
+    handleLogin,
+    handleSignup,
+    handleGoogleSignIn,
+    updateAuthUI,
+    handleLogout
 };
 
 // Експорт констант та об'єктів, які можуть знадобитися
@@ -1208,5 +1264,10 @@ window.SICOMIX.app = {
     startExport,
     init: initApp,
     attachAllEventListeners,
-    hasUnsavedChanges
+    hasUnsavedChanges,
+    handleLogin,
+    handleSignup,
+    handleGoogleSignIn,
+    updateAuthUI,
+    handleLogout
 };
