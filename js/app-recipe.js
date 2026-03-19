@@ -314,7 +314,7 @@ function performSave(existingId, name, cat, series, desc, selectedIngredients, i
     app.switchPage('recipes');
 }
 
-// Оновлена функція очищення форми
+// Оновлена функція clearRecipeForm з видаленням чернетки
 function clearRecipeForm() {
     document.getElementById('recipeName').value = '';
     document.getElementById('recipeCategory').value = '';
@@ -331,7 +331,8 @@ function clearRecipeForm() {
     if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
     if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
     resetEditMode();
-    app.clearRecipeDraft(); // Видаляємо чернетку
+    // Видаляємо збережену чернетку, щоб при поверненні на сторінку не відновлювались дані
+    app.clearRecipeDraft();
 }
 
 function resetEditMode() {
@@ -737,7 +738,7 @@ function showWeightInput(recipeId) {
     app.dom.closeWeightModal.addEventListener('click', onCancel, { once: true });
 }
 
-// Оновлена функція друку етикетки з примусовим друком фонових кольорів
+// Оновлена функція друку етикетки з секцією безпеки для всіх серій
 function printLabelWithWeight(recipe, weightKg) {
     const lang = i18n.getLanguage();
     const date = new Date().toLocaleDateString(lang);
@@ -858,6 +859,19 @@ function printLabelWithWeight(recipe, weightKg) {
             logoText: '#0e7a7a',
             seriesDisplay: 'AQUASET AS'
         },
+        OTF: {
+            headerBg: '#f59e0b', // оранжевий
+            headerBorder: '#fbbf24',
+            titleColor: '#ffffff',
+            subColor: '#ffffff',
+            productNameColor: '#f59e0b',
+            weightBorder: '#f59e0b',
+            weightColor: '#f59e0b',
+            noteColor: '#e63946',
+            logoBg: '#fbbf24',
+            logoText: '#f59e0b',
+            seriesDisplay: 'OPATEX OTF'
+        },
         NST: {
             headerBg: '#1e293b', // темно-синій
             headerBorder: '#fbbf24',
@@ -912,7 +926,166 @@ function printLabelWithWeight(recipe, weightKg) {
         dryingText = props.drying?.[lang] || props.drying?.uk || '';
     }
     
-    // Формуємо HTML – без номера партії, з правилами для кольорового друку
+    // Інформація про безпеку для кожної серії
+    const safetyInfo = {
+        EC: `
+            <div class="safety-info">
+                <p><strong>Nazwa handlowa:</strong> EURECO EC</p>
+                <p><strong>Dystrybutor:</strong><br>
+                SICO Polska Sp. z o.o.<br>
+                ul. Annopol 3<br>
+                03-236 Warszawa</p>
+                <p><strong>Zawiera:</strong> 1-etoksypropan-2-ol</p>
+                <p><strong>UWAGA</strong></p>
+                <p><strong>H226</strong> - Łatwopalna ciecz i pary</p>
+                <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy</p>
+                <p><strong>P271</strong> - Stosować wyłącznie na zewnątrz lub w dobrze wentylowanym pomieszczeniu</p>
+                <p><strong>P303+P361+P353</strong> - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem</p>
+                <p><strong>P304+P340</strong> - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić warunki do odpoczynku w pozycji umożliwiającej swobodne oddychanie</p>
+                <p><strong>P312</strong> - W przypadku złego samopoczucia skontaktować się z OŚRODKIEM ZATRUĆ lub lekarzem</p>
+                <p><strong>P370+P378</strong> - W przypadku pożaru: używać odpowiednich środków gaśniczych</p>
+                <p><strong>P405</strong> - Przechowywać pod zamknięciem</p>
+                <p><strong>P501</strong> - Zawartość/pojemnik usuwać do upoważnionego zakładu utylizacji odpadów</p>
+                <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
+            </div>
+        `,
+        CF: `
+            <div class="safety-info">
+                <p><strong>Nazwa handlowa:</strong> CARTOFLEX CF</p>
+                <p><strong>Dystrybutor:</strong><br>
+                SICO Polska Sp. z o.o.<br>
+                ul. Annopol 3<br>
+                03-236 Warszawa</p>
+                <p><strong>Zawiera:</strong> 1-etoksypropan-2-ol</p>
+                <p><strong>UWAGA</strong></p>
+                <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy.</p>
+                <p><strong>P261</strong> - Unikać wdychania pyłu/dymu/gazu/mgły/par/rozpylonej cieczy.</p>
+                <p><strong>P271</strong> - Stosować wyłącznie na zewnątrz lub w dobrze wentylowanym pomieszczeniu.</p>
+                <p><strong>P312</strong> - W przypadku złego samopoczucia skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem.</p>
+                <p><strong>P304+P340</strong> - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.</p>
+                <p><strong>P405</strong> - Przechowywać pod zamknięciem.</p>
+                <p><strong>P501</strong> - Zawartość/pojemnik usuwać zgodnie z obowiązującymi przepisami.</p>
+                <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
+            </div>
+        `,
+        PLUV: `
+            <div class="safety-info">
+                <p><strong>Nazwa handlowa:</strong> UVIPLAST PLUV</p>
+                <p><strong>Dystrybutor:</strong><br>
+                SICO Polska Sp. z o.o.<br>
+                ul. Annopol 3<br>
+                03-236 Warszawa</p>
+                <p><strong>Zawiera:</strong> Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)</p>
+                <p><strong>NIEBEZPIECZEŃSTWO</strong></p>
+                <p><strong>H226</strong> - Łatwopalna ciecz i pary.</p>
+                <p><strong>H304</strong> - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.</p>
+                <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy.</p>
+                <p><strong>H412</strong> - Działa szkodliwie na organizmy wodne, powodując długotrwałe skutki.</p>
+                <p><strong>P210</strong> - Przechowywać z dala od źródeł ciepła, gorących powierzchni, źródeł skażenia, otwartego ognia i innych źródeł zapłonu. Nie palić.</p>
+                <p><strong>P280</strong> - Stosować rękawice ochronne/odzież ochronną/ochronę oczu/ochronę twarzy.</p>
+                <p><strong>P301+P310</strong> - W PRZYPADKU POŁKNIĘCIA: natychmiast skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem/...</p>
+                <p><strong>P303+P361+P353</strong> - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem.</p>
+                <p><strong>P304+P340</strong> - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.</p>
+                <p><strong>P403+P233</strong> - Przechowywać w dobrze wentylowanym miejscu. Przechowywać pojemnik szczelnie zamknięty.</p>
+                <p><strong>EUH066</strong> - Powtarzające się narażenie może powodować wysuszanie lub pękanie skóry.</p>
+                <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
+            </div>
+        `,
+        PLUV_LED: `
+            <div class="safety-info">
+                <p><strong>Nazwa handlowa:</strong> UVIPLAST PLUV LED</p>
+                <p><strong>Dystrybutor:</strong><br>
+                SICO Polska Sp. z o.o.<br>
+                ul. Annopol 3<br>
+                03-236 Warszawa</p>
+                <p><strong>Zawiera:</strong> Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)</p>
+                <p><strong>NIEBEZPIECZEŃSTWO</strong></p>
+                <p><strong>H226</strong> - Łatwopalna ciecz i pary.</p>
+                <p><strong>H304</strong> - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.</p>
+                <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy.</p>
+                <p><strong>H412</strong> - Działa szkodliwie na organizmy wodne, powodując długotrwałe skutki.</p>
+                <p><strong>P210</strong> - Przechowywać z dala od źródeł ciepła, gorących powierzchni, źródeł skażenia, otwartego ognia i innych źródeł zapłonu. Nie palić.</p>
+                <p><strong>P280</strong> - Stosować rękawice ochronne/odzież ochronną/ochronę oczu/ochronę twarzy.</p>
+                <p><strong>P301+P310</strong> - W PRZYPADKU POŁKNIĘCIA: natychmiast skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem/...</p>
+                <p><strong>P303+P361+P353</strong> - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem.</p>
+                <p><strong>P304+P340</strong> - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.</p>
+                <p><strong>P403+P233</strong> - Przechowywać w dobrze wentylowanym miejscu. Przechowywać pojemnik szczelnie zamknięty.</p>
+                <p><strong>EUH066</strong> - Powtarzające się narażenie może powodować wysuszanie lub pękanie skóry.</p>
+                <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
+            </div>
+        `,
+        TPP: `
+            <div class="safety-info">
+                <p><strong>Nazwa handlowa:</strong> POLYPRO TPP</p>
+                <p><strong>Dystrybutor:</strong><br>
+                SICO Polska Sp. z o.o.<br>
+                ul. Annopol 3<br>
+                03-236 Warszawa</p>
+                <p><strong>Zawiera:</strong> Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)</p>
+                <p><strong>NIEBEZPIECZEŃSTWO</strong></p>
+                <p><strong>H226</strong> - Łatwopalna ciecz i pary.</p>
+                <p><strong>H304</strong> - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.</p>
+                <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy.</p>
+                <p><strong>H412</strong> - Działa szkodliwie na organizmy wodne, powodując długotrwałe skutki.</p>
+                <p><strong>P210</strong> - Przechowywać z dala od źródeł ciepła, gorących powierzchni, źródeł skażenia, otwartego ognia i innych źródeł zapłonu. Nie palić.</p>
+                <p><strong>P280</strong> - Stosować rękawice ochronne/odzież ochronną/ochronę oczu/ochronę twarzy.</p>
+                <p><strong>P301+P310</strong> - W PRZYPADKU POŁKNIĘCIA: natychmiast skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem/...</p>
+                <p><strong>P303+P361+P353</strong> - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem.</p>
+                <p><strong>P304+P340</strong> - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.</p>
+                <p><strong>P403+P233</strong> - Przechowywać w dobrze wentylowanym miejscu. Przechowywać pojemnik szczelnie zamknięty.</p>
+                <p><strong>EUH066</strong> - Powtarzające się narażenie może powodować wysuszanie lub pękanie skóry.</p>
+                <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
+            </div>
+        `,
+        AS: `
+            <div class="safety-info">
+                <p><strong>Nazwa handlowa:</strong> AQUASET AS</p>
+                <p><strong>Dystrybutor:</strong><br>
+                SICO Polska Sp. z o.o.<br>
+                ul. Annopol 3<br>
+                03-236 Warszawa</p>
+                <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
+                <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
+            </div>
+        `,
+        SX: `
+            <div class="safety-info">
+                <p><strong>Nazwa handlowa:</strong> SICOTEX SX</p>
+                <p><strong>Dystrybutor:</strong><br>
+                SICO Polska Sp. z o.o.<br>
+                ul. Annopol 3<br>
+                03-236 Warszawa</p>
+                <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
+                <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
+            </div>
+        `,
+        OTF: `
+            <div class="safety-info">
+                <p><strong>Nazwa handlowa:</strong> OPATEX OTF</p>
+                <p><strong>Dystrybutor:</strong><br>
+                SICO Polska Sp. z o.o.<br>
+                ul. Annopol 3<br>
+                03-236 Warszawa</p>
+                <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
+                <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
+            </div>
+        `,
+        SPTN: `
+            <div class="safety-info">
+                <p><strong>Nazwa handlowa:</strong> SICOPLAST SPTN</p>
+                <p><strong>Dystrybutor:</strong><br>
+                SICO Polska Sp. z o.o.<br>
+                ul. Annopol 3<br>
+                03-236 Warszawa</p>
+                <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
+                <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
+            </div>
+        `,
+        NST: '',
+        QS: '',
+        SN: ''
+    };
+    
     const labelHtml = `
     <!DOCTYPE html>
     <html>
@@ -939,7 +1112,7 @@ function printLabelWithWeight(recipe, weightKg) {
             }
             /* Примусовий друк фонових кольорів */
             @media print {
-                .label, .header {
+                .label, .header, .distributor-info, .safety-info {
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
                 }
@@ -987,6 +1160,7 @@ function printLabelWithWeight(recipe, weightKg) {
                 padding: ${isSmall ? '2mm' : '3mm'};
                 background: #f9fafb;
                 flex: 1;
+                overflow-y: auto;
             }
             .product-name {
                 font-size: ${isSmall ? '5mm' : '6mm'};
@@ -996,8 +1170,6 @@ function printLabelWithWeight(recipe, weightKg) {
                 line-height: 1.2;
             }
             .product-meta {
-                display: flex;
-                justify-content: space-between;
                 font-size: ${isSmall ? '2.2mm' : '2.8mm'};
                 color: #000000;
                 margin-bottom: 2mm;
@@ -1025,17 +1197,49 @@ function printLabelWithWeight(recipe, weightKg) {
                 font-size: ${isSmall ? '2.5mm' : '3mm'};
                 border-top: 0.3mm dashed #9ca3af;
                 padding-top: 2mm;
-                color: #e63946; /* червоний колір для технічних даних */
+                color: #e63946; /* червоний колір для значень */
             }
             .tech-item {
                 margin-bottom: 1mm;
                 line-height: 1.4;
             }
             .tech-item strong {
-                color: ${style.productNameColor};
+                color: black; /* мітки чорні */
                 font-weight: 600;
                 display: inline-block;
                 min-width: ${isSmall ? '15mm' : '20mm'};
+            }
+            .safety-info {
+                margin-top: 2mm;
+                padding: ${isSmall ? '1.5mm' : '2mm'};
+                background: #f8f8f8;
+                border: 0.3mm solid #ccc;
+                border-radius: 2mm;
+                font-size: ${isSmall ? '2mm' : '2.2mm'};
+                line-height: 1.3;
+                max-height: ${isSmall ? '30mm' : '40mm'};
+                overflow-y: auto;
+            }
+            .safety-info p {
+                margin: 0.5mm 0;
+            }
+            .safety-info strong {
+                font-weight: 600;
+            }
+            .safety-info em {
+                font-style: italic;
+            }
+            .distributor-info {
+                background: ${style.headerBg}20; /* 12% прозорості */
+                padding: ${isSmall ? '1.5mm' : '2mm'};
+                font-size: ${isSmall ? '2mm' : '2.5mm'};
+                color: black;
+                text-align: center;
+                border-top: 0.3mm solid #ccc;
+                margin-top: 1mm;
+            }
+            .distributor-info p {
+                margin: 0.5mm 0;
             }
             .note-section {
                 margin: ${isSmall ? '2mm' : '3mm'};
@@ -1057,9 +1261,9 @@ function printLabelWithWeight(recipe, weightKg) {
             </div>
 
             <div class="product-info">
-                <div class="product-name">${utils.escapeHtml(recipe.name)}</div>
+                <div class="product-name">${utils.escapeHtml(recipe.name)} - ${weightKg}kg</div>
                 <div class="product-meta">
-                    <span>Data: ${date}</span>
+                    Data: ${date}
                 </div>
 
                 <div style="text-align: center;">
@@ -1068,15 +1272,30 @@ function printLabelWithWeight(recipe, weightKg) {
                     </div>
                 </div>
                 
-                <!-- Технічні дані серії (червоним) – тільки основні -->
+                <!-- Технічні дані серії: мітки чорні, значення червоні -->
                 <div class="tech-data">
                     ${useText ? `<div class="tech-item"><strong>Use:</strong> ${utils.escapeHtml(useText)}</div>` : ''}
                     ${aspectText ? `<div class="tech-item"><strong>Aspect:</strong> ${utils.escapeHtml(aspectText)}</div>` : ''}
                     ${dryingText ? `<div class="tech-item"><strong>Drying:</strong> ${utils.escapeHtml(dryingText)}</div>` : ''}
                 </div>
+
+                <!-- Інформація про безпеку (залежить від серії) -->
+                ${safetyInfo[seriesId] || ''}
             </div>
 
-            <!-- Примітка перед друком (окремий блок після технічних даних) -->
+            <!-- Інформація про дистриб'ютора (на кольоровому фоні серії) -->
+            <div class="distributor-info">
+                <p><strong>Wyłączny dystrybutor w Polsce</strong></p>
+                <p>SICO Polska Sp. z o. o.</p>
+                <p>ul. Annopol 3, 03-236 Warszawa</p>
+                <p>tel.: 00 48 22 660 48 50 (-9)</p>
+                <p>e-mail: sico@sico.pl</p>
+                <p>Producent n.v. Sico s.a. - Belgia</p>
+                <p>n.v. SICO Screen Inks s.a.</p>
+                <p>www.sico-sko.com</p>
+            </div>
+
+            <!-- Примітка перед друком -->
             <div class="note-section">
                 PRZED DRUKIEM NAKŁADU ZALECAMY SPRAWDZENIE ZGODNOŚCI KOLORYSTYCZNEJ.
             </div>
