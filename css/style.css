@@ -1943,3 +1943,18 @@ body.theme-organic .search-stats {
         width: 100%;
     }
 }
+
+/* ===== СТИЛІ ДЛЯ ДРУКУ ЕТИКЕТОК ===== */
+@media print {
+    body {
+        background: white;
+        margin: 0;
+        padding: 0;
+    }
+    .label {
+        box-shadow: none;
+        border: 0.5mm solid #000;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+    }
+}
