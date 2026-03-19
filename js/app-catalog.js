@@ -4,24 +4,59 @@ import * as i18n from './i18n.js';
 import * as app from './app-core.js';
 
 function attachCatalogEventListeners() {
+    console.log('📚 attachCatalogEventListeners викликано');
     const dom = app.dom;
     if (!dom.paintCatalogEl) return;
 
+    // Використовуємо делегування подій на весь контейнер каталогу
     dom.paintCatalogEl.removeEventListener('click', catalogClickHandler);
     dom.paintCatalogEl.addEventListener('click', catalogClickHandler);
-
-    dom.paintCatalogEl.querySelectorAll('.series-header').forEach(header => {
-        header.removeEventListener('click', headerClickHandler);
-        header.addEventListener('click', headerClickHandler);
-    });
 }
 
 function catalogClickHandler(e) {
-    const btn = e.target.closest('.glass-add-btn, .glass-remove-btn, .delete-paint, .series-info-btn, .toggle-series');
+    const btn = e.target.closest('.toggle-series, .series-info-btn, .glass-add-btn, .glass-remove-btn, .delete-paint');
     if (!btn) return;
     e.stopPropagation();
 
-    if (btn.classList.contains('glass-add-btn') || btn.classList.contains('glass-remove-btn')) {
+    if (btn.classList.contains('toggle-series')) {
+        const card = btn.closest('.series-card');
+        if (!card) return;
+        const paintsDiv = card.querySelector('.series-paints');
+        const icon = btn.querySelector('i');
+
+        if (paintsDiv.style.display === 'none' || !paintsDiv.style.display) {
+            paintsDiv.style.display = 'grid';
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+            // Зберігаємо стан розгортання в localStorage
+            try {
+                const expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
+                if (!expandedSeries.includes(card.dataset.series)) {
+                    expandedSeries.push(card.dataset.series);
+                    localStorage.setItem('expandedSeries', JSON.stringify(expandedSeries));
+                }
+            } catch (e) {}
+        } else {
+            paintsDiv.style.display = 'none';
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+            try {
+                const expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
+                const index = expandedSeries.indexOf(card.dataset.series);
+                if (index > -1) {
+                    expandedSeries.splice(index, 1);
+                    localStorage.setItem('expandedSeries', JSON.stringify(expandedSeries));
+                }
+            } catch (e) {}
+        }
+    } else if (btn.classList.contains('series-info-btn')) {
+        const card = btn.closest('.series-card');
+        const seriesId = card.dataset.series;
+        const series = (window.SICOMIX.data?.series || []).find(s => s.id === seriesId);
+        if (series) {
+            openSeriesDetailsModal(series);
+        }
+    } else if (btn.classList.contains('glass-add-btn') || btn.classList.contains('glass-remove-btn')) {
         const paintId = btn.dataset.paintId;
         const paint = app.getPaintCatalog().find(p => String(p.id) === paintId);
         if (!paint) return;
@@ -43,49 +78,6 @@ function catalogClickHandler(e) {
     } else if (btn.classList.contains('delete-paint')) {
         const paintId = btn.dataset.paintId;
         if (paintId) deletePaint(paintId);
-    } else if (btn.classList.contains('series-info-btn')) {
-        const card = btn.closest('.series-card');
-        const seriesId = card.dataset.series;
-        const series = (window.SICOMIX.data?.series || []).find(s => s.id === seriesId);
-        if (series) {
-            openSeriesDetailsModal(series);
-        }
-    } else if (btn.classList.contains('toggle-series')) {
-        const card = btn.closest('.series-card');
-        const paintsDiv = card.querySelector('.series-paints');
-        const icon = btn.querySelector('i');
-
-        if (paintsDiv.style.display === 'none' || !paintsDiv.style.display) {
-            paintsDiv.style.display = 'grid';
-            icon.classList.remove('fa-chevron-down');
-            icon.classList.add('fa-chevron-up');
-            try {
-                const expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
-                if (!expandedSeries.includes(card.dataset.series)) {
-                    expandedSeries.push(card.dataset.series);
-                    localStorage.setItem('expandedSeries', JSON.stringify(expandedSeries));
-                }
-            } catch (e) {}
-        } else {
-            paintsDiv.style.display = 'none';
-            icon.classList.remove('fa-chevron-up');
-            icon.classList.add('fa-chevron-down');
-            try {
-                const expandedSeries = JSON.parse(localStorage.getItem('expandedSeries') || '[]');
-                const index = expandedSeries.indexOf(card.dataset.series);
-                if (index > -1) {
-                    expandedSeries.splice(index, 1);
-                    localStorage.setItem('expandedSeries', JSON.stringify(expandedSeries));
-                }
-            } catch (e) {}
-        }
-    }
-}
-
-function headerClickHandler(e) {
-    if (!e.target.closest('.toggle-series') && !e.target.closest('.series-info-btn') && !e.target.closest('button')) {
-        const btn = this.querySelector('.toggle-series');
-        if (btn) btn.click();
     }
 }
 
@@ -177,7 +169,8 @@ function renderPaintCatalog(append = false) {
 
             const seriesName = (series.name && series.name[lang]) || series.id || 'Невідома серія';
             const category = series.category || '';
-            const isExpanded = expandedSeries.includes(series.id) || search.length > 0;
+            // Якщо є пошук, розгортаємо всі серії, інакше дивимось у localStorage
+            const isExpanded = search.length > 0 || expandedSeries.includes(series.id);
 
             const paintsHtml = seriesPaints.map(p => {
                 if (!p) return '';
@@ -259,20 +252,7 @@ function renderPaintCatalog(append = false) {
             dom.paintCatalogEl.innerHTML = html;
         }
 
-        if (search) {
-            document.querySelectorAll('.series-card').forEach(card => {
-                const paintsDiv = card.querySelector('.series-paints');
-                const icon = card.querySelector('.toggle-series i');
-                if (paintsDiv) {
-                    paintsDiv.style.display = 'grid';
-                    if (icon) {
-                        icon.classList.remove('fa-chevron-down');
-                        icon.classList.add('fa-chevron-up');
-                    }
-                }
-            });
-        }
-
+        // Після додавання HTML знову прив'язуємо обробники
         attachCatalogEventListeners();
         i18n.applyTranslations();
 
