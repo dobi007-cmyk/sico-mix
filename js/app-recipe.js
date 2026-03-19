@@ -314,6 +314,7 @@ function performSave(existingId, name, cat, series, desc, selectedIngredients, i
     app.switchPage('recipes');
 }
 
+// ОНОВЛЕНА ФУНКЦІЯ: додано app.clearRecipeDraft()
 function clearRecipeForm() {
     document.getElementById('recipeName').value = '';
     document.getElementById('recipeCategory').value = '';
@@ -330,6 +331,8 @@ function clearRecipeForm() {
     if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
     if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
     resetEditMode();
+    // Видаляємо збережену чернетку, щоб при поверненні на сторінку не відновлювались дані
+    app.clearRecipeDraft();
 }
 
 function resetEditMode() {
