@@ -3,13 +3,13 @@ const urlsToCache = [
     './',
     './index.html',
     './css/style.css',
-    './js/data-colors.js',          // виправлено
+    './js/data-colors.js',
     './js/i18n.js',
     './js/utils.js',
     './js/pantone-data.js',
     './js/pantone-external-colors.js',
     './js/ral-data.js',
-    './js/app.js',
+    './js/main.js',           // виправлено: було app.js
     './js/firebase-config.js',
     './js/sync.js',
     './manifest.json',
