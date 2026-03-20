@@ -162,35 +162,43 @@ const seriesStyles = {
     }
 };
 
-// Функція для визначення піктограм небезпеки на основі H-фраз
-function getHazardPictograms(hazardText) {
-    const pictograms = [];
-    if (hazardText.includes('H226')) pictograms.push('🔥');  // Flamme (GHS02)
-    if (hazardText.includes('H304')) pictograms.push('☠️'); // Aspiration hazard
-    if (hazardText.includes('H336')) pictograms.push('⚠️'); // Exclamation mark
-    if (hazardText.includes('H410') || hazardText.includes('H412')) pictograms.push('🌊'); // Environment
-    // Якщо є інші небезпеки – можна додати
-    return pictograms;
+// Функція для визначення піктограм небезпеки на основі H-фраз (повертає HTML з картинками)
+function getHazardPictograms(seriesId) {
+    const pictograms = {
+        EC: ['🔥', '⚠️'],      // GHS02 + GHS07
+        CF: ['⚠️'],             // GHS07
+        PLUV: ['🔥', '☠️', '⚠️', '🌊'],  // GHS02, GHS08?, GHS07, GHS09
+        PLUV_LED: ['🔥', '☠️', '⚠️', '🌊'],
+        TPP: ['🔥', '☠️', '⚠️', '🌊'],
+        AS: ['✔️'],
+        SX: ['✔️'],
+        OTF: ['✔️'],
+        SPTN: ['✔️'],
+        NST: [],
+        QS: [],
+        SN: []
+    };
+    const pics = pictograms[seriesId] || [];
+    // Тут можна замінити текстові символи на реальні зображення (base64 або SVG), якщо потрібно
+    return pics.map(p => `<span class="pictogram">${p}</span>`).join('');
 }
 
-// Інформація про безпеку для кожної серії
+// Інформація про безпеку для кожної серії (скорочена версія для правої колонки)
 const safetyInfo = {
     EC: `
         <div class="safety-info">
             <div class="safety-header">
                 <strong>Nazwa handlowa:</strong> EURECO EC
-                <div class="pictograms">${getHazardPictograms('H226 H336').join(' ')}</div>
+                <div class="pictograms">${getHazardPictograms('EC')}</div>
             </div>
-            <p><strong>Zawiera:</strong> 1-etoksypropan-2-ol</p>
-            <p><strong>H226</strong> - Łatwopalna ciecz i pary</p>
-            <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy</p>
-            <p><strong>P271</strong> - Stosować wyłącznie na zewnątrz lub w dobrze wentylowanym pomieszczeniu</p>
-            <p><strong>P303+P361+P353</strong> - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem</p>
-            <p><strong>P304+P340</strong> - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić warunki do odpoczynku w pozycji umożliwiającej swobodne oddychanie</p>
-            <p><strong>P312</strong> - W przypadku złego samopoczucia skontaktować się z OŚRODKIEM ZATRUĆ lub lekarzem</p>
-            <p><strong>P370+P378</strong> - W przypadku pożaru: używać odpowiednich środków gaśniczych</p>
-            <p><strong>P405</strong> - Przechowywać pod zamknięciem</p>
-            <p><strong>P501</strong> - Zawartość/pojemnik usuwać do upoważnionego zakładu utylizacji odpadów</p>
+            <p><strong>H226</strong> Łatwopalna ciecz i pary</p>
+            <p><strong>H336</strong> Może wywoływać senność</p>
+            <p><strong>P271</strong> Stosować na zewnątrz</p>
+            <p><strong>P303+P361+P353</strong> Zanieczyszczoną odzież natychmiast zdjąć. Spłukać skórę wodą</p>
+            <p><strong>P304+P340</strong> W przypadku dostania się do dróg oddechowych: wyprowadzić na świeże powietrze</p>
+            <p><strong>P312</strong> W przypadku złego samopoczucia skontaktować się z lekarzem</p>
+            <p><strong>P405</strong> Przechowywać pod zamknięciem</p>
+            <p><strong>P501</strong> Usuwać do upoważnionego zakładu utylizacji</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
         </div>
     `,
@@ -198,16 +206,15 @@ const safetyInfo = {
         <div class="safety-info">
             <div class="safety-header">
                 <strong>Nazwa handlowa:</strong> CARTOFLEX CF
-                <div class="pictograms">${getHazardPictograms('H336').join(' ')}</div>
+                <div class="pictograms">${getHazardPictograms('CF')}</div>
             </div>
-            <p><strong>Zawiera:</strong> 1-etoksypropan-2-ol</p>
-            <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy.</p>
-            <p><strong>P261</strong> - Unikać wdychania pyłu/dymu/gazu/mgły/par/rozpylonej cieczy.</p>
-            <p><strong>P271</strong> - Stosować wyłącznie na zewnątrz lub w dobrze wentylowanym pomieszczeniu.</p>
-            <p><strong>P312</strong> - W przypadku złego samopoczucia skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem.</p>
-            <p><strong>P304+P340</strong> - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.</p>
-            <p><strong>P405</strong> - Przechowywać pod zamknięciem.</p>
-            <p><strong>P501</strong> - Zawartość/pojemnik usuwać zgodnie z obowiązującymi przepisami.</p>
+            <p><strong>H336</strong> Może wywoływać senność</p>
+            <p><strong>P261</strong> Unikać wdychania pyłu/dymu/mgły</p>
+            <p><strong>P271</strong> Stosować na zewnątrz</p>
+            <p><strong>P312</strong> W przypadku złego samopoczucia skontaktować się z lekarzem</p>
+            <p><strong>P304+P340</strong> Wyprowadzić na świeże powietrze</p>
+            <p><strong>P405</strong> Przechowywać pod zamknięciem</p>
+            <p><strong>P501</strong> Usuwać zgodnie z przepisami</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
         </div>
     `,
@@ -215,20 +222,18 @@ const safetyInfo = {
         <div class="safety-info">
             <div class="safety-header">
                 <strong>Nazwa handlowa:</strong> UVIPLAST PLUV
-                <div class="pictograms">${getHazardPictograms('H226 H304 H336 H412').join(' ')}</div>
+                <div class="pictograms">${getHazardPictograms('PLUV')}</div>
             </div>
-            <p><strong>Zawiera:</strong> Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)</p>
-            <p><strong>H226</strong> - Łatwopalna ciecz i pary.</p>
-            <p><strong>H304</strong> - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.</p>
-            <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy.</p>
-            <p><strong>H412</strong> - Działa szkodliwie na organizmy wodne, powodując długotrwałe skutki.</p>
-            <p><strong>P210</strong> - Przechowywać z dala od źródeł ciepła, gorących powierzchni, źródeł skażenia, otwartego ognia i innych źródeł zapłonu. Nie palić.</p>
-            <p><strong>P280</strong> - Stosować rękawice ochronne/odzież ochronną/ochronę oczu/ochronę twarzy.</p>
-            <p><strong>P301+P310</strong> - W PRZYPADKU POŁKNIĘCIA: natychmiast skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem/...</p>
-            <p><strong>P303+P361+P353</strong> - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem.</p>
-            <p><strong>P304+P340</strong> - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.</p>
-            <p><strong>P403+P233</strong> - Przechowywać w dobrze wentylowanym miejscu. Przechowywać pojemnik szczelnie zamknięty.</p>
-            <p><strong>EUH066</strong> - Powtarzające się narażenie może powodować wysuszanie lub pękanie skóry.</p>
+            <p><strong>H226</strong> Łatwopalna ciecz i pary</p>
+            <p><strong>H304</strong> Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią</p>
+            <p><strong>H336</strong> Może wywoływać senność</p>
+            <p><strong>H412</strong> Działa szkodliwie na organizmy wodne</p>
+            <p><strong>P210</strong> Przechowywać z dala od źródeł ciepła</p>
+            <p><strong>P280</strong> Stosować rękawice ochronne</p>
+            <p><strong>P301+P310</strong> W przypadku połknięcia: natychmiast skontaktować się z lekarzem</p>
+            <p><strong>P303+P361+P353</strong> Zanieczyszczoną odzież zdjąć, spłukać skórę wodą</p>
+            <p><strong>P304+P340</strong> Wyprowadzić na świeże powietrze</p>
+            <p><strong>P403+P233</strong> Przechowywać w dobrze wentylowanym miejscu, pojemnik szczelnie zamknięty</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
         </div>
     `,
@@ -236,20 +241,18 @@ const safetyInfo = {
         <div class="safety-info">
             <div class="safety-header">
                 <strong>Nazwa handlowa:</strong> UVIPLAST PLUV LED
-                <div class="pictograms">${getHazardPictograms('H226 H304 H336 H412').join(' ')}</div>
+                <div class="pictograms">${getHazardPictograms('PLUV_LED')}</div>
             </div>
-            <p><strong>Zawiera:</strong> Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)</p>
-            <p><strong>H226</strong> - Łatwopalna ciecz i pary.</p>
-            <p><strong>H304</strong> - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.</p>
-            <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy.</p>
-            <p><strong>H412</strong> - Działa szkodliwie na organizmy wodne, powodując długotrwałe skutki.</p>
-            <p><strong>P210</strong> - Przechowywać z dala od źródeł ciepła, gorących powierzchni, źródeł skażenia, otwartego ognia i innych źródeł zapłonu. Nie palić.</p>
-            <p><strong>P280</strong> - Stosować rękawice ochronne/odzież ochronną/ochronę oczu/ochronę twarzy.</p>
-            <p><strong>P301+P310</strong> - W PRZYPADKU POŁKNIĘCIA: natychmiast skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem/...</p>
-            <p><strong>P303+P361+P353</strong> - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem.</p>
-            <p><strong>P304+P340</strong> - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.</p>
-            <p><strong>P403+P233</strong> - Przechowywać w dobrze wentylowanym miejscu. Przechowywać pojemnik szczelnie zamknięty.</p>
-            <p><strong>EUH066</strong> - Powtarzające się narażenie może powodować wysuszanie lub pękanie skóry.</p>
+            <p><strong>H226</strong> Łatwopalna ciecz i pary</p>
+            <p><strong>H304</strong> Połknięcie grozi śmiercią</p>
+            <p><strong>H336</strong> Może wywoływać senność</p>
+            <p><strong>H412</strong> Działa szkodliwie na organizmy wodne</p>
+            <p><strong>P210</strong> Przechowywać z dala od źródeł ciepła</p>
+            <p><strong>P280</strong> Stosować rękawice ochronne</p>
+            <p><strong>P301+P310</strong> W przypadku połknięcia: natychmiast skontaktować się z lekarzem</p>
+            <p><strong>P303+P361+P353</strong> Zanieczyszczoną odzież zdjąć, spłukać skórę</p>
+            <p><strong>P304+P340</strong> Wyprowadzić na świeże powietrze</p>
+            <p><strong>P403+P233</strong> Przechowywać w wentylowanym miejscu, szczelnie zamknięte</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
         </div>
     `,
@@ -257,20 +260,18 @@ const safetyInfo = {
         <div class="safety-info">
             <div class="safety-header">
                 <strong>Nazwa handlowa:</strong> POLYPRO TPP
-                <div class="pictograms">${getHazardPictograms('H226 H304 H336 H412').join(' ')}</div>
+                <div class="pictograms">${getHazardPictograms('TPP')}</div>
             </div>
-            <p><strong>Zawiera:</strong> Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)</p>
-            <p><strong>H226</strong> - Łatwopalna ciecz i pary.</p>
-            <p><strong>H304</strong> - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.</p>
-            <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy.</p>
-            <p><strong>H412</strong> - Działa szkodliwie na organizmy wodne, powodując długotrwałe skutki.</p>
-            <p><strong>P210</strong> - Przechowywać z dala od źródeł ciepła, gorących powierzchni, źródeł skażenia, otwartego ognia i innych źródeł zapłonu. Nie palić.</p>
-            <p><strong>P280</strong> - Stosować rękawice ochronne/odzież ochronną/ochronę oczu/ochronę twarzy.</p>
-            <p><strong>P301+P310</strong> - W PRZYPADKU POŁKNIĘCIA: natychmiast skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem/...</p>
-            <p><strong>P303+P361+P353</strong> - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem.</p>
-            <p><strong>P304+P340</strong> - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.</p>
-            <p><strong>P403+P233</strong> - Przechowywać w dobrze wentylowanym miejscu. Przechowywać pojemnik szczelnie zamknięty.</p>
-            <p><strong>EUH066</strong> - Powtarzające się narażenie może powodować wysuszanie lub pękanie skóry.</p>
+            <p><strong>H226</strong> Łatwopalna ciecz i pary</p>
+            <p><strong>H304</strong> Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią</p>
+            <p><strong>H336</strong> Może wywoływać senność</p>
+            <p><strong>H412</strong> Działa szkodliwie na organizmy wodne</p>
+            <p><strong>P210</strong> Przechowywać z dala od źródeł ciepła</p>
+            <p><strong>P280</strong> Stosować rękawice ochronne</p>
+            <p><strong>P301+P310</strong> W przypadku połknięcia: natychmiast skontaktować się z lekarzem</p>
+            <p><strong>P303+P361+P353</strong> Zanieczyszczoną odzież zdjąć, spłukać skórę</p>
+            <p><strong>P304+P340</strong> Wyprowadzić na świeże powietrze</p>
+            <p><strong>P403+P233</strong> Przechowywać w wentylowanym miejscu, szczelnie zamknięte</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
         </div>
     `,
@@ -278,7 +279,7 @@ const safetyInfo = {
         <div class="safety-info">
             <div class="safety-header">
                 <strong>Nazwa handlowa:</strong> AQUASET AS
-                <div class="pictograms">✔️</div>
+                <div class="pictograms">${getHazardPictograms('AS')}</div>
             </div>
             <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
@@ -288,7 +289,7 @@ const safetyInfo = {
         <div class="safety-info">
             <div class="safety-header">
                 <strong>Nazwa handlowa:</strong> SICOTEX SX
-                <div class="pictograms">✔️</div>
+                <div class="pictograms">${getHazardPictograms('SX')}</div>
             </div>
             <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
@@ -298,7 +299,7 @@ const safetyInfo = {
         <div class="safety-info">
             <div class="safety-header">
                 <strong>Nazwa handlowa:</strong> OPATEX OTF
-                <div class="pictograms">✔️</div>
+                <div class="pictograms">${getHazardPictograms('OTF')}</div>
             </div>
             <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
@@ -308,7 +309,7 @@ const safetyInfo = {
         <div class="safety-info">
             <div class="safety-header">
                 <strong>Nazwa handlowa:</strong> SICOPLAST SPTN
-                <div class="pictograms">✔️</div>
+                <div class="pictograms">${getHazardPictograms('SPTN')}</div>
             </div>
             <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
@@ -347,8 +348,9 @@ export function printLabelWithWeight(recipe, weightKg) {
         dryingText = props.drying?.[lang] || props.drying?.uk || '';
     }
     
-    // Визначаємо, чи є інформація про безпеку
+    // Отримуємо HTML безпеки (або пустий рядок)
     const safetyHtml = safetyInfo[seriesId] || '';
+    const hasSafety = safetyHtml !== '';
     
     const labelHtml = `
     <!DOCTYPE html>
@@ -391,46 +393,52 @@ export function printLabelWithWeight(recipe, weightKg) {
                 border: 0.3mm solid #ccc;
                 display: flex;
                 flex-direction: column;
-                font-size: ${isSmall ? '3.2mm' : '3.5mm'};
-                padding: ${isSmall ? '1.5mm' : '2mm'};
+                font-size: ${isSmall ? '3mm' : '3.3mm'};
+                padding: ${isSmall ? '1.5mm' : '2mm'} ${isSmall ? '2mm' : '3mm'};
             }
             .header {
                 background: ${style.headerBg};
                 color: white;
-                padding: ${isSmall ? '2mm' : '3mm'};
+                padding: ${isSmall ? '2mm' : '2.5mm'};
                 text-align: center;
                 border-bottom: 0.5mm solid ${style.headerBorder};
                 margin: -1.5mm -2mm 0 -2mm; /* розтягуємо на всю ширину */
             }
             .header .top-logo {
-                font-size: ${isSmall ? '3mm' : '3.5mm'};
+                font-size: ${isSmall ? '2.8mm' : '3.2mm'};
                 font-weight: 500;
                 letter-spacing: 1px;
                 margin-bottom: 1mm;
                 color: rgba(255,255,255,0.9);
             }
             .header h1 {
-                font-size: ${isSmall ? '4.5mm' : '5.5mm'};
+                font-size: ${isSmall ? '4mm' : '5mm'};
                 font-weight: 800;
                 text-transform: uppercase;
-                margin-bottom: 1mm;
+                margin-bottom: 0.5mm;
                 color: ${style.titleColor};
                 line-height: 1.2;
             }
             .header .sub {
-                font-size: ${isSmall ? '2.5mm' : '3mm'};
+                font-size: ${isSmall ? '2.2mm' : '2.7mm'};
                 font-weight: 500;
                 color: ${style.subColor};
             }
             .product-info {
-                margin-top: ${isSmall ? '2mm' : '3mm'};
+                margin-top: ${isSmall ? '2mm' : '2.5mm'};
                 flex: 1;
                 display: flex;
-                flex-direction: column;
-                overflow-y: auto;
+                gap: ${isSmall ? '2mm' : '3mm'};
+            }
+            .product-details {
+                flex: ${hasSafety ? '1.5' : '2'};
+            }
+            .safety-aside {
+                flex: 1;
+                ${hasSafety ? '' : 'display: none;'}
             }
             .product-name {
-                font-size: ${isSmall ? '5mm' : '6mm'};
+                font-size: ${isSmall ? '4.5mm' : '5.5mm'};
                 font-weight: 700;
                 color: ${style.productNameColor};
                 margin-bottom: 1mm;
@@ -445,18 +453,17 @@ export function printLabelWithWeight(recipe, weightKg) {
                 background: white;
                 border: 0.5mm solid ${style.weightBorder};
                 border-radius: 5mm;
-                padding: ${isSmall ? '2mm' : '3mm'};
+                padding: ${isSmall ? '1.5mm' : '2mm'};
                 text-align: center;
-                margin: 3mm 0;
-                font-size: ${isSmall ? '6mm' : '7mm'};
+                margin: 2mm 0;
+                font-size: ${isSmall ? '5.5mm' : '6.5mm'};
                 font-weight: 800;
                 color: ${style.weightColor};
                 display: inline-block;
-                min-width: ${isSmall ? '40mm' : '50mm'};
-                align-self: center;
+                min-width: ${isSmall ? '35mm' : '45mm'};
             }
             .weight-box span {
-                font-size: ${isSmall ? '3mm' : '4mm'};
+                font-size: ${isSmall ? '2.8mm' : '3.5mm'};
                 font-weight: 500;
                 color: ${style.weightColor};
             }
@@ -464,29 +471,29 @@ export function printLabelWithWeight(recipe, weightKg) {
                 margin-top: 2mm;
                 font-size: ${isSmall ? '2.5mm' : '3mm'};
                 border-top: 0.3mm dashed #9ca3af;
-                padding-top: 2mm;
+                padding-top: 1.5mm;
                 color: #e63946; /* червоний колір для значень */
             }
             .tech-item {
-                margin-bottom: 1mm;
-                line-height: 1.4;
+                margin-bottom: 0.8mm;
+                line-height: 1.3;
             }
             .tech-item strong {
                 color: black; /* мітки чорні */
                 font-weight: 600;
                 display: inline-block;
-                min-width: ${isSmall ? '15mm' : '20mm'};
+                min-width: ${isSmall ? '14mm' : '18mm'};
             }
             .safety-info {
-                margin-top: 2mm;
-                padding: ${isSmall ? '1mm' : '1.5mm'};
                 background: #f8f8f8;
                 border: 0.3mm solid #ccc;
                 border-radius: 2mm;
+                padding: ${isSmall ? '1mm' : '1.5mm'};
                 font-size: ${isSmall ? '2mm' : '2.3mm'};
-                line-height: 1.3;
-                max-height: ${isSmall ? '35mm' : '40mm'};
-                overflow-y: auto;
+                line-height: 1.25;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
             }
             .safety-header {
                 display: flex;
@@ -494,9 +501,15 @@ export function printLabelWithWeight(recipe, weightKg) {
                 align-items: baseline;
                 margin-bottom: 1mm;
                 font-weight: bold;
+                flex-wrap: wrap;
             }
             .pictograms {
-                font-size: ${isSmall ? '2.5mm' : '3mm'};
+                font-size: ${isSmall ? '2.2mm' : '2.8mm'};
+                white-space: nowrap;
+            }
+            .pictogram {
+                margin-left: 1mm;
+                display: inline-block;
             }
             .safety-info p {
                 margin: 0.5mm 0;
@@ -508,25 +521,34 @@ export function printLabelWithWeight(recipe, weightKg) {
                 font-style: italic;
             }
             .distributor-info {
-                background: ${style.headerBg}20; /* 12% прозорості */
-                padding: ${isSmall ? '1.5mm' : '2mm'};
-                font-size: ${isSmall ? '2mm' : '2.3mm'};
+                background: ${style.headerBg}20;
+                padding: ${isSmall ? '1mm' : '1.5mm'};
+                font-size: ${isSmall ? '1.8mm' : '2.2mm'};
                 color: black;
                 text-align: center;
                 border-top: 0.3mm solid #ccc;
                 margin-top: 1mm;
+                line-height: 1.3;
             }
             .distributor-info p {
-                margin: 0.5mm 0;
+                margin: 0.2mm 0;
             }
             .note-section {
-                margin-top: ${isSmall ? '2mm' : '3mm'};
-                font-size: ${isSmall ? '2mm' : '2.5mm'};
+                margin-top: ${isSmall ? '1.5mm' : '2mm'};
+                font-size: ${isSmall ? '1.8mm' : '2.2mm'};
                 color: #000000;
                 text-align: center;
                 font-weight: 500;
                 border-top: 0.3mm dashed #9ca3af;
-                padding-top: ${isSmall ? '1.5mm' : '2mm'};
+                padding-top: 1mm;
+            }
+            @media (max-width: 110mm) {
+                /* Для маленьких етикеток трохи зменшуємо шрифти */
+                .product-name { font-size: 4mm; }
+                .weight-box { font-size: 5mm; min-width: 30mm; }
+                .tech-data { font-size: 2.2mm; }
+                .safety-info { font-size: 1.9mm; }
+                .distributor-info { font-size: 1.7mm; }
             }
         </style>
     </head>
@@ -539,41 +561,30 @@ export function printLabelWithWeight(recipe, weightKg) {
             </div>
 
             <div class="product-info">
-                <div class="product-name">${utils.escapeHtml(recipe.name)} - ${weightKg}kg</div>
-                <div class="product-meta">
-                    Data: ${date}
-                </div>
-
-                <div style="text-align: center;">
-                    <div class="weight-box">
-                        ${weightKg.toFixed(2).replace('.', ',')} <span>kg</span>
+                <div class="product-details">
+                    <div class="product-name">${utils.escapeHtml(recipe.name)} - ${weightKg}kg</div>
+                    <div class="product-meta">Data: ${date}</div>
+                    <div style="text-align: center;">
+                        <div class="weight-box">
+                            ${weightKg.toFixed(2).replace('.', ',')} <span>kg</span>
+                        </div>
+                    </div>
+                    <div class="tech-data">
+                        ${useText ? `<div class="tech-item"><strong>Use:</strong> ${utils.escapeHtml(useText)}</div>` : ''}
+                        ${aspectText ? `<div class="tech-item"><strong>Aspect:</strong> ${utils.escapeHtml(aspectText)}</div>` : ''}
+                        ${dryingText ? `<div class="tech-item"><strong>Drying:</strong> ${utils.escapeHtml(dryingText)}</div>` : ''}
                     </div>
                 </div>
-                
-                <!-- Технічні дані серії: мітки чорні, значення червоні -->
-                <div class="tech-data">
-                    ${useText ? `<div class="tech-item"><strong>Use:</strong> ${utils.escapeHtml(useText)}</div>` : ''}
-                    ${aspectText ? `<div class="tech-item"><strong>Aspect:</strong> ${utils.escapeHtml(aspectText)}</div>` : ''}
-                    ${dryingText ? `<div class="tech-item"><strong>Drying:</strong> ${utils.escapeHtml(dryingText)}</div>` : ''}
+                <div class="safety-aside">
+                    ${safetyHtml}
                 </div>
-
-                <!-- Інформація про безпеку (залежить від серії) -->
-                ${safetyHtml}
             </div>
 
-            <!-- Інформація про дистриб'ютора (на кольоровому фоні серії) -->
             <div class="distributor-info">
-                <p><strong>Wyłączny dystrybutor w Polsce</strong></p>
-                <p>SICO Polska Sp. z o. o.</p>
-                <p>ul. Annopol 3, 03-236 Warszawa</p>
-                <p>tel.: 00 48 22 660 48 50 (-9)</p>
-                <p>e-mail: sico@sico.pl</p>
-                <p>Producent n.v. Sico s.a. - Belgia</p>
-                <p>n.v. SICO Screen Inks s.a.</p>
-                <p>www.sico-sko.com</p>
+                <p><strong>Wyłączny dystrybutor w Polsce</strong> SICO Polska Sp. z o.o., ul. Annopol 3, 03-236 Warszawa, tel. 22 660 48 50, e-mail: sico@sico.pl</p>
+                <p>Producent: n.v. Sico s.a. - Belgia / n.v. SICO Screen Inks s.a. | www.sico-sko.com</p>
             </div>
 
-            <!-- Примітка перед друком -->
             <div class="note-section">
                 PRZED DRUKIEM NAKŁADU ZALECAMY SPRAWDZENIE ZGODNOŚCI KOLORYSTYCZNEJ.
             </div>
