@@ -162,12 +162,12 @@ const seriesStyles = {
     }
 };
 
-// Функція для визначення піктограм небезпеки на основі H-фраз (повертає HTML з картинками)
+// Функція для визначення піктограм небезпеки (символи)
 function getHazardPictograms(seriesId) {
     const pictograms = {
-        EC: ['🔥', '⚠️'],      // GHS02 + GHS07
-        CF: ['⚠️'],             // GHS07
-        PLUV: ['🔥', '☠️', '⚠️', '🌊'],  // GHS02, GHS08?, GHS07, GHS09
+        EC: ['🔥', '⚠️'],
+        CF: ['⚠️'],
+        PLUV: ['🔥', '☠️', '⚠️', '🌊'],
         PLUV_LED: ['🔥', '☠️', '⚠️', '🌊'],
         TPP: ['🔥', '☠️', '⚠️', '🌊'],
         AS: ['✔️'],
@@ -179,146 +179,332 @@ function getHazardPictograms(seriesId) {
         SN: []
     };
     const pics = pictograms[seriesId] || [];
-    // Тут можна замінити текстові символи на реальні зображення (base64 або SVG), якщо потрібно
     return pics.map(p => `<span class="pictogram">${p}</span>`).join('');
 }
 
-// Інформація про безпеку для кожної серії (скорочена версія для правої колонки)
-const safetyInfo = {
-    EC: `
-        <div class="safety-info">
-            <div class="safety-header">
-                <strong>Nazwa handlowa:</strong> EURECO EC
-                <div class="pictograms">${getHazardPictograms('EC')}</div>
-            </div>
-            <p><strong>H226</strong> Łatwopalna ciecz i pary</p>
-            <p><strong>H336</strong> Może wywoływać senność</p>
-            <p><strong>P271</strong> Stosować na zewnątrz</p>
-            <p><strong>P303+P361+P353</strong> Zanieczyszczoną odzież natychmiast zdjąć. Spłukać skórę wodą</p>
-            <p><strong>P304+P340</strong> W przypadku dostania się do dróg oddechowych: wyprowadzić na świeże powietrze</p>
-            <p><strong>P312</strong> W przypadku złego samopoczucia skontaktować się z lekarzem</p>
-            <p><strong>P405</strong> Przechowywać pod zamknięciem</p>
-            <p><strong>P501</strong> Usuwać do upoważnionego zakładu utylizacji</p>
-            <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
-        </div>
-    `,
-    CF: `
-        <div class="safety-info">
-            <div class="safety-header">
-                <strong>Nazwa handlowa:</strong> CARTOFLEX CF
-                <div class="pictograms">${getHazardPictograms('CF')}</div>
-            </div>
-            <p><strong>H336</strong> Może wywoływać senność</p>
-            <p><strong>P261</strong> Unikać wdychania pyłu/dymu/mgły</p>
-            <p><strong>P271</strong> Stosować na zewnątrz</p>
-            <p><strong>P312</strong> W przypadku złego samopoczucia skontaktować się z lekarzem</p>
-            <p><strong>P304+P340</strong> Wyprowadzić na świeże powietrze</p>
-            <p><strong>P405</strong> Przechowywać pod zamknięciem</p>
-            <p><strong>P501</strong> Usuwać zgodnie z przepisami</p>
-            <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
-        </div>
-    `,
-    PLUV: `
-        <div class="safety-info">
-            <div class="safety-header">
-                <strong>Nazwa handlowa:</strong> UVIPLAST PLUV
-                <div class="pictograms">${getHazardPictograms('PLUV')}</div>
-            </div>
-            <p><strong>H226</strong> Łatwopalna ciecz i pary</p>
-            <p><strong>H304</strong> Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią</p>
-            <p><strong>H336</strong> Może wywoływać senność</p>
-            <p><strong>H412</strong> Działa szkodliwie na organizmy wodne</p>
-            <p><strong>P210</strong> Przechowywać z dala od źródeł ciepła</p>
-            <p><strong>P280</strong> Stosować rękawice ochronne</p>
-            <p><strong>P301+P310</strong> W przypadku połknięcia: natychmiast skontaktować się z lekarzem</p>
-            <p><strong>P303+P361+P353</strong> Zanieczyszczoną odzież zdjąć, spłukać skórę wodą</p>
-            <p><strong>P304+P340</strong> Wyprowadzić na świeże powietrze</p>
-            <p><strong>P403+P233</strong> Przechowywać w dobrze wentylowanym miejscu, pojemnik szczelnie zamknięty</p>
-            <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
-        </div>
-    `,
-    PLUV_LED: `
-        <div class="safety-info">
-            <div class="safety-header">
-                <strong>Nazwa handlowa:</strong> UVIPLAST PLUV LED
-                <div class="pictograms">${getHazardPictograms('PLUV_LED')}</div>
-            </div>
-            <p><strong>H226</strong> Łatwopalna ciecz i pary</p>
-            <p><strong>H304</strong> Połknięcie grozi śmiercią</p>
-            <p><strong>H336</strong> Może wywoływać senność</p>
-            <p><strong>H412</strong> Działa szkodliwie na organizmy wodne</p>
-            <p><strong>P210</strong> Przechowywać z dala od źródeł ciepła</p>
-            <p><strong>P280</strong> Stosować rękawice ochronne</p>
-            <p><strong>P301+P310</strong> W przypadku połknięcia: natychmiast skontaktować się z lekarzem</p>
-            <p><strong>P303+P361+P353</strong> Zanieczyszczoną odzież zdjąć, spłukać skórę</p>
-            <p><strong>P304+P340</strong> Wyprowadzić na świeże powietrze</p>
-            <p><strong>P403+P233</strong> Przechowywać w wentylowanym miejscu, szczelnie zamknięte</p>
-            <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
-        </div>
-    `,
-    TPP: `
-        <div class="safety-info">
-            <div class="safety-header">
-                <strong>Nazwa handlowa:</strong> POLYPRO TPP
-                <div class="pictograms">${getHazardPictograms('TPP')}</div>
-            </div>
-            <p><strong>H226</strong> Łatwopalna ciecz i pary</p>
-            <p><strong>H304</strong> Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią</p>
-            <p><strong>H336</strong> Może wywoływać senność</p>
-            <p><strong>H412</strong> Działa szkodliwie na organizmy wodne</p>
-            <p><strong>P210</strong> Przechowywać z dala od źródeł ciepła</p>
-            <p><strong>P280</strong> Stosować rękawice ochronne</p>
-            <p><strong>P301+P310</strong> W przypadku połknięcia: natychmiast skontaktować się z lekarzem</p>
-            <p><strong>P303+P361+P353</strong> Zanieczyszczoną odzież zdjąć, spłukać skórę</p>
-            <p><strong>P304+P340</strong> Wyprowadzić na świeże powietrze</p>
-            <p><strong>P403+P233</strong> Przechowywać w wentylowanym miejscu, szczelnie zamknięte</p>
-            <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
-        </div>
-    `,
-    AS: `
-        <div class="safety-info">
-            <div class="safety-header">
-                <strong>Nazwa handlowa:</strong> AQUASET AS
-                <div class="pictograms">${getHazardPictograms('AS')}</div>
-            </div>
-            <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
-            <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
-        </div>
-    `,
-    SX: `
-        <div class="safety-info">
-            <div class="safety-header">
-                <strong>Nazwa handlowa:</strong> SICOTEX SX
-                <div class="pictograms">${getHazardPictograms('SX')}</div>
-            </div>
-            <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
-            <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
-        </div>
-    `,
-    OTF: `
-        <div class="safety-info">
-            <div class="safety-header">
-                <strong>Nazwa handlowa:</strong> OPATEX OTF
-                <div class="pictograms">${getHazardPictograms('OTF')}</div>
-            </div>
-            <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
-            <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
-        </div>
-    `,
-    SPTN: `
-        <div class="safety-info">
-            <div class="safety-header">
-                <strong>Nazwa handlowa:</strong> SICOPLAST SPTN
-                <div class="pictograms">${getHazardPictograms('SPTN')}</div>
-            </div>
-            <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
-            <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
-        </div>
-    `,
-    NST: '',
-    QS: '',
-    SN: ''
+// Тексти безпеки для кожної серії (українська, англійська, польська)
+const safetyTexts = {
+    EC: {
+        uk: {
+            name: "EURECO EC",
+            contains: "1-етоксипропан-2-ол",
+            hazards: [
+                "H226 - Легкозаймиста рідина і пари",
+                "H336 - Може викликати сонливість або запаморочення"
+            ],
+            precautions: [
+                "P271 - Використовувати тільки на відкритому повітрі або в добре вентильованому приміщенні",
+                "P303+P361+P353 - ПРИ ПОТРАПЛЯННІ НА ШКІРУ (або волосся): негайно зняти весь забруднений одяг. Промити шкіру водою/прийняти душ",
+                "P304+P340 - ПРИ ВДИХАННІ: вивести людину на свіже повітря і забезпечити їй спокій у положенні, зручному для дихання",
+                "P312 - При поганому самопочутті звернутися до лікаря",
+                "P370+P378 - У разі пожежі: використовувати відповідні засоби гасіння",
+                "P405 - Зберігати під замком",
+                "P501 - Утилізувати вміст/контейнер на спеціалізованому підприємстві"
+            ]
+        },
+        en: {
+            name: "EURECO EC",
+            contains: "1-ethoxypropan-2-ol",
+            hazards: [
+                "H226 - Flammable liquid and vapour",
+                "H336 - May cause drowsiness or dizziness"
+            ],
+            precautions: [
+                "P271 - Use only outdoors or in a well-ventilated area",
+                "P303+P361+P353 - IF ON SKIN (or hair): Take off immediately all contaminated clothing. Rinse skin with water/shower",
+                "P304+P340 - IF INHALED: Remove person to fresh air and keep comfortable for breathing",
+                "P312 - Call a POISON CENTER/doctor if you feel unwell",
+                "P370+P378 - In case of fire: Use appropriate extinguishing media",
+                "P405 - Store locked up",
+                "P501 - Dispose of contents/container to an authorized waste disposal facility"
+            ]
+        },
+        pl: {
+            name: "EURECO EC",
+            contains: "1-etoksypropan-2-ol",
+            hazards: [
+                "H226 - Łatwopalna ciecz i pary",
+                "H336 - Może wywoływać uczucie senności lub zawroty głowy"
+            ],
+            precautions: [
+                "P271 - Stosować wyłącznie na zewnątrz lub w dobrze wentylowanym pomieszczeniu",
+                "P303+P361+P353 - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem",
+                "P304+P340 - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić warunki do odpoczynku w pozycji umożliwiającej swobodne oddychanie",
+                "P312 - W przypadku złego samopoczucia skontaktować się z OŚRODKIEM ZATRUĆ lub lekarzem",
+                "P370+P378 - W przypadku pożaru: używać odpowiednich środków gaśniczych",
+                "P405 - Przechowywać pod zamknięciem",
+                "P501 - Zawartość/pojemnik usuwać do upoważnionego zakładu utylizacji odpadów"
+            ]
+        }
+    },
+    CF: {
+        uk: {
+            name: "CARTOFLEX CF",
+            contains: "1-етоксипропан-2-ол",
+            hazards: ["H336 - Може викликати сонливість або запаморочення"],
+            precautions: [
+                "P261 - Уникати вдихання пилу/диму/газу/туману/парів/аерозолю",
+                "P271 - Використовувати тільки на відкритому повітрі або в добре вентильованому приміщенні",
+                "P312 - При поганому самопочутті звернутися до лікаря",
+                "P304+P340 - ПРИ ВДИХАННІ: вивести людину на свіже повітря і забезпечити спокій",
+                "P405 - Зберігати під замком",
+                "P501 - Утилізувати вміст/контейнер відповідно до чинних правил"
+            ]
+        },
+        en: {
+            name: "CARTOFLEX CF",
+            contains: "1-ethoxypropan-2-ol",
+            hazards: ["H336 - May cause drowsiness or dizziness"],
+            precautions: [
+                "P261 - Avoid breathing dust/fume/gas/mist/vapours/spray",
+                "P271 - Use only outdoors or in a well-ventilated area",
+                "P312 - Call a POISON CENTER/doctor if you feel unwell",
+                "P304+P340 - IF INHALED: Remove person to fresh air and keep comfortable for breathing",
+                "P405 - Store locked up",
+                "P501 - Dispose of contents/container in accordance with local regulations"
+            ]
+        },
+        pl: {
+            name: "CARTOFLEX CF",
+            contains: "1-etoksypropan-2-ol",
+            hazards: ["H336 - Może wywoływać uczucie senności lub zawroty głowy."],
+            precautions: [
+                "P261 - Unikać wdychania pyłu/dymu/gazu/mgły/par/rozpylonej cieczy.",
+                "P271 - Stosować wyłącznie na zewnątrz lub w dobrze wentylowanym pomieszczeniu.",
+                "P312 - W przypadku złego samopoczucia skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem.",
+                "P304+P340 - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.",
+                "P405 - Przechowywać pod zamknięciem.",
+                "P501 - Zawartość/pojemnik usuwać zgodnie z obowiązującymi przepisami."
+            ]
+        }
+    },
+    PLUV: {
+        uk: {
+            name: "UVIPLAST PLUV",
+            contains: "Ацетат 2-етокси-1-метилетилу та вуглеводні, C9, ароматичні (бензол < 0,1% мас.)",
+            hazards: [
+                "H226 - Легкозаймиста рідина і пари",
+                "H304 - Може бути смертельним при ковтанні та потраплянні в дихальні шляхи",
+                "H336 - Може викликати сонливість або запаморочення",
+                "H412 - Шкідливо для водних організмів, спричиняє довготривалі наслідки"
+            ],
+            precautions: [
+                "P210 - Тримати подалі від джерел тепла, іскр, відкритого вогню. Не палити",
+                "P280 - Використовувати захисні рукавиці/захисний одяг/захист очей/захист обличчя",
+                "P301+P310 - ПРИ ПРОКОВТУВАННІ: негайно звернутися до лікаря",
+                "P303+P361+P353 - ПРИ ПОТРАПЛЯННІ НА ШКІРУ (або волосся): негайно зняти весь забруднений одяг. Промити шкіру водою/душем",
+                "P304+P340 - ПРИ ВДИХАННІ: вивести людину на свіже повітря і забезпечити спокій у положенні, зручному для дихання",
+                "P403+P233 - Зберігати в добре вентильованому місці. Тримати контейнер щільно закритим",
+                "EUH066 - Повторюване впливання може викликати сухість або тріщини шкіри"
+            ]
+        },
+        en: {
+            name: "UVIPLAST PLUV",
+            contains: "2-ethoxy-1-methylethyl acetate and hydrocarbons, C9, aromatics (benzene < 0.1% w/w)",
+            hazards: [
+                "H226 - Flammable liquid and vapour",
+                "H304 - May be fatal if swallowed and enters airways",
+                "H336 - May cause drowsiness or dizziness",
+                "H412 - Harmful to aquatic life with long lasting effects"
+            ],
+            precautions: [
+                "P210 - Keep away from heat, sparks, open flames. No smoking",
+                "P280 - Wear protective gloves/protective clothing/eye protection/face protection",
+                "P301+P310 - IF SWALLOWED: Immediately call a POISON CENTER/doctor",
+                "P303+P361+P353 - IF ON SKIN (or hair): Take off immediately all contaminated clothing. Rinse skin with water/shower",
+                "P304+P340 - IF INHALED: Remove person to fresh air and keep comfortable for breathing",
+                "P403+P233 - Store in a well-ventilated place. Keep container tightly closed",
+                "EUH066 - Repeated exposure may cause skin dryness or cracking"
+            ]
+        },
+        pl: {
+            name: "UVIPLAST PLUV",
+            contains: "Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)",
+            hazards: [
+                "H226 - Łatwopalna ciecz i pary.",
+                "H304 - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.",
+                "H336 - Może wywoływać uczucie senności lub zawroty głowy.",
+                "H412 - Działa szkodliwie na organizmy wodne, powodując długotrwałe skutki."
+            ],
+            precautions: [
+                "P210 - Przechowywać z dala od źródeł ciepła, gorących powierzchni, źródeł skażenia, otwartego ognia i innych źródeł zapłonu. Nie palić.",
+                "P280 - Stosować rękawice ochronne/odzież ochronną/ochronę oczu/ochronę twarzy.",
+                "P301+P310 - W PRZYPADKU POŁKNIĘCIA: natychmiast skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem/...",
+                "P303+P361+P353 - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem.",
+                "P304+P340 - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.",
+                "P403+P233 - Przechowywać w dobrze wentylowanym miejscu. Przechowywać pojemnik szczelnie zamknięty.",
+                "EUH066 - Powtarzające się narażenie może powodować wysuszanie lub pękanie skóry."
+            ]
+        }
+    },
+    TPP: {
+        uk: {
+            name: "POLYPRO TPP",
+            contains: "Ацетат 2-етокси-1-метилетилу та вуглеводні, C9, ароматичні (бензол < 0,1% мас.)",
+            hazards: [
+                "H226 - Легкозаймиста рідина і пари",
+                "H304 - Може бути смертельним при ковтанні та потраплянні в дихальні шляхи",
+                "H336 - Може викликати сонливість або запаморочення",
+                "H412 - Шкідливо для водних організмів, спричиняє довготривалі наслідки"
+            ],
+            precautions: [
+                "P210 - Тримати подалі від джерел тепла, іскр, відкритого вогню. Не палити",
+                "P280 - Використовувати захисні рукавиці/захисний одяг/захист очей/захист обличчя",
+                "P301+P310 - ПРИ ПРОКОВТУВАННІ: негайно звернутися до лікаря",
+                "P303+P361+P353 - ПРИ ПОТРАПЛЯННІ НА ШКІРУ (або волосся): негайно зняти весь забруднений одяг. Промити шкіру водою/душем",
+                "P304+P340 - ПРИ ВДИХАННІ: вивести людину на свіже повітря і забезпечити спокій у положенні, зручному для дихання",
+                "P403+P233 - Зберігати в добре вентильованому місці. Тримати контейнер щільно закритим",
+                "EUH066 - Повторюване впливання може викликати сухість або тріщини шкіри"
+            ]
+        },
+        en: {
+            name: "POLYPRO TPP",
+            contains: "2-ethoxy-1-methylethyl acetate and hydrocarbons, C9, aromatics (benzene < 0.1% w/w)",
+            hazards: [
+                "H226 - Flammable liquid and vapour",
+                "H304 - May be fatal if swallowed and enters airways",
+                "H336 - May cause drowsiness or dizziness",
+                "H412 - Harmful to aquatic life with long lasting effects"
+            ],
+            precautions: [
+                "P210 - Keep away from heat, sparks, open flames. No smoking",
+                "P280 - Wear protective gloves/protective clothing/eye protection/face protection",
+                "P301+P310 - IF SWALLOWED: Immediately call a POISON CENTER/doctor",
+                "P303+P361+P353 - IF ON SKIN (or hair): Take off immediately all contaminated clothing. Rinse skin with water/shower",
+                "P304+P340 - IF INHALED: Remove person to fresh air and keep comfortable for breathing",
+                "P403+P233 - Store in a well-ventilated place. Keep container tightly closed",
+                "EUH066 - Repeated exposure may cause skin dryness or cracking"
+            ]
+        },
+        pl: {
+            name: "POLYPRO TPP",
+            contains: "Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)",
+            hazards: [
+                "H226 - Łatwopalna ciecz i pary.",
+                "H304 - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.",
+                "H336 - Może wywoływać uczucie senności lub zawroty głowy.",
+                "H412 - Działa szkodliwie na organizmy wodne, powodując długotrwałe skutki."
+            ],
+            precautions: [
+                "P210 - Przechowywać z dala od źródeł ciepła, gorących powierzchni, źródeł skażenia, otwartego ognia i innych źródeł zapłonu. Nie palić.",
+                "P280 - Stosować rękawice ochronne/odzież ochronną/ochronę oczu/ochronę twarzy.",
+                "P301+P310 - W PRZYPADKU POŁKNIĘCIA: natychmiast skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem/...",
+                "P303+P361+P353 - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem.",
+                "P304+P340 - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.",
+                "P403+P233 - Przechowywać w dobrze wentylowanym miejscu. Przechowywać pojemnik szczelnie zamknięty.",
+                "EUH066 - Powtarzające się narażenie może powodować wysuszanie lub pękanie skóry."
+            ]
+        }
+    },
+    AS: {
+        uk: {
+            name: "AQUASET AS",
+            nonHazardous: true,
+            text: "Суміш не класифікується як небезпечна."
+        },
+        en: {
+            name: "AQUASET AS",
+            nonHazardous: true,
+            text: "The mixture is not classified as hazardous."
+        },
+        pl: {
+            name: "AQUASET AS",
+            nonHazardous: true,
+            text: "Mieszanina nie jest klasyfikowana jako niebezpieczna."
+        }
+    },
+    SX: {
+        uk: {
+            name: "SICOTEX SX",
+            nonHazardous: true,
+            text: "Суміш не класифікується як небезпечна."
+        },
+        en: {
+            name: "SICOTEX SX",
+            nonHazardous: true,
+            text: "The mixture is not classified as hazardous."
+        },
+        pl: {
+            name: "SICOTEX SX",
+            nonHazardous: true,
+            text: "Mieszanina nie jest klasyfikowana jako niebezpieczna."
+        }
+    },
+    OTF: {
+        uk: {
+            name: "OPATEX OTF",
+            nonHazardous: true,
+            text: "Суміш не класифікується як небезпечна."
+        },
+        en: {
+            name: "OPATEX OTF",
+            nonHazardous: true,
+            text: "The mixture is not classified as hazardous."
+        },
+        pl: {
+            name: "OPATEX OTF",
+            nonHazardous: true,
+            text: "Mieszanina nie jest klasyfikowana jako niebezpieczna."
+        }
+    },
+    SPTN: {
+        uk: {
+            name: "SICOPLAST SPTN",
+            nonHazardous: true,
+            text: "Суміш не класифікується як небезпечна."
+        },
+        en: {
+            name: "SICOPLAST SPTN",
+            nonHazardous: true,
+            text: "The mixture is not classified as hazardous."
+        },
+        pl: {
+            name: "SICOPLAST SPTN",
+            nonHazardous: true,
+            text: "Mieszanina nie jest klasyfikowana jako niebezpieczna."
+        }
+    }
 };
+
+// Допоміжна функція для генерації HTML безпеки на основі даних
+function generateSafetyHtml(seriesId, lang) {
+    const data = safetyTexts[seriesId];
+    if (!data) return '';
+    const langData = data[lang] || data.pl; // fallback на польську
+    if (langData.nonHazardous) {
+        return `
+            <div class="safety-info">
+                <div class="safety-header">
+                    <strong>${i18n.t('safety_trade_name')}:</strong> ${langData.name}
+                    <div class="pictograms">${getHazardPictograms(seriesId)}</div>
+                </div>
+                <p>${langData.text}</p>
+                <p><em>${i18n.t('safety_professional_use')}</em></p>
+            </div>
+        `;
+    }
+    // Небезпечна суміш
+    let hazardsHtml = langData.hazards.map(h => `<p><strong>${h.split(' - ')[0]}</strong> ${h.split(' - ')[1]}</p>`).join('');
+    let precautionsHtml = langData.precautions.map(p => `<p><strong>${p.split(' - ')[0]}</strong> ${p.split(' - ')[1]}</p>`).join('');
+    return `
+        <div class="safety-info">
+            <div class="safety-header">
+                <strong>${i18n.t('safety_trade_name')}:</strong> ${langData.name}
+                <div class="pictograms">${getHazardPictograms(seriesId)}</div>
+            </div>
+            <p><strong>${i18n.t('safety_contains')}:</strong> ${langData.contains}</p>
+            <div class="hazards">
+                <strong>${i18n.t('safety_hazards')}</strong>
+                ${hazardsHtml}
+            </div>
+            <div class="precautions">
+                <strong>${i18n.t('safety_precautions')}</strong>
+                ${precautionsHtml}
+            </div>
+            <p><em>${i18n.t('safety_professional_use')}</em></p>
+        </div>
+    `;
+}
 
 // Основна функція друку етикетки
 export function printLabelWithWeight(recipe, weightKg) {
@@ -348,8 +534,8 @@ export function printLabelWithWeight(recipe, weightKg) {
         dryingText = props.drying?.[lang] || props.drying?.uk || '';
     }
     
-    // Отримуємо HTML безпеки (або пустий рядок)
-    const safetyHtml = safetyInfo[seriesId] || '';
+    // Генеруємо HTML безпеки
+    const safetyHtml = generateSafetyHtml(seriesId, lang);
     const hasSafety = safetyHtml !== '';
     
     const labelHtml = `
@@ -520,6 +706,9 @@ export function printLabelWithWeight(recipe, weightKg) {
             .safety-info em {
                 font-style: italic;
             }
+            .hazards, .precautions {
+                margin-top: 1mm;
+            }
             .distributor-info {
                 background: ${style.headerBg}20;
                 padding: ${isSmall ? '1mm' : '1.5mm'};
@@ -563,16 +752,16 @@ export function printLabelWithWeight(recipe, weightKg) {
             <div class="product-info">
                 <div class="product-details">
                     <div class="product-name">${utils.escapeHtml(recipe.name)} - ${weightKg}kg</div>
-                    <div class="product-meta">Data: ${date}</div>
+                    <div class="product-meta">${i18n.t('label_date')}: ${date}</div>
                     <div style="text-align: center;">
                         <div class="weight-box">
                             ${weightKg.toFixed(2).replace('.', ',')} <span>kg</span>
                         </div>
                     </div>
                     <div class="tech-data">
-                        ${useText ? `<div class="tech-item"><strong>Use:</strong> ${utils.escapeHtml(useText)}</div>` : ''}
-                        ${aspectText ? `<div class="tech-item"><strong>Aspect:</strong> ${utils.escapeHtml(aspectText)}</div>` : ''}
-                        ${dryingText ? `<div class="tech-item"><strong>Drying:</strong> ${utils.escapeHtml(dryingText)}</div>` : ''}
+                        ${useText ? `<div class="tech-item"><strong>${i18n.t('use')}:</strong> ${utils.escapeHtml(useText)}</div>` : ''}
+                        ${aspectText ? `<div class="tech-item"><strong>${i18n.t('aspect')}:</strong> ${utils.escapeHtml(aspectText)}</div>` : ''}
+                        ${dryingText ? `<div class="tech-item"><strong>${i18n.t('drying')}:</strong> ${utils.escapeHtml(dryingText)}</div>` : ''}
                     </div>
                 </div>
                 <div class="safety-aside">
@@ -581,12 +770,12 @@ export function printLabelWithWeight(recipe, weightKg) {
             </div>
 
             <div class="distributor-info">
-                <p><strong>Wyłączny dystrybutor w Polsce</strong> SICO Polska Sp. z o.o., ul. Annopol 3, 03-236 Warszawa, tel. 22 660 48 50, e-mail: sico@sico.pl</p>
-                <p>Producent: n.v. Sico s.a. - Belgia / n.v. SICO Screen Inks s.a. | www.sico-sko.com</p>
+                <p><strong>${i18n.t('distributor_title')}</strong> ${i18n.t('distributor_info')}</p>
+                <p>${i18n.t('producer_info')}</p>
             </div>
 
             <div class="note-section">
-                PRZED DRUKIEM NAKŁADU ZALECAMY SPRAWDZENIE ZGODNOŚCI KOLORYSTYCZNEJ.
+                ${i18n.t('label_note')}
             </div>
         </div>
     </body>
