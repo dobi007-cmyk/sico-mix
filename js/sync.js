@@ -1,6 +1,10 @@
 // ========== МОДУЛЬ СИНХРОНІЗАЦІЇ ==========
-// Використовуємо глобальний SICOMIX для i18n та utils
-const { i18n, utils } = window.SICOMIX;
+const i18n = window.SICOMIX?.i18n || { t: key => key };
+const utils = window.SICOMIX?.utils || {
+    showNotification: (msg, type) => console.log(msg, type),
+    debounce: (fn, delay) => fn,
+    generateId: () => Date.now()
+};
 
 let currentUser = null;
 
@@ -13,7 +17,6 @@ function updateSyncStatus(message, isError = false) {
     if (text) text.textContent = message;
 }
 
-// Анонімний вхід
 async function signInAnonymously() {
     try {
         updateSyncStatus(i18n.t('syncing'));
@@ -28,7 +31,6 @@ async function signInAnonymously() {
     }
 }
 
-// Вихід
 async function signOut() {
     try {
         await window.SICOMIX.firebase.auth.signOut();
@@ -39,12 +41,10 @@ async function signOut() {
     }
 }
 
-// Отримати поточного користувача
 function getCurrentUser() {
     return currentUser || window.SICOMIX.firebase?.auth?.currentUser;
 }
 
-// Завантажити всі дані користувача з Firestore
 async function loadUserData(userId) {
     if (!userId) return null;
     try {
@@ -61,7 +61,6 @@ async function loadUserData(userId) {
     }
 }
 
-// Зберегти всі дані користувача в Firestore
 async function saveUserData(userId, data) {
     if (!userId) return false;
     try {
@@ -79,5 +78,4 @@ async function saveUserData(userId, data) {
     }
 }
 
-// Експортуємо публічні методи
 export { signInAnonymously, signOut, getCurrentUser, loadUserData, saveUserData };
