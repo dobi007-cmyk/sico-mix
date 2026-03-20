@@ -1192,6 +1192,7 @@ export function setLanguage(lang) {
         currentLanguage = lang;
         document.documentElement.lang = lang;
         localStorage.setItem('sicoSpectrumLanguage', lang);
+        applyTranslations();
     }
 }
 
@@ -1261,17 +1262,14 @@ export function applyTranslations() {
         const key = el.getAttribute('data-i18n');
         if (key) el.textContent = t(key);
     });
-
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
         if (key) el.placeholder = t(key);
     });
-
     document.querySelectorAll('[data-i18n-title]').forEach(el => {
         const key = el.getAttribute('data-i18n-title');
         if (key) el.title = t(key);
     });
-
     document.querySelectorAll('[data-i18n-value]').forEach(el => {
         const key = el.getAttribute('data-i18n-value');
         if (key) el.value = t(key);
@@ -1292,7 +1290,10 @@ export function initI18n() {
     applyTranslations();
 }
 
-// Для зворотної сумісності створюємо глобальний об'єкт
+// Автоматична ініціалізація під час завантаження модуля
+initI18n();
+
+// Глобальний об'єкт для зворотної сумісності
 window.SICOMIX = window.SICOMIX || {};
 window.SICOMIX.i18n = {
     t,
