@@ -12,10 +12,10 @@ function renderIngredientsList() {
     const paintCatalog = app.getPaintCatalog();
 
     if (selectedIngredients.length === 0) {
-        dom.ingredientsList.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px;">
+        dom.ingredientsList.innerHTML = `</td><td colspan="5" style="text-align:center; padding:40px;">
             <i class="fas fa-palette" style="font-size:32px; opacity:0.5;"></i><br>
             <span>${i18n.t('paints_not_found')}</span>
-        </td></tr>`;
+         </tr>`;
         i18n.applyTranslations();
         return;
     }
@@ -315,7 +315,6 @@ function performSave(existingId, name, cat, series, desc, selectedIngredients, i
     app.switchPage('recipes');
 }
 
-// Оновлена функція clearRecipeForm з видаленням чернетки
 function clearRecipeForm() {
     document.getElementById('recipeName').value = '';
     document.getElementById('recipeCategory').value = '';
@@ -332,7 +331,6 @@ function clearRecipeForm() {
     if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
     if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
     resetEditMode();
-    // Видаляємо збережену чернетку, щоб при поверненні на сторінку не відновлювались дані
     app.clearRecipeDraft();
 }
 
@@ -786,6 +784,11 @@ async function scanRecipeFromPhoto() {
         return;
     }
 
+    if (typeof Tesseract === 'undefined') {
+        utils.showNotification('Tesseract не завантажено. Спробуйте перезавантажити сторінку.', 'error');
+        return;
+    }
+
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -1040,7 +1043,6 @@ function attachRecipeEventListeners() {
     }
 }
 
-// Експорт функцій
 export {
     renderIngredientsList,
     handleIngredientChange,
@@ -1068,7 +1070,6 @@ export {
     attachRecipeEventListeners
 };
 
-// Для зворотної сумісності додаємо до глобального SICOMIX.app
 window.SICOMIX = window.SICOMIX || {};
 window.SICOMIX.app = window.SICOMIX.app || {};
 Object.assign(window.SICOMIX.app, {
