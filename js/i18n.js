@@ -374,8 +374,24 @@ const translations = {
         "cat_uv_led": "UV фарби (LED)",
 
         // Друк етикетки
-        "enter_weight_kg": "Введіть вагу (кг):"
+        "enter_weight_kg": "Введіть вагу (кг):",
+
+        // ДОДАНО ДЛЯ ЕТИКЕТКИ
+        "use": "Застосування",
+        "aspect": "Вигляд",
+        "drying": "Висихання",
+        "label_date": "Дата",
+        "distributor_title": "Виключний дистриб'ютор у Польщі:",
+        "distributor_info": "SICO Polska Sp. z o.o., вул. Annopol 3, 03-236 Warszawa, тел. 22 660 48 50, e-mail: sico@sico.pl",
+        "producer_info": "Виробник: n.v. Sico s.a. - Бельгія / n.v. SICO Screen Inks s.a. | www.sico-sko.com",
+        "label_note": "ПЕРЕД ДРУКОМ ТИРАЖУ РЕКОМЕНДУЄМО ПЕРЕВІРИТИ КОЛЬОРОВУ ВІДПОВІДНІСТЬ.",
+        "safety_trade_name": "Торгова назва",
+        "safety_contains": "Містить",
+        "safety_hazards": "Небезпечні твердження",
+        "safety_precautions": "Запобіжні заходи",
+        "safety_professional_use": "Продукт призначений виключно для професійного використання."
     },
+
     en: {
         // General
         "app_name": "SICO Spectrum",
@@ -750,8 +766,24 @@ const translations = {
         "cat_uv_led": "UV paints (LED)",
 
         // Label printing
-        "enter_weight_kg": "Enter weight (kg):"
+        "enter_weight_kg": "Enter weight (kg):",
+
+        // ADDED FOR LABEL
+        "use": "Application",
+        "aspect": "Appearance",
+        "drying": "Drying",
+        "label_date": "Date",
+        "distributor_title": "Exclusive distributor in Poland:",
+        "distributor_info": "SICO Polska Sp. z o.o., ul. Annopol 3, 03-236 Warszawa, tel. 22 660 48 50, e-mail: sico@sico.pl",
+        "producer_info": "Manufacturer: n.v. Sico s.a. - Belgium / n.v. SICO Screen Inks s.a. | www.sico-sko.com",
+        "label_note": "BEFORE PRINTING THE RUN, IT IS RECOMMENDED TO CHECK THE COLOR MATCH.",
+        "safety_trade_name": "Trade name",
+        "safety_contains": "Contains",
+        "safety_hazards": "Hazard statements",
+        "safety_precautions": "Precautionary statements",
+        "safety_professional_use": "Product intended for professional use only."
     },
+
     pl: {
         // Ogólne
         "app_name": "SICO Spectrum",
@@ -1126,7 +1158,22 @@ const translations = {
         "cat_uv_led": "Farby UV (LED)",
 
         // Drukowanie etykiety
-        "enter_weight_kg": "Wprowadź wagę (kg):"
+        "enter_weight_kg": "Wprowadź wagę (kg):",
+
+        // DODANE DLA ETYKIETY
+        "use": "Zastosowanie",
+        "aspect": "Wygląd",
+        "drying": "Schnięcie",
+        "label_date": "Data",
+        "distributor_title": "Wyłączny dystrybutor w Polsce:",
+        "distributor_info": "SICO Polska Sp. z o.o., ul. Annopol 3, 03-236 Warszawa, tel. 22 660 48 50, e-mail: sico@sico.pl",
+        "producer_info": "Producent: n.v. Sico s.a. - Belgia / n.v. SICO Screen Inks s.a. | www.sico-sko.com",
+        "label_note": "PRZED DRUKIEM NAKŁADU ZALECAMY SPRAWDZENIE ZGODNOŚCI KOLORYSTYCZNEJ.",
+        "safety_trade_name": "Nazwa handlowa",
+        "safety_contains": "Zawiera",
+        "safety_hazards": "Zwroty wskazujące rodzaj zagrożenia",
+        "safety_precautions": "Zwroty wskazujące środki ostrożności",
+        "safety_professional_use": "Produkt przeznaczony wyłącznie do użytku zawodowego."
     }
 };
 
