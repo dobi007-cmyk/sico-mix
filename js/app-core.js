@@ -109,7 +109,6 @@ function cacheDOMElements() {
     dom.weightConfirmBtn = document.getElementById('weightConfirmBtn');
     dom.weightCancelBtn = document.getElementById('weightCancelBtn');
 
-    // Елементи авторизації
     dom.authButton = document.getElementById('authButton');
     dom.authModal = document.getElementById('authModal');
     dom.closeAuthModal = document.getElementById('closeAuthModal');
@@ -449,180 +448,7 @@ function invalidateSeriesCache() {
     cachedUniqueSeries = null;
 }
 
-// ---------- НАВІГАЦІЯ ----------
-function hasUnsavedChanges() {
-    const newRecipeActive = document.getElementById('new-recipe-page')?.classList.contains('active');
-    if (!newRecipeActive) {
-        return false;
-    }
-
-    if (isEditingRecipe && editingRecipeId) {
-        const originalRecipe = recipes.find(r => String(r.id) === String(editingRecipeId));
-        if (!originalRecipe) return false;
-
-        const currentName = document.getElementById('recipeName')?.value.trim() || '';
-        const currentCategory = document.getElementById('recipeCategory')?.value || '';
-        const currentSeries = document.getElementById('recipeSeries')?.value || '';
-        const currentDesc = document.getElementById('recipeDescription')?.value.trim() || '';
-        const currentPhoto = recipePhotoDataUrl || null;
-
-        const nameChanged = currentName !== (originalRecipe.name || '');
-        const categoryChanged = currentCategory !== (originalRecipe.category || '');
-        const seriesChanged = currentSeries !== (originalRecipe.series || '');
-        const descChanged = currentDesc !== (originalRecipe.description || '');
-        const photoChanged = currentPhoto !== (originalRecipe.photo || null);
-
-        let ingredientsChanged = false;
-        const currentIngredients = selectedIngredients;
-        const originalIngredients = originalRecipe.ingredients || [];
-        if (currentIngredients.length !== originalIngredients.length) {
-            ingredientsChanged = true;
-        } else {
-            for (let i = 0; i < currentIngredients.length; i++) {
-                const a = currentIngredients[i];
-                const b = originalIngredients[i];
-                if (a.paintId !== b.paintId || a.amount !== b.amount || a.unit !== b.unit) {
-                    ingredientsChanged = true;
-                    break;
-                }
-            }
-        }
-
-        const changed = nameChanged || categoryChanged || seriesChanged || descChanged || photoChanged || ingredientsChanged;
-        return changed;
-    }
-
-    const name = document.getElementById('recipeName')?.value.trim() || '';
-    const category = document.getElementById('recipeCategory')?.value || '';
-    const series = document.getElementById('recipeSeries')?.value || '';
-    const description = document.getElementById('recipeDescription')?.value.trim() || '';
-
-    const hasText = !!(name || category || series || description);
-    const hasIngredients = selectedIngredients.length > 0;
-    const hasPhoto = !!recipePhotoDataUrl;
-
-    return hasText || hasIngredients || hasPhoto;
-}
-
-function performSwitch(pageId) {
-    const targetPage = document.getElementById(`${pageId}-page`);
-    if (!targetPage) {
-        console.error('❌ Сторінка не знайдена:', pageId);
-        return;
-    }
-    if (targetPage.classList.contains('active')) {
-        console.log('⏭️ Сторінка вже активна');
-        return;
-    }
-
-    if (isEditingRecipe && pageId !== 'new-recipe') {
-        resetEditMode();
-        clearRecipeForm();
-        clearRecipeDraft();
-    }
-
-    dom.pageContents.forEach(p => {
-        p.classList.remove('active');
-    });
-
-    targetPage.classList.add('active');
-
-    dom.navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('data-page') === pageId) {
-            link.classList.add('active');
-        }
-    });
-
-    if (pageId === 'recipes') {
-        if (window.SICOMIX?.app?.renderRecipes) window.SICOMIX.app.renderRecipes();
-    } else if (pageId === 'catalog') {
-        catalogPage = 1;
-        if (window.SICOMIX?.app?.renderPaintCatalog) window.SICOMIX.app.renderPaintCatalog();
-    } else if (pageId === 'new-recipe') {
-        const seriesSelect = document.getElementById('recipeSeries');
-        if (seriesSelect && seriesSelect.options.length <= 1) {
-            populateSeriesSelect();
-        }
-        const catSelect = document.getElementById('recipeCategory');
-        if (catSelect && catSelect.options.length <= 1) {
-            populateCategoryFilters();
-        }
-        if (!isEditingRecipe) {
-            if (selectedIngredients.length === 0) {
-                loadRecipeDraft();
-            }
-            if (recipePhotoDataUrl) {
-                showPhotoPreview(recipePhotoDataUrl);
-            } else {
-                resetPhotoPreview();
-            }
-        }
-        updateSeriesLockUI();
-        if (window.SICOMIX?.app?.renderIngredientsList) window.SICOMIX.app.renderIngredientsList();
-    } else if (pageId === 'pantone') {
-        if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-    } else if (pageId === 'ral') {
-        if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
-    }
-}
-
-function switchPage(pageId) {
-    if (!pageId) {
-        console.warn('⚠️ pageId порожній');
-        return;
-    }
-
-    if (hasUnsavedChanges() && pageId !== 'new-recipe') {
-        utils.showConfirmation(
-            i18n.t('unsaved_changes_warning'),
-            i18n.t('confirmation_message'),
-            () => {
-                if (isEditingRecipe) {
-                    resetEditMode();
-                    clearRecipeForm();
-                    clearRecipeDraft();
-                } else {
-                    clearRecipeDraft();
-                }
-                performSwitch(pageId);
-            },
-            () => {}
-        );
-        return;
-    }
-
-    performSwitch(pageId);
-}
-
-function resetEditMode() {
-    isEditingRecipe = false;
-    editingRecipeId = null;
-    if (dom.saveRecipeBtn) {
-        dom.saveRecipeBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="save_recipe"></span>`;
-        i18n.applyTranslations();
-    }
-}
-
-function clearRecipeForm() {
-    document.getElementById('recipeName').value = '';
-    document.getElementById('recipeCategory').value = '';
-    document.getElementById('recipeSeries').value = '';
-    selectedSeries = '';
-    document.getElementById('recipeDescription').value = '';
-    selectedIngredients = [];
-    recipePhotoDataUrl = null;
-    resetPhotoPreview();
-    lockedSeries = null;
-    lockedCategory = null;
-    updateSeriesLockUI();
-    if (window.SICOMIX?.app?.renderIngredientsList) window.SICOMIX.app.renderIngredientsList();
-    if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-    if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
-    resetEditMode();
-}
-
-// ---------- НАЛАШТУВАННЯ ----------
+// ---------- НАЛАШТУВАННЯ (основні функції) ----------
 function initSettings() {
     if (dom.unitsSelect) dom.unitsSelect.value = currentSettings.units || 'grams';
     if (dom.autoSaveCheckbox) dom.autoSaveCheckbox.checked = currentSettings.autoSave !== false;
@@ -854,36 +680,24 @@ async function handleGoogleSignIn() {
     }
 }
 
-// ---------- ОНОВЛЕННЯ ІНТЕРФЕЙСУ КОРИСТУВАЧА ----------
 function updateAuthUI(user) {
     if (!dom.authButton) return;
     
     if (user) {
-        // Користувач увійшов
         const displayName = user.email || user.displayName || 'Користувач';
         dom.authButton.innerHTML = `<i class="fas fa-user-circle"></i> <span>${displayName}</span>`;
-        
-        // Видаляємо всі старі обробники
         dom.authButton.removeEventListener('click', handleLogout);
         dom.authButton.removeEventListener('click', openAuthModal);
-        
-        // Додаємо новий обробник, який питає підтвердження
         dom.authButton.addEventListener('click', confirmLogout);
     } else {
-        // Користувач вийшов
         dom.authButton.innerHTML = `<i class="fas fa-sign-in-alt"></i> <span data-i18n="login">Увійти</span>`;
         i18n.applyTranslations();
-        
-        // Видаляємо всі старі обробники
         dom.authButton.removeEventListener('click', handleLogout);
         dom.authButton.removeEventListener('click', confirmLogout);
-        
-        // Додаємо обробник для відкриття модального вікна
         dom.authButton.addEventListener('click', openAuthModal);
     }
 }
 
-// Функція для відкриття модального вікна входу
 function openAuthModal() {
     if (dom.authModal) {
         dom.authModal.classList.add('active');
@@ -891,16 +705,14 @@ function openAuthModal() {
     }
 }
 
-// Функція для підтвердження виходу
 function confirmLogout() {
     utils.showConfirmation(
-        i18n.t('logout_confirmation'), // "Ви дійсно хочете вийти?"
+        i18n.t('logout_confirmation'),
         i18n.t('confirmation_message'),
         async () => {
             try {
                 const auth = window.SICOMIX?.firebase?.auth;
                 if (!auth) throw new Error('Firebase auth not initialized');
-                
                 await auth.signOut();
                 utils.showNotification(i18n.t('logged_out'), 'success');
             } catch (error) {
@@ -908,13 +720,162 @@ function confirmLogout() {
                 utils.showNotification(error.message || i18n.t('logout_error'), 'error');
             }
         },
-        () => {} // скасування
+        () => {}
     );
 }
 
-// Функція для виходу (залишаємо для сумісності, але тепер вона не використовується напряму)
 async function handleLogout() {
     confirmLogout();
+}
+
+// ---------- НАВІГАЦІЯ ----------
+function hasUnsavedChanges() {
+    const newRecipeActive = document.getElementById('new-recipe-page')?.classList.contains('active');
+    if (!newRecipeActive) return false;
+
+    if (isEditingRecipe && editingRecipeId) {
+        const originalRecipe = recipes.find(r => String(r.id) === String(editingRecipeId));
+        if (!originalRecipe) return false;
+
+        const currentName = document.getElementById('recipeName')?.value.trim() || '';
+        const currentCategory = document.getElementById('recipeCategory')?.value || '';
+        const currentSeries = document.getElementById('recipeSeries')?.value || '';
+        const currentDesc = document.getElementById('recipeDescription')?.value.trim() || '';
+        const currentPhoto = recipePhotoDataUrl || null;
+
+        const nameChanged = currentName !== (originalRecipe.name || '');
+        const categoryChanged = currentCategory !== (originalRecipe.category || '');
+        const seriesChanged = currentSeries !== (originalRecipe.series || '');
+        const descChanged = currentDesc !== (originalRecipe.description || '');
+        const photoChanged = currentPhoto !== (originalRecipe.photo || null);
+
+        let ingredientsChanged = false;
+        const currentIngredients = selectedIngredients;
+        const originalIngredients = originalRecipe.ingredients || [];
+        if (currentIngredients.length !== originalIngredients.length) {
+            ingredientsChanged = true;
+        } else {
+            for (let i = 0; i < currentIngredients.length; i++) {
+                const a = currentIngredients[i];
+                const b = originalIngredients[i];
+                if (a.paintId !== b.paintId || a.amount !== b.amount || a.unit !== b.unit) {
+                    ingredientsChanged = true;
+                    break;
+                }
+            }
+        }
+
+        return nameChanged || categoryChanged || seriesChanged || descChanged || photoChanged || ingredientsChanged;
+    }
+
+    const name = document.getElementById('recipeName')?.value.trim() || '';
+    const category = document.getElementById('recipeCategory')?.value || '';
+    const series = document.getElementById('recipeSeries')?.value || '';
+    const description = document.getElementById('recipeDescription')?.value.trim() || '';
+
+    const hasText = !!(name || category || series || description);
+    const hasIngredients = selectedIngredients.length > 0;
+    const hasPhoto = !!recipePhotoDataUrl;
+
+    return hasText || hasIngredients || hasPhoto;
+}
+
+function performSwitch(pageId) {
+    const targetPage = document.getElementById(`${pageId}-page`);
+    if (!targetPage) {
+        console.error('❌ Сторінка не знайдена:', pageId);
+        return;
+    }
+    if (targetPage.classList.contains('active')) return;
+
+    if (isEditingRecipe && pageId !== 'new-recipe') {
+        resetEditMode();
+        clearRecipeForm();
+        clearRecipeDraft();
+    }
+
+    dom.pageContents.forEach(p => p.classList.remove('active'));
+    targetPage.classList.add('active');
+
+    dom.navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('data-page') === pageId) link.classList.add('active');
+    });
+
+    if (pageId === 'recipes') {
+        if (window.SICOMIX?.app?.renderRecipes) window.SICOMIX.app.renderRecipes();
+    } else if (pageId === 'catalog') {
+        catalogPage = 1;
+        if (window.SICOMIX?.app?.renderPaintCatalog) window.SICOMIX.app.renderPaintCatalog();
+    } else if (pageId === 'new-recipe') {
+        const seriesSelect = document.getElementById('recipeSeries');
+        if (seriesSelect && seriesSelect.options.length <= 1) populateSeriesSelect();
+        const catSelect = document.getElementById('recipeCategory');
+        if (catSelect && catSelect.options.length <= 1) populateCategoryFilters();
+        if (!isEditingRecipe) {
+            if (selectedIngredients.length === 0) loadRecipeDraft();
+            if (recipePhotoDataUrl) showPhotoPreview(recipePhotoDataUrl);
+            else resetPhotoPreview();
+        }
+        updateSeriesLockUI();
+        if (window.SICOMIX?.app?.renderIngredientsList) window.SICOMIX.app.renderIngredientsList();
+    } else if (pageId === 'pantone') {
+        if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
+    } else if (pageId === 'ral') {
+        if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
+    }
+}
+
+function switchPage(pageId) {
+    if (!pageId) return;
+
+    if (hasUnsavedChanges() && pageId !== 'new-recipe') {
+        utils.showConfirmation(
+            i18n.t('unsaved_changes_warning'),
+            i18n.t('confirmation_message'),
+            () => {
+                if (isEditingRecipe) {
+                    resetEditMode();
+                    clearRecipeForm();
+                    clearRecipeDraft();
+                } else {
+                    clearRecipeDraft();
+                }
+                performSwitch(pageId);
+            },
+            () => {}
+        );
+        return;
+    }
+
+    performSwitch(pageId);
+}
+
+function resetEditMode() {
+    isEditingRecipe = false;
+    editingRecipeId = null;
+    if (dom.saveRecipeBtn) {
+        dom.saveRecipeBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="save_recipe"></span>`;
+        i18n.applyTranslations();
+    }
+}
+
+function clearRecipeForm() {
+    document.getElementById('recipeName').value = '';
+    document.getElementById('recipeCategory').value = '';
+    document.getElementById('recipeSeries').value = '';
+    selectedSeries = '';
+    document.getElementById('recipeDescription').value = '';
+    selectedIngredients = [];
+    recipePhotoDataUrl = null;
+    resetPhotoPreview();
+    lockedSeries = null;
+    lockedCategory = null;
+    updateSeriesLockUI();
+    if (window.SICOMIX?.app?.renderIngredientsList) window.SICOMIX.app.renderIngredientsList();
+    if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
+    if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
+    resetEditMode();
 }
 
 // ---------- ГОЛОВНІ ПОДІЇ ----------
@@ -1018,12 +979,8 @@ function setupCoreEventListeners() {
         });
     }
 
-    // Обробник для кнопки "Увійти" – спочатку просто відкриває модалку,
-    // але потім updateAuthUI змінить його, якщо користувач увійшов.
     if (dom.authButton) {
         dom.authButton.addEventListener('click', () => {
-            // Якщо користувач увійшов, то обробник буде замінено на confirmLogout
-            // тому цей код спрацює тільки для виходу з системи або якщо користувач не увійшов.
             if (!window.SICOMIX?.firebase?.auth?.currentUser) {
                 if (dom.authModal) {
                     dom.authModal.classList.add('active');
@@ -1033,7 +990,6 @@ function setupCoreEventListeners() {
         });
     }
 
-    // Обробник для закриття модального вікна авторизації
     if (dom.closeAuthModal) {
         dom.closeAuthModal.addEventListener('click', () => {
             dom.authModal.classList.remove('active');
@@ -1041,7 +997,6 @@ function setupCoreEventListeners() {
         });
     }
 
-    // Обробники для кнопок всередині модального вікна
     if (dom.authLoginBtn) {
         dom.authLoginBtn.addEventListener('click', handleLogin);
     }
@@ -1082,7 +1037,6 @@ async function initApp() {
                 await loadData();
             }
             
-            // Оновлюємо інтерфейс
             updateAuthUI(user);
             
             populateSeriesSelect();
@@ -1091,6 +1045,10 @@ async function initApp() {
             updatePaintCount();
             attachAllEventListeners();
             setupCoreEventListeners();
+
+            if (window.SICOMIX?.app?.setupPdfButtons) {
+                window.SICOMIX.app.setupPdfButtons();
+            }
 
             const activePage = document.querySelector('.page-content.active');
             if (activePage) {
@@ -1119,8 +1077,11 @@ async function initApp() {
         updatePaintCount();
         attachAllEventListeners();
         setupCoreEventListeners();
-        
-        // Якщо Firebase немає, кнопка залишається "Увійти"
+
+        if (window.SICOMIX?.app?.setupPdfButtons) {
+            window.SICOMIX.app.setupPdfButtons();
+        }
+
         updateAuthUI(null);
 
         const activePage = document.querySelector('.page-content.active');
@@ -1144,9 +1105,7 @@ async function initApp() {
     }
 }
 
-// ========== ЕКСПОРТ ПУБЛІЧНИХ МЕТОДІВ (ІМЕНОВАНІ) ==========
-
-// Геттери
+// ========== ЕКСПОРТ ПУБЛІЧНИХ МЕТОДІВ ==========
 export function getRecipes() { return recipes; }
 export function getUserPaints() { return userPaints; }
 export function getPaintCatalog() { return paintCatalog; }
@@ -1161,7 +1120,6 @@ export function getRecipePhotoDataUrl() { return recipePhotoDataUrl; }
 export function getCatalogPage() { return catalogPage; }
 export function getCATALOG_PAGE_SIZE() { return CATALOG_PAGE_SIZE; }
 
-// Сеттери
 export function setRecipes(newRecipes) { recipes = newRecipes; }
 export function setUserPaints(newPaints) { userPaints = newPaints; }
 export function setPaintCatalog(newCatalog) { paintCatalog = newCatalog; }
@@ -1177,7 +1135,6 @@ export function setRecipeDraft(draft) { recipeDraft = draft; }
 export function setCatalogPage(page) { catalogPage = page; }
 export function setSelectedSeries(series) { selectedSeries = series; }
 
-// Інші функції (вже визначені вище)
 export {
     cacheDOMElements,
     loadData,
@@ -1220,10 +1177,9 @@ export {
     handleLogout
 };
 
-// Експорт констант та об'єктів, які можуть знадобитися
 export { unitMap, dom, CATALOG_PAGE_SIZE };
 
-// Для зворотної сумісності створюємо глобальний об'єкт
+// Глобальний об'єкт для зворотної сумісності
 window.SICOMIX = window.SICOMIX || {};
 window.SICOMIX.app = {
     getRecipes,
