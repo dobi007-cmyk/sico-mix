@@ -366,7 +366,7 @@ function openPantonePdfHandler(e) {
         });
 }
 
-// Експорт функцій
+// Експорт
 export {
     renderPantoneCatalog,
     showPantoneRecipeModal,
@@ -378,7 +378,6 @@ export {
     setupPdfButtons
 };
 
-// Для зворотної сумісності додаємо до глобального SICOMIX.app
 window.SICOMIX = window.SICOMIX || {};
 window.SICOMIX.app = window.SICOMIX.app || {};
 Object.assign(window.SICOMIX.app, {
