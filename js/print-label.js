@@ -626,7 +626,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 border: 0.3mm solid #ccc;
                 border-radius: 2mm;
                 padding: ${isSmall ? '1mm' : '1.5mm'};
-                font-size: ${isSmall ? '1.8mm' : '2.0mm'}; /* зменшено для великих */
+                font-size: ${isSmall ? '1.8mm' : '1.8mm'}; /* тепер однаковий для обох */
                 line-height: 1.25;
                 height: 100%;
                 display: flex;
@@ -642,7 +642,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 flex-wrap: wrap;
             }
             .pictograms {
-                font-size: ${isSmall ? '2.2mm' : '2.5mm'};
+                font-size: ${isSmall ? '2.2mm' : '2.2mm'}; /* однаковий */
                 white-space: nowrap;
             }
             .pictogram {
@@ -661,7 +661,7 @@ export function printLabelWithWeight(recipe, weightKg) {
             .distributor-info {
                 background: ${style.headerBg}20;
                 padding: ${isSmall ? '1mm' : '1.5mm'};
-                font-size: ${isSmall ? '1.8mm' : '2.0mm'}; /* зменшено для великих */
+                font-size: ${isSmall ? '1.8mm' : '1.8mm'}; /* однаковий */
                 color: black;
                 text-align: center;
                 border-top: 0.3mm solid #ccc;
