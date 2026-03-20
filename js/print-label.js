@@ -575,7 +575,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 flex-direction: column;
             }
             .product-name {
-                font-size: ${isSmall ? '4.5mm' : '5.5mm'};
+                font-size: ${isSmall ? '4.5mm' : '5.2mm'};
                 font-weight: 700;
                 color: ${style.productNameColor};
                 margin-bottom: 1mm;
@@ -593,7 +593,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 padding: ${isSmall ? '1.5mm' : '2mm'};
                 text-align: center;
                 margin: 2mm 0;
-                font-size: ${isSmall ? '5.5mm' : '6.5mm'};
+                font-size: ${isSmall ? '5.5mm' : '6mm'};
                 font-weight: 800;
                 color: ${style.weightColor};
                 display: inline-block;
@@ -606,7 +606,7 @@ export function printLabelWithWeight(recipe, weightKg) {
             }
             .tech-data {
                 margin-top: 2mm;
-                font-size: ${isSmall ? '2.5mm' : '3mm'};
+                font-size: ${isSmall ? '2.5mm' : '2.6mm'};
                 border-top: 0.3mm dashed #9ca3af;
                 padding-top: 1.5mm;
                 color: #e63946;
@@ -626,7 +626,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 border: 0.3mm solid #ccc;
                 border-radius: 2mm;
                 padding: ${isSmall ? '1mm' : '1.5mm'};
-                font-size: ${isSmall ? '1.8mm' : '1.8mm'}; /* тепер однаковий для обох */
+                font-size: ${isSmall ? '1.8mm' : '1.7mm'};
                 line-height: 1.25;
                 height: 100%;
                 display: flex;
@@ -642,7 +642,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 flex-wrap: wrap;
             }
             .pictograms {
-                font-size: ${isSmall ? '2.2mm' : '2.2mm'}; /* однаковий */
+                font-size: ${isSmall ? '2.2mm' : '2.0mm'};
                 white-space: nowrap;
             }
             .pictogram {
@@ -661,7 +661,7 @@ export function printLabelWithWeight(recipe, weightKg) {
             .distributor-info {
                 background: ${style.headerBg}20;
                 padding: ${isSmall ? '1mm' : '1.5mm'};
-                font-size: ${isSmall ? '1.8mm' : '1.8mm'}; /* однаковий */
+                font-size: ${isSmall ? '1.8mm' : '1.6mm'};
                 color: black;
                 text-align: center;
                 border-top: 0.3mm solid #ccc;
