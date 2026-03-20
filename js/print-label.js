@@ -162,17 +162,26 @@ const seriesStyles = {
     }
 };
 
+// Функція для визначення піктограм небезпеки на основі H-фраз
+function getHazardPictograms(hazardText) {
+    const pictograms = [];
+    if (hazardText.includes('H226')) pictograms.push('🔥');  // Flamme (GHS02)
+    if (hazardText.includes('H304')) pictograms.push('☠️'); // Aspiration hazard
+    if (hazardText.includes('H336')) pictograms.push('⚠️'); // Exclamation mark
+    if (hazardText.includes('H410') || hazardText.includes('H412')) pictograms.push('🌊'); // Environment
+    // Якщо є інші небезпеки – можна додати
+    return pictograms;
+}
+
 // Інформація про безпеку для кожної серії
 const safetyInfo = {
     EC: `
         <div class="safety-info">
-            <p><strong>Nazwa handlowa:</strong> EURECO EC</p>
-            <p><strong>Dystrybutor:</strong><br>
-            SICO Polska Sp. z o.o.<br>
-            ul. Annopol 3<br>
-            03-236 Warszawa</p>
+            <div class="safety-header">
+                <strong>Nazwa handlowa:</strong> EURECO EC
+                <div class="pictograms">${getHazardPictograms('H226 H336').join(' ')}</div>
+            </div>
             <p><strong>Zawiera:</strong> 1-etoksypropan-2-ol</p>
-            <p><strong>UWAGA</strong></p>
             <p><strong>H226</strong> - Łatwopalna ciecz i pary</p>
             <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy</p>
             <p><strong>P271</strong> - Stosować wyłącznie na zewnątrz lub w dobrze wentylowanym pomieszczeniu</p>
@@ -187,13 +196,11 @@ const safetyInfo = {
     `,
     CF: `
         <div class="safety-info">
-            <p><strong>Nazwa handlowa:</strong> CARTOFLEX CF</p>
-            <p><strong>Dystrybutor:</strong><br>
-            SICO Polska Sp. z o.o.<br>
-            ul. Annopol 3<br>
-            03-236 Warszawa</p>
+            <div class="safety-header">
+                <strong>Nazwa handlowa:</strong> CARTOFLEX CF
+                <div class="pictograms">${getHazardPictograms('H336').join(' ')}</div>
+            </div>
             <p><strong>Zawiera:</strong> 1-etoksypropan-2-ol</p>
-            <p><strong>UWAGA</strong></p>
             <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy.</p>
             <p><strong>P261</strong> - Unikać wdychania pyłu/dymu/gazu/mgły/par/rozpylonej cieczy.</p>
             <p><strong>P271</strong> - Stosować wyłącznie na zewnątrz lub w dobrze wentylowanym pomieszczeniu.</p>
@@ -206,13 +213,11 @@ const safetyInfo = {
     `,
     PLUV: `
         <div class="safety-info">
-            <p><strong>Nazwa handlowa:</strong> UVIPLAST PLUV</p>
-            <p><strong>Dystrybutor:</strong><br>
-            SICO Polska Sp. z o.o.<br>
-            ul. Annopol 3<br>
-            03-236 Warszawa</p>
+            <div class="safety-header">
+                <strong>Nazwa handlowa:</strong> UVIPLAST PLUV
+                <div class="pictograms">${getHazardPictograms('H226 H304 H336 H412').join(' ')}</div>
+            </div>
             <p><strong>Zawiera:</strong> Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)</p>
-            <p><strong>NIEBEZPIECZEŃSTWO</strong></p>
             <p><strong>H226</strong> - Łatwopalna ciecz i pary.</p>
             <p><strong>H304</strong> - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.</p>
             <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy.</p>
@@ -229,13 +234,11 @@ const safetyInfo = {
     `,
     PLUV_LED: `
         <div class="safety-info">
-            <p><strong>Nazwa handlowa:</strong> UVIPLAST PLUV LED</p>
-            <p><strong>Dystrybutor:</strong><br>
-            SICO Polska Sp. z o.o.<br>
-            ul. Annopol 3<br>
-            03-236 Warszawa</p>
+            <div class="safety-header">
+                <strong>Nazwa handlowa:</strong> UVIPLAST PLUV LED
+                <div class="pictograms">${getHazardPictograms('H226 H304 H336 H412').join(' ')}</div>
+            </div>
             <p><strong>Zawiera:</strong> Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)</p>
-            <p><strong>NIEBEZPIECZEŃSTWO</strong></p>
             <p><strong>H226</strong> - Łatwopalna ciecz i pary.</p>
             <p><strong>H304</strong> - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.</p>
             <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy.</p>
@@ -252,13 +255,11 @@ const safetyInfo = {
     `,
     TPP: `
         <div class="safety-info">
-            <p><strong>Nazwa handlowa:</strong> POLYPRO TPP</p>
-            <p><strong>Dystrybutor:</strong><br>
-            SICO Polska Sp. z o.o.<br>
-            ul. Annopol 3<br>
-            03-236 Warszawa</p>
+            <div class="safety-header">
+                <strong>Nazwa handlowa:</strong> POLYPRO TPP
+                <div class="pictograms">${getHazardPictograms('H226 H304 H336 H412').join(' ')}</div>
+            </div>
             <p><strong>Zawiera:</strong> Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)</p>
-            <p><strong>NIEBEZPIECZEŃSTWO</strong></p>
             <p><strong>H226</strong> - Łatwopalna ciecz i pary.</p>
             <p><strong>H304</strong> - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.</p>
             <p><strong>H336</strong> - Może wywoływać uczucie senności lub zawroty głowy.</p>
@@ -275,44 +276,40 @@ const safetyInfo = {
     `,
     AS: `
         <div class="safety-info">
-            <p><strong>Nazwa handlowa:</strong> AQUASET AS</p>
-            <p><strong>Dystrybutor:</strong><br>
-            SICO Polska Sp. z o.o.<br>
-            ul. Annopol 3<br>
-            03-236 Warszawa</p>
+            <div class="safety-header">
+                <strong>Nazwa handlowa:</strong> AQUASET AS
+                <div class="pictograms">✔️</div>
+            </div>
             <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
         </div>
     `,
     SX: `
         <div class="safety-info">
-            <p><strong>Nazwa handlowa:</strong> SICOTEX SX</p>
-            <p><strong>Dystrybutor:</strong><br>
-            SICO Polska Sp. z o.o.<br>
-            ul. Annopol 3<br>
-            03-236 Warszawa</p>
+            <div class="safety-header">
+                <strong>Nazwa handlowa:</strong> SICOTEX SX
+                <div class="pictograms">✔️</div>
+            </div>
             <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
         </div>
     `,
     OTF: `
         <div class="safety-info">
-            <p><strong>Nazwa handlowa:</strong> OPATEX OTF</p>
-            <p><strong>Dystrybutor:</strong><br>
-            SICO Polska Sp. z o.o.<br>
-            ul. Annopol 3<br>
-            03-236 Warszawa</p>
+            <div class="safety-header">
+                <strong>Nazwa handlowa:</strong> OPATEX OTF
+                <div class="pictograms">✔️</div>
+            </div>
             <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
         </div>
     `,
     SPTN: `
         <div class="safety-info">
-            <p><strong>Nazwa handlowa:</strong> SICOPLAST SPTN</p>
-            <p><strong>Dystrybutor:</strong><br>
-            SICO Polska Sp. z o.o.<br>
-            ul. Annopol 3<br>
-            03-236 Warszawa</p>
+            <div class="safety-header">
+                <strong>Nazwa handlowa:</strong> SICOPLAST SPTN
+                <div class="pictograms">✔️</div>
+            </div>
             <p>Mieszanina nie jest klasyfikowana jako niebezpieczna.</p>
             <p><em>Produkt przeznaczony wyłącznie do użytku zawodowego.</em></p>
         </div>
@@ -349,6 +346,9 @@ export function printLabelWithWeight(recipe, weightKg) {
         aspectText = props.finish?.[lang] || props.finish?.uk || '';
         dryingText = props.drying?.[lang] || props.drying?.uk || '';
     }
+    
+    // Визначаємо, чи є інформація про безпеку
+    const safetyHtml = safetyInfo[seriesId] || '';
     
     const labelHtml = `
     <!DOCTYPE html>
@@ -392,6 +392,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 display: flex;
                 flex-direction: column;
                 font-size: ${isSmall ? '3.2mm' : '3.5mm'};
+                padding: ${isSmall ? '1.5mm' : '2mm'};
             }
             .header {
                 background: ${style.headerBg};
@@ -399,6 +400,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 padding: ${isSmall ? '2mm' : '3mm'};
                 text-align: center;
                 border-bottom: 0.5mm solid ${style.headerBorder};
+                margin: -1.5mm -2mm 0 -2mm; /* розтягуємо на всю ширину */
             }
             .header .top-logo {
                 font-size: ${isSmall ? '3mm' : '3.5mm'};
@@ -421,9 +423,10 @@ export function printLabelWithWeight(recipe, weightKg) {
                 color: ${style.subColor};
             }
             .product-info {
-                padding: ${isSmall ? '2mm' : '3mm'};
-                background: #f9fafb;
+                margin-top: ${isSmall ? '2mm' : '3mm'};
                 flex: 1;
+                display: flex;
+                flex-direction: column;
                 overflow-y: auto;
             }
             .product-name {
@@ -450,6 +453,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 color: ${style.weightColor};
                 display: inline-block;
                 min-width: ${isSmall ? '40mm' : '50mm'};
+                align-self: center;
             }
             .weight-box span {
                 font-size: ${isSmall ? '3mm' : '4mm'};
@@ -475,14 +479,24 @@ export function printLabelWithWeight(recipe, weightKg) {
             }
             .safety-info {
                 margin-top: 2mm;
-                padding: ${isSmall ? '1.5mm' : '2mm'};
+                padding: ${isSmall ? '1mm' : '1.5mm'};
                 background: #f8f8f8;
                 border: 0.3mm solid #ccc;
                 border-radius: 2mm;
-                font-size: ${isSmall ? '2mm' : '2.2mm'};
+                font-size: ${isSmall ? '2mm' : '2.3mm'};
                 line-height: 1.3;
-                max-height: ${isSmall ? '30mm' : '40mm'};
+                max-height: ${isSmall ? '35mm' : '40mm'};
                 overflow-y: auto;
+            }
+            .safety-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                margin-bottom: 1mm;
+                font-weight: bold;
+            }
+            .pictograms {
+                font-size: ${isSmall ? '2.5mm' : '3mm'};
             }
             .safety-info p {
                 margin: 0.5mm 0;
@@ -496,7 +510,7 @@ export function printLabelWithWeight(recipe, weightKg) {
             .distributor-info {
                 background: ${style.headerBg}20; /* 12% прозорості */
                 padding: ${isSmall ? '1.5mm' : '2mm'};
-                font-size: ${isSmall ? '2mm' : '2.5mm'};
+                font-size: ${isSmall ? '2mm' : '2.3mm'};
                 color: black;
                 text-align: center;
                 border-top: 0.3mm solid #ccc;
@@ -506,13 +520,13 @@ export function printLabelWithWeight(recipe, weightKg) {
                 margin: 0.5mm 0;
             }
             .note-section {
-                margin: ${isSmall ? '2mm' : '3mm'};
-                font-size: ${isSmall ? '2.2mm' : '2.8mm'};
+                margin-top: ${isSmall ? '2mm' : '3mm'};
+                font-size: ${isSmall ? '2mm' : '2.5mm'};
                 color: #000000;
                 text-align: center;
                 font-weight: 500;
                 border-top: 0.3mm dashed #9ca3af;
-                padding-top: ${isSmall ? '2mm' : '3mm'};
+                padding-top: ${isSmall ? '1.5mm' : '2mm'};
             }
         </style>
     </head>
@@ -544,7 +558,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 </div>
 
                 <!-- Інформація про безпеку (залежить від серії) -->
-                ${safetyInfo[seriesId] || ''}
+                ${safetyHtml}
             </div>
 
             <!-- Інформація про дистриб'ютора (на кольоровому фоні серії) -->
