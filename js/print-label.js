@@ -1,4 +1,4 @@
-// ========== МОДУЛЬ ДРУКУ ЕТИКЕТКИ (фінальна версія) ==========
+// ========== МОДУЛЬ ДРУКУ ЕТИКЕТКИ (з офіційними піктограмами ADR/GHS) ==========
 import * as utils from './utils.js';
 import * as i18n from './i18n.js';
 
@@ -162,24 +162,43 @@ const seriesStyles = {
     }
 };
 
-// Функція для визначення піктограм небезпеки (стилізовані)
+// SVG-піктограми офіційних символів небезпеки
+const hazardSVG = {
+    // Легкозаймиста (orange square, black flame)
+    flammable: `<svg viewBox="0 0 100 100" style="width:100%; height:100%;"><rect width="100" height="100" fill="#ff8c00" stroke="#000" stroke-width="1"/><path d="M50 20 L40 45 L45 45 L35 70 L45 70 L40 85 L60 70 L55 70 L65 45 L55 45 L50 20Z" fill="black" stroke="none"/></svg>`,
+    // Токсична (white square, black skull & crossbones)
+    toxic: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="white" stroke="black" stroke-width="1"/><path d="M50 30 L30 50 L50 70 L70 50 L50 30Z" fill="black"/><circle cx="35" cy="45" r="5" fill="white"/><circle cx="65" cy="45" r="5" fill="white"/><path d="M45 65 L55 65" stroke="white" stroke-width="4"/></svg>`,
+    // Podrażnienie / uwaga (white square, black exclamation)
+    exclamation: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="white" stroke="black" stroke-width="1"/><path d="M50 25 L50 65" stroke="black" stroke-width="8"/><circle cx="50" cy="80" r="7" fill="black"/></svg>`,
+    // Środowisko (white square, dead fish & tree)
+    environment: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="white" stroke="black" stroke-width="1"/><path d="M20 70 L30 30 L50 45 L70 30 L80 70 L20 70Z" fill="none" stroke="black" stroke-width="2"/><circle cx="50" cy="55" r="8" fill="white" stroke="black"/><path d="M50 47 L50 63 M42 55 L58 55" stroke="black"/><path d="M35 75 L65 75" stroke="black" stroke-width="2"/></svg>`,
+    // Oko (eye irritant)
+    eye: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="white" stroke="black" stroke-width="1"/><circle cx="50" cy="50" r="20" fill="white" stroke="black" stroke-width="2"/><circle cx="50" cy="50" r="8" fill="black"/></svg>`,
+    // Skóra (hand with droplet)
+    skin: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="white" stroke="black" stroke-width="1"/><path d="M35 70 L50 40 L65 70 Z" fill="none" stroke="black" stroke-width="3"/><circle cx="50" cy="35" r="8" fill="white" stroke="black"/><path d="M48 75 L52 75" stroke="black" stroke-width="2"/></svg>`,
+    // Organy (lungs silhouette)
+    organs: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="white" stroke="black" stroke-width="1"/><path d="M30 60 C30 40,45 35,50 40 C55 35,70 40,70 60 C70 80,50 75,50 80 C50 75,30 80,30 60Z" fill="none" stroke="black" stroke-width="2"/></svg>`
+};
+
+// Функція для визначення піктограм на основі серії
 function getHazardPictograms(seriesId) {
-    const pictograms = {
-        EC: ['🔥', '⚠️'],
-        CF: ['⚠️'],
-        PLUV: ['🔥', '☠️', '⚠️', '🌊'],
-        PLUV_LED: ['🔥', '☠️', '⚠️', '🌊'],
-        TPP: ['🔥', '☠️', '⚠️', '🌊'],
-        AS: ['✔️'],
-        SX: ['✔️'],
-        OTF: ['✔️'],
-        SPTN: ['✔️'],
+    // Мапа: для кожної серії – масив ключів піктограм
+    const hazardMap = {
+        EC: ['flammable', 'exclamation'],
+        CF: ['exclamation'],
+        PLUV: ['flammable', 'toxic', 'exclamation', 'environment', 'eye', 'skin', 'organs'],
+        PLUV_LED: ['flammable', 'toxic', 'exclamation', 'environment', 'eye', 'skin', 'organs'],
+        TPP: ['flammable', 'toxic', 'exclamation', 'environment'],
+        AS: [],
+        SX: [],
+        OTF: [],
+        SPTN: [],
         NST: [],
         QS: [],
         SN: []
     };
-    const pics = pictograms[seriesId] || [];
-    return pics.map(p => `<span class="pictogram">${p}</span>`).join('');
+    const keys = hazardMap[seriesId] || [];
+    return keys.map(key => `<div class="pictogram">${hazardSVG[key]}</div>`).join('');
 }
 
 // Повні тексти безпеки (скорочено для зменшення висоти)
@@ -225,17 +244,23 @@ const safetyTexts = {
             hazards: [
                 "H226 - Łatwopalna ciecz i pary",
                 "H304 - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią",
+                "H319 - Działa drażniąco na oczy",
+                "H315 - Działa drażniąco na skórę",
+                "H317 - Może powodować reakcję alergiczną skóry",
                 "H336 - Może wywoływać uczucie senności lub zawroty głowy",
-                "H412 - Działa szkodliwie na organizmy wodne"
+                "H373 - Może powodować uszkodzenie narządów poprzez długotrwałe narażenie",
+                "H410 - Działa bardzo toksycznie na organizmy wodne, powodując długotrwałe skutki"
             ],
             precautions: [
                 "P210 - Przechowywać z dala od źródeł ciepła, iskier, ognia. Nie palić",
-                "P280 - Stosować rękawice ochronne/odzież ochronną/ochronę oczu",
-                "P301+P310 - W PRZYPADKU POŁKNIĘCIA: natychmiast skontaktować się z lekarzem",
-                "P303+P361+P353 - W PRZYPADKU KONTAKTU ZE SKÓRĄ: natychmiast zdjąć odzież, spłukać wodą",
-                "P304+P340 - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić na świeże powietrze",
-                "P403+P233 - Przechowywać w dobrze wentylowanym miejscu. Pojemnik szczelnie zamknięty",
-                "EUH066 - Powtarzające się narażenie może powodować wysuszanie lub pękanie skóry"
+                "P260 - Nie wdychać pyłu/dymu/gazu/mgły/par/rozpylonej cieczy",
+                "P261 - Unikać wdychania pyłu/dymu/gazu/mgły/par/rozpylonej cieczy",
+                "P264 - Dokładnie umyć po użyciu",
+                "P273 - Unikać uwolnienia do środowiska",
+                "P280 - Stosować rękawice ochronne/odzież ochronną/ochronę oczu/ochronę twarzy",
+                "P302+P352 - W PRZYPADKU KONTAKTU ZE SKÓRĄ: Umyć dużą ilością wody",
+                "P305+P351+P338 - W PRZYPADKU DOSTANIA SIĘ DO OCZU: Ostrożnie płukać wodą przez kilka minut. Wyjąć soczewki kontaktowe, jeżeli są i można je łatwo usunąć. Nadal płukać",
+                "P501 - Zawartość/pojemnik usuwać zgodnie z przepisami"
             ]
         }
     },
@@ -247,7 +272,7 @@ const safetyTexts = {
                 "H226 - Łatwopalna ciecz i pary",
                 "H304 - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią",
                 "H336 - Może wywoływać uczucie senności lub zawroty głowy",
-                "H412 - Działa szkodliwie na organizmy wodne"
+                "H412 - Działa szkodliwie na organizmy wodne, powodując długotrwałe skutki"
             ],
             precautions: [
                 "P210 - Przechowywać z dala od źródeł ciepła, iskier, ognia. Nie palić",
@@ -333,7 +358,6 @@ export function printLabelWithWeight(recipe, weightKg) {
     const safetyHtml = generateSafetyHtml(seriesId);
     const hasSafety = safetyHtml !== '';
     
-    // Компактний рядок дистриб'ютора
     const distributorText = `SICO Polska Sp. z o.o., ul. Annopol 3, 03-236 Warszawa | tel.: 00 48 22 660 48 50 (-9) | e-mail: sico@sico.pl | Producent: n.v. Sico s.a. - Belgia, n.v. SICO Screen Inks s.a. | www.sico-sko.com`;
     
     const labelHtml = `
@@ -497,24 +521,24 @@ export function printLabelWithWeight(recipe, weightKg) {
                 flex-wrap: wrap;
             }
             .pictograms {
-                font-size: ${isSmall ? '3.5mm' : '3mm'};
-                white-space: nowrap;
                 display: flex;
                 gap: 1mm;
+                flex-wrap: wrap;
+                justify-content: flex-end;
             }
             .pictogram {
+                width: ${isSmall ? '6mm' : '5.5mm'};
+                height: ${isSmall ? '6mm' : '5.5mm'};
+                background: none;
+                border-radius: 0;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                width: ${isSmall ? '4mm' : '3.8mm'};
-                height: ${isSmall ? '4mm' : '3.8mm'};
-                background: #e0e0e0;
-                border-radius: 50%;
-                font-size: ${isSmall ? '3.2mm' : '3mm'};
-                text-align: center;
-                line-height: 1;
-                color: #333;
-                font-weight: normal;
+            }
+            .pictogram svg {
+                width: 100%;
+                height: 100%;
+                display: block;
             }
             .safety-info p {
                 margin: 0.3mm 0;
@@ -556,7 +580,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 .tech-data { font-size: 2.2mm; }
                 .safety-info { font-size: 1.7mm; }
                 .distributor-info { font-size: 1.5mm; }
-                .pictogram { width: 3.5mm; height: 3.5mm; font-size: 2.8mm; }
+                .pictogram { width: 5mm; height: 5mm; }
             }
         </style>
     </head>
