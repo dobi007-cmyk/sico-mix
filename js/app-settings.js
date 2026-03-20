@@ -3,22 +3,6 @@ import * as utils from './utils.js';
 import * as i18n from './i18n.js';
 import * as app from './app-core.js';
 
-function initSettings() {
-    const currentSettings = app.getCurrentSettings();
-    const dom = app.dom;
-    if (dom.unitsSelect) dom.unitsSelect.value = currentSettings.units || 'grams';
-    if (dom.autoSaveCheckbox) dom.autoSaveCheckbox.checked = currentSettings.autoSave !== false;
-    if (dom.backupCheckbox) dom.backupCheckbox.checked = currentSettings.backup === true;
-    if (dom.languageSelect) dom.languageSelect.value = i18n.getLanguage();
-    if (dom.themeSelect) dom.themeSelect.value = currentSettings.theme || 'spectrum';
-    if (dom.catalogLayoutSelect) dom.catalogLayoutSelect.value = currentSettings.catalogLayout || 'classic';
-    
-    updateLayoutOptionsText();
-    
-    applyTheme(currentSettings.theme || 'spectrum');
-    applyCatalogLayout(currentSettings.catalogLayout || 'classic');
-}
-
 function updateLayoutOptionsText() {
     const dom = app.dom;
     if (!dom.catalogLayoutSelect) return;
@@ -35,19 +19,9 @@ function updateLayoutOptionsText() {
     }
 }
 
-function applyTheme(theme) {
-    document.body.classList.remove('theme-organic');
-    if (theme === 'organic') {
-        document.body.classList.add('theme-organic');
-    }
-}
-
-function applyCatalogLayout(layout) {
-    const dom = app.dom;
-    if (dom.paintCatalogEl) {
-        dom.paintCatalogEl.classList.remove('catalog-layout-classic', 'catalog-layout-compact', 'catalog-layout-list');
-        dom.paintCatalogEl.classList.add(`catalog-layout-${layout}`);
-    }
+function initSettings() {
+    app.initSettings();
+    updateLayoutOptionsText();
 }
 
 function saveSettings() {
@@ -80,8 +54,8 @@ function saveSettings() {
     
     updateLayoutOptionsText();
     
-    applyTheme(newTheme);
-    applyCatalogLayout(newCatalogLayout);
+    app.applyTheme(newTheme);
+    app.applyCatalogLayout(newCatalogLayout);
     
     if (document.getElementById('catalog-page')?.classList.contains('active')) {
         if (window.SICOMIX?.app?.renderPaintCatalog) {
@@ -114,8 +88,8 @@ function resetSettings() {
             
             updateLayoutOptionsText();
             
-            applyTheme(defaultSettings.theme || 'spectrum');
-            applyCatalogLayout(defaultSettings.catalogLayout || 'classic');
+            app.applyTheme(defaultSettings.theme || 'spectrum');
+            app.applyCatalogLayout(defaultSettings.catalogLayout || 'classic');
 
             if (document.getElementById('catalog-page')?.classList.contains('active')) {
                 if (window.SICOMIX?.app?.renderPaintCatalog) {
@@ -183,11 +157,8 @@ function attachSettingsEventListeners() {
     }
 }
 
-// Експорт функцій
 export {
     initSettings,
-    applyTheme,
-    applyCatalogLayout,
     saveSettings,
     resetSettings,
     clearAllData,
@@ -195,13 +166,10 @@ export {
     updateLayoutOptionsText
 };
 
-// Для зворотної сумісності додаємо до глобального SICOMIX.app
 window.SICOMIX = window.SICOMIX || {};
 window.SICOMIX.app = window.SICOMIX.app || {};
 Object.assign(window.SICOMIX.app, {
     initSettings,
-    applyTheme,
-    applyCatalogLayout,
     saveSettings,
     resetSettings,
     clearAllData,
