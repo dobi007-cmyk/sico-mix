@@ -4,6 +4,7 @@ const translations = {
         // Загальні
         "app_name": "SICO Spectrum",
         "app_subtitle": "Цифрова лабораторія кольору",
+        "app_title": "SICO Spectrum • Цифрова лабораторія кольору",
         "version": "Версія",
         "loading": "Завантаження...",
         "save": "Зберегти",
@@ -322,7 +323,7 @@ const translations = {
         "unit_l": "л",
         "unit_percent": "%",
 
-        // Стандартні категорії (ключі)
+        // Стандартні категорії
         "cat_standard": "Стандартні",
         "cat_metallic": "Металік",
         "cat_matte": "Матові",
@@ -356,7 +357,7 @@ const translations = {
         "saturday": "Субота",
         "sunday": "Неділя",
 
-        // Скорочені дні тижня
+        // Скорочені дні
         "mon": "Пн",
         "tue": "Вт",
         "wed": "Ср",
@@ -365,7 +366,7 @@ const translations = {
         "sat": "Сб",
         "sun": "Нд",
 
-        // Користувацькі категорії (для перекладу)
+        // Користувацькі категорії
         "cat_universal": "Універсальні",
         "cat_paper_cardboard": "Папір/картон",
         "cat_plastics": "Пластики",
@@ -375,8 +376,6 @@ const translations = {
 
         // Друк етикетки
         "enter_weight_kg": "Введіть вагу (кг):",
-
-        // ДОДАНО ДЛЯ ЕТИКЕТКИ
         "use": "Застосування",
         "aspect": "Вигляд",
         "drying": "Висихання",
@@ -391,11 +390,11 @@ const translations = {
         "safety_precautions": "Запобіжні заходи",
         "safety_professional_use": "Продукт призначений виключно для професійного використання."
     },
-
     en: {
-        // General
+        // Загальні (аналогічно українській, але англійською)
         "app_name": "SICO Spectrum",
         "app_subtitle": "Digital Color Laboratory",
+        "app_title": "SICO Spectrum • Digital Color Laboratory",
         "version": "Version",
         "loading": "Loading...",
         "save": "Save",
@@ -444,7 +443,7 @@ const translations = {
         "rate_app": "Rate app",
         "share_app": "Share app",
 
-        // Menu
+        // Меню
         "main_menu": "Main menu",
         "home": "Home",
         "new_recipe": "New recipe",
@@ -464,7 +463,7 @@ const translations = {
         "backup": "Backup",
         "restore": "Restore",
 
-        // Home page
+        // Головна сторінка
         "welcome_title": "Welcome to SICO Spectrum",
         "welcome_subtitle": "Digital Color Laboratory",
         "quick_actions": "Quick actions",
@@ -484,7 +483,7 @@ const translations = {
         "catalog_desc": "SICO Polska Catalog",
         "export_data": "Export",
 
-        // New recipe
+        // Новий рецепт
         "new_recipe_desc_long": "Create a new paint recipe by adding ingredients",
         "basic_info": "Basic information",
         "recipe_name": "Recipe name",
@@ -529,7 +528,7 @@ const translations = {
         "scan_error": "Scan error",
         "search_paints": "Search paints...",
 
-        // Recipes
+        // Рецепти
         "my_recipes": "My recipes",
         "my_recipes_desc_long": "View, edit and manage recipes",
         "search_recipes": "Search recipes...",
@@ -560,7 +559,7 @@ const translations = {
         "imported": "Imported",
         "no_recipes_to_export": "No recipes to export",
 
-        // Paint catalog
+        // Каталог фарб
         "paint_catalog": "Paint catalog",
         "catalog_desc_long": "Database of all available paints",
         "search_catalog": "Search catalog...",
@@ -575,7 +574,7 @@ const translations = {
         "search_results": "Search results",
         "paints_found": "Paints found",
 
-        // Add/edit paint
+        // Додавання/редагування фарби
         "add_new_paint_title": "Add new paint",
         "edit_paint": "Edit paint",
         "paint_name": "Paint name",
@@ -620,7 +619,7 @@ const translations = {
         "open_ral_pdf": "Open RAL fan deck",
         "open_pantone_pdf": "Open Pantone fan deck",
 
-        // Import/Export
+        // Імпорт/Експорт
         "import_desc": "Import recipes and catalog from files",
         "export_desc_long": "Export your data in various formats",
         "select_import_file": "Select file for import",
@@ -643,7 +642,7 @@ const translations = {
         "and": "and",
         "export_error": "Export error",
 
-        // Settings
+        // Налаштування
         "settings_desc": "Configure the system according to your needs",
         "general_settings": "General settings",
         "interface_language": "Interface language",
@@ -669,7 +668,7 @@ const translations = {
         "clear_all_data_confirmation": "Are you sure? All recipes and added paints will be deleted!",
         "data_cleared": "All data cleared",
 
-        // Modals
+        // Модальні вікна
         "confirmation": "Confirmation",
         "confirmation_message": "Are you sure?",
         "confirm_action": "Yes",
@@ -677,14 +676,14 @@ const translations = {
         "recipe_exists_title": "Recipe already exists",
         "recipe_exists_message": "A recipe with this name already exists. Replace it?",
 
-        // Sync
+        // Синхронізація
         "syncing": "Syncing...",
         "sync_complete": "Sync complete",
         "sync_error": "Sync error",
         "sync_offline": "No internet connection",
         "sync_in_progress": "Syncing...",
 
-        // Auth
+        // Авторизація
         "email": "Email",
         "password": "Password",
         "or": "or",
@@ -694,7 +693,7 @@ const translations = {
         "logged_out": "You have been logged out",
         "logout_error": "Logout error",
 
-        // Errors and messages
+        // Помилки та повідомлення
         "paints_not_found": "Paints not found",
         "unknown_error": "Unknown error",
         "network_error": "Network error",
@@ -707,14 +706,14 @@ const translations = {
         "operation_successful": "Operation successful",
         "operation_failed": "Operation failed",
 
-        // Units
+        // Одиниці
         "unit_g": "g",
         "unit_kg": "kg",
         "unit_ml": "ml",
         "unit_l": "l",
         "unit_percent": "%",
 
-        // Standard categories (keys)
+        // Стандартні категорії
         "cat_standard": "Standard",
         "cat_metallic": "Metallic",
         "cat_matte": "Matte",
@@ -725,7 +724,7 @@ const translations = {
         "cat_photochromic": "Photochromic",
         "cat_special": "Special",
 
-        // Months
+        // Місяці
         "january": "January",
         "february": "February",
         "march": "March",
@@ -739,7 +738,7 @@ const translations = {
         "november": "November",
         "december": "December",
 
-        // Days
+        // Дні
         "monday": "Monday",
         "tuesday": "Tuesday",
         "wednesday": "Wednesday",
@@ -747,8 +746,6 @@ const translations = {
         "friday": "Friday",
         "saturday": "Saturday",
         "sunday": "Sunday",
-
-        // Short days
         "mon": "Mon",
         "tue": "Tue",
         "wed": "Wed",
@@ -757,7 +754,7 @@ const translations = {
         "sat": "Sat",
         "sun": "Sun",
 
-        // Custom categories (for translation)
+        // Користувацькі категорії
         "cat_universal": "Universal",
         "cat_paper_cardboard": "Paper/Cardboard",
         "cat_plastics": "Plastics",
@@ -765,10 +762,8 @@ const translations = {
         "cat_uv": "UV paints",
         "cat_uv_led": "UV paints (LED)",
 
-        // Label printing
+        // Друк етикетки
         "enter_weight_kg": "Enter weight (kg):",
-
-        // ADDED FOR LABEL
         "use": "Application",
         "aspect": "Appearance",
         "drying": "Drying",
@@ -783,11 +778,11 @@ const translations = {
         "safety_precautions": "Precautionary statements",
         "safety_professional_use": "Product intended for professional use only."
     },
-
     pl: {
-        // Ogólne
+        // Загальні (польською)
         "app_name": "SICO Spectrum",
         "app_subtitle": "Cyfrowe laboratorium kolorów",
+        "app_title": "SICO Spectrum • Cyfrowe laboratorium kolorów",
         "version": "Wersja",
         "loading": "Ładowanie...",
         "save": "Zapisz",
@@ -836,7 +831,7 @@ const translations = {
         "rate_app": "Oceń aplikację",
         "share_app": "Udostępnij aplikację",
 
-        // Menu
+        // Меню
         "main_menu": "Menu główne",
         "home": "Strona główna",
         "new_recipe": "Nowa receptura",
@@ -856,7 +851,7 @@ const translations = {
         "backup": "Kopia zapasowa",
         "restore": "Przywróć",
 
-        // Strona główna
+        // Головна сторінка
         "welcome_title": "Witaj w SICO Spectrum",
         "welcome_subtitle": "Cyfrowe laboratorium kolorów",
         "quick_actions": "Szybkie akcje",
@@ -1106,7 +1101,7 @@ const translations = {
         "unit_l": "l",
         "unit_percent": "%",
 
-        // Standardowe kategorie (klucze)
+        // Standardowe kategorie
         "cat_standard": "Standardowe",
         "cat_metallic": "Metaliczne",
         "cat_matte": "Matowe",
@@ -1139,8 +1134,6 @@ const translations = {
         "friday": "Piątek",
         "saturday": "Sobota",
         "sunday": "Niedziela",
-
-        // Skrócone dni
         "mon": "Pon",
         "tue": "Wt",
         "wed": "Śr",
@@ -1149,7 +1142,7 @@ const translations = {
         "sat": "Sob",
         "sun": "Niedz",
 
-        // Niestandardowe kategorie (do tłumaczenia)
+        // Niestandardowe kategorie
         "cat_universal": "Uniwersalne",
         "cat_paper_cardboard": "Papier/Tektura",
         "cat_plastics": "Tworzywa sztuczne",
@@ -1159,8 +1152,6 @@ const translations = {
 
         // Drukowanie etykiety
         "enter_weight_kg": "Wprowadź wagę (kg):",
-
-        // DODANE DLA ETYKIETY
         "use": "Zastosowanie",
         "aspect": "Wygląd",
         "drying": "Schnięcie",
@@ -1274,6 +1265,9 @@ export function applyTranslations() {
         const key = el.getAttribute('data-i18n-value');
         if (key) el.value = t(key);
     });
+    
+    // Оновлення заголовка сторінки
+    document.title = t('app_title');
 }
 
 export function initI18n() {
