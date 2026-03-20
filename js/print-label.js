@@ -182,7 +182,7 @@ function getHazardPictograms(seriesId) {
     return pics.map(p => `<span class="pictogram">${p}</span>`).join('');
 }
 
-// Тексти безпеки для кожної серії (українська, англійська, польська)
+// Повні тексти безпеки для кожної серії (як на фото)
 const safetyTexts = {
     EC: {
         uk: {
@@ -241,7 +241,9 @@ const safetyTexts = {
         uk: {
             name: "CARTOFLEX CF",
             contains: "1-етоксипропан-2-ол",
-            hazards: ["H336 - Може викликати сонливість або запаморочення"],
+            hazards: [
+                "H336 - Може викликати сонливість або запаморочення"
+            ],
             precautions: [
                 "P261 - Уникати вдихання пилу/диму/газу/туману/парів/аерозолю",
                 "P271 - Використовувати тільки на відкритому повітрі або в добре вентильованому приміщенні",
@@ -397,72 +399,24 @@ const safetyTexts = {
         }
     },
     AS: {
-        uk: {
-            name: "AQUASET AS",
-            nonHazardous: true,
-            text: "Суміш не класифікується як небезпечна."
-        },
-        en: {
-            name: "AQUASET AS",
-            nonHazardous: true,
-            text: "The mixture is not classified as hazardous."
-        },
-        pl: {
-            name: "AQUASET AS",
-            nonHazardous: true,
-            text: "Mieszanina nie jest klasyfikowana jako niebezpieczna."
-        }
+        uk: { name: "AQUASET AS", nonHazardous: true, text: "Суміш не класифікується як небезпечна." },
+        en: { name: "AQUASET AS", nonHazardous: true, text: "The mixture is not classified as hazardous." },
+        pl: { name: "AQUASET AS", nonHazardous: true, text: "Mieszanina nie jest klasyfikowana jako niebezpieczna." }
     },
     SX: {
-        uk: {
-            name: "SICOTEX SX",
-            nonHazardous: true,
-            text: "Суміш не класифікується як небезпечна."
-        },
-        en: {
-            name: "SICOTEX SX",
-            nonHazardous: true,
-            text: "The mixture is not classified as hazardous."
-        },
-        pl: {
-            name: "SICOTEX SX",
-            nonHazardous: true,
-            text: "Mieszanina nie jest klasyfikowana jako niebezpieczna."
-        }
+        uk: { name: "SICOTEX SX", nonHazardous: true, text: "Суміш не класифікується як небезпечна." },
+        en: { name: "SICOTEX SX", nonHazardous: true, text: "The mixture is not classified as hazardous." },
+        pl: { name: "SICOTEX SX", nonHazardous: true, text: "Mieszanina nie jest klasyfikowana jako niebezpieczna." }
     },
     OTF: {
-        uk: {
-            name: "OPATEX OTF",
-            nonHazardous: true,
-            text: "Суміш не класифікується як небезпечна."
-        },
-        en: {
-            name: "OPATEX OTF",
-            nonHazardous: true,
-            text: "The mixture is not classified as hazardous."
-        },
-        pl: {
-            name: "OPATEX OTF",
-            nonHazardous: true,
-            text: "Mieszanina nie jest klasyfikowana jako niebezpieczna."
-        }
+        uk: { name: "OPATEX OTF", nonHazardous: true, text: "Суміш не класифікується як небезпечна." },
+        en: { name: "OPATEX OTF", nonHazardous: true, text: "The mixture is not classified as hazardous." },
+        pl: { name: "OPATEX OTF", nonHazardous: true, text: "Mieszanina nie jest klasyfikowana jako niebezpieczna." }
     },
     SPTN: {
-        uk: {
-            name: "SICOPLAST SPTN",
-            nonHazardous: true,
-            text: "Суміш не класифікується як небезпечна."
-        },
-        en: {
-            name: "SICOPLAST SPTN",
-            nonHazardous: true,
-            text: "The mixture is not classified as hazardous."
-        },
-        pl: {
-            name: "SICOPLAST SPTN",
-            nonHazardous: true,
-            text: "Mieszanina nie jest klasyfikowana jako niebezpieczna."
-        }
+        uk: { name: "SICOPLAST SPTN", nonHazardous: true, text: "Суміш не класифікується як небезпечна." },
+        en: { name: "SICOPLAST SPTN", nonHazardous: true, text: "The mixture is not classified as hazardous." },
+        pl: { name: "SICOPLAST SPTN", nonHazardous: true, text: "Mieszanina nie jest klasyfikowana jako niebezpieczna." }
     }
 };
 
@@ -493,14 +447,8 @@ function generateSafetyHtml(seriesId, lang) {
                 <div class="pictograms">${getHazardPictograms(seriesId)}</div>
             </div>
             <p><strong>${i18n.t('safety_contains')}:</strong> ${langData.contains}</p>
-            <div class="hazards">
-                <strong>${i18n.t('safety_hazards')}</strong>
-                ${hazardsHtml}
-            </div>
-            <div class="precautions">
-                <strong>${i18n.t('safety_precautions')}</strong>
-                ${precautionsHtml}
-            </div>
+            <div class="hazards"><strong>${i18n.t('safety_hazards')}</strong> ${hazardsHtml}</div>
+            <div class="precautions"><strong>${i18n.t('safety_precautions')}</strong> ${precautionsHtml}</div>
             <p><em>${i18n.t('safety_professional_use')}</em></p>
         </div>
     `;
@@ -526,7 +474,6 @@ export function printLabelWithWeight(recipe, weightKg) {
     
     // Базові технічні дані – тільки основні
     let useText = '', aspectText = '', dryingText = '';
-    
     if (series && series.properties) {
         const props = series.properties;
         useText = props.type?.[lang] || props.type?.uk || '';
@@ -562,7 +509,6 @@ export function printLabelWithWeight(recipe, weightKg) {
                 size: ${labelWidth} ${labelHeight};
                 margin: 0;
             }
-            /* Примусовий друк фонових кольорів */
             @media print {
                 .label, .header, .distributor-info, .safety-info {
                     -webkit-print-color-adjust: exact;
@@ -588,7 +534,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 padding: ${isSmall ? '2mm' : '2.5mm'};
                 text-align: center;
                 border-bottom: 0.5mm solid ${style.headerBorder};
-                margin: -1.5mm -2mm 0 -2mm; /* розтягуємо на всю ширину */
+                margin: -1.5mm -2mm 0 -2mm;
             }
             .header .top-logo {
                 font-size: ${isSmall ? '2.8mm' : '3.2mm'};
@@ -615,13 +561,18 @@ export function printLabelWithWeight(recipe, weightKg) {
                 flex: 1;
                 display: flex;
                 gap: ${isSmall ? '2mm' : '3mm'};
+                min-height: 0;
             }
             .product-details {
                 flex: ${hasSafety ? '1.5' : '2'};
+                display: flex;
+                flex-direction: column;
             }
             .safety-aside {
                 flex: 1;
                 ${hasSafety ? '' : 'display: none;'}
+                display: flex;
+                flex-direction: column;
             }
             .product-name {
                 font-size: ${isSmall ? '4.5mm' : '5.5mm'};
@@ -658,14 +609,14 @@ export function printLabelWithWeight(recipe, weightKg) {
                 font-size: ${isSmall ? '2.5mm' : '3mm'};
                 border-top: 0.3mm dashed #9ca3af;
                 padding-top: 1.5mm;
-                color: #e63946; /* червоний колір для значень */
+                color: #e63946;
             }
             .tech-item {
                 margin-bottom: 0.8mm;
                 line-height: 1.3;
             }
             .tech-item strong {
-                color: black; /* мітки чорні */
+                color: black;
                 font-weight: 600;
                 display: inline-block;
                 min-width: ${isSmall ? '14mm' : '18mm'};
@@ -680,6 +631,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 height: 100%;
                 display: flex;
                 flex-direction: column;
+                overflow-y: auto; /* scroll only if needed, but we try to avoid */
             }
             .safety-header {
                 display: flex;
@@ -702,9 +654,6 @@ export function printLabelWithWeight(recipe, weightKg) {
             }
             .safety-info strong {
                 font-weight: 600;
-            }
-            .safety-info em {
-                font-style: italic;
             }
             .hazards, .precautions {
                 margin-top: 1mm;
@@ -732,7 +681,6 @@ export function printLabelWithWeight(recipe, weightKg) {
                 padding-top: 1mm;
             }
             @media (max-width: 110mm) {
-                /* Для маленьких етикеток трохи зменшуємо шрифти */
                 .product-name { font-size: 4mm; }
                 .weight-box { font-size: 5mm; min-width: 30mm; }
                 .tech-data { font-size: 2.2mm; }
