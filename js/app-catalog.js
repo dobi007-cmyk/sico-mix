@@ -3,71 +3,30 @@ import * as utils from './utils.js';
 import * as i18n from './i18n.js';
 import * as app from './app-core.js';
 
-// Прапорець для запобігання одночасним завантаженням
 let isLoadingMore = false;
 
-// Обробник для кнопки "Завантажити ще" (глобальне делегування)
+function attachCatalogEventListeners() {
+    const dom = app.dom;
+    if (!dom.paintCatalogEl) return;
+
+    dom.paintCatalogEl.removeEventListener('click', catalogClickHandler);
+    dom.paintCatalogEl.addEventListener('click', catalogClickHandler);
+    
+    document.removeEventListener('click', globalLoadMoreHandler);
+    document.addEventListener('click', globalLoadMoreHandler);
+}
+
 function globalLoadMoreHandler(e) {
     const btn = e.target.closest('#loadMoreCatalogBtn');
     if (!btn) return;
     e.preventDefault();
-    
-    if (isLoadingMore) return; // запобігаємо подвійним клікам
+    if (isLoadingMore) return;
     isLoadingMore = true;
-    
     const newPage = app.getCatalogPage() + 1;
     app.setCatalogPage(newPage);
     renderPaintCatalog(true).finally(() => {
         isLoadingMore = false;
     });
-}
-
-// Додаємо глобальний обробник один раз при завантаженні модуля
-document.addEventListener('click', globalLoadMoreHandler);
-
-function attachCatalogEventListeners() {
-    console.log('📚 attachCatalogEventListeners викликано');
-    const dom = app.dom;
-    if (!dom.paintCatalogEl) return;
-
-    // Делегування на контейнер каталогу для внутрішніх кнопок
-    dom.paintCatalogEl.removeEventListener('click', catalogClickHandler);
-    dom.paintCatalogEl.addEventListener('click', catalogClickHandler);
-    
-    // Кнопка "Завантажити ще" тепер обробляється глобально, тому окремо не чіпляємо
-    // Просто оновлюємо її видимість
-    updateLoadMoreButtonVisibility();
-}
-
-function updateLoadMoreButtonVisibility() {
-    const loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
-    if (!loadMoreBtn) return;
-    
-    const allSeries = app.getUniqueSeries();
-    const search = document.getElementById('catalogSearch')?.value?.toLowerCase() || '';
-    const lang = i18n.getLanguage();
-    const paintCatalog = app.getPaintCatalog();
-    
-    let seriesWithPaints = allSeries.filter(series => {
-        if (!series || !series.id) return false;
-        let seriesPaints = paintCatalog.filter(p => p && p.series === series.id);
-        if (search) {
-            seriesPaints = seriesPaints.filter(p => {
-                if (!p) return false;
-                const paintName = p.displayName?.[lang] || p.name || '';
-                return paintName.toLowerCase().includes(search) ||
-                       (p.article && p.article.toLowerCase().includes(search));
-            });
-        }
-        return seriesPaints.length > 0;
-    });
-    
-    const catalogPage = app.getCatalogPage();
-    const pageSize = app.getCATALOG_PAGE_SIZE();
-    const endIndex = catalogPage * pageSize;
-    const hasMore = seriesWithPaints.length > endIndex;
-    
-    loadMoreBtn.style.display = hasMore ? 'inline-block' : 'none';
 }
 
 function catalogClickHandler(e) {
@@ -191,7 +150,6 @@ function renderPaintCatalog(append = false) {
             const paginatedSeries = seriesWithPaints.slice(startIndex, endIndex);
             const hasMore = seriesWithPaints.length > endIndex;
 
-            // Оновлюємо видимість кнопки
             const loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
             if (loadMoreBtn) {
                 loadMoreBtn.style.display = hasMore ? 'inline-block' : 'none';
@@ -313,7 +271,6 @@ function renderPaintCatalog(append = false) {
                 dom.paintCatalogEl.innerHTML = html;
             }
 
-            // Після додавання HTML знову прив'язуємо обробники
             attachCatalogEventListeners();
             i18n.applyTranslations();
             resolve();
@@ -423,11 +380,11 @@ function showPaintDetails(paint) {
                 </div>
             </div>
             <table style="width: 100%; border-collapse: collapse;">
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('category')}</th><td>${i18n.translateCategoryName(paint.category)}</td></tr>
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('series')}</th><td>${utils.escapeHtml(paint.series)}</td></tr>
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('manufacturer')}</th><td>${utils.escapeHtml(paint.manufacturer || 'SICO')}</td></tr>
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('color_code')}</th><td>${utils.escapeHtml(paint.color)}</td></tr>
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('article')}</th><td>${utils.escapeHtml(paint.article || '-')}</td></tr>
+                <tr><th style="text-align: left; padding: 8px;">${i18n.t('category')}</th> <td>${i18n.translateCategoryName(paint.category)}</td> </tr>
+                <tr><th style="text-align: left; padding: 8px;">${i18n.t('series')}</th> <td>${utils.escapeHtml(paint.series)}</td> </tr>
+                <tr><th style="text-align: left; padding: 8px;">${i18n.t('manufacturer')}</th> <td>${utils.escapeHtml(paint.manufacturer || 'SICO')}</td> </tr>
+                <tr><th style="text-align: left; padding: 8px;">${i18n.t('color_code')}</th> <td>${utils.escapeHtml(paint.color)}</td> </tr>
+                <tr><th style="text-align: left; padding: 8px;">${i18n.t('article')}</th> <td>${utils.escapeHtml(paint.article || '-')}</td> </tr>
             </table>
             <p style="margin-top: 20px;">${utils.escapeHtml(paint.description || '')}</p>
         </div>
@@ -562,7 +519,6 @@ function updatePaintButton(paintId, isInRecipe) {
     }
 }
 
-// Експорт функцій
 export {
     renderPaintCatalog,
     openSeriesDetailsModal,
@@ -576,7 +532,6 @@ export {
     updatePaintButton
 };
 
-// Для зворотної сумісності додаємо до глобального SICOMIX.app
 window.SICOMIX = window.SICOMIX || {};
 window.SICOMIX.app = window.SICOMIX.app || {};
 Object.assign(window.SICOMIX.app, {
