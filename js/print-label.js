@@ -211,7 +211,7 @@ function getHazardPictogramsImg(seriesId) {
     return `<div class="pictograms">${imgHtml}</div>`;
 }
 
-// Повні тексти безпеки для кожної серії (без змін)
+// Повні тексти безпеки для кожної серії (залишаються без змін)
 const safetyTexts = {
     EC: {
         uk: {
@@ -481,7 +481,7 @@ function generateSafetyHtml(seriesId, lang) {
     `;
 }
 
-// Основна функція друку етикетки (універсальний розмір)
+// Основна функція друку етикетки
 export function printLabelWithWeight(recipe, weightKg) {
     const lang = i18n.getLanguage();
     const date = new Date().toLocaleDateString(lang);
@@ -668,11 +668,11 @@ export function printLabelWithWeight(recipe, weightKg) {
                 white-space: nowrap;
                 display: inline-flex;
                 align-items: center;
-                gap: 1mm;
+                gap: 2mm; /* збільшено для великих піктограм */
             }
             .pictogram-img {
-                width: 8mm;
-                height: 8mm;
+                width: 24mm; /* збільшено в 3 рази */
+                height: 24mm;
                 object-fit: contain;
                 display: inline-block;
                 vertical-align: middle;
@@ -714,7 +714,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 .tech-data { font-size: 2.2mm; }
                 .safety-info { font-size: 1.5mm; }
                 .distributor-info { font-size: 1.5mm; }
-                .pictogram-img { width: 7mm; height: 7mm; }
+                .pictogram-img { width: 21mm; height: 21mm; }
             }
         </style>
     </head>
