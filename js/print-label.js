@@ -175,19 +175,19 @@ const seriesStyles = {
     }
 };
 
-// Функція для отримання піктограм GHS (PNG)
+// Функція для отримання піктограм GHS (PNG) – з оновленим маппінгом
 function getHazardPictogramsImg(seriesId) {
     const pictogramsMap = {
-        EC: ['ghs02'],
-        CF: ['ghs02'],
-        PLUV: ['ghs02', 'ghs08', 'ghs09'],
-        PLUV_LED: ['ghs02', 'ghs08', 'ghs09'],
-        TPP: ['ghs02', 'ghs08', 'ghs09'],
+        EC: ['ghs02', 'ghs07'],               // GHS02 + GHS07
+        CF: ['ghs07'],                        // GHS07
+        PLUV: ['ghs07', 'ghs08', 'ghs09'],    // GHS07 + GHS08 + GHS09
+        PLUV_LED: ['ghs07', 'ghs08', 'ghs09'],
+        TPP: ['ghs07', 'ghs02', 'ghs08'],     // GHS07 + GHS02 + GHS08
         AS: [],
         SX: [],
         OTF: [],
         SPTN: [],
-        NST: ['ghs02'],
+        NST: ['ghs02'],                       // без змін
         QS: ['ghs02'],
         SN: ['ghs02']
     };
@@ -211,7 +211,7 @@ function getHazardPictogramsImg(seriesId) {
     return `<div class="pictograms">${imgHtml}</div>`;
 }
 
-// Повні тексти безпеки для кожної серії
+// Повні тексти безпеки для кожної серії (без змін)
 const safetyTexts = {
     EC: {
         uk: {
