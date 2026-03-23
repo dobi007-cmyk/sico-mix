@@ -614,7 +614,7 @@ function startExport() {
     }
 }
 
-// ---------- ФУНКЦІЇ АВТОРИЗАЦІЇ ----------
+/ ---------- ФУНКЦІЇ АВТОРИЗАЦІЇ (виправлені) ----------
 async function handleLogin() {
     const email = dom.authEmail?.value.trim();
     const password = dom.authPassword?.value.trim();
@@ -633,6 +633,9 @@ async function handleLogin() {
         utils.showNotification(i18n.t('login_success'), 'success');
         dom.authModal?.classList.remove('active');
         document.body.style.overflow = 'auto';
+        // Очистимо поля після входу
+        dom.authEmail.value = '';
+        dom.authPassword.value = '';
     } catch (error) {
         console.error('Помилка входу:', error);
         utils.showNotification(error.message || i18n.t('login_error'), 'error');
@@ -657,6 +660,8 @@ async function handleSignup() {
         utils.showNotification(i18n.t('signup_success'), 'success');
         dom.authModal?.classList.remove('active');
         document.body.style.overflow = 'auto';
+        dom.authEmail.value = '';
+        dom.authPassword.value = '';
     } catch (error) {
         console.error('Помилка реєстрації:', error);
         utils.showNotification(error.message || i18n.t('signup_error'), 'error');
@@ -683,26 +688,39 @@ async function handleGoogleSignIn() {
 function updateAuthUI(user) {
     if (!dom.authButton) return;
     
+    // Видаляємо всі попередні обробники, щоб уникнути конфліктів
+    const newButton = dom.authButton.cloneNode(true);
+    dom.authButton.parentNode.replaceChild(newButton, dom.authButton);
+    dom.authButton = newButton;
+    
     if (user) {
+        // Користувач увійшов
         const displayName = user.email || user.displayName || 'Користувач';
         dom.authButton.innerHTML = `<i class="fas fa-user-circle"></i> <span>${displayName}</span>`;
-        dom.authButton.removeEventListener('click', handleLogout);
-        dom.authButton.removeEventListener('click', openAuthModal);
+        // Обробник для виходу (з підтвердженням)
         dom.authButton.addEventListener('click', confirmLogout);
+        console.log('🔐 UI оновлено: користувач увійшов');
     } else {
+        // Користувач вийшов
         dom.authButton.innerHTML = `<i class="fas fa-sign-in-alt"></i> <span data-i18n="login">Увійти</span>`;
-        i18n.applyTranslations();
-        dom.authButton.removeEventListener('click', handleLogout);
-        dom.authButton.removeEventListener('click', confirmLogout);
+        i18n.applyTranslations(); // оновити текст "Увійти"
+        // Обробник для відкриття модального вікна
         dom.authButton.addEventListener('click', openAuthModal);
+        console.log('🔓 UI оновлено: користувач вийшов, кнопка "Увійти" готова');
     }
 }
 
 function openAuthModal() {
-    if (dom.authModal) {
-        dom.authModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+    if (!dom.authModal) {
+        console.error('❌ authModal не знайдено в DOM');
+        return;
     }
+    console.log('🔄 Відкриваємо модальне вікно авторизації');
+    dom.authModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    // Очищаємо поля для нового входу
+    if (dom.authEmail) dom.authEmail.value = '';
+    if (dom.authPassword) dom.authPassword.value = '';
 }
 
 function confirmLogout() {
@@ -715,6 +733,7 @@ function confirmLogout() {
                 if (!auth) throw new Error('Firebase auth not initialized');
                 await auth.signOut();
                 utils.showNotification(i18n.t('logged_out'), 'success');
+                console.log('✅ Користувач вийшов');
             } catch (error) {
                 console.error('Помилка виходу:', error);
                 utils.showNotification(error.message || i18n.t('logout_error'), 'error');
