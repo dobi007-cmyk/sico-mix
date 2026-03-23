@@ -175,7 +175,7 @@ const seriesStyles = {
     }
 };
 
-// Функція для отримання піктограм GHS (PNG) – з оновленим маппінгом
+// Функція для отримання піктограм GHS (PNG)
 function getHazardPictogramsImg(seriesId) {
     const pictogramsMap = {
         EC: ['ghs02', 'ghs07'],
@@ -506,6 +506,25 @@ export function printLabelWithWeight(recipe, weightKg) {
     const safetyHtml = generateSafetyHtml(seriesId, lang);
     const hasSafety = safetyHtml !== '';
     
+    // Текст для кнопки закриття та повідомлення – залежно від мови
+    const closeButtonText = {
+        uk: '✖ Закрити',
+        pl: '✖ Zamknij',
+        en: '✖ Close'
+    }[lang] || '✖ Zamknij';
+    
+    const fallbackMessage = {
+        uk: '✖ Вікно не вдалося закрити автоматично. Будь ласка, закрийте цю вкладку вручну.',
+        pl: '✖ Nie udało się zamknąć okna automatycznie. Proszę zamknąć tę kartę ręcznie.',
+        en: '✖ Could not close window automatically. Please close this tab manually.'
+    }[lang] || '✖ Nie udało się zamknąć okna automatycznie. Proszę zamknąć tę kartę ręcznie.';
+    
+    const tryAgainText = {
+        uk: 'Спробувати ще раз',
+        pl: 'Spróbuj ponownie',
+        en: 'Try again'
+    }[lang] || 'Spróbuj ponownie';
+    
     const labelHtml = `
     <!DOCTYPE html>
     <html>
@@ -562,15 +581,19 @@ export function printLabelWithWeight(recipe, weightKg) {
                 color: white;
                 border: none;
                 border-radius: 4mm;
-                padding: 2mm 4mm;
-                font-size: 2.8mm;
+                padding: 3mm 5mm;
+                font-size: 3mm;
                 font-weight: bold;
                 cursor: pointer;
                 z-index: 100;
                 box-shadow: 0 1mm 2mm rgba(0,0,0,0.2);
+                transition: all 0.2s;
+                min-width: 15mm;
+                text-align: center;
             }
             .close-btn:active {
                 background: #b91c1c;
+                transform: scale(0.95);
             }
             .header {
                 background: ${style.headerBg};
@@ -738,13 +761,29 @@ export function printLabelWithWeight(recipe, weightKg) {
                 .safety-info { font-size: 1.5mm; }
                 .distributor-info { font-size: 1.5mm; }
                 .pictogram-img { width: 21mm; height: 21mm; }
-                .close-btn { font-size: 2.5mm; padding: 1.5mm 3mm; }
+                .close-btn { font-size: 2.8mm; padding: 2.5mm 4mm; min-width: 13mm; }
             }
         </style>
+        <script>
+            const closeBtnText = ${JSON.stringify(closeButtonText)};
+            const fallbackMsg = ${JSON.stringify(fallbackMessage)};
+            const tryAgainText = ${JSON.stringify(tryAgainText)};
+            
+            function closeWindow() {
+                if (window.close) {
+                    window.close();
+                }
+                setTimeout(() => {
+                    if (!window.closed) {
+                        document.body.innerHTML = '<div style="text-align:center; margin-top:20mm; font-family:Inter,sans-serif;"><p style="font-size:5mm;">' + fallbackMsg + '</p><button onclick="window.close();" style="margin-top:10mm; padding:3mm 6mm; font-size:4mm; background:#e63946; color:white; border:none; border-radius:3mm;">' + tryAgainText + '</button></div>';
+                    }
+                }, 200);
+            }
+        </script>
     </head>
     <body>
         <div class="label">
-            <button class="close-btn" onclick="window.close();">✖ Zamknij</button>
+            <button class="close-btn" onclick="closeWindow();">${closeButtonText}</button>
             <div class="header">
                 <div class="top-logo">SICO Screen Inks</div>
                 <h1>${style.seriesDisplay}</h1>
