@@ -1168,7 +1168,7 @@ const translations = {
     }
 };
 
-let currentLanguage = 'uk';
+let currentLanguage = 'pl';
 
 export function t(key, params = {}) {
     const lang = currentLanguage;
