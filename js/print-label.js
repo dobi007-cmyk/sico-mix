@@ -178,16 +178,16 @@ const seriesStyles = {
 // Функція для отримання піктограм GHS (PNG) – з оновленим маппінгом
 function getHazardPictogramsImg(seriesId) {
     const pictogramsMap = {
-        EC: ['ghs02', 'ghs07'],               // GHS02 + GHS07
-        CF: ['ghs07'],                        // GHS07
-        PLUV: ['ghs07', 'ghs08', 'ghs09'],    // GHS07 + GHS08 + GHS09
+        EC: ['ghs02', 'ghs07'],
+        CF: ['ghs07'],
+        PLUV: ['ghs07', 'ghs08', 'ghs09'],
         PLUV_LED: ['ghs07', 'ghs08', 'ghs09'],
-        TPP: ['ghs07', 'ghs02', 'ghs08'],     // GHS07 + GHS02 + GHS08
+        TPP: ['ghs07', 'ghs02', 'ghs08'],
         AS: [],
         SX: [],
         OTF: [],
         SPTN: [],
-        NST: ['ghs02'],                       // без змін
+        NST: ['ghs02'],
         QS: ['ghs02'],
         SN: ['ghs02']
     };
@@ -481,14 +481,14 @@ function generateSafetyHtml(seriesId, lang) {
     `;
 }
 
-// Основна функція друку етикетки
+// Основна функція друку етикетки (універсальний розмір)
 export function printLabelWithWeight(recipe, weightKg) {
     const lang = i18n.getLanguage();
     const date = new Date().toLocaleDateString(lang);
     
-    const isSmall = weightKg <= 2;
-    const labelWidth = isSmall ? '104mm' : '147mm';
-    const labelHeight = isSmall ? '100mm' : '105mm';
+    // Універсальний розмір для будь-якої ваги
+    const labelWidth = '147mm';
+    const labelHeight = '105mm';
     
     const seriesId = recipe.series;
     const allSeries = window.SICOMIX?.data?.series || [];
@@ -546,26 +546,26 @@ export function printLabelWithWeight(recipe, weightKg) {
                 border: 0.3mm solid #ccc;
                 display: flex;
                 flex-direction: column;
-                font-size: ${isSmall ? '3mm' : '3.3mm'};
-                padding: ${isSmall ? '1.5mm' : '2mm'} ${isSmall ? '2mm' : '3mm'};
+                font-size: 3.3mm;
+                padding: 2mm 3mm;
             }
             .header {
                 background: ${style.headerBg};
                 color: white;
-                padding: ${isSmall ? '2mm' : '2.5mm'};
+                padding: 2.5mm;
                 text-align: center;
                 border-bottom: 0.5mm solid ${style.headerBorder};
-                margin: -1.5mm -2mm 0 -2mm;
+                margin: -2mm -3mm 0 -3mm;
             }
             .header .top-logo {
-                font-size: ${isSmall ? '2.8mm' : '3.2mm'};
+                font-size: 3.2mm;
                 font-weight: 500;
                 letter-spacing: 1px;
                 margin-bottom: 1mm;
                 color: rgba(255,255,255,0.9);
             }
             .header h1 {
-                font-size: ${isSmall ? '4mm' : '5mm'};
+                font-size: 5mm;
                 font-weight: 800;
                 text-transform: uppercase;
                 margin-bottom: 0.5mm;
@@ -573,15 +573,15 @@ export function printLabelWithWeight(recipe, weightKg) {
                 line-height: 1.2;
             }
             .header .sub {
-                font-size: ${isSmall ? '2.2mm' : '2.7mm'};
+                font-size: 2.7mm;
                 font-weight: 500;
                 color: ${style.subColor};
             }
             .product-info {
-                margin-top: ${isSmall ? '2mm' : '2.5mm'};
+                margin-top: 2.5mm;
                 flex: 1;
                 display: flex;
-                gap: ${isSmall ? '2mm' : '3mm'};
+                gap: 3mm;
                 min-height: 0;
             }
             .product-details {
@@ -596,7 +596,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 flex-direction: column;
             }
             .product-name {
-                font-size: ${isSmall ? '4.5mm' : '5.2mm'};
+                font-size: 5.2mm;
                 font-weight: 700;
                 color: ${style.productNameColor};
                 margin-bottom: 1mm;
@@ -604,7 +604,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 text-align: center;
             }
             .product-meta {
-                font-size: ${isSmall ? '2.2mm' : '2.8mm'};
+                font-size: 2.8mm;
                 color: #000000;
                 margin-bottom: 2mm;
                 text-align: center;
@@ -613,23 +613,23 @@ export function printLabelWithWeight(recipe, weightKg) {
                 background: white;
                 border: 0.5mm solid ${style.weightBorder};
                 border-radius: 5mm;
-                padding: ${isSmall ? '1.5mm' : '2mm'};
+                padding: 2mm;
                 text-align: center;
                 margin: 2mm auto;
-                font-size: ${isSmall ? '5.5mm' : '6mm'};
+                font-size: 6mm;
                 font-weight: 800;
                 color: ${style.weightColor};
                 display: inline-block;
-                min-width: ${isSmall ? '35mm' : '45mm'};
+                min-width: 45mm;
             }
             .weight-box span {
-                font-size: ${isSmall ? '2.8mm' : '3.5mm'};
+                font-size: 3.5mm;
                 font-weight: 500;
                 color: ${style.weightColor};
             }
             .tech-data {
                 margin-top: 2mm;
-                font-size: ${isSmall ? '2.5mm' : '2.6mm'};
+                font-size: 2.6mm;
                 border-top: 0.3mm dashed #9ca3af;
                 padding-top: 1.5mm;
                 color: #000000;
@@ -642,14 +642,14 @@ export function printLabelWithWeight(recipe, weightKg) {
                 color: #000000;
                 font-weight: 600;
                 display: inline-block;
-                min-width: ${isSmall ? '14mm' : '18mm'};
+                min-width: 18mm;
             }
             .safety-info {
                 background: #f8f8f8;
                 border: 0.3mm solid #ccc;
                 border-radius: 2mm;
-                padding: ${isSmall ? '1mm' : '1.2mm'};
-                font-size: ${isSmall ? '1.5mm' : '1.4mm'};
+                padding: 1.2mm;
+                font-size: 1.4mm;
                 line-height: 1.2;
                 height: 100%;
                 display: flex;
@@ -671,8 +671,8 @@ export function printLabelWithWeight(recipe, weightKg) {
                 gap: 1mm;
             }
             .pictogram-img {
-                width: ${isSmall ? '7mm' : '8mm'};
-                height: ${isSmall ? '7mm' : '8mm'};
+                width: 8mm;
+                height: 8mm;
                 object-fit: contain;
                 display: inline-block;
                 vertical-align: middle;
@@ -688,8 +688,8 @@ export function printLabelWithWeight(recipe, weightKg) {
             }
             .distributor-info {
                 background: ${style.headerBg}20;
-                padding: ${isSmall ? '1mm' : '1.2mm'};
-                font-size: ${isSmall ? '1.6mm' : '1.5mm'};
+                padding: 1.2mm;
+                font-size: 1.5mm;
                 color: black;
                 text-align: center;
                 border-top: 0.3mm solid #ccc;
@@ -700,8 +700,8 @@ export function printLabelWithWeight(recipe, weightKg) {
                 margin: 0.2mm 0;
             }
             .note-section {
-                margin-top: ${isSmall ? '1mm' : '1.5mm'};
-                font-size: ${isSmall ? '1.6mm' : '1.8mm'};
+                margin-top: 1.5mm;
+                font-size: 1.8mm;
                 color: #e63946;
                 text-align: center;
                 font-weight: 500;
@@ -714,7 +714,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 .tech-data { font-size: 2.2mm; }
                 .safety-info { font-size: 1.5mm; }
                 .distributor-info { font-size: 1.5mm; }
-                .pictogram-img { width: 6.5mm; height: 6.5mm; }
+                .pictogram-img { width: 7mm; height: 7mm; }
             }
         </style>
     </head>
