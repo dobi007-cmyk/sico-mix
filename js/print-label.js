@@ -9,13 +9,13 @@ const seriesStyles = {
         headerBorder: '#fbbf24',
         titleColor: '#ffffff',
         subColor: '#ffffff',
-        productNameColor: '#000000',          // чорний
-        weightBorder: '#000000',              // чорна рамка для ваги
-        weightColor: '#000000',               // чорний текст ваги
+        productNameColor: '#000000',
+        weightBorder: '#000000',
+        weightColor: '#000000',
         noteColor: '#e63946',
         logoBg: '#fbbf24',
         logoText: '#10b981',
-        seriesDisplay: 'EC / Universal'       // згідно з виправленням на фото
+        seriesDisplay: 'EURECO EC'          // повернено оригінальну назву
     },
     CF: {
         headerBg: '#dc2626',
@@ -175,30 +175,31 @@ const seriesStyles = {
     }
 };
 
-// Функція для отримання піктограм із зовнішніх зображень
+// Функція для отримання піктограм GHS (GHS02, GHS07, GHS08, GHS09) у вигляді зображень
 function getHazardPictogramsImg(seriesId) {
-    const pictograms = {
-        EC: ['flammable'],
-        CF: ['flammable'],
-        PLUV: ['flammable', 'environment'],
-        PLUV_LED: ['flammable', 'environment'],
-        TPP: ['flammable', 'environment'],
-        AS: ['non-hazardous'],
-        SX: ['non-hazardous'],
-        OTF: ['non-hazardous'],
-        SPTN: ['non-hazardous'],
-        NST: ['flammable'],
-        QS: ['flammable'],
-        SN: ['flammable']
+    const pictogramsMap = {
+        EC: ['ghs02'],
+        CF: ['ghs02'],
+        PLUV: ['ghs02', 'ghs08', 'ghs09'],
+        PLUV_LED: ['ghs02', 'ghs08', 'ghs09'],
+        TPP: ['ghs02', 'ghs08', 'ghs09'],
+        AS: [],
+        SX: [],
+        OTF: [],
+        SPTN: [],
+        NST: ['ghs02'],
+        QS: ['ghs02'],
+        SN: ['ghs02']
     };
 
-    const symbols = pictograms[seriesId] || [];
+    const symbols = pictogramsMap[seriesId] || [];
     if (symbols.length === 0) return '';
 
     const imgPaths = {
-        flammable: './icons/flammable.png',
-        environment: './icons/environment.png',
-        'non-hazardous': './icons/non-hazardous.png'
+        ghs02: './icons/ghs02.png',
+        ghs07: './icons/ghs07.png',
+        ghs08: './icons/ghs08.png',
+        ghs09: './icons/ghs09.png'
     };
 
     const imgHtml = symbols.map(symbol => {
@@ -212,15 +213,238 @@ function getHazardPictogramsImg(seriesId) {
 
 // Повні тексти безпеки для кожної серії (залишаються без змін)
 const safetyTexts = {
-    EC: { /* ... ваші дані ... */ },
-    CF: { /* ... */ },
-    PLUV: { /* ... */ },
-    TPP: { /* ... */ },
-    AS: { /* ... */ },
-    SX: { /* ... */ },
-    OTF: { /* ... */ },
-    SPTN: { /* ... */ }
-    // інші серії (NST, QS, SN) за потреби можна доповнити
+    EC: {
+        uk: {
+            name: "EURECO EC",
+            contains: "1-етоксипропан-2-ол",
+            hazards: [
+                "H226 - Легкозаймиста рідина і пари",
+                "H336 - Може викликати сонливість або запаморочення"
+            ],
+            precautions: [
+                "P271 - Використовувати тільки на відкритому повітрі або в добре вентильованому приміщенні",
+                "P303+P361+P353 - ПРИ ПОТРАПЛЯННІ НА ШКІРУ (або волосся): негайно зняти весь забруднений одяг. Промити шкіру водою/прийняти душ",
+                "P304+P340 - ПРИ ВДИХАННІ: вивести людину на свіже повітря і забезпечити їй спокій у положенні, зручному для дихання",
+                "P312 - При поганому самопочутті звернутися до лікаря",
+                "P370+P378 - У разі пожежі: використовувати відповідні засоби гасіння",
+                "P405 - Зберігати під замком",
+                "P501 - Утилізувати вміст/контейнер на спеціалізованому підприємстві"
+            ]
+        },
+        en: {
+            name: "EURECO EC",
+            contains: "1-ethoxypropan-2-ol",
+            hazards: [
+                "H226 - Flammable liquid and vapour",
+                "H336 - May cause drowsiness or dizziness"
+            ],
+            precautions: [
+                "P271 - Use only outdoors or in a well-ventilated area",
+                "P303+P361+P353 - IF ON SKIN (or hair): Take off immediately all contaminated clothing. Rinse skin with water/shower",
+                "P304+P340 - IF INHALED: Remove person to fresh air and keep comfortable for breathing",
+                "P312 - Call a POISON CENTER/doctor if you feel unwell",
+                "P370+P378 - In case of fire: Use appropriate extinguishing media",
+                "P405 - Store locked up",
+                "P501 - Dispose of contents/container to an authorized waste disposal facility"
+            ]
+        },
+        pl: {
+            name: "EURECO EC",
+            contains: "1-etoksypropan-2-ol",
+            hazards: [
+                "H226 - Łatwopalna ciecz i pary",
+                "H336 - Może wywoływać uczucie senności lub zawroty głowy"
+            ],
+            precautions: [
+                "P271 - Stosować wyłącznie na zewnątrz lub w dobrze wentylowanym pomieszczeniu",
+                "P303+P361+P353 - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem",
+                "P304+P340 - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić warunki do odpoczynku w pozycji umożliwiającej swobodne oddychanie",
+                "P312 - W przypadku złego samopoczucia skontaktować się z OŚRODKIEM ZATRUĆ lub lekarzem",
+                "P370+P378 - W przypadku pożaru: używać odpowiednich środków gaśniczych",
+                "P405 - Przechowywać pod zamknięciem",
+                "P501 - Zawartość/pojemnik usuwać do upoważnionego zakładu utylizacji odpadów"
+            ]
+        }
+    },
+    CF: {
+        uk: {
+            name: "CARTOFLEX CF",
+            contains: "1-етоксипропан-2-ол",
+            hazards: ["H336 - Може викликати сонливість або запаморочення"],
+            precautions: [
+                "P261 - Уникати вдихання пилу/диму/газу/туману/парів/аерозолю",
+                "P271 - Використовувати тільки на відкритому повітрі або в добре вентильованому приміщенні",
+                "P312 - При поганому самопочутті звернутися до лікаря",
+                "P304+P340 - ПРИ ВДИХАННІ: вивести людину на свіже повітря і забезпечити спокій",
+                "P405 - Зберігати під замком",
+                "P501 - Утилізувати вміст/контейнер відповідно до чинних правил"
+            ]
+        },
+        en: {
+            name: "CARTOFLEX CF",
+            contains: "1-ethoxypropan-2-ol",
+            hazards: ["H336 - May cause drowsiness or dizziness"],
+            precautions: [
+                "P261 - Avoid breathing dust/fume/gas/mist/vapours/spray",
+                "P271 - Use only outdoors or in a well-ventilated area",
+                "P312 - Call a POISON CENTER/doctor if you feel unwell",
+                "P304+P340 - IF INHALED: Remove person to fresh air and keep comfortable for breathing",
+                "P405 - Store locked up",
+                "P501 - Dispose of contents/container in accordance with local regulations"
+            ]
+        },
+        pl: {
+            name: "CARTOFLEX CF",
+            contains: "1-etoksypropan-2-ol",
+            hazards: ["H336 - Może wywoływać uczucie senności lub zawroty głowy."],
+            precautions: [
+                "P261 - Unikać wdychania pyłu/dymu/gazu/mgły/par/rozpylonej cieczy.",
+                "P271 - Stosować wyłącznie na zewnątrz lub w dobrze wentylowanym pomieszczeniu.",
+                "P312 - W przypadku złego samopoczucia skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem.",
+                "P304+P340 - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.",
+                "P405 - Przechowywać pod zamknięciem.",
+                "P501 - Zawartość/pojemnik usuwać zgodnie z obowiązującymi przepisami."
+            ]
+        }
+    },
+    PLUV: {
+        uk: {
+            name: "UVIPLAST PLUV",
+            contains: "Ацетат 2-етокси-1-метилетилу та вуглеводні, C9, ароматичні (бензол < 0,1% мас.)",
+            hazards: [
+                "H226 - Легкозаймиста рідина і пари",
+                "H304 - Може бути смертельним при ковтанні та потраплянні в дихальні шляхи",
+                "H336 - Може викликати сонливість або запаморочення",
+                "H412 - Шкідливо для водних організмів, спричиняє довготривалі наслідки"
+            ],
+            precautions: [
+                "P210 - Тримати подалі від джерел тепла, іскр, відкритого вогню. Не палити",
+                "P280 - Використовувати захисні рукавиці/захисний одяг/захист очей/захист обличчя",
+                "P301+P310 - ПРИ ПРОКОВТУВАННІ: негайно звернутися до лікаря",
+                "P303+P361+P353 - ПРИ ПОТРАПЛЯННІ НА ШКІРУ (або волосся): негайно зняти весь забруднений одяг. Промити шкіру водою/душем",
+                "P304+P340 - ПРИ ВДИХАННІ: вивести людину на свіже повітря і забезпечити спокій у положенні, зручному для дихання",
+                "P403+P233 - Зберігати в добре вентильованому місці. Тримати контейнер щільно закритим",
+                "EUH066 - Повторюване впливання може викликати сухість або тріщини шкіри"
+            ]
+        },
+        en: {
+            name: "UVIPLAST PLUV",
+            contains: "2-ethoxy-1-methylethyl acetate and hydrocarbons, C9, aromatics (benzene < 0.1% w/w)",
+            hazards: [
+                "H226 - Flammable liquid and vapour",
+                "H304 - May be fatal if swallowed and enters airways",
+                "H336 - May cause drowsiness or dizziness",
+                "H412 - Harmful to aquatic life with long lasting effects"
+            ],
+            precautions: [
+                "P210 - Keep away from heat, sparks, open flames. No smoking",
+                "P280 - Wear protective gloves/protective clothing/eye protection/face protection",
+                "P301+P310 - IF SWALLOWED: Immediately call a POISON CENTER/doctor",
+                "P303+P361+P353 - IF ON SKIN (or hair): Take off immediately all contaminated clothing. Rinse skin with water/shower",
+                "P304+P340 - IF INHALED: Remove person to fresh air and keep comfortable for breathing",
+                "P403+P233 - Store in a well-ventilated place. Keep container tightly closed",
+                "EUH066 - Repeated exposure may cause skin dryness or cracking"
+            ]
+        },
+        pl: {
+            name: "UVIPLAST PLUV",
+            contains: "Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)",
+            hazards: [
+                "H226 - Łatwopalna ciecz i pary.",
+                "H304 - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.",
+                "H336 - Może wywoływać uczucie senności lub zawroty głowy.",
+                "H412 - Działa szkodliwie na organizmy wodne, powodując długotrwałe skutki."
+            ],
+            precautions: [
+                "P210 - Przechowywać z dala od źródeł ciepła, gorących powierzchni, źródeł skażenia, otwartego ognia i innych źródeł zapłonu. Nie palić.",
+                "P280 - Stosować rękawice ochronne/odzież ochronną/ochronę oczu/ochronę twarzy.",
+                "P301+P310 - W PRZYPADKU POŁKNIĘCIA: natychmiast skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem/...",
+                "P303+P361+P353 - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem.",
+                "P304+P340 - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.",
+                "P403+P233 - Przechowywać w dobrze wentylowanym miejscu. Przechowywać pojemnik szczelnie zamknięty.",
+                "EUH066 - Powtarzające się narażenie może powodować wysuszanie lub pękanie skóry."
+            ]
+        }
+    },
+    TPP: {
+        uk: {
+            name: "POLYPRO TPP",
+            contains: "Ацетат 2-етокси-1-метилетилу та вуглеводні, C9, ароматичні (бензол < 0,1% мас.)",
+            hazards: [
+                "H226 - Легкозаймиста рідина і пари",
+                "H304 - Може бути смертельним при ковтанні та потраплянні в дихальні шляхи",
+                "H336 - Може викликати сонливість або запаморочення",
+                "H412 - Шкідливо для водних організмів, спричиняє довготривалі наслідки"
+            ],
+            precautions: [
+                "P210 - Тримати подалі від джерел тепла, іскр, відкритого вогню. Не палити",
+                "P280 - Використовувати захисні рукавиці/захисний одяг/захист очей/захист обличчя",
+                "P301+P310 - ПРИ ПРОКОВТУВАННІ: негайно звернутися до лікаря",
+                "P303+P361+P353 - ПРИ ПОТРАПЛЯННІ НА ШКІРУ (або волосся): негайно зняти весь забруднений одяг. Промити шкіру водою/душем",
+                "P304+P340 - ПРИ ВДИХАННІ: вивести людину на свіже повітря і забезпечити спокій у положенні, зручному для дихання",
+                "P403+P233 - Зберігати в добре вентильованому місці. Тримати контейнер щільно закритим",
+                "EUH066 - Повторюване впливання може викликати сухість або тріщини шкіри"
+            ]
+        },
+        en: {
+            name: "POLYPRO TPP",
+            contains: "2-ethoxy-1-methylethyl acetate and hydrocarbons, C9, aromatics (benzene < 0.1% w/w)",
+            hazards: [
+                "H226 - Flammable liquid and vapour",
+                "H304 - May be fatal if swallowed and enters airways",
+                "H336 - May cause drowsiness or dizziness",
+                "H412 - Harmful to aquatic life with long lasting effects"
+            ],
+            precautions: [
+                "P210 - Keep away from heat, sparks, open flames. No smoking",
+                "P280 - Wear protective gloves/protective clothing/eye protection/face protection",
+                "P301+P310 - IF SWALLOWED: Immediately call a POISON CENTER/doctor",
+                "P303+P361+P353 - IF ON SKIN (or hair): Take off immediately all contaminated clothing. Rinse skin with water/shower",
+                "P304+P340 - IF INHALED: Remove person to fresh air and keep comfortable for breathing",
+                "P403+P233 - Store in a well-ventilated place. Keep container tightly closed",
+                "EUH066 - Repeated exposure may cause skin dryness or cracking"
+            ]
+        },
+        pl: {
+            name: "POLYPRO TPP",
+            contains: "Octan 2-etoksy-1-metyleotytu oraz węglowodory, C9, aromaty (benzen < 0,1% w/w)",
+            hazards: [
+                "H226 - Łatwopalna ciecz i pary.",
+                "H304 - Połknięcie i dostanie się przez drogi oddechowe może grozić śmiercią.",
+                "H336 - Może wywoływać uczucie senności lub zawroty głowy.",
+                "H412 - Działa szkodliwie na organizmy wodne, powodując długotrwałe skutki."
+            ],
+            precautions: [
+                "P210 - Przechowywać z dala od źródeł ciepła, gorących powierzchni, źródeł skażenia, otwartego ognia i innych źródeł zapłonu. Nie palić.",
+                "P280 - Stosować rękawice ochronne/odzież ochronną/ochronę oczu/ochronę twarzy.",
+                "P301+P310 - W PRZYPADKU POŁKNIĘCIA: natychmiast skontaktować się z OŚRODKIEM ZATRUĆ/lekarzem/...",
+                "P303+P361+P353 - W PRZYPADKU KONTAKTU ZE SKÓRĄ (lub z włosami): Natychmiast zdjąć całą zanieczyszczoną odzież. Spłukać skórę pod strumieniem wody/prysznicem.",
+                "P304+P340 - W PRZYPADKU DOSTANIA SIĘ DO DRÓG ODDECHOWYCH: wyprowadzić lub wynieść poszkodowanego na świeże powietrze i zapewnić mu warunki do swobodnego oddychania.",
+                "P403+P233 - Przechowywać w dobrze wentylowanym miejscu. Przechowywać pojemnik szczelnie zamknięty.",
+                "EUH066 - Powtarzające się narażenie może powodować wysuszanie lub pękanie skóry."
+            ]
+        }
+    },
+    AS: {
+        uk: { name: "AQUASET AS", nonHazardous: true, text: "Суміш не класифікується як небезпечна." },
+        en: { name: "AQUASET AS", nonHazardous: true, text: "The mixture is not classified as hazardous." },
+        pl: { name: "AQUASET AS", nonHazardous: true, text: "Mieszanina nie jest klasyfikowana jako niebezpieczna." }
+    },
+    SX: {
+        uk: { name: "SICOTEX SX", nonHazardous: true, text: "Суміш не класифікується як небезпечна." },
+        en: { name: "SICOTEX SX", nonHazardous: true, text: "The mixture is not classified as hazardous." },
+        pl: { name: "SICOTEX SX", nonHazardous: true, text: "Mieszanina nie jest klasyfikowana jako niebezpieczna." }
+    },
+    OTF: {
+        uk: { name: "OPATEX OTF", nonHazardous: true, text: "Суміш не класифікується як небезпечна." },
+        en: { name: "OPATEX OTF", nonHazardous: true, text: "The mixture is not classified as hazardous." },
+        pl: { name: "OPATEX OTF", nonHazardous: true, text: "Mieszanina nie jest klasyfikowana jako niebezpieczna." }
+    },
+    SPTN: {
+        uk: { name: "SICOPLAST SPTN", nonHazardous: true, text: "Суміш не класифікується як небезпечна." },
+        en: { name: "SICOPLAST SPTN", nonHazardous: true, text: "The mixture is not classified as hazardous." },
+        pl: { name: "SICOPLAST SPTN", nonHazardous: true, text: "Mieszanina nie jest klasyfikowana jako niebezpieczna." }
+    }
 };
 
 // Допоміжна функція для генерації HTML безпеки на основі даних
@@ -377,13 +601,13 @@ export function printLabelWithWeight(recipe, weightKg) {
                 color: ${style.productNameColor};
                 margin-bottom: 1mm;
                 line-height: 1.2;
-                text-align: center;          /* назва по центру */
+                text-align: center;
             }
             .product-meta {
                 font-size: ${isSmall ? '2.2mm' : '2.8mm'};
                 color: #000000;
                 margin-bottom: 2mm;
-                text-align: center;          /* дата по центру */
+                text-align: center;
             }
             .weight-box {
                 background: white;
@@ -408,7 +632,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 font-size: ${isSmall ? '2.5mm' : '2.6mm'};
                 border-top: 0.3mm dashed #9ca3af;
                 padding-top: 1.5mm;
-                color: #000000;               /* чорний текст технічних даних */
+                color: #000000;
             }
             .tech-item {
                 margin-bottom: 0.8mm;
@@ -475,7 +699,7 @@ export function printLabelWithWeight(recipe, weightKg) {
             .note-section {
                 margin-top: ${isSmall ? '1.5mm' : '2mm'};
                 font-size: ${isSmall ? '1.8mm' : '2.2mm'};
-                color: #e63946;               /* червоний текст попередження */
+                color: #e63946;
                 text-align: center;
                 font-weight: 500;
                 border-top: 0.3mm dashed #9ca3af;
