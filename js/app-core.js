@@ -614,7 +614,7 @@ function startExport() {
     }
 }
 
-// ---------- ФУНКЦІЇ АВТОРИЗАЦІЇ (виправлені) ----------
+// ---------- ФУНКЦІЇ АВТОРИЗАЦІЇ ----------
 async function handleLogin() {
     const email = dom.authEmail?.value.trim();
     const password = dom.authPassword?.value.trim();
@@ -687,23 +687,21 @@ async function handleGoogleSignIn() {
 function updateAuthUI(user) {
     if (!dom.authButton) return;
     
-    // Видаляємо всі попередні обробники, щоб уникнути конфліктів
+    // Повністю видаляємо стару кнопку та створюємо нову, щоб позбутися старих обробників
     const newButton = dom.authButton.cloneNode(true);
     dom.authButton.parentNode.replaceChild(newButton, dom.authButton);
     dom.authButton = newButton;
     
     if (user) {
-        // Користувач увійшов
+        // Користувач увійшов – показуємо його email та кнопку виходу
         const displayName = user.email || user.displayName || 'Користувач';
         dom.authButton.innerHTML = `<i class="fas fa-user-circle"></i> <span>${displayName}</span>`;
-        // Обробник для виходу (з підтвердженням)
         dom.authButton.addEventListener('click', confirmLogout);
         console.log('🔐 UI оновлено: користувач увійшов');
     } else {
-        // Користувач вийшов
+        // Користувач вийшов – показуємо кнопку "Увійти", яка відкриває модальне вікно
         dom.authButton.innerHTML = `<i class="fas fa-sign-in-alt"></i> <span data-i18n="login">Увійти</span>`;
-        i18n.applyTranslations(); // оновити текст "Увійти"
-        // Обробник для відкриття модального вікна
+        i18n.applyTranslations(); // оновлюємо текст на поточній мові
         dom.authButton.addEventListener('click', openAuthModal);
         console.log('🔓 UI оновлено: користувач вийшов, кнопка "Увійти" готова');
     }
@@ -733,6 +731,7 @@ function confirmLogout() {
                 await auth.signOut();
                 utils.showNotification(i18n.t('logged_out'), 'success');
                 console.log('✅ Користувач вийшов');
+                // Після виходу не виконуємо перезавантаження, просто оновлюємо UI через onAuthStateChanged
             } catch (error) {
                 console.error('Помилка виходу:', error);
                 utils.showNotification(error.message || i18n.t('logout_error'), 'error');
