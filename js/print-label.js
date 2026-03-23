@@ -5,7 +5,7 @@ import * as i18n from './i18n.js';
 // Налаштування дизайну для різних серій (кольори, логотипи)
 const seriesStyles = {
     EC: {
-        headerBg: '#10b981', // зелений
+        headerBg: '#10b981',
         headerBorder: '#fbbf24',
         titleColor: '#ffffff',
         subColor: '#ffffff',
@@ -18,7 +18,7 @@ const seriesStyles = {
         seriesDisplay: 'EURECO EC'
     },
     CF: {
-        headerBg: '#dc2626', // червоний
+        headerBg: '#dc2626',
         headerBorder: '#fcd34d',
         titleColor: '#ffffff',
         subColor: '#ffffff',
@@ -31,7 +31,7 @@ const seriesStyles = {
         seriesDisplay: 'CARTOFLEX CF'
     },
     PLUV: {
-        headerBg: '#2563eb', // синій
+        headerBg: '#2563eb',
         headerBorder: '#fbbf24',
         titleColor: '#ffffff',
         subColor: '#ffffff',
@@ -44,7 +44,7 @@ const seriesStyles = {
         seriesDisplay: 'UVIPLAST PLUV'
     },
     PLUV_LED: {
-        headerBg: '#2563eb', // синій
+        headerBg: '#2563eb',
         headerBorder: '#fbbf24',
         titleColor: '#ffffff',
         subColor: '#ffffff',
@@ -57,9 +57,9 @@ const seriesStyles = {
         seriesDisplay: 'UVIPLAST PLUV LED'
     },
     SX: {
-        headerBg: '#fbbf24', // жовтий
+        headerBg: '#fbbf24',
         headerBorder: '#000000',
-        titleColor: '#1e1e1e', // темний текст
+        titleColor: '#1e1e1e',
         subColor: '#1e1e1e',
         productNameColor: '#b45309',
         weightBorder: '#b45309',
@@ -70,7 +70,7 @@ const seriesStyles = {
         seriesDisplay: 'SICOTEX SX'
     },
     SPTN: {
-        headerBg: '#7e22ce', // фіолетовий
+        headerBg: '#7e22ce',
         headerBorder: '#fcd34d',
         titleColor: '#ffffff',
         subColor: '#ffffff',
@@ -83,7 +83,7 @@ const seriesStyles = {
         seriesDisplay: 'SICOPLAST SPTN'
     },
     TPP: {
-        headerBg: '#a78bfa', // світло-фіолетовий
+        headerBg: '#a78bfa',
         headerBorder: '#fbbf24',
         titleColor: '#1e1e1e',
         subColor: '#1e1e1e',
@@ -96,7 +96,7 @@ const seriesStyles = {
         seriesDisplay: 'POLYPRO TPP'
     },
     AS: {
-        headerBg: '#0e7a7a', // бірюзовий
+        headerBg: '#0e7a7a',
         headerBorder: '#fbbf24',
         titleColor: '#ffffff',
         subColor: '#ffffff',
@@ -109,7 +109,7 @@ const seriesStyles = {
         seriesDisplay: 'AQUASET AS'
     },
     OTF: {
-        headerBg: '#2563eb', // синій
+        headerBg: '#2563eb',
         headerBorder: '#fbbf24',
         titleColor: '#ffffff',
         subColor: '#ffffff',
@@ -122,7 +122,7 @@ const seriesStyles = {
         seriesDisplay: 'OPATEX OTF'
     },
     NST: {
-        headerBg: '#1e293b', // темно-синій
+        headerBg: '#1e293b',
         headerBorder: '#fbbf24',
         titleColor: '#ffffff',
         subColor: '#ffffff',
@@ -135,7 +135,7 @@ const seriesStyles = {
         seriesDisplay: 'SICONYL NST'
     },
     QS: {
-        headerBg: '#f97316', // оранжевий
+        headerBg: '#f97316',
         headerBorder: '#fcd34d',
         titleColor: '#ffffff',
         subColor: '#ffffff',
@@ -148,7 +148,7 @@ const seriesStyles = {
         seriesDisplay: 'QUICKSET QS'
     },
     SN: {
-        headerBg: '#6b7280', // сірий
+        headerBg: '#6b7280',
         headerBorder: '#fbbf24',
         titleColor: '#ffffff',
         subColor: '#ffffff',
@@ -159,30 +159,79 @@ const seriesStyles = {
         logoBg: '#fbbf24',
         logoText: '#6b7280',
         seriesDisplay: 'SICONYL SN'
+    },
+    default: {
+        headerBg: '#6b7280',
+        headerBorder: '#fbbf24',
+        titleColor: '#ffffff',
+        subColor: '#ffffff',
+        productNameColor: '#6b7280',
+        weightBorder: '#6b7280',
+        weightColor: '#6b7280',
+        noteColor: '#fbbf24',
+        logoBg: '#fbbf24',
+        logoText: '#6b7280',
+        seriesDisplay: 'SICO'
     }
 };
 
-// Функція для визначення піктограм небезпеки (символи)
-function getHazardPictograms(seriesId) {
+// Функція для отримання SVG знаків небезпеки (ADR)
+function getHazardPictogramsSvg(seriesId) {
     const pictograms = {
-        EC: ['🔥', '⚠️'],
-        CF: ['⚠️'],
-        PLUV: ['🔥', '☠️', '⚠️', '🌊'],
-        PLUV_LED: ['🔥', '☠️', '⚠️', '🌊'],
-        TPP: ['🔥', '☠️', '⚠️', '🌊'],
-        AS: ['✔️'],
-        SX: ['✔️'],
-        OTF: ['✔️'],
-        SPTN: ['✔️'],
-        NST: [],
-        QS: [],
-        SN: []
+        EC: ['flammable'],           // клас 3
+        CF: ['flammable'],
+        PLUV: ['flammable', 'environment'], // легкозаймиста + небезпечна для довкілля
+        PLUV_LED: ['flammable', 'environment'],
+        TPP: ['flammable', 'environment'],
+        AS: ['non-hazardous'],       // зелений знак безпеки
+        SX: ['non-hazardous'],
+        OTF: ['non-hazardous'],
+        SPTN: ['non-hazardous'],
+        NST: ['flammable'],          // якщо потрібно
+        QS: ['flammable'],
+        SN: ['flammable']
     };
-    const pics = pictograms[seriesId] || [];
-    return pics.map(p => `<span class="pictogram">${p}</span>`).join('');
+
+    const symbols = pictograms[seriesId] || [];
+    if (symbols.length === 0) return '';
+
+    const svgIcons = symbols.map(symbol => {
+        if (symbol === 'flammable') {
+            // Знак класу 3: червоний ромб з полум'ям
+            return `<svg viewBox="0 0 100 100" width="12mm" height="12mm" style="display:inline-block; vertical-align:middle;">
+                <rect width="100" height="100" fill="#FF4D00" stroke="black" stroke-width="2" />
+                <polygon points="50,20 70,40 70,60 50,80 30,60 30,40" fill="white" stroke="black" stroke-width="1.5" />
+                <path d="M50,25 L60,40 L55,40 L65,55 L55,55 L50,70 L45,55 L35,55 L45,40 L40,40 Z" fill="black" />
+            </svg>`;
+        }
+        if (symbol === 'environment') {
+            // Знак небезпеки для довкілля: мертва риба та дерево
+            return `<svg viewBox="0 0 100 100" width="12mm" height="12mm" style="display:inline-block; vertical-align:middle;">
+                <rect width="100" height="100" fill="white" stroke="black" stroke-width="2" />
+                <path d="M30,70 L50,25 L70,70 L30,70" fill="white" stroke="black" stroke-width="1.5" />
+                <path d="M45,55 L55,55 L50,70 L45,55 Z" fill="white" stroke="black" />
+                <circle cx="50" cy="48" r="3" fill="black" />
+                <path d="M40,85 L60,85" stroke="black" stroke-width="2" />
+                <path d="M35,30 L45,35 L55,30 L65,35" stroke="black" fill="none" />
+                <path d="M20,45 L30,40 L40,45 L50,40 L60,45 L70,40 L80,45" stroke="black" fill="none" />
+                <path d="M30,70 L50,30 L70,70" stroke="black" fill="none" />
+                <path d="M45,75 L55,75" stroke="black" stroke-width="1.5" />
+                <text x="50" y="92" text-anchor="middle" font-size="12" fill="black">🐟</text>
+            </svg>`;
+        }
+        if (symbol === 'non-hazardous') {
+            // Зелена галочка
+            return `<svg viewBox="0 0 100 100" width="12mm" height="12mm" style="display:inline-block; vertical-align:middle;">
+                <circle cx="50" cy="50" r="45" fill="#10b981" stroke="none" />
+                <path d="M30,55 L45,70 L70,35" stroke="white" stroke-width="8" fill="none" stroke-linecap="round" />
+            </svg>`;
+        }
+        return '';
+    }).join('');
+    return `<div class="pictograms">${svgIcons}</div>`;
 }
 
-// Повні тексти безпеки для кожної серії (як на фото)
+// Повні тексти безпеки для кожної серії (залишаються без змін)
 const safetyTexts = {
     EC: {
         uk: {
@@ -241,9 +290,7 @@ const safetyTexts = {
         uk: {
             name: "CARTOFLEX CF",
             contains: "1-етоксипропан-2-ол",
-            hazards: [
-                "H336 - Може викликати сонливість або запаморочення"
-            ],
+            hazards: ["H336 - Може викликати сонливість або запаморочення"],
             precautions: [
                 "P261 - Уникати вдихання пилу/диму/газу/туману/парів/аерозолю",
                 "P271 - Використовувати тільки на відкритому повітрі або в добре вентильованому приміщенні",
@@ -424,13 +471,13 @@ const safetyTexts = {
 function generateSafetyHtml(seriesId, lang) {
     const data = safetyTexts[seriesId];
     if (!data) return '';
-    const langData = data[lang] || data.pl; // fallback на польську
+    const langData = data[lang] || data.pl;
     if (langData.nonHazardous) {
         return `
             <div class="safety-info">
                 <div class="safety-header">
                     <strong>${i18n.t('safety_trade_name')}:</strong> ${langData.name}
-                    <div class="pictograms">${getHazardPictograms(seriesId)}</div>
+                    ${getHazardPictogramsSvg(seriesId)}
                 </div>
                 <p>${langData.text}</p>
                 <p><em>${i18n.t('safety_professional_use')}</em></p>
@@ -444,7 +491,7 @@ function generateSafetyHtml(seriesId, lang) {
         <div class="safety-info">
             <div class="safety-header">
                 <strong>${i18n.t('safety_trade_name')}:</strong> ${langData.name}
-                <div class="pictograms">${getHazardPictograms(seriesId)}</div>
+                ${getHazardPictogramsSvg(seriesId)}
             </div>
             <p><strong>${i18n.t('safety_contains')}:</strong> ${langData.contains}</p>
             <div class="hazards"><strong>${i18n.t('safety_hazards')}</strong> ${hazardsHtml}</div>
@@ -459,20 +506,15 @@ export function printLabelWithWeight(recipe, weightKg) {
     const lang = i18n.getLanguage();
     const date = new Date().toLocaleDateString(lang);
     
-    // Визначаємо розмір етикетки залежно від ваги
     const isSmall = weightKg <= 2;
     const labelWidth = isSmall ? '104mm' : '147mm';
     const labelHeight = isSmall ? '100mm' : '105mm';
     
-    // Отримуємо дані серії
     const seriesId = recipe.series;
     const allSeries = window.SICOMIX?.data?.series || [];
     const series = allSeries.find(s => s.id === seriesId);
+    const style = seriesStyles[seriesId] || seriesStyles.default;
     
-    // Вибираємо стиль для серії, якщо немає – використовуємо EC
-    const style = seriesStyles[seriesId] || seriesStyles.EC;
-    
-    // Базові технічні дані – тільки основні
     let useText = '', aspectText = '', dryingText = '';
     if (series && series.properties) {
         const props = series.properties;
@@ -481,7 +523,6 @@ export function printLabelWithWeight(recipe, weightKg) {
         dryingText = props.drying?.[lang] || props.drying?.uk || '';
     }
     
-    // Генеруємо HTML безпеки
     const safetyHtml = generateSafetyHtml(seriesId, lang);
     const hasSafety = safetyHtml !== '';
     
@@ -631,7 +672,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 height: 100%;
                 display: flex;
                 flex-direction: column;
-                overflow-y: auto; /* scroll only if needed, but we try to avoid */
+                overflow-y: auto;
             }
             .safety-header {
                 display: flex;
@@ -642,12 +683,12 @@ export function printLabelWithWeight(recipe, weightKg) {
                 flex-wrap: wrap;
             }
             .pictograms {
-                font-size: ${isSmall ? '2.2mm' : '2.0mm'};
                 white-space: nowrap;
             }
-            .pictogram {
-                margin-left: 1mm;
-                display: inline-block;
+            .pictograms svg {
+                margin-left: 2mm;
+                width: 8mm;
+                height: 8mm;
             }
             .safety-info p {
                 margin: 0.5mm 0;
@@ -686,7 +727,7 @@ export function printLabelWithWeight(recipe, weightKg) {
                 .tech-data { font-size: 2.2mm; }
                 .safety-info { font-size: 1.8mm; }
                 .distributor-info { font-size: 1.7mm; }
-                .pictograms { font-size: 2.2mm; }
+                .pictograms svg { width: 7mm; height: 7mm; }
             }
         </style>
     </head>
