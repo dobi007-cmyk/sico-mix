@@ -614,7 +614,7 @@ function startExport() {
     }
 }
 
-/ ---------- ФУНКЦІЇ АВТОРИЗАЦІЇ (виправлені) ----------
+// ---------- ФУНКЦІЇ АВТОРИЗАЦІЇ (виправлені) ----------
 async function handleLogin() {
     const email = dom.authEmail?.value.trim();
     const password = dom.authPassword?.value.trim();
@@ -633,7 +633,6 @@ async function handleLogin() {
         utils.showNotification(i18n.t('login_success'), 'success');
         dom.authModal?.classList.remove('active');
         document.body.style.overflow = 'auto';
-        // Очистимо поля після входу
         dom.authEmail.value = '';
         dom.authPassword.value = '';
     } catch (error) {
