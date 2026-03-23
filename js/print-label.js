@@ -205,13 +205,13 @@ function getHazardPictogramsImg(seriesId) {
     const imgHtml = symbols.map(symbol => {
         const src = imgPaths[symbol];
         if (!src) return '';
-        return `<img src="${src}" class="pictogram-img" alt="${symbol}" width="12mm" height="12mm" style="display:inline-block; vertical-align:middle; margin-left:2mm;">`;
+        return `<img src="${src}" class="pictogram-img" alt="${symbol}">`;
     }).join('');
 
     return `<div class="pictograms">${imgHtml}</div>`;
 }
 
-// Повні тексти безпеки для кожної серії (залишаються без змін)
+// Повні тексти безпеки для кожної серії
 const safetyTexts = {
     EC: {
         uk: {
@@ -648,71 +648,73 @@ export function printLabelWithWeight(recipe, weightKg) {
                 background: #f8f8f8;
                 border: 0.3mm solid #ccc;
                 border-radius: 2mm;
-                padding: ${isSmall ? '1mm' : '1.5mm'};
-                font-size: ${isSmall ? '1.8mm' : '1.7mm'};
-                line-height: 1.25;
+                padding: ${isSmall ? '1mm' : '1.2mm'};
+                font-size: ${isSmall ? '1.5mm' : '1.4mm'};
+                line-height: 1.2;
                 height: 100%;
                 display: flex;
                 flex-direction: column;
-                /* без прокрутки */
                 overflow-y: visible;
             }
             .safety-header {
                 display: flex;
                 justify-content: space-between;
                 align-items: baseline;
-                margin-bottom: 1mm;
+                margin-bottom: 0.5mm;
                 font-weight: bold;
                 flex-wrap: wrap;
             }
             .pictograms {
                 white-space: nowrap;
+                display: inline-flex;
+                align-items: center;
+                gap: 1mm;
             }
             .pictogram-img {
-                width: 8mm;
-                height: 8mm;
-                margin-left: 2mm;
+                width: ${isSmall ? '7mm' : '8mm'};
+                height: ${isSmall ? '7mm' : '8mm'};
+                object-fit: contain;
                 display: inline-block;
                 vertical-align: middle;
             }
             .safety-info p {
-                margin: 0.5mm 0;
+                margin: 0.3mm 0;
             }
             .safety-info strong {
                 font-weight: 600;
             }
             .hazards, .precautions {
-                margin-top: 1mm;
+                margin-top: 0.5mm;
             }
             .distributor-info {
                 background: ${style.headerBg}20;
-                padding: ${isSmall ? '1mm' : '1.5mm'};
-                font-size: ${isSmall ? '1.8mm' : '1.6mm'};
+                padding: ${isSmall ? '1mm' : '1.2mm'};
+                font-size: ${isSmall ? '1.6mm' : '1.5mm'};
                 color: black;
                 text-align: center;
                 border-top: 0.3mm solid #ccc;
                 margin-top: 1mm;
-                line-height: 1.3;
+                line-height: 1.2;
             }
             .distributor-info p {
                 margin: 0.2mm 0;
             }
             .note-section {
-                margin-top: ${isSmall ? '1.5mm' : '2mm'};
-                font-size: ${isSmall ? '1.8mm' : '2.2mm'};
+                margin-top: ${isSmall ? '1mm' : '1.5mm'};
+                font-size: ${isSmall ? '1.6mm' : '1.8mm'};
                 color: #e63946;
                 text-align: center;
                 font-weight: 500;
                 border-top: 0.3mm dashed #9ca3af;
-                padding-top: 1mm;
+                padding-top: 0.8mm;
             }
             @media (max-width: 110mm) {
                 .product-name { font-size: 4mm; }
                 .weight-box { font-size: 5mm; min-width: 30mm; }
                 .tech-data { font-size: 2.2mm; }
-                .safety-info { font-size: 1.8mm; }
-                .distributor-info { font-size: 1.7mm; }
-                .pictogram-img { width: 7mm; height: 7mm; }
+                .safety-info { font-size: 1.5mm; }
+                .distributor-info { font-size: 1.5mm; }
+                .pictogram-img { width: 6.5mm; height: 6.5mm; }
             }
         </style>
     </head>
