@@ -211,7 +211,7 @@ function getHazardPictogramsImg(seriesId) {
     return `<div class="pictograms">${imgHtml}</div>`;
 }
 
-// Повні тексти безпеки для кожної серії (залишаються без змін)
+// Повні тексти безпеки для кожної серії
 const safetyTexts = {
     EC: {
         uk: {
@@ -511,6 +511,7 @@ export function printLabelWithWeight(recipe, weightKg) {
     <html>
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
         <title>Etykieta - ${utils.escapeHtml(recipe.name)}</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <style>
@@ -535,6 +536,9 @@ export function printLabelWithWeight(recipe, weightKg) {
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
                 }
+                .close-btn {
+                    display: none;
+                }
             }
             .label {
                 width: ${labelWidth};
@@ -548,6 +552,25 @@ export function printLabelWithWeight(recipe, weightKg) {
                 flex-direction: column;
                 font-size: 3.3mm;
                 padding: 2mm 3mm;
+                position: relative;
+            }
+            .close-btn {
+                position: absolute;
+                top: 2mm;
+                right: 2mm;
+                background: #e63946;
+                color: white;
+                border: none;
+                border-radius: 4mm;
+                padding: 2mm 4mm;
+                font-size: 2.8mm;
+                font-weight: bold;
+                cursor: pointer;
+                z-index: 100;
+                box-shadow: 0 1mm 2mm rgba(0,0,0,0.2);
+            }
+            .close-btn:active {
+                background: #b91c1c;
             }
             .header {
                 background: ${style.headerBg};
@@ -668,10 +691,10 @@ export function printLabelWithWeight(recipe, weightKg) {
                 white-space: nowrap;
                 display: inline-flex;
                 align-items: center;
-                gap: 2mm; /* збільшено для великих піктограм */
+                gap: 2mm;
             }
             .pictogram-img {
-                width: 24mm; /* збільшено в 3 рази */
+                width: 24mm;
                 height: 24mm;
                 object-fit: contain;
                 display: inline-block;
@@ -715,11 +738,13 @@ export function printLabelWithWeight(recipe, weightKg) {
                 .safety-info { font-size: 1.5mm; }
                 .distributor-info { font-size: 1.5mm; }
                 .pictogram-img { width: 21mm; height: 21mm; }
+                .close-btn { font-size: 2.5mm; padding: 1.5mm 3mm; }
             }
         </style>
     </head>
     <body>
         <div class="label">
+            <button class="close-btn" onclick="window.close();">✖ Zamknij</button>
             <div class="header">
                 <div class="top-logo">SICO Screen Inks</div>
                 <h1>${style.seriesDisplay}</h1>
@@ -763,5 +788,4 @@ export function printLabelWithWeight(recipe, weightKg) {
     printWindow.document.write(labelHtml);
     printWindow.document.close();
     printWindow.focus();
-    printWindow.print();
 }
