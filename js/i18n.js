@@ -1298,4 +1298,3 @@ window.SICOMIX.i18n = {
     applyTranslations,
     init: initI18n
 };
-};
