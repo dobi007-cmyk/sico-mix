@@ -11,9 +11,6 @@ function attachCatalogEventListeners() {
 
     dom.paintCatalogEl.removeEventListener('click', catalogClickHandler);
     dom.paintCatalogEl.addEventListener('click', catalogClickHandler);
-    
-    document.removeEventListener('click', globalLoadMoreHandler);
-    document.addEventListener('click', globalLoadMoreHandler);
 }
 
 function globalLoadMoreHandler(e) {
@@ -30,7 +27,7 @@ function globalLoadMoreHandler(e) {
 }
 
 function catalogClickHandler(e) {
-    const btn = e.target.closest('.toggle-series, .series-info-btn, .glass-add-btn, .glass-remove-btn, .delete-paint');
+    const btn = e.target.closest('.toggle-series, .series-info-btn, .glass-add-btn, .glass-remove-btn');
     if (!btn) return;
     e.stopPropagation();
 
@@ -90,9 +87,6 @@ function catalogClickHandler(e) {
                 if (window.SICOMIX?.app?.updatePaintButton) window.SICOMIX.app.updatePaintButton(paintId, false);
             }
         }
-    } else if (btn.classList.contains('delete-paint')) {
-        const paintId = btn.dataset.paintId;
-        if (paintId) deletePaint(paintId);
     }
 }
 
@@ -163,7 +157,7 @@ function renderPaintCatalog(append = false) {
             }
 
             const currentSettings = app.getCurrentSettings();
-            applyCatalogLayout(currentSettings.catalogLayout || 'classic');
+            app.applyCatalogLayout(currentSettings.catalogLayout || 'classic');
 
             let html = '';
             let totalFoundPaints = 0;
@@ -212,10 +206,6 @@ function renderPaintCatalog(append = false) {
                         <button class="${buttonClass}" data-paint-id="${p.id}" title="${buttonTitle}" aria-label="${buttonTitle}">
                             <i class="fas ${buttonIcon}"></i>
                         </button>
-                        ${!p.isDefault ? `
-                            <button class="delete-paint" data-paint-id="${p.id}" title="${i18n.t('delete')}" aria-label="${i18n.t('delete')}">
-                                <i class="fas fa-trash"></i>
-                            </button>` : ''}
                     </div>
                 `}).join('');
 
@@ -285,14 +275,6 @@ function renderPaintCatalog(append = false) {
             resolve();
         }
     });
-}
-
-function applyCatalogLayout(layout) {
-    const dom = app.dom;
-    if (dom.paintCatalogEl) {
-        dom.paintCatalogEl.classList.remove('catalog-layout-classic', 'catalog-layout-compact', 'catalog-layout-list');
-        dom.paintCatalogEl.classList.add(`catalog-layout-${layout}`);
-    }
 }
 
 function openSeriesDetailsModal(series) {
@@ -385,7 +367,7 @@ function showPaintDetails(paint) {
                 <tr><th style="text-align: left; padding: 8px;">${i18n.t('manufacturer')}</th> <td>${utils.escapeHtml(paint.manufacturer || 'SICO')}</td> </tr>
                 <tr><th style="text-align: left; padding: 8px;">${i18n.t('color_code')}</th> <td>${utils.escapeHtml(paint.color)}</td> </tr>
                 <tr><th style="text-align: left; padding: 8px;">${i18n.t('article')}</th> <td>${utils.escapeHtml(paint.article || '-')}</td> </tr>
-            </table>
+             </table>
             <p style="margin-top: 20px;">${utils.escapeHtml(paint.description || '')}</p>
         </div>
     `;
@@ -398,139 +380,17 @@ function showPaintDetails(paint) {
     }
 }
 
-function addNewPaint() {
-    document.getElementById('paintName').value = '';
-    app.populateStandardCategorySelect(document.getElementById('paintCategory'));
-    document.getElementById('paintColorCode').value = '#3a86ff';
-    document.getElementById('paintDescription').value = '';
-    document.getElementById('paintManufacturer').value = 'SICO';
-    document.getElementById('paintArticle').value = '';
-    app.dom.addPaintModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function saveNewPaint() {
-    const name = document.getElementById('paintName').value.trim();
-    const cat = document.getElementById('paintCategory').value;
-    const color = document.getElementById('paintColorCode').value || '#3a86ff';
-    const desc = document.getElementById('paintDescription').value.trim();
-    const mfr = document.getElementById('paintManufacturer').value.trim() || 'SICO';
-    const art = document.getElementById('paintArticle').value.trim();
-
-    if (!name || !cat) {
-        utils.showNotification(i18n.t('fill_required_fields'), 'error');
-        return;
-    }
-
-    const newPaint = {
-        id: utils.generateId(),
-        name,
-        category: cat,
-        color,
-        description: desc,
-        manufacturer: mfr,
-        article: art,
-        isDefault: false,
-        displayName: { uk: name, en: name, pl: name }
-    };
-    const userPaints = app.getUserPaints();
-    userPaints.push(newPaint);
-    app.setUserPaints(userPaints);
-    const paintCatalog = [...app.getPaintCatalog().filter(p => p.isDefault), ...userPaints];
-    app.setPaintCatalog(paintCatalog);
-    app.invalidateSeriesCache();
-    app.saveData();
-    app.dom.addPaintModal.classList.remove('active');
-    document.body.style.overflow = 'auto';
-    app.populateCategoryFilters();
-    renderPaintCatalog();
-    utils.showNotification(`${i18n.t('paint_added')} "${utils.escapeHtml(name)}"`, 'success');
-}
-
-function deletePaint(id) {
-    const paintCatalog = app.getPaintCatalog();
-    const paint = paintCatalog.find(p => String(p.id) === String(id));
-    if (!paint) return;
-    
-    if (paint.isDefault) {
-        utils.showNotification(i18n.t('cannot_delete_default_paint'), 'warning');
-        return;
-    }
-
-    const recipes = app.getRecipes();
-    const usedInRecipes = recipes.filter(r => 
-        r.ingredients.some(ing => String(ing.paintId) === String(id))
-    );
-    const count = usedInRecipes.length;
-
-    if (count > 0) {
-        utils.showConfirmation(
-            i18n.t('paint_in_use_title'),
-            i18n.t('paint_in_use_message', { count }),
-            () => {
-                usedInRecipes.forEach(r => {
-                    r.ingredients = r.ingredients.filter(ing => String(ing.paintId) !== String(id));
-                });
-                const userPaints = app.getUserPaints();
-                const newUserPaints = userPaints.filter(p => String(p.id) !== String(id));
-                app.setUserPaints(newUserPaints);
-                app.setPaintCatalog([...app.getPaintCatalog().filter(p => p.isDefault), ...newUserPaints]);
-                app.invalidateSeriesCache();
-                app.saveData();
-                renderPaintCatalog();
-                if (window.SICOMIX?.app?.renderRecipes) window.SICOMIX.app.renderRecipes();
-                if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-                if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
-                utils.showNotification(i18n.t('paint_deleted'), 'success');
-            }
-        );
-    } else {
-        const userPaints = app.getUserPaints();
-        const newUserPaints = userPaints.filter(p => String(p.id) !== String(id));
-        app.setUserPaints(newUserPaints);
-        app.setPaintCatalog([...app.getPaintCatalog().filter(p => p.isDefault), ...newUserPaints]);
-        app.invalidateSeriesCache();
-        app.saveData();
-        renderPaintCatalog();
-        if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-        if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
-        utils.showNotification(i18n.t('paint_deleted'), 'success');
-    }
-}
-
-function updatePaintButton(paintId, isInRecipe) {
-    const card = document.querySelector(`.paint-card-glass[data-paint-id="${paintId}"]`);
-    if (!card) return;
-    const btn = card.querySelector('.glass-add-btn, .glass-remove-btn');
-    if (btn) {
-        if (isInRecipe) {
-            btn.classList.remove('glass-add-btn');
-            btn.classList.add('glass-remove-btn');
-            btn.innerHTML = '<i class="fas fa-trash"></i>';
-            btn.title = i18n.t('remove_from_recipe');
-            btn.setAttribute('aria-label', i18n.t('remove_from_recipe'));
-        } else {
-            btn.classList.remove('glass-remove-btn');
-            btn.classList.add('glass-add-btn');
-            btn.innerHTML = '<i class="fas fa-plus"></i>';
-            btn.title = i18n.t('add_ingredient');
-            btn.setAttribute('aria-label', i18n.t('add_ingredient'));
-        }
-    }
-}
-
 export {
     renderPaintCatalog,
     openSeriesDetailsModal,
     addPaintToRecipeFromCatalog,
     showPaintDetails,
-    addNewPaint,
-    saveNewPaint,
-    deletePaint,
     attachCatalogEventListeners,
-    applyCatalogLayout,
     updatePaintButton
 };
+
+// Глобальний обробник для кнопки "Завантажити ще"
+document.addEventListener('click', globalLoadMoreHandler);
 
 window.SICOMIX = window.SICOMIX || {};
 window.SICOMIX.app = window.SICOMIX.app || {};
@@ -539,10 +399,6 @@ Object.assign(window.SICOMIX.app, {
     openSeriesDetailsModal,
     addPaintToRecipeFromCatalog,
     showPaintDetails,
-    addNewPaint,
-    saveNewPaint,
-    deletePaint,
     attachCatalogEventListeners,
-    applyCatalogLayout,
     updatePaintButton
 });
