@@ -156,8 +156,10 @@ function renderPaintCatalog(append = false) {
                 return;
             }
 
-            const currentSettings = app.getCurrentSettings();
-            app.applyCatalogLayout(currentSettings.catalogLayout || 'classic');
+            // Застосовуємо клас компонування безпосередньо, щоб уникнути рекурсії
+            const currentLayout = app.getCurrentSettings().catalogLayout || 'classic';
+            dom.paintCatalogEl.classList.remove('catalog-layout-classic', 'catalog-layout-compact', 'catalog-layout-list');
+            dom.paintCatalogEl.classList.add(`catalog-layout-${currentLayout}`);
 
             let html = '';
             let totalFoundPaints = 0;
@@ -362,11 +364,11 @@ function showPaintDetails(paint) {
                 </div>
             </div>
             <table style="width: 100%; border-collapse: collapse;">
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('category')}</th>  <td>${i18n.translateCategoryName(paint.category)}</td> </tr>
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('series')}</th>  <td>${utils.escapeHtml(paint.series)}</td> </tr>
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('manufacturer')}</th>  <td>${utils.escapeHtml(paint.manufacturer || 'SICO')}</td> </tr>
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('color_code')}</th>  <td>${utils.escapeHtml(paint.color)}</td> </tr>
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('article')}</th>  <td>${utils.escapeHtml(paint.article || '-')}</td> </tr>
+                <tr><th style="text-align: left; padding: 8px;">${i18n.t('category')}</th>  <td>${i18n.translateCategoryName(paint.category)}</td>  </tr>
+                 <tr><th style="text-align: left; padding: 8px;">${i18n.t('series')}</th>      <td>${utils.escapeHtml(paint.series)}</td>      </tr>
+                 <tr><th style="text-align: left; padding: 8px;">${i18n.t('manufacturer')}</th><td>${utils.escapeHtml(paint.manufacturer || 'SICO')}</td></tr>
+                 <tr><th style="text-align: left; padding: 8px;">${i18n.t('color_code')}</th> <td>${utils.escapeHtml(paint.color)}</td>        </tr>
+                 <tr><th style="text-align: left; padding: 8px;">${i18n.t('article')}</th>    <td>${utils.escapeHtml(paint.article || '-')}</td>   </tr>
              </table>
             <p style="margin-top: 20px;">${utils.escapeHtml(paint.description || '')}</p>
         </div>
@@ -380,7 +382,6 @@ function showPaintDetails(paint) {
     }
 }
 
-// Функція оновлення кнопки додавання/видалення в каталозі
 function updatePaintButton(paintId, isInRecipe) {
     const card = document.querySelector(`.paint-card-glass[data-paint-id="${paintId}"]`);
     if (!card) return;
