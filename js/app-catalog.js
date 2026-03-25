@@ -362,11 +362,11 @@ function showPaintDetails(paint) {
                 </div>
             </div>
             <table style="width: 100%; border-collapse: collapse;">
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('category')}</th> <td>${i18n.translateCategoryName(paint.category)}</td> </tr>
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('series')}</th> <td>${utils.escapeHtml(paint.series)}</td> </tr>
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('manufacturer')}</th> <td>${utils.escapeHtml(paint.manufacturer || 'SICO')}</td> </tr>
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('color_code')}</th> <td>${utils.escapeHtml(paint.color)}</td> </tr>
-                <tr><th style="text-align: left; padding: 8px;">${i18n.t('article')}</th> <td>${utils.escapeHtml(paint.article || '-')}</td> </tr>
+                <tr><th style="text-align: left; padding: 8px;">${i18n.t('category')}</th>  <td>${i18n.translateCategoryName(paint.category)}</td> </tr>
+                <tr><th style="text-align: left; padding: 8px;">${i18n.t('series')}</th>  <td>${utils.escapeHtml(paint.series)}</td> </tr>
+                <tr><th style="text-align: left; padding: 8px;">${i18n.t('manufacturer')}</th>  <td>${utils.escapeHtml(paint.manufacturer || 'SICO')}</td> </tr>
+                <tr><th style="text-align: left; padding: 8px;">${i18n.t('color_code')}</th>  <td>${utils.escapeHtml(paint.color)}</td> </tr>
+                <tr><th style="text-align: left; padding: 8px;">${i18n.t('article')}</th>  <td>${utils.escapeHtml(paint.article || '-')}</td> </tr>
              </table>
             <p style="margin-top: 20px;">${utils.escapeHtml(paint.description || '')}</p>
         </div>
@@ -377,6 +377,28 @@ function showPaintDetails(paint) {
     const closeBtn = modal.querySelector('.close-paint-selection');
     if (closeBtn) {
         closeBtn.addEventListener('click', () => modal.classList.remove('active'), { once: true });
+    }
+}
+
+// Функція оновлення кнопки додавання/видалення в каталозі
+function updatePaintButton(paintId, isInRecipe) {
+    const card = document.querySelector(`.paint-card-glass[data-paint-id="${paintId}"]`);
+    if (!card) return;
+    const btn = card.querySelector('.glass-add-btn, .glass-remove-btn');
+    if (btn) {
+        if (isInRecipe) {
+            btn.classList.remove('glass-add-btn');
+            btn.classList.add('glass-remove-btn');
+            btn.innerHTML = '<i class="fas fa-trash"></i>';
+            btn.title = i18n.t('remove_from_recipe');
+            btn.setAttribute('aria-label', i18n.t('remove_from_recipe'));
+        } else {
+            btn.classList.remove('glass-remove-btn');
+            btn.classList.add('glass-add-btn');
+            btn.innerHTML = '<i class="fas fa-plus"></i>';
+            btn.title = i18n.t('add_ingredient');
+            btn.setAttribute('aria-label', i18n.t('add_ingredient'));
+        }
     }
 }
 
