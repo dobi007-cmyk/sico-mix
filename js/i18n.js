@@ -1184,6 +1184,7 @@ export function setLanguage(lang) {
         document.documentElement.lang = lang;
         localStorage.setItem('sicoSpectrumLanguage', lang);
         applyTranslations();
+        window.dispatchEvent(new CustomEvent('languageChanged')); // Додано для синхронізації
     }
 }
 
@@ -1266,7 +1267,6 @@ export function applyTranslations() {
         if (key) el.value = t(key);
     });
     
-    // Оновлення заголовка сторінки
     document.title = t('app_title');
 }
 
@@ -1284,10 +1284,8 @@ export function initI18n() {
     applyTranslations();
 }
 
-// Автоматична ініціалізація під час завантаження модуля
 initI18n();
 
-// Глобальний об'єкт для зворотної сумісності
 window.SICOMIX = window.SICOMIX || {};
 window.SICOMIX.i18n = {
     t,
