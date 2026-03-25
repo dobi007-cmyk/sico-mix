@@ -113,6 +113,18 @@ function cacheDOMElements() {
     dom.authGoogleBtn = document.getElementById('authGoogleBtn');
 }
 
+// ---------- ОНОВЛЕННЯ UI ПІСЛЯ ЗМІНИ ДАНИХ ----------
+function refreshUIAfterDataChange() {
+    populateCategoryFilters();
+    populateSeriesSelect();
+    updatePaintCount();
+    if (window.SICOMIX?.app?.renderRecipes) window.SICOMIX.app.renderRecipes();
+    if (window.SICOMIX?.app?.renderPaintCatalog) window.SICOMIX.app.renderPaintCatalog();
+    if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
+    if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
+    invalidateSeriesCache();
+}
+
 // ---------- ЗАВАНТАЖЕННЯ ТА ЗБЕРЕЖЕННЯ ----------
 async function loadData() {
     if (data && Array.isArray(data.paints)) {
@@ -170,6 +182,7 @@ async function loadData() {
             }
         } catch (error) {
             console.error('Помилка синхронізації:', error);
+            utils.showNotification(i18n.t('sync_error'), 'error');
         }
     }
 
@@ -190,6 +203,9 @@ async function loadData() {
         lockedSeries = null;
         lockedCategory = null;
     }
+
+    // Оновлюємо UI після зміни даних
+    refreshUIAfterDataChange();
 }
 
 function saveData() {
@@ -215,6 +231,9 @@ function saveData() {
             utils.showNotification(i18n.t('sync_error'), 'error');
         });
     }
+
+    // Оновлюємо UI після збереження
+    refreshUIAfterDataChange();
 }
 
 // ---------- АВТОЗБЕРЕЖЕННЯ ЧЕРНЕТКИ ----------
@@ -466,7 +485,6 @@ function applyCatalogLayout(layout) {
         dom.paintCatalogEl.classList.remove('catalog-layout-classic', 'catalog-layout-compact', 'catalog-layout-list');
         dom.paintCatalogEl.classList.add(`catalog-layout-${layout}`);
     }
-    // Не викликаємо renderPaintCatalog – це робить той, хто викликав applyCatalogLayout, якщо потрібно
 }
 
 // ---------- ІМПОРТ/ЕКСПОРТ ----------
@@ -523,11 +541,7 @@ function startImport() {
             }
 
             saveData();
-            populateCategoryFilters();
-            if (window.SICOMIX?.app?.renderRecipes) window.SICOMIX.app.renderRecipes();
-            if (window.SICOMIX?.app?.renderPaintCatalog) window.SICOMIX.app.renderPaintCatalog();
-            if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
-            if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
+            refreshUIAfterDataChange();
 
             let message = i18n.t('imported') + '!';
             if (recipesCount > 0 && paintsCount > 0) {
@@ -1025,10 +1039,7 @@ async function initApp() {
             
             updateAuthUI(user);
             
-            populateSeriesSelect();
-            populateCategoryFilters();
             initSettings();
-            updatePaintCount();
             attachAllEventListeners();
             setupCoreEventListeners();
 
@@ -1057,10 +1068,7 @@ async function initApp() {
         });
     } else {
         await loadData();
-        populateSeriesSelect();
-        populateCategoryFilters();
         initSettings();
-        updatePaintCount();
         attachAllEventListeners();
         setupCoreEventListeners();
 
@@ -1159,7 +1167,8 @@ export {
     updateAuthUI,
     openAuthModal,
     confirmLogout,
-    handleLogout
+    handleLogout,
+    refreshUIAfterDataChange
 };
 
 export { unitMap, dom, CATALOG_PAGE_SIZE };
@@ -1233,5 +1242,6 @@ window.SICOMIX.app = {
     updateAuthUI,
     openAuthModal,
     confirmLogout,
-    handleLogout
+    handleLogout,
+    refreshUIAfterDataChange
 };
