@@ -9,7 +9,7 @@ const urlsToCache = [
     './js/pantone-data.js',
     './js/pantone-external-colors.js',
     './js/ral-data.js',
-    './js/main.js',           // виправлено: було app.js
+    './js/main.js',           // виправлено – було app.js
     './js/firebase-config.js',
     './js/sync.js',
     './manifest.json',
