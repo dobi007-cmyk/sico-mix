@@ -12,10 +12,10 @@ function renderIngredientsList() {
     const paintCatalog = app.getPaintCatalog();
 
     if (selectedIngredients.length === 0) {
-        dom.ingredientsList.innerHTML = `</td><td colspan="5" style="text-align:center; padding:40px;">
+        dom.ingredientsList.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px;">
             <i class="fas fa-palette" style="font-size:32px; opacity:0.5;"></i><br>
             <span>${i18n.t('paints_not_found')}</span>
-         </tr>`;
+          </td></tr>`;
         i18n.applyTranslations();
         return;
     }
@@ -128,6 +128,14 @@ function showPaintSelectionModal(paints) {
     `}).join('');
     modal.classList.add('active');
 
+    const closeModal = () => {
+        modal.classList.remove('active');
+        list.removeEventListener('click', clickHandler);
+        closeBtn?.removeEventListener('click', closeHandler);
+        document.removeEventListener('keydown', escHandler);
+        modal.removeEventListener('click', overlayHandler);
+    };
+
     const clickHandler = (e) => {
         const card = e.target.closest('.paint-selection-card');
         if (!card) return;
@@ -138,9 +146,7 @@ function showPaintSelectionModal(paints) {
         const validation = app.validatePaintAddition(paint);
         if (!validation.valid) {
             utils.showNotification(validation.message, 'error');
-            modal.classList.remove('active');
-            list.removeEventListener('click', clickHandler);
-            closeBtn?.removeEventListener('click', closeHandler);
+            closeModal();
             return;
         }
         
@@ -160,20 +166,18 @@ function showPaintSelectionModal(paints) {
             if (window.SICOMIX?.app?.renderPantoneCatalog) window.SICOMIX.app.renderPantoneCatalog();
             if (window.SICOMIX?.app?.renderRalCatalog) window.SICOMIX.app.renderRalCatalog();
         }
-        modal.classList.remove('active');
-        list.removeEventListener('click', clickHandler);
-        closeBtn?.removeEventListener('click', closeHandler);
+        closeModal();
     };
-    const closeHandler = () => {
-        modal.classList.remove('active');
-        list.removeEventListener('click', clickHandler);
-        closeBtn?.removeEventListener('click', closeHandler);
-    };
+
+    const closeHandler = () => closeModal();
+    const escHandler = (e) => { if (e.key === 'Escape') closeModal(); };
+    const overlayHandler = (e) => { if (e.target === modal) closeModal(); };
+
     list.addEventListener('click', clickHandler);
     const closeBtn = modal.querySelector('.close-paint-selection');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeHandler, { once: true });
-    }
+    if (closeBtn) closeBtn.addEventListener('click', closeHandler);
+    document.addEventListener('keydown', escHandler);
+    modal.addEventListener('click', overlayHandler);
 }
 
 function deleteIngredient(index) {
