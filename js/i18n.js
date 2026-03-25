@@ -1184,7 +1184,7 @@ export function setLanguage(lang) {
         document.documentElement.lang = lang;
         localStorage.setItem('sicoSpectrumLanguage', lang);
         applyTranslations();
-        window.dispatchEvent(new CustomEvent('languageChanged')); // Додано для синхронізації
+        window.dispatchEvent(new CustomEvent('languageChanged'));
     }
 }
 
@@ -1282,6 +1282,7 @@ export function initI18n() {
     }
     document.documentElement.lang = currentLanguage;
     applyTranslations();
+    window.dispatchEvent(new CustomEvent('languageChanged')); // Додано для оновлення статусу синхронізації
 }
 
 initI18n();
@@ -1296,4 +1297,5 @@ window.SICOMIX.i18n = {
     localizeUnitSymbol,
     applyTranslations,
     init: initI18n
+};
 };
