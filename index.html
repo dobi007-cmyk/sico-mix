@@ -600,69 +600,6 @@
         </footer>
     </div>
 
-    <!-- MODAL: Add Paint (залишаємо для можливості додавання через код) -->
-    <div class="modal" id="addPaintModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" data-i18n="add_new_paint">Додати нову фарбу</h3>
-                <button class="modal-close" id="closePaintModal">&times;</button>
-            </div>
-            <div id="addPaintForm">
-                <div class="form-group">
-                    <label class="form-label required" data-i18n="paint_name">Назва фарби</label>
-                    <input type="text" class="form-input" id="paintName" placeholder="" data-i18n-placeholder="paint_name_placeholder" required>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label required" data-i18n="category">Категорія</label>
-                        <select class="form-select" id="paintCategory" required>
-                            <option value="" data-i18n="select_category">Оберіть категорію</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="color_code">Код кольору</label>
-                        <input type="text" class="form-input" id="paintColorCode" placeholder="#000000" data-i18n-placeholder="color_code_placeholder">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-i18n="paint_description">Опис фарби</label>
-                    <textarea class="form-textarea" id="paintDescription" placeholder="" data-i18n-placeholder="paint_description_placeholder"></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="manufacturer">Виробник</label>
-                        <input type="text" class="form-input" id="paintManufacturer" placeholder="SICO" data-i18n-placeholder="manufacturer_placeholder">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="article">Артикул</label>
-                        <input type="text" class="form-input" id="paintArticle" placeholder="" data-i18n-placeholder="article_placeholder">
-                    </div>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-primary" id="savePaintBtn"><span data-i18n="save_paint">Зберегти фарбу</span></button>
-                    <button class="btn btn-warning" id="cancelPaintBtn"><span data-i18n="cancel">Скасувати</span></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: Confirmation -->
-    <div class="modal" id="confirmationModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="confirmationTitle" data-i18n="confirmation">Підтвердження</h3>
-                <button class="modal-close" id="closeConfirmationModal">&times;</button>
-            </div>
-            <div id="confirmationMessage" style="padding: 20px; text-align: center;">
-                <span data-i18n="confirmation_message">Ви впевнені?</span>
-            </div>
-            <div class="action-buttons" style="justify-content: center;">
-                <button class="btn btn-danger" id="confirmActionBtn"><span data-i18n="confirm_action">Так</span></button>
-                <button class="btn btn-secondary" id="cancelActionBtn"><span data-i18n="cancel">Скасувати</span></button>
-            </div>
-        </div>
-    </div>
-
     <!-- MODAL: Paint Selection -->
     <div class="modal" id="paintSelectionModal">
         <div class="modal-content" style="max-width: 600px;">
@@ -699,6 +636,23 @@
                     <button class="btn btn-google" id="authGoogleBtn"><i class="fab fa-google"></i> <span data-i18n="signin_google">Увійти через Google</span></button>
                 </div>
                 <p style="text-align:center; margin-top:15px; color:var(--text-tertiary); font-size:12px;" data-i18n="auth_note">Дані синхронізуються між пристроями</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Confirmation -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="confirmationTitle" data-i18n="confirmation">Підтвердження</h3>
+                <button class="modal-close" id="closeConfirmationModal">&times;</button>
+            </div>
+            <div id="confirmationMessage" style="padding: 20px; text-align: center;">
+                <span data-i18n="confirmation_message">Ви впевнені?</span>
+            </div>
+            <div class="action-buttons" style="justify-content: center;">
+                <button class="btn btn-danger" id="confirmActionBtn"><span data-i18n="confirm_action">Так</span></button>
+                <button class="btn btn-secondary" id="cancelActionBtn"><span data-i18n="cancel">Скасувати</span></button>
             </div>
         </div>
     </div>
