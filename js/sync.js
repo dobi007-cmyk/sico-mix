@@ -1,10 +1,6 @@
 // ========== МОДУЛЬ СИНХРОНІЗАЦІЇ ==========
-const i18n = window.SICOMIX?.i18n || { t: key => key };
-const utils = window.SICOMIX?.utils || {
-    showNotification: (msg, type) => console.log(msg, type),
-    debounce: (fn, delay) => fn,
-    generateId: () => Date.now()
-};
+import * as i18n from './i18n.js';
+import * as utils from './utils.js';
 
 let currentUser = null;
 
@@ -77,5 +73,12 @@ async function saveUserData(userId, data) {
         return false;
     }
 }
+
+// Реакція на зміну мови
+function handleLanguageChange() {
+    updateSyncStatus(i18n.t('sync_complete')); // або інший текст статусу
+}
+
+window.addEventListener('languageChanged', handleLanguageChange);
 
 export { signInAnonymously, signOut, getCurrentUser, loadUserData, saveUserData };
