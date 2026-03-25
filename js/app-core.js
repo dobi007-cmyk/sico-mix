@@ -146,7 +146,6 @@ async function loadData() {
         try {
             const remoteData = await sync.loadUserData(user.uid);
             if (remoteData) {
-                // Злиття рецептів (зберігаємо локальні, якщо немає в remote)
                 if (remoteData.recipes) {
                     const mergedRecipes = [...recipes];
                     remoteData.recipes.forEach(r => {
@@ -156,7 +155,6 @@ async function loadData() {
                     });
                     recipes = mergedRecipes;
                 }
-                // Злиття фарб користувача
                 if (remoteData.userPaints) {
                     const mergedPaints = [...userPaints];
                     remoteData.userPaints.forEach(p => {
@@ -463,14 +461,12 @@ function applyTheme(theme) {
 }
 
 function applyCatalogLayout(layout) {
+    // Тільки змінюємо клас на контейнері каталогу – без виклику renderPaintCatalog
     if (dom.paintCatalogEl) {
         dom.paintCatalogEl.classList.remove('catalog-layout-classic', 'catalog-layout-compact', 'catalog-layout-list');
         dom.paintCatalogEl.classList.add(`catalog-layout-${layout}`);
     }
-    if (window.SICOMIX?.app?.renderPaintCatalog) {
-        window.SICOMIX.app.setCatalogPage(1);
-        window.SICOMIX.app.renderPaintCatalog();
-    }
+    // Не викликаємо renderPaintCatalog – це робить той, хто викликав applyCatalogLayout, якщо потрібно
 }
 
 // ---------- ІМПОРТ/ЕКСПОРТ ----------
@@ -1060,7 +1056,7 @@ async function initApp() {
             utils.showNotification(i18n.t('welcome_title'), 'success', 2000);
         });
     } else {
-        await loadData(); // ← виправлено – додано await
+        await loadData();
         populateSeriesSelect();
         populateCategoryFilters();
         initSettings();
