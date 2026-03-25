@@ -28,21 +28,5 @@
     }
   ],
   "categories": ["productivity", "utilities"],
-  "lang": "uk",
-  "shortcuts": [
-    {
-      "name": "Новий рецепт",
-      "short_name": "Новий",
-      "description": "Створити новий рецепт",
-      "url": "/#new-recipe",
-      "icons": [{ "src": "icons/shortcut-new.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Мої рецепти",
-      "short_name": "Рецепти",
-      "description": "Переглянути рецепти",
-      "url": "/#recipes",
-      "icons": [{ "src": "icons/shortcut-recipes.png", "sizes": "96x96" }]
-    }
-  ]
+  "lang": "uk"
 }
