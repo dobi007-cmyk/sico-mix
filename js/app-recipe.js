@@ -3,6 +3,7 @@ import * as utils from './utils.js';
 import * as i18n from './i18n.js';
 import * as app from './app-core.js';
 import { printLabelWithWeight } from './print-label.js';
+import { updatePaintButton } from './app-catalog.js'; // виправлено – додано імпорт
 
 // ---------- ДОПОМІЖНІ ФУНКЦІЇ ----------
 function renderIngredientsList() {
@@ -678,11 +679,11 @@ function printRecipes() {
             const paint = paintCatalog.find(p => String(p.id) === String(ing.paintId)) || ing;
             const paintName = paint.displayName?.[lang] || paint.name;
             html += `
-                <tr>
-                    <td>${utils.escapeHtml(paintName)}</td>
-                    <td>${ing.amount} ${ing.unit}</td>
-                    <td>${ing.percentage || 0}%</td>
-                </tr>
+                    <tr>
+                        <td>${utils.escapeHtml(paintName)}</td>
+                        <td>${ing.amount} ${ing.unit}</td>
+                        <td>${ing.percentage || 0}%</td>
+                    </tr>
             `;
         });
         html += `
@@ -986,27 +987,6 @@ async function scanRecipeFromPhoto() {
     input.click();
 }
 
-function updatePaintButton(paintId, isInRecipe) {
-    const card = document.querySelector(`.paint-card-glass[data-paint-id="${paintId}"]`);
-    if (!card) return;
-    const btn = card.querySelector('.glass-add-btn, .glass-remove-btn');
-    if (btn) {
-        if (isInRecipe) {
-            btn.classList.remove('glass-add-btn');
-            btn.classList.add('glass-remove-btn');
-            btn.innerHTML = '<i class="fas fa-trash"></i>';
-            btn.title = i18n.t('remove_from_recipe');
-            btn.setAttribute('aria-label', i18n.t('remove_from_recipe'));
-        } else {
-            btn.classList.remove('glass-remove-btn');
-            btn.classList.add('glass-add-btn');
-            btn.innerHTML = '<i class="fas fa-plus"></i>';
-            btn.title = i18n.t('add_ingredient');
-            btn.setAttribute('aria-label', i18n.t('add_ingredient'));
-        }
-    }
-}
-
 function attachRecipeEventListeners() {
     const dom = app.dom;
     if (dom.addIngredientBtn) {
@@ -1070,7 +1050,6 @@ export {
     showWeightInput,
     editRecipe,
     scanRecipeFromPhoto,
-    updatePaintButton,
     attachRecipeEventListeners
 };
 
@@ -1099,6 +1078,5 @@ Object.assign(window.SICOMIX.app, {
     showWeightInput,
     editRecipe,
     scanRecipeFromPhoto,
-    updatePaintButton,
     attachRecipeEventListeners
 });
