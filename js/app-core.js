@@ -61,11 +61,6 @@ function cacheDOMElements() {
     dom.printRecipesBtn = document.getElementById('printRecipesBtn');
     dom.deleteSelectedRecipesBtn = document.getElementById('deleteSelectedRecipesBtn');
     dom.paintCatalogEl = document.getElementById('paintCatalog');
-    dom.addNewPaintBtn = document.getElementById('addNewPaintBtn');
-    dom.addPaintModal = document.getElementById('addPaintModal');
-    dom.closePaintModal = document.getElementById('closePaintModal');
-    dom.savePaintBtn = document.getElementById('savePaintBtn');
-    dom.cancelPaintBtn = document.getElementById('cancelPaintBtn');
     dom.languageSelect = document.getElementById('languageSelect');
     dom.unitsSelect = document.getElementById('unitsSelect');
     dom.themeSelect = document.getElementById('themeSelect');
@@ -108,7 +103,6 @@ function cacheDOMElements() {
     dom.weightInput = document.getElementById('weightInput');
     dom.weightConfirmBtn = document.getElementById('weightConfirmBtn');
     dom.weightCancelBtn = document.getElementById('weightCancelBtn');
-
     dom.authButton = document.getElementById('authButton');
     dom.authModal = document.getElementById('authModal');
     dom.closeAuthModal = document.getElementById('closeAuthModal');
@@ -152,14 +146,28 @@ async function loadData() {
         try {
             const remoteData = await sync.loadUserData(user.uid);
             if (remoteData) {
+                // Злиття рецептів (зберігаємо локальні, якщо немає в remote)
                 if (remoteData.recipes) {
-                    recipes = remoteData.recipes.map(r => ({ ...r, id: String(r.id) }));
+                    const mergedRecipes = [...recipes];
+                    remoteData.recipes.forEach(r => {
+                        const idx = mergedRecipes.findIndex(local => local.id === r.id);
+                        if (idx !== -1) mergedRecipes[idx] = r;
+                        else mergedRecipes.push(r);
+                    });
+                    recipes = mergedRecipes;
                 }
+                // Злиття фарб користувача
                 if (remoteData.userPaints) {
-                    userPaints = remoteData.userPaints.map(p => ({ ...p, id: String(p.id), isDefault: false }));
+                    const mergedPaints = [...userPaints];
+                    remoteData.userPaints.forEach(p => {
+                        const idx = mergedPaints.findIndex(local => local.id === p.id);
+                        if (idx !== -1) mergedPaints[idx] = p;
+                        else mergedPaints.push(p);
+                    });
+                    userPaints = mergedPaints;
                 }
                 if (remoteData.settings) {
-                    currentSettings = remoteData.settings;
+                    currentSettings = { ...currentSettings, ...remoteData.settings };
                 }
             }
         } catch (error) {
@@ -206,6 +214,7 @@ function saveData() {
         };
         sync.saveUserData(user.uid, dataToSync).catch(error => {
             console.error('Помилка збереження в Firestore:', error);
+            utils.showNotification(i18n.t('sync_error'), 'error');
         });
     }
 }
@@ -375,23 +384,6 @@ function populateCategoryFilters() {
         }
     });
     
-    i18n.applyTranslations();
-}
-
-function populateStandardCategorySelect(selectElement) {
-    if (!selectElement) return;
-    const standardCategories = data.categories || [];
-    const current = selectElement.value;
-    selectElement.innerHTML = `<option value="" data-i18n="select_category">${i18n.t('select_category')}</option>`;
-    standardCategories.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = i18n.translateCategoryName(c);
-        selectElement.appendChild(opt);
-    });
-    if (current && standardCategories.includes(current)) {
-        selectElement.value = current;
-    }
     i18n.applyTranslations();
 }
 
@@ -687,35 +679,25 @@ async function handleGoogleSignIn() {
 function updateAuthUI(user) {
     if (!dom.authButton) return;
     
-    // Повністю видаляємо стару кнопку та створюємо нову, щоб позбутися старих обробників
     const newButton = dom.authButton.cloneNode(true);
     dom.authButton.parentNode.replaceChild(newButton, dom.authButton);
     dom.authButton = newButton;
     
     if (user) {
-        // Користувач увійшов – показуємо його email та кнопку виходу
         const displayName = user.email || user.displayName || 'Користувач';
         dom.authButton.innerHTML = `<i class="fas fa-user-circle"></i> <span>${displayName}</span>`;
         dom.authButton.addEventListener('click', confirmLogout);
-        console.log('🔐 UI оновлено: користувач увійшов');
     } else {
-        // Користувач вийшов – показуємо кнопку "Увійти", яка відкриває модальне вікно
         dom.authButton.innerHTML = `<i class="fas fa-sign-in-alt"></i> <span data-i18n="login">Увійти</span>`;
-        i18n.applyTranslations(); // оновлюємо текст на поточній мові
+        i18n.applyTranslations();
         dom.authButton.addEventListener('click', openAuthModal);
-        console.log('🔓 UI оновлено: користувач вийшов, кнопка "Увійти" готова');
     }
 }
 
 function openAuthModal() {
-    if (!dom.authModal) {
-        console.error('❌ authModal не знайдено в DOM');
-        return;
-    }
-    console.log('🔄 Відкриваємо модальне вікно авторизації');
+    if (!dom.authModal) return;
     dom.authModal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    // Очищаємо поля для нового входу
     if (dom.authEmail) dom.authEmail.value = '';
     if (dom.authPassword) dom.authPassword.value = '';
 }
@@ -730,8 +712,6 @@ function confirmLogout() {
                 if (!auth) throw new Error('Firebase auth not initialized');
                 await auth.signOut();
                 utils.showNotification(i18n.t('logged_out'), 'success');
-                console.log('✅ Користувач вийшов');
-                // Після виходу не виконуємо перезавантаження, просто оновлюємо UI через onAuthStateChanged
             } catch (error) {
                 console.error('Помилка виходу:', error);
                 utils.showNotification(error.message || i18n.t('logout_error'), 'error');
@@ -799,10 +779,7 @@ function hasUnsavedChanges() {
 
 function performSwitch(pageId) {
     const targetPage = document.getElementById(`${pageId}-page`);
-    if (!targetPage) {
-        console.error('❌ Сторінка не знайдена:', pageId);
-        return;
-    }
+    if (!targetPage) return;
     if (targetPage.classList.contains('active')) return;
 
     if (isEditingRecipe && pageId !== 'new-recipe') {
@@ -950,10 +927,6 @@ function setupCoreEventListeners() {
                 dom.sidebar.classList.remove('active');
                 document.body.style.overflow = 'auto';
             }
-            if (dom.addPaintModal?.classList.contains('active')) {
-                dom.addPaintModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            }
             if (dom.seriesDetailsModal?.classList.contains('active')) {
                 dom.seriesDetailsModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
@@ -1087,7 +1060,7 @@ async function initApp() {
             utils.showNotification(i18n.t('welcome_title'), 'success', 2000);
         });
     } else {
-        await loadData();
+        await loadData(); // ← виправлено – додано await
         populateSeriesSelect();
         populateCategoryFilters();
         initSettings();
@@ -1168,7 +1141,6 @@ export {
     createLocalBackup,
     exportBackup,
     populateCategoryFilters,
-    populateStandardCategorySelect,
     populateSeriesSelect,
     showPhotoPreview,
     resetPhotoPreview,
@@ -1241,7 +1213,6 @@ window.SICOMIX.app = {
     createLocalBackup,
     exportBackup,
     populateCategoryFilters,
-    populateStandardCategorySelect,
     populateSeriesSelect,
     showPhotoPreview,
     resetPhotoPreview,
