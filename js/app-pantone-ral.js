@@ -366,6 +366,20 @@ function openPantonePdfHandler(e) {
         });
 }
 
+// Закриття модального вікна Pantone по хрестику
+function initModalClose() {
+    const closeBtn = document.querySelector('.close-pantone-recipe');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            const modal = document.getElementById('pantoneRecipeModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
+}
+
 // Експорт
 export {
     renderPantoneCatalog,
@@ -375,7 +389,8 @@ export {
     addRalToRecipe,
     attachPantoneEventListeners,
     attachRalEventListeners,
-    setupPdfButtons
+    setupPdfButtons,
+    initModalClose
 };
 
 window.SICOMIX = window.SICOMIX || {};
@@ -388,5 +403,13 @@ Object.assign(window.SICOMIX.app, {
     addRalToRecipe,
     attachPantoneEventListeners,
     attachRalEventListeners,
-    setupPdfButtons
+    setupPdfButtons,
+    initModalClose
 });
+
+// Викликаємо ініціалізацію закриття після завантаження DOM
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initModalClose);
+} else {
+    initModalClose();
+}
