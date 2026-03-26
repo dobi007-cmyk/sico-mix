@@ -48,6 +48,7 @@ function cacheDOMElements() {
     dom.pageContents = document.querySelectorAll('.page-content');
     dom.totalPaintsEl = document.getElementById('totalPaints');
     dom.headerPaintCount = document.getElementById('headerPaintCount');
+    dom.mobileHeaderPaintCount = document.getElementById('mobileHeaderPaintCount');
     dom.ingredientsList = document.getElementById('ingredientsList');
     dom.paintSearch = document.getElementById('paintSearch');
     dom.categoryFilter = document.getElementById('categoryFilter');
@@ -104,6 +105,7 @@ function cacheDOMElements() {
     dom.weightConfirmBtn = document.getElementById('weightConfirmBtn');
     dom.weightCancelBtn = document.getElementById('weightCancelBtn');
     dom.authButton = document.getElementById('authButton');
+    dom.mobileAuthButton = document.getElementById('mobileAuthButton');
     dom.authModal = document.getElementById('authModal');
     dom.closeAuthModal = document.getElementById('closeAuthModal');
     dom.authEmail = document.getElementById('authEmail');
@@ -347,6 +349,7 @@ function updatePaintCount() {
     const count = paintCatalog.length;
     if (dom.totalPaintsEl) dom.totalPaintsEl.textContent = count;
     if (dom.headerPaintCount) dom.headerPaintCount.textContent = count;
+    if (dom.mobileHeaderPaintCount) dom.mobileHeaderPaintCount.textContent = count;
 }
 
 function createLocalBackup() {
@@ -686,18 +689,37 @@ async function handleGoogleSignIn() {
 function updateAuthUI(user) {
     if (!dom.authButton) return;
     
+    // Оновлюємо основну кнопку
     const newButton = dom.authButton.cloneNode(true);
     dom.authButton.parentNode.replaceChild(newButton, dom.authButton);
     dom.authButton = newButton;
+    
+    // Оновлюємо мобільну кнопку
+    if (dom.mobileAuthButton) {
+        const newMobileButton = dom.mobileAuthButton.cloneNode(true);
+        dom.mobileAuthButton.parentNode.replaceChild(newMobileButton, dom.mobileAuthButton);
+        dom.mobileAuthButton = newMobileButton;
+    }
     
     if (user) {
         const displayName = user.email || user.displayName || 'Користувач';
         dom.authButton.innerHTML = `<i class="fas fa-user-circle"></i> <span>${displayName}</span>`;
         dom.authButton.addEventListener('click', confirmLogout);
+        
+        if (dom.mobileAuthButton) {
+            dom.mobileAuthButton.innerHTML = `<i class="fas fa-user-circle"></i> <span>${displayName}</span>`;
+            dom.mobileAuthButton.addEventListener('click', confirmLogout);
+        }
     } else {
         dom.authButton.innerHTML = `<i class="fas fa-sign-in-alt"></i> <span data-i18n="login">Увійти</span>`;
         i18n.applyTranslations();
         dom.authButton.addEventListener('click', openAuthModal);
+        
+        if (dom.mobileAuthButton) {
+            dom.mobileAuthButton.innerHTML = `<i class="fas fa-sign-in-alt"></i> <span data-i18n="login">Увійти</span>`;
+            i18n.applyTranslations();
+            dom.mobileAuthButton.addEventListener('click', openAuthModal);
+        }
     }
 }
 
