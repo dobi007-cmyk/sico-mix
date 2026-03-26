@@ -204,7 +204,6 @@ async function loadData() {
         lockedCategory = null;
     }
 
-    // Оновлюємо UI після зміни даних
     refreshUIAfterDataChange();
 }
 
@@ -232,7 +231,6 @@ function saveData() {
         });
     }
 
-    // Оновлюємо UI після збереження
     refreshUIAfterDataChange();
 }
 
@@ -480,7 +478,6 @@ function applyTheme(theme) {
 }
 
 function applyCatalogLayout(layout) {
-    // Тільки змінюємо клас на контейнері каталогу – без виклику renderPaintCatalog
     if (dom.paintCatalogEl) {
         dom.paintCatalogEl.classList.remove('catalog-layout-classic', 'catalog-layout-compact', 'catalog-layout-list');
         dom.paintCatalogEl.classList.add(`catalog-layout-${layout}`);
@@ -954,6 +951,16 @@ function setupCoreEventListeners() {
             }
         }
     });
+
+    // Закриття модального вікна деталей серії по хрестику
+    if (dom.closeSeriesModal) {
+        dom.closeSeriesModal.addEventListener('click', () => {
+            if (dom.seriesDetailsModal) {
+                dom.seriesDetailsModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
 
     document.addEventListener('click', function(e) {
         if (!dom.sidebar || window.innerWidth > 992) return;
