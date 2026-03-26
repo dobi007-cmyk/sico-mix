@@ -689,12 +689,10 @@ async function handleGoogleSignIn() {
 function updateAuthUI(user) {
     if (!dom.authButton) return;
     
-    // Оновлюємо основну кнопку
     const newButton = dom.authButton.cloneNode(true);
     dom.authButton.parentNode.replaceChild(newButton, dom.authButton);
     dom.authButton = newButton;
     
-    // Оновлюємо мобільну кнопку
     if (dom.mobileAuthButton) {
         const newMobileButton = dom.mobileAuthButton.cloneNode(true);
         dom.mobileAuthButton.parentNode.replaceChild(newMobileButton, dom.mobileAuthButton);
@@ -996,6 +994,33 @@ function setupCoreEventListeners() {
     });
 
     attachAutoSaveListeners();
+
+    // ===== ОБРОБНИК ЗАВАНТАЖЕННЯ ФОТО =====
+    if (dom.recipePhotoInput) {
+        dom.recipePhotoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        recipePhotoDataUrl = ev.target.result;
+                        showPhotoPreview(recipePhotoDataUrl);
+                        // Автоматичне збереження чернетки
+                        debouncedAutoSave();
+                    };
+                    reader.readAsDataURL(file);
+                    if (dom.fileNameSpan) {
+                        dom.fileNameSpan.textContent = file.name;
+                    }
+                } else {
+                    utils.showNotification(i18n.t('invalid_file_format'), 'error');
+                    dom.recipePhotoInput.value = '';
+                }
+            } else {
+                // Якщо файл не вибрано (скасування) – нічого не робимо
+            }
+        });
+    }
 
     if (dom.startImportBtn) {
         dom.startImportBtn.addEventListener('click', (e) => {
