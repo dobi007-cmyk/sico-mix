@@ -952,16 +952,6 @@ function setupCoreEventListeners() {
         }
     });
 
-    // Закриття модального вікна деталей серії по хрестику (специфічний обробник)
-    if (dom.closeSeriesModal) {
-        dom.closeSeriesModal.addEventListener('click', () => {
-            if (dom.seriesDetailsModal) {
-                dom.seriesDetailsModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            }
-        });
-    }
-
     // ДЕЛЕГОВАНИЙ ОБРОБНИК ДЛЯ ВСІХ КНОПОК ЗАКРИТТЯ МОДАЛЬНИХ ВІКОН
     document.addEventListener('click', function(e) {
         const closeBtn = e.target.closest('.modal-close');
