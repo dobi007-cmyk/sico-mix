@@ -3,7 +3,7 @@ import * as utils from './utils.js';
 import * as i18n from './i18n.js';
 import * as app from './app-core.js';
 import { printLabelWithWeight } from './print-label.js';
-import { updatePaintButton } from './app-catalog.js'; // імпорт з app-catalog
+import { updatePaintButton } from './app-catalog.js';
 
 // ---------- ДОПОМІЖНІ ФУНКЦІЇ ----------
 function renderIngredientsList() {
