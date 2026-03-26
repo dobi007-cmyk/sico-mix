@@ -1,13 +1,11 @@
 /* ===== SICO Spectrum 2026 – Сучасний гармонійний дизайн ===== */
 :root {
-    /* Основні кольори */
     --bg-primary: #0a0c0f;
     --bg-secondary: #14181c;
     --bg-card: rgba(20, 24, 28, 0.7);
     --bg-glass: rgba(10, 12, 15, 0.6);
     --bg-elevated: rgba(30, 35, 40, 0.85);
     
-    /* Акцентні кольори – спектр */
     --spectrum-violet: #7b2cbf;
     --spectrum-violet-light: #9d4edd;
     --spectrum-blue: #3a86ff;
@@ -18,24 +16,20 @@
     --spectrum-orange: #fb8500;
     --spectrum-red: #e63946;
     
-    /* Текст */
     --text-primary: #f0f4f8;
     --text-secondary: #b0c0ce;
     --text-tertiary: #7f8c9a;
     
-    /* Межі */
     --border-light: rgba(255, 255, 255, 0.08);
     --border-medium: rgba(255, 255, 255, 0.12);
     --border-accent: rgba(58, 134, 255, 0.4);
     
-    /* Тіні */
     --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
     --shadow-glow: 0 8px 32px rgba(58, 134, 255, 0.3);
     --shadow-glow-hover: 0 12px 48px rgba(123, 44, 191, 0.4);
     
-    /* Радіуси */
     --radius-xs: 8px;
     --radius-sm: 12px;
     --radius-md: 20px;
@@ -43,12 +37,10 @@
     --radius-xl: 40px;
     --radius-full: 999px;
     
-    /* Анімація */
     --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     
-    /* Шрифти */
     --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -75,7 +67,7 @@ body {
     overflow-x: hidden;
 }
 
-/* ===== АБСТРАКТНА ПЛЯМА ФАРБИ (декоративний елемент) ===== */
+/* ===== АБСТРАКТНА ПЛЯМА ФАРБИ ===== */
 .paint-blob {
     position: fixed;
     top: -20vh;
@@ -743,6 +735,8 @@ body.theme-organic .search-stats {
     margin-bottom: 28px;
     border: 1px solid var(--border-light);
     backdrop-filter: blur(8px);
+    width: 100%;
+    box-sizing: border-box;
 }
 .form-group {
     margin-bottom: 20px;
@@ -851,6 +845,7 @@ body.theme-organic .search-stats {
     border-radius: var(--radius-sm);
     overflow-x: auto;
     display: block;
+    table-layout: fixed;
 }
 .ingredients-table th {
     background: rgba(58,134,255,0.15);
@@ -864,6 +859,7 @@ body.theme-organic .search-stats {
 .ingredients-table td {
     padding: 14px 16px;
     border-bottom: 1px solid var(--border-light);
+    word-break: break-word;
 }
 .ingredients-table tr:hover {
     background: rgba(255,255,255,0.02);
@@ -931,6 +927,7 @@ body.theme-organic .search-stats {
     gap: 16px;
     margin-bottom: 24px;
     flex-wrap: wrap;
+    width: 100%;
 }
 .search-box {
     flex: 1;
@@ -1749,7 +1746,6 @@ body.theme-organic .search-stats {
     .container.sidebar-open {
         margin-left: 0;
     }
-    /* Сховуємо основний хедер на мобільних пристроях */
     .header {
         display: none;
     }
@@ -1848,6 +1844,30 @@ body.theme-organic .search-stats {
         max-width: none;
         width: 100%;
     }
+}
+
+/* ===== ДОДАТКОВІ ПРАВИЛА ДЛЯ ВИРІВНЮВАННЯ ТА РОЗТЯГУВАННЯ НА ДЕСКТОПІ ===== */
+/* Контейнер, що містить кнопки "Додати інгредієнт" та "Сканувати", розташований під таблицею */
+.form-section > div:last-child {
+    display: flex;
+    justify-content: center;   /* центрує кнопки по горизонталі */
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    width: 100%;
+}
+
+/* Якщо потрібно, щоб кнопки займали однакову ширину, розкоментуйте наступне: */
+/*
+.form-section > div:last-child button {
+    flex: 1;
+}
+*/
+
+/* Забезпечуємо повну ширину для таблиці інгредієнтів та фільтрів */
+.ingredients-table {
+    width: 100%;
+    table-layout: fixed; /* допомагає рівномірно розподілити колонки */
 }
 
 /* Анімація для спливаючого вікна */
