@@ -952,7 +952,7 @@ function setupCoreEventListeners() {
         }
     });
 
-    // Закриття модального вікна деталей серії по хрестику
+    // Закриття модального вікна деталей серії по хрестику (специфічний обробник)
     if (dom.closeSeriesModal) {
         dom.closeSeriesModal.addEventListener('click', () => {
             if (dom.seriesDetailsModal) {
@@ -961,6 +961,18 @@ function setupCoreEventListeners() {
             }
         });
     }
+
+    // ДЕЛЕГОВАНИЙ ОБРОБНИК ДЛЯ ВСІХ КНОПОК ЗАКРИТТЯ МОДАЛЬНИХ ВІКОН
+    document.addEventListener('click', function(e) {
+        const closeBtn = e.target.closest('.modal-close');
+        if (!closeBtn) return;
+        const modal = closeBtn.closest('.modal');
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            e.preventDefault();
+        }
+    });
 
     document.addEventListener('click', function(e) {
         if (!dom.sidebar || window.innerWidth > 992) return;
